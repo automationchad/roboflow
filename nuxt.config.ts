@@ -14,7 +14,9 @@ export default defineNuxtConfig({
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
 		},
 	},
-
+	publicRuntimeConfig: {
+		SUPABASE_URL: process.env.SUPABASE_URL,
+	},
 	css: ['~/assets/css/main.css'],
 	modules: ['@nuxtjs/supabase'],
 	vite: {

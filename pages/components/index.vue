@@ -1,3 +1,88 @@
+<script setup>
+	import { useAttrs } from 'vue';
+	const attrs = useAttrs();
+	const user = attrs.user;
+	const profile = attrs.profile;
+	const loading = ref(true);
+	const username = ref('');
+	const allAccess = ref(false);
+	const templates = ref([]);
+
+	if (user) {
+		if (profile) {
+			username.value = profile.username;
+			allAccess.value = profile.workspaces.all_access;
+			templates.value = profile.workspaces.templates;
+		}
+		loading.value = false;
+	}
+
+	let { data: components } = await useFetch(`/api/components`);
+	components = components.value.data;
+
+	const softwares = [
+		...new Set(
+			components
+				.filter((o) => o.categories.includes('sales'))
+				.map((o) => o.connectors)
+				.flat(1)
+		),
+	].map((o) => {
+		return { name: o, id: o };
+	});
+
+	const tabs = [
+		{
+			name: 'Finance',
+			url: 'finance',
+			description:
+				'Heroes, feature sections, newsletter sign up forms — everything you need to build beautiful marketing websites.',
+			children: [
+				...new Set(
+					components
+						.filter((o) => o.categories.includes('finance'))
+						.map((o) => o.connectors)
+						.flat(1)
+				),
+			].map((o) => {
+				return { name: o, id: o };
+			}),
+		},
+		{
+			name: 'Sales',
+			url: 'sales',
+			description:
+				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
+			children: [
+				...new Set(
+					components
+						.filter((o) => o.categories.includes('sales'))
+						.map((o) => o.connectors)
+						.flat(1)
+				),
+			].map((o) => {
+				return { name: o, id: o };
+			}),
+		},
+		{
+			name: 'Marketing',
+			url: 'marketing',
+			description:
+				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
+			children: [
+				...new Set(
+					components
+						.filter((o) => o.categories.includes('marketing'))
+						.map((o) => o.connectors)
+						.flat(1)
+				),
+			].map((o) => {
+				return { name: o, id: o };
+			}),
+		},
+	];
+</script>
+
 <template>
 	<div class="">
 		<div
@@ -620,91 +705,6 @@
 	</div>
 </template>
 
-<script setup>
-	import { useAttrs } from 'vue';
-	const attrs = useAttrs();
-	const user = attrs.user;
-	const profile = attrs.profile;
-	const loading = ref(true);
-	const username = ref('');
-	const allAccess = ref(false);
-	const templates = ref([]);
-
-	if (user) {
-		if (profile) {
-			username.value = profile.username;
-			allAccess.value = profile.workspaces.all_access;
-			templates.value = profile.workspaces.templates;
-		}
-		loading.value = false;
-	}
-
-	let { data: components } = await useFetch(`/api/components`);
-	components = components.value.data;
-
-	const softwares = [
-		...new Set(
-			components
-				.filter((o) => o.categories.includes('sales'))
-				.map((o) => o.connectors)
-				.flat(1)
-		),
-	].map((o) => {
-		return { name: o, id: o };
-	});
-	console.log(softwares);
-
-	const tabs = [
-		{
-			name: 'Finance',
-			url: 'finance',
-			description:
-				'Heroes, feature sections, newsletter sign up forms — everything you need to build beautiful marketing websites.',
-			children: [
-				...new Set(
-					components
-						.filter((o) => o.categories.includes('finance'))
-						.map((o) => o.connectors)
-						.flat(1)
-				),
-			].map((o) => {
-				return { name: o, id: o };
-			}),
-		},
-		{
-			name: 'Sales',
-			url: 'sales',
-			description:
-				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
-			children: [
-				...new Set(
-					components
-						.filter((o) => o.categories.includes('sales'))
-						.map((o) => o.connectors)
-						.flat(1)
-				),
-			].map((o) => {
-				return { name: o, id: o };
-			}),
-		},
-		{
-			name: 'Marketing',
-			url: 'marketing',
-			description:
-				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
-			children: [
-				...new Set(
-					components
-						.filter((o) => o.categories.includes('marketing'))
-						.map((o) => o.connectors)
-						.flat(1)
-				),
-			].map((o) => {
-				return { name: o, id: o };
-			}),
-		},
-	];
-</script>
 <script>
 	export default {
 		methods: {
