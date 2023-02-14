@@ -308,7 +308,7 @@
 							>
 								<div class="flex items-center p-4 pb-0">
 									<img
-										src="/img/avatar-3.jpg"
+										src="https://images.unsplash.com/photo-1676310483825-daa08914445e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1420&q=80"
 										alt=""
 										class="h-10 w-10 flex-none rounded-full"
 									/>
@@ -347,7 +347,7 @@
 							>
 								<div class="flex items-center p-4">
 									<img
-										src="/img/avatar-1.jpg"
+										src="https://images.unsplash.com/photo-1676310483825-daa08914445e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1420&q=80"
 										alt=""
 										class="h-10 w-10 flex-none rounded-full"
 									/>
@@ -363,7 +363,7 @@
 								</div>
 								<div class="flex items-center p-4">
 									<img
-										src="/img/avatar-2.jpg"
+										src="https://images.unsplash.com/photo-1676310483825-daa08914445e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1420&q=80"
 										alt=""
 										class="h-10 w-10 flex-none rounded-full"
 									/>
