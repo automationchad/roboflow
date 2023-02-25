@@ -1,5 +1,26 @@
 <script setup>
-	
+	import Airtable from 'airtable';
+
+	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
+		'appkU7PnQUq7lePwf'
+	);
+	let requests = [];
+
+	const table = base('sprints');
+
+	const getSprints = async () => {
+		const records = await table
+			.select({
+				view: 'viwjRdvlzpCwm0OuK',
+				sort: [{ field: 'est_finish_date', direction: 'asc' }],
+			})
+			.firstPage();
+		requests = records.map((o) => {
+			return { uuid: o.id, fields: o.fields };
+		});
+	};
+
+	await getSprints();
 </script>
 
 <template>
@@ -20,7 +41,7 @@
 						</div> -->
 						<div class="relative space-y-2">
 							<p class="text-7xl font-bold dark:text-white">
-								Integration libraries,
+								Data integrations,
 							</p>
 							<p class="text-7xl font-bold dark:text-white">as-a-service.</p>
 						</div>
@@ -35,39 +56,28 @@
 								custom software development team.
 							</p>
 						</div>
+
 						<div
 							class="relative col-start-1 row-start-4 mt-10 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
 						>
 							<a
 								class="inline-flex justify-center rounded-lg bg-slate-900 py-3 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-								href="/components"
-								><span
-									>Browse components
-									<span
-										aria-hidden="true"
-										class="hidden text-slate-400 sm:inline"
-										>→</span
-									></span
-								></a
-							><a
-								class="hover:ring-slate-900/15 inline-flex justify-center rounded-lg bg-white/0 py-3 px-4 text-sm font-semibold text-slate-900 ring-1 ring-slate-900/10 hover:bg-white/25"
 								href="/blueprints"
 								><span
 									>Explore blueprints
 									<span
 										aria-hidden="true"
-										class="hidden text-black/25 sm:inline"
+										class="hidden sm:inline"
 										>→</span
 									></span
 								></a
-							>
+							><ButtonGroup :requests="requests" />
 						</div>
 					</div>
-
-					<Hero class="mt-4 space-y-6" />
 				</div>
 			</div>
 		</div>
+		<Logos/>
 		<TemplatesMain />
 		<BlueprintsMain />
 		<FooterContent />

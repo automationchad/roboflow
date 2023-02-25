@@ -41,7 +41,7 @@
 	const route = useRoute();
 	console.log(route.query);
 
-	const maxSpots = 10;
+	const maxSpots = 6;
 
 	const spotsLeft = computed(() => {
 		var arrNum = Math.abs(maxSpots - requests.length);

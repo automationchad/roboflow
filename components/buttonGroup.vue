@@ -13,21 +13,20 @@ import { differenceInDays } from "date-fns";
     <div class="flex items-center space-x-4">
       <a
         href="/contact"
-        class="hover:ring-slate-900/15 inline-flex items-center justify-center rounded-lg bg-white py-3 px-4 text-sm font-semibold text-slate-900 ring-1 ring-slate-900/10 hover:bg-white/90"
-        style=""
+        class="hover:ring-slate-900/15 inline-flex justify-center rounded-lg bg-white/0 py-3 px-4 text-sm font-semibold text-slate-900 ring-1 ring-slate-900/10 hover:bg-white/25"
       >
         <SparklesIcon v-if="spotsLeft.spots > 0" class="h-4 w-4 mr-1" />
         <QueueListIcon v-else class="h-4 w-4" />
         <div>
-          {{ spotsLeft.spots > 0 ? "Get started →" : "Join waitlist" }}
+          {{ spotsLeft.spots > 0 ? "Work with us →" : "Join waitlist" }}
         </div>
       </a>
       <div>
         <p
-          class="text-xs text-rose-400 dark:text-rose-600"
+          class="text-xs text-rose-600 dark:text-rose-800 bg-red-100 border-rose-600 border rounded-lg px-2 shadow-sm"
           v-if="spotsLeft.spots > 0"
         >
-          Only {{ spotsLeft.spots }} spot{{ spotsLeft.spots > 1 ? "s" : "" }}
+          {{ spotsLeft.spots }} spot{{ spotsLeft.spots > 1 ? "s" : "" }}
           left for
           {{ moment(new Date()).format("MMM") }}
         </p>

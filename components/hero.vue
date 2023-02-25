@@ -25,8 +25,8 @@ await getSprints();
 
 <template>
   <div>
-    <div class="mt-24">
-      <h2 class="mb-2 text-white">How we can help</h2>
+    <div class="mt-24 relative">
+    
       <div class="grid grid-cols-3 gap-16">
         <div class="col-span-1 rounded-lg bg-black/70 p-6 backdrop-blur">
           <TemplateIcon class="mb-2" />

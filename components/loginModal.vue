@@ -1,5 +1,5 @@
 <template>
-	<div class="relative z-10">
+	<div class="relative z-50">
 		<transition
 			enter="ease-out duration-300"
 			enter-from="opacity-0"

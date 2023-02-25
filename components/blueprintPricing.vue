@@ -9,7 +9,7 @@
 				customer: workspace.stripe_customer_id,
 			},
 		});
-		// console.log(url);
+
 		location.href = url;
 	};
 </script>
@@ -264,10 +264,22 @@
 									<h3 class="text-base font-semibold text-sky-500">
 										Get with all-access
 									</h3>
-									<a
+									<button
+										v-if="!authed"
+										@click="$emit('open-modal')"
 										class="inline-flex justify-center rounded-lg bg-slate-900 py-2 px-3 text-sm font-semibold text-white hover:bg-slate-700"
-										href="https://calendly.com/willmarzella/session"
-										><span>Book call <span aria-hidden="true">→</span></span></a
+									>
+										<span
+											>Get all-access <span aria-hidden="true">→</span></span
+										>
+									</button>
+									<a
+										v-else
+										class="inline-flex justify-center rounded-lg bg-slate-900 py-2 px-3 text-sm font-semibold text-white hover:bg-slate-700"
+										href="https://calendly.com/motis-group/all-access"
+										><span
+											>Get all-access <span aria-hidden="true">→</span></span
+										></a
 									>
 								</div>
 								<div class="mt-3 flex items-center">
@@ -485,7 +497,6 @@
 										<button
 											@click="$emit('open-modal')"
 											v-if="!authed"
-											href="/login"
 											class="inline-flex justify-center rounded-lg py-2 px-3 text-sm font-semibold text-slate-900 ring-1 ring-slate-900/10 hover:ring-slate-900/20"
 										>
 											<span
@@ -514,7 +525,7 @@
 										<div class="col-span-2">
 											<span class="text-2xl text-slate-900"
 												>$<span class="font-bold">{{
-													(product.setup_fee/100).toLocaleString()
+													(product.setup_fee / 100).toLocaleString()
 												}}</span></span
 											><span class="ml-2 text-sm text-slate-500"
 												>setup fee</span

@@ -22,6 +22,20 @@
 	const templates = ref([]);
 	const workspace = ref({});
 
+	if (user) {
+		if (profile) {
+			allAccess.value = profile.workspaces.all_access;
+			templates.value = profile.workspaces.templates;
+			workspace.value = profile.workspaces;
+		}
+		loading.value = false;
+	}
+
+	let { data: product } = await $fetch(`/api/components/${route.params.id}`);
+
+	exists.value =
+		templates.value.filter((o) => o === product.tray_project_id).length > 0;
+
 	const handleCheckout = async (product, workspace) => {
 		const { url } = await $fetch('/api/checkout', {
 			method: 'post',
@@ -32,7 +46,6 @@
 				customer: workspace.stripe_customer_id,
 			},
 		});
-		// console.log(url);
 		location.href = url;
 	};
 
@@ -51,26 +64,6 @@
 			location.reload();
 		}
 	};
-
-	if (user) {
-		if (profile) {
-			allAccess.value = profile.workspaces.all_access;
-			templates.value = profile.workspaces.templates;
-			workspace.value = profile.workspaces;
-		}
-		loading.value = false;
-	}
-
-	let {
-		pending,
-		data: product,
-		refresh,
-	} = await useFetch(`/api/components/${route.params.id}`);
-
-	product = product.value.data;
-	exists.value =
-		templates.value.filter((o) => o === product.tray_project_id).length > 0;
-	console.log(exists);
 </script>
 
 <template>
@@ -78,7 +71,7 @@
 		<div class="mx-auto px-4 pb-16 pt-10 sm:px-6 lg:px-8">
 			<!-- <Breadcrumbs :product="product" /> -->
 		</div>
-		<div class="mx-auto mb-16 h-full px-48 sm:px-46 lg:px-48">
+		<div class="sm:px-46 mx-auto mb-16 h-full px-48 lg:px-48">
 			<!-- Product -->
 			<div
 				class="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-6 xl:gap-x-16"
@@ -279,7 +272,7 @@
 							v-if="!allAccess"
 							:disabled="exists"
 							@click="
-								workspace
+								user
 									? handleCheckout(product, workspace)
 									: (showLoginModal = true)
 							"
@@ -309,11 +302,7 @@
 								'flex w-full items-center justify-center rounded-md border border-transparent  py-3 px-8 text-base font-medium text-white  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50',
 							]"
 						>
-							{{
-								exists && workspace
-									? 'Downloaded'
-									: `Download`
-							}}
+							{{ exists && workspace ? 'Downloaded' : `Download` }}
 						</button>
 						<!-- <div class="flex justify-center">
 						<a

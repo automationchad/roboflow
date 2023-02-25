@@ -5,9 +5,9 @@
 		? await supabase
 				.from('profiles')
 				.select(
-					`username,
+					`username,first_name,last_name,phone_num,country_code,
     			workspaces (
-      					id, tray_workspace_id, stripe_customer_id, all_access, templates)`
+      					id, tray_workspace_id, stripe_customer_id, type, all_access, templates)`
 				)
 				.eq('id', user.value.id)
 				.single()
@@ -17,8 +17,8 @@
 <template>
 	<div class="">
 		<div class="h-screen bg-white dark:bg-[#0A101E]">
-			<Navbar class="" @open-modal="showLoginModal = true" />
-			<NuxtPage class="" :user="user" :profile="profile ?? {}" />
+			<Navbar class="" @open-modal="showLoginModal = true" :user="user" :profile="profile ?? {}"/>
+			<NuxtPage :user="user" :profile="profile ?? {}" />
 			<LoginModal
 				v-show="showLoginModal"
 				@close-modal="showLoginModal = false"

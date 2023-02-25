@@ -7,8 +7,7 @@
 			name: 'Finance',
 			id: 'finance',
 			url: 'finance',
-			description:
-				'Heroes, feature sections, newsletter sign up forms — everything you need to build beautiful marketing websites.',
+			description: 'Meet deadlines set by regulators.',
 			children: [{ name: 'Intercom', id: 'intercom' }],
 		},
 		{
@@ -16,18 +15,17 @@
 			id: 'sales',
 			url: 'finance',
 			description:
-				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
+				'Sales teams need to hit quotas, not waste time on paperwork.',
 			children: [
 				{ name: 'Salesforce', id: 'salesforce' },
 				{ name: 'Outreach.io', id: 'outreach' },
 			],
 		},
 		{
-			name: 'Marketing',
-			id: 'marketing',
+			name: 'IT',
+			id: 'it',
 			url: 'marketing',
-			description:
-				'Form layouts, tables, modal dialogs — everything you need to build beautiful responsive web applications.',
+			description: 'Manage massive amounts of data.',
 			children: [
 				{ name: 'Application Shells', id: 'page_sections' },
 				{ name: 'Headings', id: 'page_sections' },
@@ -43,14 +41,13 @@
 				Components
 			</h2>
 			<p class="mt-4 text-4xl font-extrabold tracking-tight text-slate-900">
-				Beautifully crafted UI components, ready for your next project.
+				Robot and solution examples all in one place.
 			</p>
 		</div>
 		<div class="max-w-xl">
 			<p class="mt-4 text-base leading-7 text-slate-700">
-				Over 500+ professionally designed, fully responsive, expertly crafted
-				component examples you can drop into your Tailwind projects and
-				customize to your heart’s content.
+				Jumpstart your automation development with hundreds of example robots
+				and solution blueprints by Robocorp and the community.
 			</p>
 		</div>
 		<div class="mt-6">

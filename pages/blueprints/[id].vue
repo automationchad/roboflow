@@ -27,11 +27,12 @@
 		loading.value = false;
 	}
 
-	const {
-		pending,
-		data: product,
-		refresh,
-	} = await $fetch(`/api/blueprints/${route.params.id}`);
+	const { data: product } = await $fetch(`/api/blueprints/${route.params.id}`);
+
+	const { data: reviews } = await $fetch(`/api/reviews`);
+
+	const exists =
+		templates.value.filter((o) => o === product.tray_project_id).length > 0;
 
 	const handleDownload = async () => {
 		loading.value = true;
@@ -48,11 +49,6 @@
 			location.reload();
 		}
 	};
-
-	const { data: reviews } = await $fetch(`/api/reviews`);
-
-	const exists =
-		templates.value.filter((o) => o === product.tray_project_id).length > 0;
 </script>
 
 <script>

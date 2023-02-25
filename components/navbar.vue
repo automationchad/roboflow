@@ -8,13 +8,22 @@
 		MenuItem,
 		MenuItems,
 	} from '@headlessui/vue';
+	import logo from '~/assets/images/logo.png';
 	import { ShoppingCartIcon, ChevronDownIcon } from '@heroicons/vue/24/outline';
 	import { PlusIcon } from '@heroicons/vue/20/solid';
+
+	const props = defineProps({
+		user: {
+			type: Object,
+		},
+		profile: {
+			type: Object,
+		},
+	});
 
 	const route = useRoute();
 
 	const supabase = useSupabaseClient();
-	const user = useSupabaseUser();
 
 	const loading = ref(true);
 	const username = ref('');
@@ -27,7 +36,6 @@
 			let { error } = await supabase.auth.signOut();
 			location.reload();
 			if (error) throw error;
-			user.value = null;
 		} catch (error) {
 			alert(error.message);
 		} finally {
@@ -37,9 +45,9 @@
 
 	const paths = [
 		{
-			id: '/contact',
+			id: '/consulting',
 			title: 'Consulting',
-			active: route.path === '/contact' || route.path.includes('contact'),
+			active: route.path === '/consulting' || route.path.includes('contact'),
 		},
 		{
 			id: '/blueprints',
@@ -53,7 +61,7 @@
 		},
 		{
 			id: '/posts',
-			title: 'Blog',
+			title: 'Podcast',
 			active: route.path === '/feed' || route.path.includes('post'),
 		},
 	];
@@ -77,8 +85,8 @@
 					</div>
 					<div class="flex flex-shrink-0 items-center">
 						<a href="/"
-							><Motis class="block h-6 w-auto lg:hidden" />
-							<Motis class="hidden h-6 w-auto lg:block"
+							><img class="block h-8 w-auto lg:hidden" :src="logo" />
+							<img class="hidden h-8 w-auto lg:block" :src="logo"
 						/></a>
 					</div>
 					<div class="hidden md:ml-6 md:flex md:space-x-8">
@@ -145,6 +153,7 @@
 											Changelog
 										</a>
 									</MenuItem>
+
 									<MenuItem v-slot="{ active }">
 										<a
 											href="/support"
@@ -171,13 +180,17 @@
 								<div class="px-2 py-1">
 									<MenuItem v-slot="{ active }">
 										<a
-											href="/upgrade"
+											:href="
+												profile.workspaces.type === 'super_admin'
+													? '/admin/stats'
+													: '/account/stats'
+											"
 											:class="[
 												active ? 'bg-slate-100 ' : 'text-gray-900',
 												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ 'Upgrade to Team License' }}
+											{{ 'Stats' }}
 										</a>
 									</MenuItem>
 								</div>
@@ -211,7 +224,7 @@
 					</Menu>
 				</div>
 				<div
-					v-else-if="!user"
+					v-else
 					class="lg:border-slate-900/15 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8 lg:dark:border-slate-800"
 				>
 					<div class="">

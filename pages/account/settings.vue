@@ -90,6 +90,7 @@
 					<form action="/account-settings/email" class="mt-8">
 						<div class="">
 							<input
+								:disabled="username"
 								v-model="username"
 								type="email"
 								id="email"
@@ -101,6 +102,7 @@
 							class="mt-4 sm:flex sm:items-center sm:space-x-4 sm:space-x-reverse"
 						>
 							<button
+								:disabled="username"
 								type="submit"
 								class="inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
 							>
@@ -120,13 +122,17 @@
 							xmlns="http://www.w3.org/2000/svg"
 						>
 							<path
-							class="fill-[#F0F9FF] dark:fill-slate-800"
+								class="fill-[#F0F9FF] dark:fill-slate-800"
 								d="M16 29.25c7.318 0 13.25-5.932 13.25-13.25S23.318 2.75 16 2.75 2.75 8.682 2.75 16 8.682 29.25 16 29.25Z"
-								
 								stroke="#0EA5E9"
 								stroke-width="1.5"
 							></path>
-							<circle cx="16" cy="16" r="7" class="fill-white dark:fill-slate-700"></circle>
+							<circle
+								cx="16"
+								cy="16"
+								r="7"
+								class="fill-white dark:fill-slate-700"
+							></circle>
 							<path
 								d="M9.707 13a7.251 7.251 0 0 1 13.852 3 7.25 7.25 0 0 1-13.298 4"
 								stroke="#0EA5E9"

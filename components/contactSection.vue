@@ -10,7 +10,162 @@
 </script>
 
 <template>
-	<div class="h-full dark:bg-[#0A101E]">
+	<form
+		v-on:submit.prevent="submitForm"
+		class="px-6 pb-24 pt-20 sm:pb-32 lg:py-48 lg:px-8"
+	>
+		<div class="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
+			<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
+				<div>
+					<label
+						for="first-name"
+						class="block text-sm font-semibold leading-6 text-white"
+						>First name</label
+					>
+					<div class="mt-2.5">
+						<input
+							:disabled="user.profile.first_name"
+							required
+							v-model="form.first_name"
+							type="text"
+							name="first-name"
+							id="first-name"
+							autocomplete="given-name"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						/>
+					</div>
+				</div>
+				<div>
+					<label
+						for="last-name"
+						class="block text-sm font-semibold leading-6 text-white"
+						>Last name</label
+					>
+					<div class="mt-2.5">
+						<input
+							:disabled="user.profile.last_name"
+							required
+							v-model="form.last_name"
+							type="text"
+							name="last-name"
+							id="last-name"
+							autocomplete="family-name"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						/>
+					</div>
+				</div>
+				<div class="sm:col-span-2">
+					<label
+						for="email"
+						class="block text-sm font-semibold leading-6 text-white"
+						>Email</label
+					>
+					<div class="mt-2.5">
+						<input
+							:disabled="user.email"
+							v-model="form.email"
+							required
+							type="email"
+							name="email"
+							id="email"
+							autocomplete="email"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						/>
+					</div>
+				</div>
+				<div class="sm:col-span-2">
+					<label
+						for="phone-number"
+						class="block text-sm font-semibold leading-6 text-white"
+						>Phone number</label
+					>
+					<div class="relative mt-2.5">
+						<div class="absolute inset-y-0 left-0 flex items-center">
+							<label for="country" class="sr-only">Country</label>
+							<select
+								:disabled="user.profile.country_code"
+								v-model="form.phone_country"
+								id="country"
+								name="country"
+								autocomplete="country"
+								class="h-full rounded-md border-transparent bg-transparent py-0 pl-3 pr-7 text-gray-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+							>
+								<option value="1" selected>🇺🇸</option>
+								<option value="1">🇨🇦</option>
+								<option value="44">🇬🇧</option>
+								<option value="61">🇦🇺</option>
+							</select>
+						</div>
+						<input
+							:disabled="user.profile.phone_num"
+							v-model="form.phone"
+							required
+							type="tel"
+							name="phone-number"
+							id="phone-number"
+							autocomplete="tel"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 pl-16 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						/>
+					</div>
+				</div>
+				<div class="sm:col-span-2">
+					<label
+						for="budget"
+						class="block text-sm font-semibold leading-6 text-white"
+						>Can you make financial decisions on behalf of your business above
+						$10k?</label
+					>
+					<div class="mt-2.5">
+						<select
+							required
+							v-model="form.decision"
+							name="budget"
+							id="budget"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						>
+							<option value="true" class="flex items-center">Yes</option>
+							<option value="false" class="flex items-center">No</option>
+						</select>
+					</div>
+				</div>
+				<div class="sm:col-span-2">
+					<label
+						for="message"
+						class="block text-sm font-semibold leading-6 text-white"
+						>Message</label
+					>
+					<div class="mt-2.5">
+						<textarea
+							required
+							v-model="form.description"
+							name="message"
+							id="message"
+							rows="4"
+							class="block w-full rounded-md border-0 bg-white/5 py-2 px-3.5 text-sm leading-6 text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="mt-8 flex justify-end">
+				<button
+					type="submit"
+					class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+				>
+					<div v-if="spotsLeft.spots > 0" class="flex items-center">
+						<SparklesIcon class="mr-1 h-5 w-5" />
+						<span>Apply now</span>
+					</div>
+					<div v-else class="flex items-center">
+						<QueueListIcon class="mr-1 h-5 w-5" />
+						<span>Join waitlist</span>
+					</div>
+				</button>
+			</div>
+		</div>
+		<FormSubmit :open-modal="success" />
+	</form>
+
+	<!-- <div class="h-full dark:bg-[#0A101E]">
 		<div
 			class="flex items-center justify-center py-12 px-6 sm:py-16 lg:mx-auto lg:max-w-7xl lg:px-8 lg:py-14"
 		>
@@ -52,7 +207,7 @@
 						:v-model="form"
 						class="mt-9 grid grid-cols-1 gap-y-6 transition-all sm:grid-cols-2 sm:gap-x-8"
 					>
-						<div v-if="!user">
+						<div>
 							<label
 								for="first-name"
 								class="block text-sm font-medium text-gray-700 dark:text-white"
@@ -60,6 +215,7 @@
 							>
 							<div class="mt-1">
 								<input
+									:disabled="user.profile.first_name"
 									required
 									type="text"
 									name="first-name"
@@ -67,11 +223,11 @@
 									v-model="form.first_name"
 									autocomplete="given-name"
 									placeholder="John"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
+									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
 								/>
 							</div>
 						</div>
-						<div v-if="!user">
+						<div>
 							<label
 								for="last-name"
 								class="block text-sm font-medium text-gray-700 dark:text-white"
@@ -79,18 +235,18 @@
 							>
 							<div class="mt-1">
 								<input
-									required
+									
 									type="text"
 									name="last-name"
 									id="last-name"
 									placeholder="Smith"
-									v-model="form.last_name"
+									
 									autocomplete="family-name"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
+									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
 								/>
 							</div>
 						</div>
-						<div v-if="!user" class="sm:col-span-2">
+						<div class="">
 							<label
 								for="email"
 								class="block text-sm font-medium text-gray-700 dark:text-white"
@@ -98,14 +254,47 @@
 							>
 							<div class="mt-1">
 								<input
-									:disabled="user"
-									required
+									
 									id="email"
 									name="email"
 									type="email"
-									v-model="form.email"
+									
 									autocomplete="email"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
+									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
+								/>
+							</div>
+						</div>
+						<div class="">
+							<label
+								for="phone-number"
+								class="block text-sm font-medium text-gray-700"
+								>Phone Number</label
+							>
+							<div class="relative mt-1 rounded-md shadow-sm">
+								<div class="absolute inset-y-0 left-0 flex items-center">
+									<label for="country" class="sr-only">Country</label>
+									<select
+										:disabled="user.profile.country_code"
+										v-model="form.phone_country"
+										id="country"
+										name="country"
+										autocomplete="country"
+										class="h-full rounded-md border-transparent bg-transparent py-0 pl-3 pr-7 text-gray-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+									>
+										<option value="1" selected>🇺🇸</option>
+										<option value="1">🇨🇦</option>
+										<option value="44">🇬🇧</option>
+										<option value="61">🇦🇺</option>
+									</select>
+								</div>
+
+								<input
+									:disabled="user.profile.phone_num"
+									v-model="form.phone"
+									type="text"
+									name="phone-number"
+									id="phone-number"
+									class="block w-full rounded-md border-gray-300 pl-16 focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 sm:text-sm"
 								/>
 							</div>
 						</div>
@@ -117,16 +306,17 @@
 									>What type of request is this</label
 								>
 								<select
+									:disabled="user"
 									v-model="form.type"
 									id="type"
 									name="type"
-									class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
+									class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
 								>
 									<option value="vendor">
 										Software vendor wanting to be featured on our blueprint
 										marketplace
 									</option>
-									<option selected="" value="component">
+									<option selected="" value="client">
 										Want us to build you a custom component that's not already
 										listed
 									</option>
@@ -237,12 +427,16 @@
 								v-model="form.decision"
 							>
 								<option
-									v-for="notificationMethod in notificationMethods"
-									:key="notificationMethod.id"
-									:value="notificationMethod.id"
+									value="true"
 									class="flex items-center"
 								>
-									{{ notificationMethod.title }}
+									Yes
+								</option>
+								<option
+									value="false"
+									class="flex items-center"
+								>
+									No
 								</option>
 							</select>
 						</div>
@@ -266,8 +460,9 @@
 				</div>
 			</div>
 		</div>
-		<FormSubmit :open-modal="success" />
-	</div>
+		
+	</div> -->
+	
 </template>
 
 <script>
@@ -282,8 +477,12 @@
 					{ id: 'no', title: 'No' },
 				],
 				form: {
-					first_name: '',
-					last_name: '',
+					first_name: this.user ? this.user?.profile?.first_name : '',
+					last_name: this.user ? this.user?.profile?.last_name : '',
+					phone_country: this.user.profile.country_code
+						? this.user.profile.country_code
+						: '1',
+					phone: this.user.profile.phone_num ? this.user.profile.phone_num : '',
 					type: this.type ? this.type : 'vendor',
 					email: this.user ? this.user.email : '',
 					videoUrl: '',
@@ -322,11 +521,13 @@
 				)
 					.then((res) => {
 						this.success = true;
-						if (this.spotsLeft.spots > 0 && this.form.decision === 'yes') {
+						if (this.spotsLeft.spots > 0 && this.form.decision === 'true') {
 							setTimeout(() => {
-								location.href = `https://calendly.com/willmarzella/session?name=${
+								location.href = `https://calendly.com/motis-group/session?name=${
 									this.form.first_name + '%20' + this.form.last_name
-								}&email=${this.form.email}&a1=${this.form.description}`;
+								}&email=${this.form.email}&a1=${
+									this.form.phone_country + this.form.phone
+								}&a2=${this.form.description}`;
 							}, 2000);
 						} else {
 							setTimeout(() => {
@@ -335,6 +536,8 @@
 							this.form = {
 								first_name: '',
 								last_name: '',
+								phone: '',
+								phone_country: '',
 								softwares: '',
 								email: '',
 								videoUrl: '',

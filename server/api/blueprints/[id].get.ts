@@ -19,6 +19,14 @@ export default defineEventHandler(async (event) => {
 			sortBy: { column: 'name', order: 'asc' },
 		});
 
+	const { data: documentation } = await client.storage
+		.from('files')
+		.list(`blueprints/${event.context.params.id}`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'name', order: 'asc' },
+		});
+
 	blueprint.images = images
 		.filter((o) => o.name !== '.emptyFolderPlaceholder')
 		.map((o) => {
@@ -26,14 +34,6 @@ export default defineEventHandler(async (event) => {
 				url: `${process.env.SUPABASE_URL}/storage/v1/object/public/images/blueprints/${event.context.params.id}/${o.name}`,
 				alt: o.name,
 			};
-		});
-
-	const { data: documentation } = await client.storage
-		.from('files')
-		.list(`blueprints/${event.context.params.id}`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'name', order: 'asc' },
 		});
 
 	blueprint.documentation = documentation
