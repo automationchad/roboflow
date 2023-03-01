@@ -1,5 +1,5 @@
 <template>
-	<div class="relative isolate bg-white pt-24 pb-32 sm:pt-32">
+	<div class="relative isolate bg-white pt-24 pb-32 sm:pt-32" id="testimonials">
 		<div
 			class="absolute inset-x-0 top-0 -z-10 flex transform-gpu overflow-hidden pt-32 opacity-25 blur-3xl sm:pt-40 xl:justify-end"
 		>
@@ -105,19 +105,12 @@
 </template>
 
 <script>
-
-export default {
-    props: ['featuredTestimonial', 'testimonials']
-}
-
-
+	export default {
+		props: ['featuredTestimonial', 'testimonials'],
+	};
 </script>
 
 <script setup>
-
-
-
-
 	const featuredTestimonial = {
 		body: 'Integer id nunc sit semper purus. Bibendum at lacus ut arcu blandit montes vitae auctor libero. Hac condimentum dignissim nibh vulputate ut nunc. Amet nibh orci mi venenatis blandit vel et proin. Non hendrerit in vel ac diam.',
 		author: {

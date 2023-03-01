@@ -94,17 +94,16 @@
 					<p
 						class="text-lg font-semibold leading-8 tracking-tight text-indigo-600"
 					>
-						Scale past the
+						Unlimited requests. No expensive hourly billing. Flat monthly rate.
 					</p>
 					<h1
 						class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
 					>
-						A better workflow
+						Your outsourced AutomationOps team
 					</h1>
 					<p class="mt-6 text-xl leading-8 text-gray-700">
-						We're a group of former corporate insiders who realized that there
-						are a lot of things that can be improved with a little bit of tech
-						magic.
+						We build the digital plumbing between your software stack without
+						exposing you to the complexity that actually makes it work.
 					</p>
 				</div>
 				<div
@@ -173,58 +172,104 @@
 						</p>
 						<ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600">
 							<li class="flex gap-x-3">
-								<!-- <CloudArrowUpIcon
-									class="mt-1 h-5 w-5 flex-none text-indigo-600"
-									aria-hidden="true"
-								/> -->
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
+									class="mt-1 h-5 w-5 flex-none text-indigo-600"
 									fill="none"
 									viewBox="0 0 24 24"
-									class="mt-1 h-5 w-5 flex-none text-indigo-600"
 								>
 									<path
 										stroke="currentColor"
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="1.5"
-										d="m15.75 8.75 3.5 3.25-3.5 3.25m-7.5-6.5L4.75 12l3.5 3.25m5-9.5-2.5 12.5"
+										d="M8.25 5.75h-2.5a1 1 0 0 0-1 1v5.5m10.07-3.533c-1.786-1.074-.573-3.263-.573-3.263l-.946-.568a.95.95 0 0 0-1.325.37L6.88 14.448a1.034 1.034 0 0 0 .355 1.381l5.464 3.285a.95.95 0 0 0 1.325-.37l5.096-9.192a1.034 1.034 0 0 0-.355-1.381l-.946-.569s-1.213 2.19-3 1.115Z"
 									></path>
 								</svg>
 
 								<span
 									><strong class="font-semibold text-gray-900"
-										>Push to deploy.</strong
+										>Unlimited Automation Requests.</strong
 									>
-									Think of Motis Group as an outsourced business operations team
-									– creating infrastructure through systems and extending
-									capacity of those systems through automation.</span
+									Submit as many automation requests as you like. Need something
+									bumped up the list? Just let us know and we'll get on
+									it.</span
 								>
 							</li>
 							<li class="flex gap-x-3">
-								<LockClosedIcon
+								<svg
 									class="mt-1 h-5 w-5 flex-none text-indigo-600"
-									aria-hidden="true"
-								/>
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M7.75 10.75C7.75 9.64543 8.64543 8.75 9.75 8.75H14.25C15.3546 8.75 16.25 9.64543 16.25 10.75V17.25C16.25 18.3546 15.3546 19.25 14.25 19.25H9.75C8.64543 19.25 7.75 18.3546 7.75 17.25V10.75Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M19.25 10.25V6.75C19.25 5.64543 18.3546 4.75 17.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V10.25"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M13.25 14C13.25 14.6904 12.6904 15.25 12 15.25C11.3096 15.25 10.75 14.6904 10.75 14C10.75 13.3096 11.3096 12.75 12 12.75C12.6904 12.75 13.25 13.3096 13.25 14Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+								</svg>
+
 								<span
 									><strong class="font-semibold text-gray-900"
-										>SSL certificates.</strong
+										>Flat Monthly Rate.</strong
 									>
-									Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure
-									qui lorem cupidatat commodo.</span
+									No fluctuating costs or hidden fees or worrying about every
+									billable hour. We offer a fixed price to give you peace of
+									mind as you grow your business.</span
 								>
 							</li>
 							<li class="flex gap-x-3">
-								<ServerIcon
+								<svg
+									fill="none"
+									viewBox="0 0 24 24"
 									class="mt-1 h-5 w-5 flex-none text-indigo-600"
-									aria-hidden="true"
-								/>
+								>
+									<rect
+										width="14.5"
+										height="14.5"
+										x="4.75"
+										y="4.75"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										rx="2"
+									></rect>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										d="M8.75 10.75L11.25 13L8.75 15.25"
+									></path>
+								</svg>
+
 								<span
 									><strong class="font-semibold text-gray-900"
-										>Database backups.</strong
+										>Production–Ready Code.</strong
 									>
-									Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-									Et magna sit morbi lobortis.</span
+									We work with Tray.io and Robocorp, which means we send you a
+									real working automation. No mock-ups or screenshots that you
+									have to pay someone to code-up later. This is a lot faster,
+									more predicable and saves you a lot of money. It's the
+									future.</span
 								>
 							</li>
 						</ul>
@@ -264,7 +309,9 @@
 		</div>
 
 		<Testimonials />
+
 		<Team />
+		<consulting-pricing @open-modal="showLoginModal = true" v-if="!allAccess" />
 		<div class="bg-white">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
@@ -332,6 +379,12 @@
 				</div>
 			</div>
 		</div>
+		<LoginModal
+			v-show="showLoginModal"
+			@close-modal="showLoginModal = false"
+			@show-otp-modal="handleOtpModal()"
+		/>
+		<otpModal v-show="showOtpModal" />
 	</div>
 </template>
 
@@ -349,6 +402,16 @@
 	} from '@headlessui/vue';
 	import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/vue/24/outline';
 
+	import Airtable from 'airtable';
+	import showdown from 'showdown';
+
+	const attrs = useAttrs();
+	const user = attrs.user;
+	const profile = attrs.profile;
+	const allAccess = ref(false);
+	const workspace = profile?.workspaces;
+	allAccess.value = profile?.workspaces?.all_access;
+
 	const stats = [
 		{ label: 'Founded', value: '2021' },
 		{ label: 'Employees', value: '37' },
@@ -356,8 +419,6 @@
 		{ label: 'Raised', value: '$25M' },
 	];
 
-	import Airtable from 'airtable';
-	import showdown from 'showdown';
 	const converter = new showdown.Converter();
 	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
 		'appkU7PnQUq7lePwf'
@@ -403,4 +464,39 @@
 	const case_study = await case_studies[
 		Math.floor(Math.random() * case_studies.length)
 	];
+</script>
+
+<script>
+	export default {
+		data() {
+			return {
+				success: false,
+				showLoginModal: false,
+				showOtpModal: false,
+			};
+		},
+
+		computed: {},
+		methods: {
+			handleOtpModal() {
+				this.showOtpModal = true;
+				setTimeout(() => {
+					this.showOtpModal = false;
+				}, 2000);
+			},
+			abbreviatedNumber(number) {
+				const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
+				const tier = (Math.log10(Math.abs(number)) / 3) | 0;
+				if (tier === 0) {
+					return number;
+				}
+				const suffix = SI_SYMBOL[tier];
+				const scale = 10 ** (tier * 3);
+				const scaled = number / scale;
+				const length = scaled.toFixed(1).toString();
+				const precision = length > 3 ? 0 : 1;
+				return scaled.toFixed(precision) + suffix;
+			},
+		},
+	};
 </script>

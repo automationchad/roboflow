@@ -43,47 +43,24 @@
 
 	const maxSpots = 6;
 
-	const spotsLeft = computed(() => {
+	const spotsCalc = async () => {
 		var arrNum = Math.abs(maxSpots - requests.length);
-		console.log(arrNum);
 		let remaining_days;
 		if (maxSpots <= requests.length) {
 			remaining_days = differenceInDays(
-				new Date(requests[arrNum].fields.est_finish_date),
-				new Date()
+				new Date(),
+				new Date(requests[arrNum].fields.est_finish_date)
 			);
 		} else remaining_days = 0;
 		return {
 			spots: requests.length >= maxSpots ? 0 : maxSpots - requests.length,
 			remaining_days,
 		};
-	});
+	};
+
+	const spotsLeft = await spotsCalc();
 </script>
 
-<!-- <template>
-	<div>
-		<ContactSection
-			:requests="requests"
-			:user="user"
-			:type="user.profile.workspaces.type"
-		/>
-	</div>
-</template> -->
-
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
 <template>
 	<div class="relative isolate h-full bg-gray-900">
 		<div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
@@ -152,7 +129,7 @@
 						<div
 							:class="[
 								spotsLeft.spots > 0 ? 'badge' : 'err-badge',
-								' flex items-center rounded-full px-3 py-0.5 shadow-md',
+								'flex items-center rounded-full px-3 py-0.5 shadow-md',
 							]"
 						>
 							<ClockIcon class="mr-1 h-4 w-4" v-if="!spotsLeft.spots > 0" />
@@ -213,18 +190,13 @@
 					</dl>
 				</div>
 			</div>
-			<ContactSection
-				:requests="requests ?? {}"
-				:user="user ?? {}"
-			/>
+			<ContactSection :requests="requests ?? {}" :user="user ?? {}" />
 		</div>
 	</div>
 </template>
 
-<style setup>
+<style scoped>
 	.err-badge {
-		background-size: 100% 100%;
-		background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
 		background-image: radial-gradient(
 				49% 81% at 45% 47%,
 				#ffe20345 0%,
@@ -237,9 +209,6 @@
 		color: rgb(0, 0, 0);
 	}
 	.badge {
-		background-size: 100% 100%;
-		background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px,
-			0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
 		background-image: radial-gradient(
 				18% 28% at 24% 50%,
 				#cefaffff 7%,

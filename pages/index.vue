@@ -26,8 +26,8 @@
 <template>
 	<main class="m-0 w-full bg-white p-0 dark:bg-[#0A101E]">
 		<div class="">
-			<div class="relative">
-				<div class="back absolute h-full w-full"></div>
+			<div class="relative back">
+				
 				<div class="sm:px-46 mx-auto space-y-4 px-48 py-36 lg:px-48">
 					<div class="space-y-4">
 						<!-- <div class="relative flex">
@@ -65,9 +65,7 @@
 								href="/blueprints"
 								><span
 									>Explore blueprints
-									<span
-										aria-hidden="true"
-										class="hidden sm:inline"
+									<span aria-hidden="true" class="hidden sm:inline"
 										>→</span
 									></span
 								></a
@@ -77,10 +75,11 @@
 				</div>
 			</div>
 		</div>
-		<Logos/>
-		<TemplatesMain />
-		<BlueprintsMain />
-		<FooterContent />
+		<Logos />
+		<!-- <Testimonials /> -->
+		<!-- <TemplatesMain />
+		<BlueprintsMain /> -->
+		<!-- <FooterContent /> -->
 	</main>
 </template>
 

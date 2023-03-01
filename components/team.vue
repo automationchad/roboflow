@@ -14,18 +14,20 @@
 				role="list"
 				class="mx-auto mt-20 grid max-w-2xl grid-cols-2 gap-y-16 gap-x-8 text-center sm:grid-cols-3 md:grid-cols-4 lg:mx-0 lg:max-w-none lg:grid-cols-5 xl:grid-cols-6"
 			>
-				<li v-for="person in people" :key="person.name">
+				<li v-for="person in people" :key="person.id">
 					<img
 						class="mx-auto h-24 w-24 rounded-full"
-						:src="person.imageUrl"
+						:src="person.fields.image[0].url"
 						alt=""
 					/>
 					<h3
 						class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
 					>
-						{{ person.name }}
+						{{ person.fields.name }}
 					</h3>
-					<p class="text-sm leading-6 text-gray-600">{{ person.role }}</p>
+					<p class="text-sm leading-6 text-gray-600">
+						{{ person.fields.role }}
+					</p>
 				</li>
 			</ul>
 		</div>
@@ -33,25 +35,21 @@
 </template>
 
 <script setup>
-	const people = [
-		{
-			name: 'William Marzella',
-			role: 'Director',
-			imageUrl:
-				'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		},
-		{
-			name: 'Anthony Huni',
-			role: 'Director',
-			imageUrl:
-				'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		},
-		{
-			name: 'Michael Foster',
-			role: 'Principal Consultant',
-			imageUrl:
-				'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		},
-		// More people...
-	];
+	import Airtable from 'airtable';
+
+	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
+		'appkU7PnQUq7lePwf'
+	);
+	let people = [];
+
+	const table = base('team');
+
+	const getRecords = async () => {
+		const records = await table.select({}).firstPage();
+		people = records.map((o) => {
+			return { uuid: o.id, fields: o.fields };
+		});
+	};
+
+	await getRecords();
 </script>
