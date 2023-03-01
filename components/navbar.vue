@@ -46,6 +46,7 @@
 	const paths = [
 		{
 			id: '/consulting',
+			target: '_parent',
 			title: 'Consulting',
 			active: route.path === '/consulting' || route.path.includes('contact'),
 		},
@@ -60,7 +61,8 @@
 		// 	active: route.path === '/components' || route.path.includes('components'),
 		// },
 		{
-			id: '/posts',
+			id: 'https://www.google.com',
+			target: '_blank',
 			title: 'Podcast',
 			active: route.path === '/feed' || route.path.includes('post'),
 		},
@@ -96,6 +98,7 @@
 							:key="path.id"
 							as="a"
 							:href="path.id"
+							:target="path.target"
 							:class="[
 								path.active
 									? 'border-indigo-500 text-slate-900 dark:text-white'
