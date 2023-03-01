@@ -2,9 +2,7 @@
 	<div class="bg-white py-24 sm:py-32">
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
 			<div class="mx-auto max-w-4xl text-center">
-				<h2 class="text-base font-semibold leading-7 text-blue-600">
-					Pricing
-				</h2>
+				<h2 class="text-base font-semibold leading-7 text-blue-600">Pricing</h2>
 				<p
 					class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"
 				>
@@ -49,9 +47,7 @@
 					:key="tier.id"
 					:class="[
 						tier.featured ? 'bg-gray-900 ring-gray-900' : 'ring-gray-200',
-						tier.mostPopular
-							? 'ring-2 ring-blue-600'
-							: 'ring-1 ring-gray-200',
+						tier.mostPopular ? 'ring-2 ring-blue-600' : 'ring-1 ring-gray-200',
 						'rounded-3xl p-8 ring-1 xl:p-10',
 					]"
 				>
@@ -116,6 +112,32 @@
 					>
 						{{ tier.cta }}
 					</a>
+					<a
+						v-else-if="user && !allAccess"
+						@click="handleCheckout(product, workspace)"
+						:aria-describedby="tier.id"
+						:class="[
+							tier.featured
+								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
+								: 'bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:outline-blue-600',
+							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+						]"
+					>
+						{{ tier.cta }}
+					</a>
+					<a
+						v-else
+						@click="handleCheckout(product, workspace)"
+						:aria-describedby="tier.id"
+						:class="[
+							tier.featured
+								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
+								: 'bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:outline-blue-600',
+							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+						]"
+					>
+						{{ 'Already purchased' }}
+					</a>
 					<ul
 						role="list"
 						:class="[
@@ -156,7 +178,9 @@
 	const attrs = useAttrs();
 	const user = attrs.user;
 	const profile = attrs.profile;
+	const allAccess = ref(false);
 	const workspace = profile?.workspaces;
+	allAccess.value = profile?.workspaces?.all_access;
 	const product = {
 		tray_project_id: null,
 	};
