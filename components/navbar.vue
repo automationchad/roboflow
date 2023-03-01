@@ -49,16 +49,16 @@
 			title: 'Consulting',
 			active: route.path === '/consulting' || route.path.includes('contact'),
 		},
-		{
-			id: '/blueprints',
-			title: 'Blueprints',
-			active: route.path === '/blueprints' || route.path.includes('blueprint'),
-		},
-		{
-			id: '/components',
-			title: 'Components',
-			active: route.path === '/components' || route.path.includes('components'),
-		},
+		// {
+		// 	id: '/blueprints',
+		// 	title: 'Blueprints',
+		// 	active: route.path === '/blueprints' || route.path.includes('blueprint'),
+		// },
+		// {
+		// 	id: '/components',
+		// 	title: 'Components',
+		// 	active: route.path === '/components' || route.path.includes('components'),
+		// },
 		{
 			id: '/posts',
 			title: 'Podcast',

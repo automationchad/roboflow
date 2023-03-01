@@ -12,7 +12,7 @@ import { differenceInDays } from "date-fns";
   <div>
     <div class="flex items-center space-x-4">
       <a
-        href="/contact"
+        href="/consulting"
         class="hover:ring-slate-900/15 inline-flex justify-center rounded-lg bg-white/0 py-3 px-4 text-sm font-semibold text-slate-900 ring-1 ring-slate-900/10 hover:bg-white/25"
       >
         <SparklesIcon v-if="spotsLeft.spots > 0" class="h-4 w-4 mr-1" />
@@ -48,7 +48,7 @@ export default {
   props: ["requests"],
   data() {
     return {
-      maxSpots: 5,
+      maxSpots: 6,
     };
   },
   computed: {

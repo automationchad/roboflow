@@ -38,9 +38,16 @@
 							</p>
 							<div class="mt-10 flex items-center gap-x-6">
 								<a
+									v-if="!profile.workspaces"
+									@click="showLoginModal = true"
+									class="cursor-pointer rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									>Book a call</a
+								>
+								<a
+									v-else-if="profile.workspaces"
 									href="/consulting/contact"
-									class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-									>Submit inquiry</a
+									class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									>Book a call</a
 								>
 								<a
 									href="#info"
@@ -323,11 +330,18 @@
 						<p></p>
 					</div>
 				</div>
-				<div class="mt-10 flex">
+				<div class="mt-10 absolute">
 					<a
+						v-if="!profile.workspaces"
+						@click="showLoginModal = true"
+						class="cursor-pointer rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						>Book a call</a
+					>
+					<a
+						v-else-if="profile.workspaces"
 						href="/consulting/contact"
 						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Submit inquiry</a
+						>Book a call</a
 					>
 				</div>
 			</div>
@@ -402,18 +416,18 @@
 						</dl>
 					</div>
 				</div>
-				<div class="mt-10 flex">
+				<div class="mt-10">
 					<a
-						v-if="!profile"
+						v-if="!profile.workspaces"
 						@click="showLoginModal = true"
-						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Submit inquiry</a
+						class="cursor-pointer rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						>Book a call</a
 					>
 					<a
-						v-else="!profile"
-						@click="showLoginModal = true"
+						v-else-if="profile.workspaces"
+						href="/consulting/contact"
 						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Submit inquiry</a
+						>Book a call</a
 					>
 				</div>
 			</div>
@@ -504,9 +518,7 @@
 
 	await getCaseStudy();
 
-	const featured_case_study = await case_studies.find(
-		(o) => o.fields.featured
-	);
+	const featured_case_study = await case_studies.find((o) => o.fields.featured);
 </script>
 
 <script>

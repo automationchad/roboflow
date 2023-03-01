@@ -100,7 +100,7 @@
 						>
 					</p>
 					<a
-						v-if="!profile"
+						v-if="!user"
 						@click="$emit('open-modal')"
 						:aria-describedby="tier.id"
 						:class="[
@@ -217,13 +217,13 @@
 			],
 			featured: false,
 			mostPopular: false,
-			cta: 'Buy plan',
+			cta: 'Book a call',
 		},
 		{
 			name: 'Growth',
 			id: 'tier-startup',
 			href: '#',
-			price: { monthly: '$7,500', quarterly: '$20,250' },
+			price: { monthly: '$7,200', quarterly: '$19,500' },
 			description:
 				'For companies that need automation engineers for complex workflows.',
 			features: [
@@ -236,7 +236,7 @@
 			],
 			featured: false,
 			mostPopular: true,
-			cta: 'Buy plan',
+			cta: 'Book a call',
 		},
 		{
 			name: 'Enterprise',
@@ -255,7 +255,7 @@
 			],
 			featured: true,
 			mostPopular: false,
-			cta: 'Contact sales',
+			cta: 'Book a call',
 		},
 	];
 

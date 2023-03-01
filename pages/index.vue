@@ -60,7 +60,7 @@
 						<div
 							class="relative col-start-1 row-start-4 mt-10 flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
 						>
-							<a
+							<!-- <a
 								class="inline-flex justify-center rounded-lg bg-slate-900 py-3 px-4 text-sm font-semibold text-white hover:bg-slate-700"
 								href="/blueprints"
 								><span
@@ -69,7 +69,8 @@
 										>→</span
 									></span
 								></a
-							><ButtonGroup :requests="requests" />
+							> -->
+							<ButtonGroup :requests="requests" />
 						</div>
 					</div>
 				</div>
