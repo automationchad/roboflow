@@ -311,7 +311,7 @@
 		<Testimonials />
 
 		<Team />
-		<consulting-pricing @open-modal="showLoginModal = true" v-if="!allAccess" />
+		<consulting-pricing @open-modal="showLoginModal = true" />
 		<div class="bg-white">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
