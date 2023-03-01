@@ -462,7 +462,6 @@
 		</div>
 		
 	</div> -->
-	
 </template>
 
 <script>
@@ -521,7 +520,11 @@
 				)
 					.then((res) => {
 						this.success = true;
-						if (this.spotsLeft.spots > 0 && this.form.decision === 'true') {
+						if (
+							this.spotsLeft.spots > 0 &&
+							this.form.decision === 'true' &&
+							this.user
+						) {
 							setTimeout(() => {
 								location.href = `https://calendly.com/motis-group/session?name=${
 									this.form.first_name + '%20' + this.form.last_name

@@ -135,20 +135,20 @@
 							<blockquote
 								class="text-xl font-semibold leading-8 tracking-tight text-gray-900"
 							>
-								<p>“{{ case_study.fields.quote }}”</p>
+								<p>“{{ featured_case_study.fields.quote }}”</p>
 							</blockquote>
 							<figcaption class="mt-8 flex gap-x-4">
 								<img
-									:src="case_study.fields.customerPhoto[0].url"
+									:src="featured_case_study.fields.customerPhoto[0].url"
 									alt=""
 									class="mt-1 h-10 w-10 flex-none rounded-full bg-gray-50"
 								/>
 								<div class="text-sm leading-6">
 									<div class="font-semibold text-gray-900">
-										{{ case_study.fields.customerName }}
+										{{ featured_case_study.fields.customerName }}
 									</div>
 									<div class="text-gray-600">
-										{{ case_study.fields.customerTitle }}
+										{{ featured_case_study.fields.customerTitle }}
 									</div>
 								</div>
 							</figcaption>
@@ -162,14 +162,44 @@
 							have less time to do all things you want to do, to make the
 							decisions you need to make, to service your customers the way they
 							deserve to be serviced. The paradox of business is this:
-							<i>The faster you are growing, the tighter cash usually is.</i>
-							<br /><br />
-							So the businesses that need cash most, have it least! The key to
-							freeing up cash flow is building capacity. By extending capacity,
-							you allow more sales and gross margin to accumulate so you can
-							make the investments needed for next stage growth. The key to
-							automation is to extend capacity.
 						</p>
+
+						<div class="my-4 border-l-4 border-yellow-400 bg-yellow-50 px-4">
+							<div class="flex items-center">
+								<div class="flex-shrink-0">
+									<ExclamationTriangleIcon
+										class="h-5 w-5 text-yellow-400"
+										aria-hidden="true"
+									/>
+								</div>
+								<div class="ml-3">
+									<p class="text-sm text-yellow-700">
+										The faster you are growing, the tighter cash usually is. So
+										the businesses that need cash most, have it least!
+									</p>
+								</div>
+							</div>
+						</div>
+						<p>
+							The key to freeing up cash flow is building capacity. By extending
+							capacity, you allow more sales and gross margin to accumulate so
+							you can make the investments needed for next stage growth.
+						</p>
+						<p>
+							Automation isn't about making things easier. It isn't about
+							because it's new or tech-forward. It's not even about cutting
+							costs...
+						</p>
+						<p class="font-bold text-indigo-600">
+							The key to the automation is to extend capacity by building high
+							leverage systems.
+						</p>
+						<p>
+							Motis Group replaces unreliable freelancers and expensive agencies
+							for one flat monthly fee, with automations delivered so fast that
+							it will blow your mind.
+						</p>
+
 						<ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600">
 							<li class="flex gap-x-3">
 								<svg
@@ -275,27 +305,22 @@
 						</ul>
 						<p class="mt-8">
 							We're a lean, mean, data-integrating machine, and we're not afraid
-							to get our hands dirty (in code, that is). Our approach is simple:
-							we work with you to understand your challenges, and then we
-							develop customized automation solutions to solve them.
+							to get our hands dirty (in code, that is).
 						</p>
 						<h2 class="mt-16 text-2xl font-bold tracking-tight text-gray-900">
-							No server? No problem.
+							Our approach is simple:
 						</h2>
-						<p class="mt-6">
-							Id orci tellus laoreet id ac. Dolor, aenean leo, ac etiam
-							consequat in. Convallis arcu ipsum urna nibh. Pharetra, euismod
-							vitae interdum mauris enim, consequat vulputate nibh. Maecenas
-							pellentesque id sed tellus mauris, ultrices mauris. Tincidunt enim
-							cursus ridiculus mi. Pellentesque nam sed nullam sed diam turpis
-							ipsum eu a sed convallis diam. If you're interested in working
-							together, click below to submit an inquiry and I'll get back to
-							you within 48 hours.
-							<b
-								>Please note that advisory packages are 90-day retainers and
-								cost $4,000 per month.</b
-							>
+						<p class="mt-6 border-l-4 border-gray-500 px-4">
+							We work with you to understand your challenges, and then we
+							develop customized automation solutions to solve them.
 						</p>
+						If you're interested in working together, click below to submit an
+						inquiry and we'll get back to you within 48 hours.
+						<b
+							>Please note that advisory packages are 90-day retainers and cost
+							$4,000 per month.</b
+						>
+						<p></p>
 					</div>
 				</div>
 				<div class="mt-10 flex">
@@ -308,10 +333,17 @@
 			</div>
 		</div>
 
-		<Testimonials />
+		<Testimonials
+			:featured-testimonial="featured_case_study"
+			:testimonials="case_studies.filter((o) => !o.fields.featured)"
+		/>
 
 		<Team />
-		<consulting-pricing @open-modal="showLoginModal = true" />
+		<consulting-pricing
+			@open-modal="showLoginModal = true"
+			:user="user"
+			:profile="profile"
+		/>
 		<div class="bg-white">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
@@ -372,7 +404,14 @@
 				</div>
 				<div class="mt-10 flex">
 					<a
-						href="/consulting/contact"
+						v-if="!profile"
+						@click="showLoginModal = true"
+						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						>Submit inquiry</a
+					>
+					<a
+						v-else="!profile"
+						@click="showLoginModal = true"
 						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 						>Submit inquiry</a
 					>
@@ -400,11 +439,15 @@
 		DisclosureButton,
 		DisclosurePanel,
 	} from '@headlessui/vue';
-	import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/vue/24/outline';
+	import {
+		MinusSmallIcon,
+		PlusSmallIcon,
+		ExclamationTriangleIcon,
+	} from '@heroicons/vue/24/outline';
 
 	import Airtable from 'airtable';
 	import showdown from 'showdown';
-
+	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = attrs.user;
 	const profile = attrs.profile;
@@ -450,7 +493,7 @@
 	const getCaseStudy = async () => {
 		const records = await table2
 			.select({
-				view: 'viwqsEntAHmvVzthi',
+				view: 'viwHYYzg65fLzBI0c',
 				sort: [{ field: 'last_updated', direction: 'desc' }],
 			})
 			.firstPage();
@@ -461,9 +504,9 @@
 
 	await getCaseStudy();
 
-	const case_study = await case_studies[
-		Math.floor(Math.random() * case_studies.length)
-	];
+	const featured_case_study = await case_studies.find(
+		(o) => o.fields.featured
+	);
 </script>
 
 <script>

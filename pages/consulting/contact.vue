@@ -190,7 +190,7 @@
 					</dl>
 				</div>
 			</div>
-			<ContactSection :requests="requests ?? {}" :user="user ?? {}" />
+			<ContactSection :requests="requests" :user="user" />
 		</div>
 	</div>
 </template>

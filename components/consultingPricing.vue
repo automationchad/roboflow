@@ -2,7 +2,7 @@
 	<div class="bg-white py-24 sm:py-32">
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
 			<div class="mx-auto max-w-4xl text-center">
-				<h2 class="text-base font-semibold leading-7 text-blue-600">Pricing</h2>
+				<h2 class="text-base font-semibold leading-7 text-indigo-600">Pricing</h2>
 				<p
 					class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"
 				>
@@ -30,7 +30,7 @@
 					>
 						<div
 							:class="[
-								checked ? 'bg-blue-600 text-white' : 'text-gray-500',
+								checked ? 'bg-indigo-600 text-white' : 'text-gray-500',
 								'cursor-pointer rounded-full py-1 px-2.5',
 							]"
 						>
@@ -47,7 +47,7 @@
 					:key="tier.id"
 					:class="[
 						tier.featured ? 'bg-gray-900 ring-gray-900' : 'ring-gray-200',
-						tier.mostPopular ? 'ring-2 ring-blue-600' : 'ring-1 ring-gray-200',
+						tier.mostPopular ? 'ring-2 ring-indigo-600' : 'ring-1 ring-gray-200',
 						'rounded-3xl p-8 ring-1 xl:p-10',
 					]"
 				>
@@ -55,7 +55,7 @@
 						<h3
 							:id="tier.id"
 							:class="[
-								tier.mostPopular ? 'text-blue-600' : 'text-gray-900',
+								tier.mostPopular ? 'text-indigo-600' : 'text-gray-900',
 								tier.featured ? 'text-white' : 'text-gray-900',
 								'text-lg font-semibold leading-8',
 							]"
@@ -64,7 +64,7 @@
 						</h3>
 						<p
 							v-if="tier.mostPopular"
-							class="rounded-full bg-blue-600/10 py-1 px-2.5 text-xs font-semibold leading-5 text-blue-600"
+							class="rounded-full bg-indigo-600/10 py-1 px-2.5 text-xs font-semibold leading-5 text-indigo-600"
 						>
 							Most popular
 						</p>
@@ -100,26 +100,39 @@
 						>
 					</p>
 					<a
-						v-if="!user"
+						v-if="!profile"
 						@click="$emit('open-modal')"
 						:aria-describedby="tier.id"
 						:class="[
 							tier.featured
 								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:outline-blue-600',
+								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
 							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
 						]"
 					>
 						{{ tier.cta }}
 					</a>
-					<a
-						v-else-if="user && !allAccess"
-						@click="handleCheckout(product, workspace)"
+					<!-- <a
+						v-else-if="user && !profile?.workspaces.all_access"
+						@click="handleCheckout(product, profile?.workspaces)"
 						:aria-describedby="tier.id"
 						:class="[
 							tier.featured
 								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:outline-blue-600',
+								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
+							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+						]"
+					>
+						{{ tier.cta }}
+					</a> -->
+					<a
+						v-else-if="user && !profile?.workspaces.all_access"
+						href="/consulting/contact"
+						:aria-describedby="tier.id"
+						:class="[
+							tier.featured
+								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
+								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
 							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
 						]"
 					>
@@ -127,12 +140,12 @@
 					</a>
 					<a
 						v-else
-						@click="handleCheckout(product, workspace)"
+						disabled
 						:aria-describedby="tier.id"
 						:class="[
 							tier.featured
 								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-blue-600 text-white shadow-sm hover:bg-blue-500 focus-visible:outline-blue-600',
+								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
 							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
 						]"
 					>
@@ -152,7 +165,7 @@
 						>
 							<CheckIcon
 								:class="[
-									tier.featured ? 'text-white' : 'text-blue-600',
+									tier.featured ? 'text-white' : 'text-indigo-600',
 									'h-6 w-5 flex-none',
 								]"
 								aria-hidden="true"
@@ -174,13 +187,11 @@
 		RadioGroupOption,
 	} from '@headlessui/vue';
 	import { CheckIcon } from '@heroicons/vue/20/solid';
+	const props = defineProps({
+		user: { type: Object, required: true },
+		profile: { type: Object, required: true },
+	});
 
-	const attrs = useAttrs();
-	const user = attrs.user;
-	const profile = attrs.profile;
-	const allAccess = ref(false);
-	const workspace = profile?.workspaces;
-	allAccess.value = profile?.workspaces?.all_access;
 	const product = {
 		tray_project_id: null,
 	};

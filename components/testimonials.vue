@@ -21,7 +21,7 @@
 				<p
 					class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
 				>
-					We have worked with thousands of amazing people
+					We have worked with amazing people
 				</p>
 			</div>
 			<div
@@ -33,27 +33,27 @@
 					<blockquote
 						class="p-12 text-xl font-semibold leading-8 tracking-tight text-gray-900"
 					>
-						<p>{{ `“${featuredTestimonial.body}”` }}</p>
+						<p>{{ `“${featuredTestimonial.fields.quote}”` }}</p>
 					</blockquote>
 					<figcaption
 						class="flex items-center gap-x-4 border-t border-gray-900/10 py-4 px-6"
 					>
 						<img
 							class="h-10 w-10 flex-none rounded-full bg-gray-50"
-							:src="featuredTestimonial.author.imageUrl"
+							:src="featuredTestimonial.fields.customerPhoto[0].url"
 							alt=""
 						/>
 						<div class="flex-auto">
 							<div class="font-semibold">
-								{{ featuredTestimonial.author.name }}
+								{{ featuredTestimonial.fields.customerName }}
 							</div>
 							<div class="text-gray-600">
-								{{ `@${featuredTestimonial.author.handle}` }}
+								{{ `${featuredTestimonial.fields.customerTitle}` }}
 							</div>
 						</div>
 						<img
 							class="h-10 w-auto flex-none"
-							:src="featuredTestimonial.author.logoUrl"
+							:src="featuredTestimonial.fields.logo[0].url"
 							alt=""
 						/>
 					</figcaption>
@@ -111,16 +111,6 @@
 </script>
 
 <script setup>
-	const featuredTestimonial = {
-		body: 'Integer id nunc sit semper purus. Bibendum at lacus ut arcu blandit montes vitae auctor libero. Hac condimentum dignissim nibh vulputate ut nunc. Amet nibh orci mi venenatis blandit vel et proin. Non hendrerit in vel ac diam.',
-		author: {
-			name: 'Brenna Goyette',
-			handle: 'brennagoyette',
-			imageUrl:
-				'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=1024&h=1024&q=80',
-			logoUrl: 'https://tailwindui.com/img/logos/savvycal-logo-gray-900.svg',
-		},
-	};
 	const testimonials = [
 		[
 			[
