@@ -347,6 +347,7 @@
 				</div>
 			</div>
 		</div>
+		
 
 		<Testimonials
 			:featured-testimonial="featured_case_study"

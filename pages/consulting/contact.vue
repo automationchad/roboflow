@@ -5,6 +5,7 @@
 		BuildingOffice2Icon,
 		EnvelopeIcon,
 		PhoneIcon,
+		MapPinIcon,
 		PaperClipIcon,
 		QueueListIcon,
 		GlobeAmericasIcon,
@@ -155,27 +156,28 @@
 						<div class="flex gap-x-4">
 							<dt class="flex-none">
 								<span class="sr-only">Telephone</span>
-								<GlobeAmericasIcon
+								
+								<MapPinIcon
 									class="h-7 w-6 text-gray-400"
 									aria-hidden="true"
 								/>
 							</dt>
-							<dd>Remote, US</dd>
+							<dd>Remote</dd>
 						</div>
-						<div class="flex gap-x-4">
+						<!-- <div class="flex gap-x-4">
 							<dt class="flex-none">
 								<span class="sr-only">Telephone</span>
 								<PhoneIcon class="h-7 w-6 text-gray-400" aria-hidden="true" />
 							</dt>
 							<dd>
 								<a class="hover:text-white" href="tel:+1 (555) 234-5678"
-									>+1 (555) 234-5678</a
+									>+1 (424) 395-8724</a
 								>
 							</dd>
-						</div>
+						</div> -->
 						<div class="flex gap-x-4">
 							<dt class="flex-none">
-								<span class="sr-only">Telephone</span>
+								<span class="sr-only">Email</span>
 								<EnvelopeIcon
 									class="h-7 w-6 text-gray-400"
 									aria-hidden="true"
