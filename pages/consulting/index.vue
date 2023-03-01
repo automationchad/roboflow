@@ -18,9 +18,9 @@
 								<div
 									class="relative rounded-full py-1 px-3 text-sm leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
 								>
-									Shaping the way you deliver change.
+									Retainers to scale your business.
 									<a
-										href="#"
+										href="#info"
 										class="whitespace-nowrap font-semibold text-indigo-600"
 										><span class="absolute inset-0" aria-hidden="true" />Read
 										more <span aria-hidden="true">&rarr;</span></a
@@ -30,7 +30,8 @@
 							<h1
 								class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"
 							>
-								Scaling from 8 → 9 figures is formulaic.
+								<p>AutomationOps,</p>
+								<p>as a service.</p>
 							</h1>
 							<p class="mt-6 text-lg leading-8 text-gray-600">
 								We’re a process automation consultancy, providing advice and
@@ -330,7 +331,7 @@
 						<p></p>
 					</div>
 				</div>
-				<div class="mt-10 absolute">
+				<div class="absolute mt-10">
 					<a
 						v-if="!profile.workspaces"
 						@click="showLoginModal = true"

@@ -41,7 +41,7 @@
 						</div> -->
 						<div class="relative space-y-2">
 							<p class="text-7xl font-bold dark:text-white">
-								Data integrations,
+								AutomationOps,
 							</p>
 							<p class="text-7xl font-bold dark:text-white">as-a-service.</p>
 						</div>
