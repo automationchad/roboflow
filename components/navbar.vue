@@ -200,31 +200,22 @@
 								<div class="px-2 py-1">
 									<MenuItem v-slot="{ active }" class="cursor-pointer">
 										<a
-											v-if="!profile.workspaces.active"
 											@click="
-												handleCheckout(
-													{
-														tray_project_id: null,
-													},
-													profile.workspaces
-												)
+												!profile?.workspaces?.active
+													? handleCheckout(
+															{ tray_project_id: null },
+															profile.workspaces
+													  )
+													: navigateTo(
+															`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`
+													  )
 											"
 											:class="[
 												active ? 'bg-slate-100 ' : 'text-gray-900',
 												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ 'Upgrade' }}
-										</a>
-										<a
-											v-else
-											href="#"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											{{ 'Manage' }}
+											{{ !profile?.workspaces?.active ? 'Upgrade' : 'Manage' }}
 										</a>
 									</MenuItem>
 								</div>
