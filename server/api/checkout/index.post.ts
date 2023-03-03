@@ -29,10 +29,10 @@ export default defineEventHandler(async (event) => {
 			'prod_NSMvHhDDIRWENr'
 		);
 		line_items.push(
+			{ price: base_plan.default_price, quantity: 1 },
 			{
 				price: subscription_product.default_price,
-			},
-			{ price: base_plan.default_price }
+			}
 		);
 	} else {
 		line_items.push({
@@ -62,8 +62,8 @@ export default defineEventHandler(async (event) => {
 		phone_number_collection: {
 			enabled: true,
 		},
-		success_url: 'http://localhost:3000/contact/success',
-		cancel_url: 'http://localhost:3000/',
+		success_url: 'https://motis.group/contact/success',
+		cancel_url: 'https://motis.group',
 		allow_promotion_codes: promo ? true : null,
 		line_items,
 		customer: body.customer ?? null,
