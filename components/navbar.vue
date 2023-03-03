@@ -198,19 +198,36 @@
 									</MenuItem>
 								</div>
 								<div class="px-2 py-1">
-									<MenuItem v-slot="{ active }">
+									<MenuItem v-slot="{ active }" class="cursor-pointer">
 										<a
-											:href="
-												profile.workspaces.type === 'super_admin'
-													? '/admin/stats'
-													: '/account/stats'
+											v-if="
+												!profile.workspaces.stripe_subscription_id &&
+												!profile.workspaces.active
+											"
+											@click="
+												handleCheckout(
+													{
+														tray_project_id: null,
+													},
+													profile.workspaces
+												)
 											"
 											:class="[
 												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ 'Stats' }}
+											{{ 'Upgrade' }}
+										</a>
+										<a
+											v-else
+											href="#"
+											:class="[
+												active ? 'bg-slate-100 ' : 'text-gray-900',
+												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
+											]"
+										>
+											{{ 'Manage' }}
 										</a>
 									</MenuItem>
 								</div>
@@ -242,23 +259,6 @@
 							</MenuItems>
 						</transition>
 					</Menu>
-					<button
-						v-if="
-							!profile.workspaces.stripe_subscription_id &&
-							!profile.workspaces.active
-						"
-						@click="
-							handleCheckout(
-								{
-									tray_project_id: null,
-								},
-								profile.workspaces
-							)
-						"
-						class="-my-2.5 ml-8 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-					>
-						<span>Get all-access <span aria-hidden="true">→</span></span>
-					</button>
 				</div>
 				<div
 					v-else
@@ -275,7 +275,7 @@
 							@click="$emit('open-modal')"
 							class="-my-2.5 ml-8 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
 						>
-							<span>Get all-access <span aria-hidden="true">→</span></span>
+							<span>Get access <span aria-hidden="true">→</span></span>
 						</button>
 					</div>
 				</div>
