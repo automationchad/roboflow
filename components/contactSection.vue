@@ -24,7 +24,9 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="user.profile.first_name"
+							:disabled="
+								user.profile.first_name != '' && user.profile.first_name != null
+							"
 							required
 							v-model="form.first_name"
 							type="text"
@@ -43,7 +45,9 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="user.profile.last_name"
+							:disabled="
+								user.profile.last_name != '' && user.profile.last_name != null
+							"
 							required
 							v-model="form.last_name"
 							type="text"
@@ -62,7 +66,7 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="user.email"
+							:disabled="user.email != '' && user.email != null"
 							v-model="form.email"
 							required
 							type="email"
@@ -83,7 +87,10 @@
 						<div class="absolute inset-y-0 left-0 flex items-center">
 							<label for="country" class="sr-only">Country</label>
 							<select
-								:disabled="user.profile.country_code"
+								:disabled="
+									user.profile.country_code != '' &&
+									user.profile.country_code != null
+								"
 								v-model="form.phone_country"
 								id="country"
 								name="country"
@@ -97,7 +104,9 @@
 							</select>
 						</div>
 						<input
-							:disabled="user.profile.phone_num"
+							:disabled="
+								user.profile.phone_num != '' && user.profile.phone_num != null
+							"
 							v-model="form.phone"
 							required
 							type="tel"
@@ -164,304 +173,6 @@
 		</div>
 		<FormSubmit :open-modal="success" />
 	</form>
-
-	<!-- <div class="h-full dark:bg-[#0A101E]">
-		<div
-			class="flex items-center justify-center py-12 px-6 sm:py-16 lg:mx-auto lg:max-w-7xl lg:px-8 lg:py-14"
-		>
-			<div class="">
-				<div class="mx-auto max-w-md sm:max-w-lg lg:mx-0">
-					<div class="relative mb-4 flex">
-						<div
-							:class="[
-								spotsLeft.spots > 0 ? 'badge' : 'err-badge',
-								' flex items-center rounded-full px-3 py-0.5 shadow-md',
-							]"
-						>
-							<ClockIcon class="mr-1 h-4 w-4" v-if="!spotsLeft.spots > 0" />
-							<p class="text-xs font-normal">
-								{{
-									spotsLeft.spots > 0
-										? `${spotsLeft.spots} spot${
-												spotsLeft.spots > 1 ? 's' : ''
-										  } left`
-										: ` ${spotsLeft.remaining_days} days`
-								}}
-							</p>
-						</div>
-					</div>
-					<h2
-						class="text-3xl font-bold tracking-tight dark:text-white sm:text-4xl"
-					>
-						Let's work together
-					</h2>
-					<p class="mt-4 text-lg text-gray-500 dark:text-gray-200 sm:mt-3">
-						{{
-							spotsLeft.spots > 0
-								? `Please fill out the answers on this form so we can get you in touch with the appropriate member of our team.`
-								: `Unfortunately, we're at capacity. Please submit your request and we'll reach out when availablity opens up.`
-						}}
-					</p>
-					<form
-						v-on:submit.prevent="submitForm"
-						:v-model="form"
-						class="mt-9 grid grid-cols-1 gap-y-6 transition-all sm:grid-cols-2 sm:gap-x-8"
-					>
-						<div>
-							<label
-								for="first-name"
-								class="block text-sm font-medium text-gray-700 dark:text-white"
-								>First name <span class="text-red-600">*</span></label
-							>
-							<div class="mt-1">
-								<input
-									:disabled="user.profile.first_name"
-									required
-									type="text"
-									name="first-name"
-									id="first-name"
-									v-model="form.first_name"
-									autocomplete="given-name"
-									placeholder="John"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								/>
-							</div>
-						</div>
-						<div>
-							<label
-								for="last-name"
-								class="block text-sm font-medium text-gray-700 dark:text-white"
-								>Last name <span class="text-red-600">*</span></label
-							>
-							<div class="mt-1">
-								<input
-									
-									type="text"
-									name="last-name"
-									id="last-name"
-									placeholder="Smith"
-									
-									autocomplete="family-name"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								/>
-							</div>
-						</div>
-						<div class="">
-							<label
-								for="email"
-								class="block text-sm font-medium text-gray-700 dark:text-white"
-								>Email <span class="text-red-600">*</span></label
-							>
-							<div class="mt-1">
-								<input
-									
-									id="email"
-									name="email"
-									type="email"
-									
-									autocomplete="email"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								/>
-							</div>
-						</div>
-						<div class="">
-							<label
-								for="phone-number"
-								class="block text-sm font-medium text-gray-700"
-								>Phone Number</label
-							>
-							<div class="relative mt-1 rounded-md shadow-sm">
-								<div class="absolute inset-y-0 left-0 flex items-center">
-									<label for="country" class="sr-only">Country</label>
-									<select
-										:disabled="user.profile.country_code"
-										v-model="form.phone_country"
-										id="country"
-										name="country"
-										autocomplete="country"
-										class="h-full rounded-md border-transparent bg-transparent py-0 pl-3 pr-7 text-gray-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-									>
-										<option value="1" selected>🇺🇸</option>
-										<option value="1">🇨🇦</option>
-										<option value="44">🇬🇧</option>
-										<option value="61">🇦🇺</option>
-									</select>
-								</div>
-
-								<input
-									:disabled="user.profile.phone_num"
-									v-model="form.phone"
-									type="text"
-									name="phone-number"
-									id="phone-number"
-									class="block w-full rounded-md border-gray-300 pl-16 focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 sm:text-sm"
-								/>
-							</div>
-						</div>
-						<div class="sm:col-span-2">
-							<div>
-								<label
-									for="type"
-									class="block text-sm font-medium text-gray-700 dark:text-white"
-									>What type of request is this</label
-								>
-								<select
-									:disabled="user"
-									v-model="form.type"
-									id="type"
-									name="type"
-									class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								>
-									<option value="vendor">
-										Software vendor wanting to be featured on our blueprint
-										marketplace
-									</option>
-									<option selected="" value="client">
-										Want us to build you a custom component that's not already
-										listed
-									</option>
-								</select>
-							</div>
-						</div>
-						<div class="sm:col-span-2">
-							<div>
-								<label
-									required
-									for="softwares"
-									class="block text-sm font-medium text-gray-700 dark:text-white"
-									>List the softwares involved<span class="text-red-600"
-										>*</span
-									></label
-								>
-								<div class="mt-1">
-									<input
-										type="text"
-										name="softwares"
-										id="softwares"
-										v-model="form.softwares"
-										class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-										placeholder="Salesforce,Hubspot,Airtable,..."
-										aria-describedby="email-description"
-									/>
-								</div>
-								<p class="mt-2 text-xs text-gray-500" id="email-description">
-									Separate using commas.
-								</p>
-							</div>
-						</div>
-
-						<div class="sm:col-span-2">
-							<div class="flex justify-between">
-								<label
-									for="how-can-we-help"
-									class="block text-sm font-medium text-gray-700 dark:text-white"
-									>{{
-										form.type === 'vendor'
-											? "Describe the top use cases you'd want to feature"
-											: 'Describe exactly what you want the workflow to do'
-									}}
-									<span class="text-red-600">*</span></label
-								>
-								<span
-									id="how-can-we-help-description"
-									class="text-sm text-gray-500"
-									>Max. 500 characters</span
-								>
-							</div>
-							<div class="mt-1">
-								<textarea
-									required
-									id="how-can-we-help"
-									name="how-can-we-help"
-									v-model="form.description"
-									aria-describedby="how-can-we-help-description"
-									placeholder="Please integrate {product name} with {System being integrated with}. The integration should include {Insert specific features/functionalities to be integrated}."
-									rows="4"
-									minlength="10"
-									maxlength="500"
-									class="block w-full rounded-md border-gray-300 shadow-sm transition-colors focus:border-indigo-500 focus:ring-indigo-500 focus:invalid:border-red-500 focus:invalid:ring-red-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								/>
-							</div>
-						</div>
-
-						<div class="sm:col-span-2">
-							<div class="flex justify-between">
-								<label
-									for="loom"
-									class="block text-sm font-medium text-gray-700 dark:text-white"
-									>Loom recording</label
-								>
-								<span class="text-sm text-gray-500" id="loom-optional"
-									>Optional</span
-								>
-							</div>
-							<div class="relative mt-1 rounded-md shadow-sm">
-								<div
-									class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-								>
-									<ViewfinderCircleIcon
-										class="h-5 w-5 text-gray-400"
-										aria-hidden="true"
-									/>
-								</div>
-								<input
-									type="url"
-									name="loom"
-									id="loom"
-									v-model="form.videoUrl"
-									class="block w-full rounded-md border-gray-300 pl-10 transition-colors focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-									placeholder="https://www.loom.com/share/..."
-								/>
-							</div>
-						</div>
-
-						<div class="sm:col-span-2">
-							<label class="text-sm font-medium text-gray-700 dark:text-white"
-								>Are you in a position to invest upwards of
-								{{ form.type === 'vendor' ? '$50,000' : '$8,000' }} to engage
-								our team? <span class="text-red-600">*</span></label
-							>
-							<select
-								required
-								class="mt-1 block w-full space-y-4 rounded-md border-gray-300 py-2 pl-3 pr-10 text-base transition-colors focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:text-sm"
-								v-model="form.decision"
-							>
-								<option
-									value="true"
-									class="flex items-center"
-								>
-									Yes
-								</option>
-								<option
-									value="false"
-									class="flex items-center"
-								>
-									No
-								</option>
-							</select>
-						</div>
-
-						<div class="text-right sm:col-span-2">
-							<button
-								type="submit"
-								class="inline-flex justify-center rounded-md border border-gray-400 bg-white py-2 px-4 text-sm font-medium text-black shadow-sm transition-transform hover:scale-105 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-transparent"
-							>
-								<div v-if="spotsLeft.spots > 0" class="flex items-center">
-									<SparklesIcon class="mr-1 h-5 w-5" />
-									<span>Apply now</span>
-								</div>
-								<div v-else class="flex items-center">
-									<QueueListIcon class="mr-1 h-5 w-5" />
-									<span>Join waitlist</span>
-								</div>
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-		
-	</div> -->
 </template>
 
 <script>
