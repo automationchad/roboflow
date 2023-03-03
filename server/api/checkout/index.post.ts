@@ -24,12 +24,16 @@ export default defineEventHandler(async (event) => {
 	} else if (body.type === 'initial') {
 		subscription = true;
 		promo = true;
+		const base_plan = await stripe.products.retrieve('prod_NSYJ4bOlfIJa6M');
 		const subscription_product = await stripe.products.retrieve(
 			'prod_NSMvHhDDIRWENr'
 		);
-		line_items.push({
-			price: subscription_product.default_price,
-		});
+		line_items.push(
+			{
+				price: subscription_product.default_price,
+			},
+			{ price: base_plan.default_price }
+		);
 	} else {
 		line_items.push({
 			price_data: {
