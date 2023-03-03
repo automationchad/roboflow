@@ -207,7 +207,8 @@
 															profile.workspaces
 													  )
 													: navigateTo(
-															`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`
+															`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
+															{ external: true }
 													  )
 											"
 											:class="[
@@ -215,7 +216,7 @@
 												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ !profile?.workspaces?.active ? 'Upgrade' : 'Manage' }}
+											{{ !profile.workspaces.active ? 'Upgrade' : 'Manage' }}
 										</a>
 									</MenuItem>
 								</div>
