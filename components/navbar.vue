@@ -200,10 +200,7 @@
 								<div class="px-2 py-1">
 									<MenuItem v-slot="{ active }" class="cursor-pointer">
 										<a
-											v-if="
-												!profile.workspaces.stripe_subscription_id &&
-												!profile.workspaces.active
-											"
+											v-if="!profile.workspaces.active"
 											@click="
 												handleCheckout(
 													{
