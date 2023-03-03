@@ -21,6 +21,15 @@ export default defineEventHandler(async (event) => {
 			price: retainer_product.default_price,
 			quantity: 1,
 		});
+	} else if (body.type === 'initial') {
+		subscription = true;
+		promo = true;
+		const subscription_product = await stripe.products.retrieve(
+			'prod_NSMvHhDDIRWENr'
+		);
+		line_items.push({
+			price: subscription_product.default_price,
+		});
 	} else {
 		line_items.push({
 			price_data: {
@@ -35,7 +44,7 @@ export default defineEventHandler(async (event) => {
 		});
 		if (customer.subscriptions.data.length === 0) {
 			const subscription_product = await stripe.products.retrieve(
-				'prod_NJiugyPSv8bwEj'
+				'prod_NSMvHhDDIRWENr'
 			);
 			subscription = true;
 			line_items.push({
@@ -56,10 +65,7 @@ export default defineEventHandler(async (event) => {
 		customer: body.customer ?? null,
 		payment_method_types: ['card', 'us_bank_account'],
 		mode: subscription ? 'subscription' : 'payment',
-		metadata: {
-			project_id: body.project_id,
-			workspace_id: `${body.workspace_id}`,
-		},
+		metadata: body.metadata,
 	};
 	const session = await stripe.checkout.sessions.create(details);
 	return { url: session.url };

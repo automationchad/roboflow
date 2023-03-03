@@ -51,7 +51,7 @@
 					const decay_rate = 0.7;
 					return initial_value * (1 - decay_rate) ** i;
 				});
-
+				console.log(pricing);
 				if (tasks <= 1000) return tasks * pricing[0];
 				if (tasks > 1000 && tasks <= 5000)
 					return 1000 * pricing[0] + (tasks - 1000) * pricing[1];

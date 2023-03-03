@@ -26,8 +26,7 @@
 <template>
 	<main class="m-0 w-full bg-white p-0 dark:bg-[#0A101E]">
 		<div class="">
-			<div class="relative back">
-				
+			<div class="back relative">
 				<div class="sm:px-46 mx-auto space-y-4 px-48 py-36 lg:px-48">
 					<div class="space-y-4">
 						<!-- <div class="relative flex">
@@ -40,9 +39,7 @@
 							</div>
 						</div> -->
 						<div class="relative space-y-2">
-							<p class="text-7xl font-bold dark:text-white">
-								AutomationOps,
-							</p>
+							<p class="text-7xl font-bold dark:text-white">AutomationOps,</p>
 							<p class="text-7xl font-bold dark:text-white">as-a-service.</p>
 						</div>
 						<div
@@ -98,6 +95,7 @@
 				customers: this.data,
 			};
 		},
+
 		computed: {
 			spotsLeft() {
 				const maxClients = 10;

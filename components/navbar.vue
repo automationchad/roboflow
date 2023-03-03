@@ -26,9 +26,6 @@
 	const supabase = useSupabaseClient();
 
 	const loading = ref(true);
-	const username = ref('');
-	const website = ref('');
-	const avatar_path = ref('');
 
 	async function signOut() {
 		try {
@@ -67,6 +64,26 @@
 			active: route.path === '/feed' || route.path.includes('post'),
 		},
 	];
+
+	const product = {
+		tray_project_id: null,
+	};
+
+	const handleCheckout = async (product, workspace) => {
+		const { url } = await $fetch('/api/checkout', {
+			method: 'post',
+			body: {
+				type: 'initial',
+				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
+				product: product,
+				project_id: product.tray_project_id,
+				workspace_id: workspace.id,
+				customer: workspace.stripe_customer_id,
+			},
+		});
+
+		location.href = url;
+	};
 </script>
 
 <template>
@@ -225,6 +242,23 @@
 							</MenuItems>
 						</transition>
 					</Menu>
+					<button
+						v-if="
+							!profile.workspaces.stripe_subscription_id &&
+							!profile.workspaces.active
+						"
+						@click="
+							handleCheckout(
+								{
+									tray_project_id: null,
+								},
+								profile.workspaces
+							)
+						"
+						class="-my-2.5 ml-8 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
+					>
+						<span>Get all-access <span aria-hidden="true">→</span></span>
+					</button>
 				</div>
 				<div
 					v-else
@@ -313,6 +347,14 @@
 
 <script>
 	export default {
+		props: {
+			user: {
+				type: Object,
+			},
+			profile: {
+				type: Object,
+			},
+		},
 		components: { ChevronDownIcon },
 	};
 </script>
