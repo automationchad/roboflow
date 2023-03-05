@@ -165,7 +165,7 @@
 								>
 									Tray.io development
 									<span class="ml-1 text-base font-normal text-gray-500"
-										>$999/mo</span
+										>$500/mo</span
 									>
 								</h3>
 								<p class="mt-1 text-base leading-7 text-gray-600">
@@ -173,10 +173,19 @@
 									Requires an automation subscription.
 								</p>
 							</div>
-							<a
-								:disabled="subscription"
-								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-								>Add on {{ ' ' }}<span aria-hidden="true">&rarr;</span></a
+							<button
+								:disabled="add_on.status === 'active' && subscription"
+								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-lime-600 disabled:ring-lime-200"
+								>{{
+									add_on.status === 'active' && subscription
+										? 'Active'
+										: 'Add on'
+								}}
+								{{ ' ' }}<span aria-hidden="true">{{
+									add_on.status === 'active' && subscription
+										? '&check;'
+										: '&rarr;'
+								}}</span></button
 							>
 						</div>
 					</div>
@@ -202,20 +211,25 @@
 
 	let subscription = false;
 	let subscription_type = false;
+	let add_on = false;
 	let customer = {};
+	const test = false;
 
-	if (user.value) {
-		customer = await $fetch(
-			`/api/stripe/customer?email=${user.value.email}`,
-			{
-				method: 'get',
-			}
-		);
-		console.log(customer);
-		subscription = await customer.subscriptions.data.find(
-			(o) => o.plan.metadata.type === 'retainer'
+	if (user.value || test) {
+		const email = test ? 'automation@motis.group' : user.value.email;
+		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
+			method: 'get',
+		});
+
+		subscription = customer.subscriptions.data.find(
+			(o) => o.plan?.metadata.type === 'retainer'
 		);
 		subscription_type = subscription.plan.nickname;
+
+		add_on = customer.subscriptions.data.find((o) =>
+			o.items.data.find((v) => v.plan.nickname === 'software_license')
+		);
+		console.log(add_on);
 	}
 
 	const tiers = [
