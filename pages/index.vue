@@ -408,7 +408,10 @@
 	const attrs = useAttrs();
 	const user = attrs.user;
 	const profile = attrs.profile;
-	if (profile?.workspaces.stripe_subscription_id) {
+	if (
+		profile?.workspaces.stripe_subscription_id &&
+		profile?.workspaces.active
+	) {
 		navigateTo('/account/requests');
 	}
 	const allAccess = ref(false);
