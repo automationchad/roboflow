@@ -91,7 +91,7 @@
 									{{ tier.description }}
 								</p>
 								<NuxtLink
-									@click="handleButtonClick(profile, tier)"
+									@click="handleButtonClick(user, profile, tier)"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -240,8 +240,8 @@
 		},
 	];
 
-	const handleButtonClick = async (profile, tier) => {
-		if (!user) {
+	const handleButtonClick = async (user, profile, tier) => {
+		if (!profile) {
 			emit('open-modal');
 		} else if (
 			profile?.workspaces?.stripe_subscription_id !== '' &&
