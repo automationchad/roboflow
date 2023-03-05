@@ -1,178 +1,172 @@
 <template>
-	<div class="bg-white py-24 sm:py-32">
-		<div class="mx-auto max-w-7xl px-6 lg:px-8">
-			<div class="mx-auto max-w-4xl text-center">
-				<h2 class="text-base font-semibold leading-7 text-indigo-600">Pricing</h2>
+	<div class="isolate overflow-hidden bg-gray-900" id="pricing">
+		<div
+			class="mx-auto max-w-7xl px-6 pb-96 pt-24 text-center sm:pt-32 lg:px-8"
+		>
+			<div class="mx-auto max-w-4xl">
+				<h2 class="text-base font-semibold leading-7 text-indigo-400">
+					Memberships levels
+				</h2>
 				<p
-					class="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"
+					class="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl"
 				>
-					Affordable pricing
+					Choose a plan that's right for you.
 				</p>
 			</div>
-			<p
-				class="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600"
-			>
-				Get unlimited automation requests and revisions. No expensive hourly
-				billing or contracts, cancel anytime.
-			</p>
-			<div class="mt-16 flex justify-center">
-				<RadioGroup
-					v-model="frequency"
-					class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200"
+			<div class="relative mt-6">
+				<p class="mx-auto max-w-2xl text-lg leading-8 text-white/60">
+					Get unlimited automation requests and revisions. No expensive hourly
+					billing or contracts, cancel anytime.
+				</p>
+				<svg
+					viewBox="0 0 1208 1024"
+					class="absolute -top-10 left-1/2 -z-10 h-[64rem] -translate-x-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:-top-12 md:-top-20 lg:-top-12 xl:top-0"
 				>
-					<RadioGroupLabel class="sr-only">Payment frequency</RadioGroupLabel>
-					<RadioGroupOption
-						as="template"
-						v-for="option in frequencies"
-						:key="option.value"
-						:value="option"
-						v-slot="{ checked }"
+					<ellipse
+						cx="604"
+						cy="512"
+						fill="url(#6d1bd035-0dd1-437e-93fa-59d316231eb0)"
+						rx="604"
+						ry="512"
+					/>
+					<defs>
+						<radialGradient id="6d1bd035-0dd1-437e-93fa-59d316231eb0">
+							<stop stop-color="#7775D6" />
+							<stop offset="1" stop-color="#E935C1" />
+						</radialGradient>
+					</defs>
+				</svg>
+			</div>
+		</div>
+		<div class="flow-root bg-white pb-24 sm:pb-32">
+			<div class="-mt-80">
+				<div class="mx-auto max-w-7xl px-6 lg:px-8">
+					<div
+						class="mx-auto grid max-w-lg grid-cols-3 gap-8 lg:max-w-7xl lg:grid-cols-3"
 					>
 						<div
+							v-for="(tier, idx) in tiers"
+							:key="tier.id"
 							:class="[
-								checked ? 'bg-indigo-600 text-white' : 'text-gray-500',
-								'cursor-pointer rounded-full py-1 px-2.5',
+								tier.mostPopular
+									? 'ring-2 ring-indigo-600'
+									: 'ring-1 ring-gray-900/10',
+								'flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl  sm:p-10',
 							]"
 						>
-							<span>{{ option.label }}</span>
-						</div>
-					</RadioGroupOption>
-				</RadioGroup>
-			</div>
-			<div
-				class="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
-			>
-				<div
-					v-for="tier in tiers"
-					:key="tier.id"
-					:class="[
-						tier.featured ? 'bg-gray-900 ring-gray-900' : 'ring-gray-200',
-						tier.mostPopular ? 'ring-2 ring-indigo-600' : 'ring-1 ring-gray-200',
-						'rounded-3xl p-8 ring-1 xl:p-10',
-					]"
-				>
-					<div class="flex items-center justify-between gap-x-4">
-						<h3
-							:id="tier.id"
-							:class="[
-								tier.mostPopular ? 'text-indigo-600' : 'text-gray-900',
-								tier.featured ? 'text-white' : 'text-gray-900',
-								'text-lg font-semibold leading-8',
-							]"
-						>
-							{{ tier.name }}
-						</h3>
-						<p
-							v-if="tier.mostPopular"
-							class="rounded-full bg-indigo-600/10 py-1 px-2.5 text-xs font-semibold leading-5 text-indigo-600"
-						>
-							Most popular
-						</p>
-					</div>
+							<div>
+								<div class="flex items-center justify-between gap-x-4">
+									<h3
+										:id="tier.id"
+										:class="[
+											tier.mostPopular ? 'text-indigo-600' : 'text-gray-900',
+											'text-base font-semibold leading-8',
+										]"
+									>
+										{{ tier.name }}
+									</h3>
+									<p
+										v-if="tier.mostPopular"
+										class="rounded-full bg-indigo-600/10 py-1 px-2.5 text-xs font-semibold leading-5 text-indigo-600"
+									>
+										Most popular
+									</p>
+								</div>
 
-					<p
-						:class="[
-							tier.featured ? 'text-gray-300' : 'text-gray-600',
-							'mt-4 text-sm leading-6',
-						]"
-					>
-						{{ tier.description }}
-					</p>
-					<p class="mt-6 flex items-baseline gap-x-1">
-						<span
-							:class="[
-								tier.featured ? 'text-white' : 'text-gray-900',
-								'text-4xl font-bold tracking-tight',
-							]"
-							>{{
-								typeof tier.price === 'string'
-									? tier.price
-									: tier.price[frequency.value]
-							}}</span
+								<div class="mt-4 flex items-baseline gap-x-2">
+									<span class="text-4xl font-bold tracking-tight text-gray-900"
+										>${{
+											(
+												tier.priceMonthly -
+												tier.priceMonthly * idx * 0.1
+											).toLocaleString()
+										}}</span
+									>
+									<span class="text-base font-semibold leading-7 text-gray-600"
+										>/month</span
+									>
+								</div>
+								<p class="mt-2 text-sm text-gray-400">{{ tier.billingInfo }}</p>
+								<p class="mt-6 text-base leading-7 text-gray-600">
+									{{ tier.description }}
+								</p>
+								<a
+									@click="
+										!user
+											? $emit('open-modal')
+											: navigateTo('/consulting/contact')
+									"
+									:aria-describedby="tier.id"
+									:class="[
+										tier.mostPopular
+											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500'
+											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300',
+										'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+									]"
+									>Get started</a
+								>
+
+								<ul
+									role="list"
+									class="my-10 space-y-4 text-sm leading-6 text-gray-600"
+								>
+									<li
+										v-for="feature in tier.features"
+										:key="feature"
+										class="flex gap-x-3"
+									>
+										<CheckIcon
+											class="h-6 w-5 flex-none text-indigo-600"
+											aria-hidden="true"
+										/>
+										{{ feature }}
+									</li>
+								</ul>
+
+								<ul
+									v-if="tier.addOns.length > 0"
+									role="list"
+									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600"
+								>
+									<span>Available add-ons:</span>
+									<li
+										v-for="feature in tier.addOns"
+										:key="feature"
+										class="flex gap-x-3"
+									>
+										<MinusIcon
+											class="h-6 w-5 flex-none text-slate-600"
+											aria-hidden="true"
+										/>
+										{{ feature }}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div
+							class="flex flex-col items-start gap-y-6 gap-x-8 rounded-3xl p-8 ring-1 ring-gray-900/10 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
 						>
-						<span
-							v-if="typeof tier.price !== 'string'"
-							:class="[
-								tier.featured ? 'text-gray-300' : 'text-gray-600',
-								'text-sm font-semibold leading-6',
-							]"
-							>{{ frequency.priceSuffix }}</span
-						>
-					</p>
-					<a
-						v-if="!user"
-						@click="$emit('open-modal')"
-						:aria-describedby="tier.id"
-						:class="[
-							tier.featured
-								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
-							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-						]"
-					>
-						{{ tier.cta }}
-					</a>
-					<!-- <a
-						v-else-if="user && !profile?.workspaces.all_access"
-						@click="handleCheckout(product, profile?.workspaces)"
-						:aria-describedby="tier.id"
-						:class="[
-							tier.featured
-								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
-							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-						]"
-					>
-						{{ tier.cta }}
-					</a> -->
-					<a
-						v-else-if="user && !profile?.workspaces.all_access"
-						href="/consulting/contact"
-						:aria-describedby="tier.id"
-						:class="[
-							tier.featured
-								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
-							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-						]"
-					>
-						{{ tier.cta }}
-					</a>
-					<a
-						v-else
-						disabled
-						:aria-describedby="tier.id"
-						:class="[
-							tier.featured
-								? 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white'
-								: 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600',
-							'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-						]"
-					>
-						{{ 'Already purchased' }}
-					</a>
-					<ul
-						role="list"
-						:class="[
-							tier.featured ? 'text-gray-300' : 'text-gray-600',
-							'mt-8 space-y-3 text-sm leading-6 xl:mt-10',
-						]"
-					>
-						<li
-							v-for="feature in tier.features"
-							:key="feature"
-							class="flex gap-x-3"
-						>
-							<CheckIcon
-								:class="[
-									tier.featured ? 'text-white' : 'text-indigo-600',
-									'h-6 w-5 flex-none',
-								]"
-								aria-hidden="true"
-							/>
-							{{ feature }}
-						</li>
-					</ul>
+							<div class="lg:min-w-0 lg:flex-1">
+								<h3
+									class="mt-1 text-lg font-semibold leading-8 tracking-tight text-indigo-600"
+								>
+									Tray.io development
+									<span class="ml-1 text-base font-normal text-gray-500"
+										>$999/mo</span
+									>
+								</h3>
+								<p class="mt-1 text-base leading-7 text-gray-600">
+									Get a better automation faster with Tray.io development.
+									Requires an automation subscription.
+								</p>
+							</div>
+							<a
+								disabled
+								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								>Add on {{ ' ' }}<span aria-hidden="true">&rarr;</span></a
+							>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -180,99 +174,56 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
-	import {
-		RadioGroup,
-		RadioGroupLabel,
-		RadioGroupOption,
-	} from '@headlessui/vue';
-	import { CheckIcon } from '@heroicons/vue/20/solid';
-	const props = defineProps({
-		user: { type: Object, required: true },
-		profile: { type: Object, required: true },
-	});
+	import { CheckIcon, MinusIcon } from '@heroicons/vue/20/solid';
 
-	const product = {
-		tray_project_id: null,
-	};
+	const base_price = 5000;
 
-	const frequencies = [
-		{ value: 'monthly', label: 'Monthly', priceSuffix: '/month' },
-		{ value: 'quarterly', label: 'Quarterly', priceSuffix: '/quarter' },
-	];
 	const tiers = [
 		{
-			name: 'Support',
-			id: 'tier-freelancer',
+			name: 'Monthly',
+			id: 'tier-hobby',
+			mostPopular: true,
 			href: '#',
-			price: { monthly: '$4,000', quarterly: '$10,800' },
-			description: 'For stalled startups that need more resource capacity.',
-			features: [
-				'Unlimited requests',
-				'Unlimited changes',
-				'Simple edits & changes',
-				'One project at a time',
+			billingInfo: 'Pause or cancel anytime',
+			priceMonthly: base_price,
+			description: 'No minimum commitment.',
+			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
+			addOns: [
+				'Multiple projects at a time',
 				'Weekly session calls',
 				'48-hour support response time',
 			],
-			featured: false,
-			mostPopular: false,
-			cta: 'Book a call',
 		},
 		{
-			name: 'Growth',
-			id: 'tier-startup',
+			name: 'Quarterly',
+			id: 'tier-team',
+			mostPopular: false,
 			href: '#',
-			price: { monthly: '$7,200', quarterly: '$19,500' },
-			description:
-				'For companies that need automation engineers for complex workflows.',
-			features: [
-				'Unlimited requests',
-				'Unlimited changes',
-				'Full scale projects',
+			billingInfo: 'Paid quarterly',
+			priceMonthly: base_price,
+			description: 'Save $500 per month.',
+			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
+			addOns: [
 				'Multiple projects at a time',
 				'Bi-weekly session calls',
 				'24-hour support response time',
 			],
-			featured: false,
-			mostPopular: true,
-			cta: 'Book a call',
 		},
 		{
-			name: 'Enterprise',
-			id: 'tier-enterprise',
-			href: '/consulting/contact',
-			price: 'Custom',
-			description: 'Dedicated support and infrastructure for your company.',
-			features: [
-				'Unlimited requests',
-				'Unlimited changes',
-				'Full scale projects',
+			name: 'Yearly',
+			id: 'tier-team',
+			mostPopular: false,
+			href: '#',
+			billingInfo: 'Paid annually',
+			priceMonthly: base_price,
+			description: 'Save $1,000 per month.',
+			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
+			addOns: [
 				'Multiple projects at a time',
 				'Bi-weekly session calls',
 				'1-hour, dedicated support response time',
 				'Custom reporting tools',
 			],
-			featured: true,
-			mostPopular: false,
-			cta: 'Book a call',
 		},
 	];
-
-	const frequency = ref(frequencies[0]);
-
-	const handleCheckout = async (product, workspace) => {
-		const { url } = await $fetch('/api/checkout', {
-			method: 'post',
-			body: {
-				type: 'retainer',
-				frequency,
-				product: product,
-				project_id: product.tray_project_id,
-				workspace_id: workspace.id,
-				customer: workspace.stripe_customer_id,
-			},
-		});
-		location.href = url;
-	};
 </script>
