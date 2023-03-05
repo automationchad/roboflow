@@ -24,6 +24,7 @@ export default defineNuxtConfig({
 			exclude: ['date-fns'],
 		},
 	},
+	plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
 	postcss: {
 		plugins: {
 			tailwindcss: {},
