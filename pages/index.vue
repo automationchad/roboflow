@@ -292,12 +292,6 @@
 		<consulting-scope />
 		<projects />
 		<consulting-pricing
-			v-if="
-				!profile ||
-				(profile?.workspaces.stripe_subscription_id === '' &&
-					!profile?.workspaces.stripe_subscription_id &&
-					!profile?.workspaces.active)
-			"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"

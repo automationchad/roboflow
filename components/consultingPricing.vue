@@ -91,17 +91,7 @@
 									{{ tier.description }}
 								</p>
 								<NuxtLink
-									@click="
-										!user
-											? $emit('open-modal')
-											: handleCheckout(
-													{
-														tray_project_id: null,
-													},
-													tier.id,
-													profile.workspaces
-											  )
-									"
+									@click="handleButtonClick(profile, tier)"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -109,7 +99,14 @@
 											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300',
 										'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
 									]"
-									>Get started</NuxtLink
+									>{{
+										profile ||
+										(profile?.workspaces.stripe_subscription_id !== '' &&
+											profile?.workspaces.stripe_subscription_id &&
+											profile?.workspaces.active)
+											? 'Manage'
+											: 'Get started'
+									}}</NuxtLink
 								>
 
 								<ul
@@ -167,7 +164,11 @@
 								</p>
 							</div>
 							<a
-								disabled
+								:disabled="
+									profile?.workspaces.stripe_subscription_id === '' &&
+									!profile?.workspaces.stripe_subscription_id &&
+									!profile?.workspaces.active
+								"
 								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>Add on {{ ' ' }}<span aria-hidden="true">&rarr;</span></a
 							>
@@ -181,8 +182,14 @@
 
 <script setup>
 	import { CheckIcon, MinusIcon } from '@heroicons/vue/20/solid';
+	import { useAttrs } from 'vue';
 
 	const base_price = 6000;
+	const emit = defineEmits(['open-modal']);
+
+	const attrs = useAttrs;
+	const profile = attrs.profile;
+	const user = attrs.user;
 
 	const tiers = [
 		{
@@ -211,7 +218,7 @@
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
-				'Bi-weekly session calls',
+				'Weekly session calls',
 				'24-hour support response time',
 			],
 		},
@@ -226,18 +233,42 @@
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
-				'Bi-weekly session calls',
+				'Weekly session calls',
 				'1-hour, dedicated support response time',
-				'Custom reporting tools',
+				'Advanced analytics',
 			],
 		},
 	];
 
-	const handleCheckout = async (product, billing_period, workspace) => {
+	const handleButtonClick = async (profile, tier) => {
+		if (!user) {
+			emit('open-modal');
+		} else if (
+			profile?.workspaces?.stripe_subscription_id !== '' &&
+			profile?.workspaces?.stripe_subscription_id &&
+			profile?.workspaces?.active
+		) {
+			navigateTo(
+				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${profile.workspaces.billing_email}`,
+				{ external: true }
+			);
+		} else {
+			await handleCheckout(
+				{
+					tray_project_id: null,
+				},
+				'retainer',
+				tier.id,
+				profile.workspaces
+			);
+		}
+	};
+
+	const handleCheckout = async (product, type, billing_period, workspace) => {
 		const { url } = await $fetch('/api/checkout', {
 			method: 'post',
 			body: {
-				type: 'retainer',
+				type,
 				billing_period,
 				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
 				product: product,
@@ -250,8 +281,8 @@
 	};
 </script>
 
-<script>
+<!-- <script>
 	export default {
 		props: ['user', 'profile'],
 	};
-</script>
+</script> -->

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 			price,
 			quantity: 1,
 		});
-	} else if (body.type === 'initial') {
+	} else if (body.type === 'initial' || body.type === 'add_on') {
 		subscription = true;
 		promo = true;
 		const base_plan = await stripe.products.retrieve('prod_NSYJ4bOlfIJa6M');
