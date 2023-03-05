@@ -227,3 +227,9 @@
 		},
 	];
 </script>
+
+<script>
+	export default {
+		props: ['user', 'profile'],
+	};
+</script>

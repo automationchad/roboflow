@@ -41,12 +41,12 @@
 	}
 
 	const paths = [
-		{
-			id: '/consulting',
-			target: '_parent',
-			title: 'Consulting',
-			active: route.path === '/consulting' || route.path.includes('contact'),
-		},
+		// {
+		// 	id: '/consulting',
+		// 	target: '_parent',
+		// 	title: 'Consulting',
+		// 	active: route.path === '/consulting' || route.path.includes('contact'),
+		// },
 		// {
 		// 	id: '/blueprints',
 		// 	title: 'Blueprints',
@@ -57,12 +57,12 @@
 		// 	title: 'Components',
 		// 	active: route.path === '/components' || route.path.includes('components'),
 		// },
-		{
-			id: 'https://www.google.com',
-			target: '_blank',
-			title: 'Podcast',
-			active: route.path === '/feed' || route.path.includes('post'),
-		},
+		// {
+		// 	id: 'https://www.google.com',
+		// 	target: '_blank',
+		// 	title: 'Podcast',
+		// 	active: route.path === '/feed' || route.path.includes('post'),
+		// },
 	];
 
 	const product = {
