@@ -90,19 +90,26 @@
 								<p class="mt-6 text-base leading-7 text-gray-600">
 									{{ tier.description }}
 								</p>
-								<NuxtLink
-									@click="handleButtonClick(user, profile, tier)"
+								<button
+									@click="handleButtonClick(user, customer, tier)"
+									:disabled="subscription_type === tier.id"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
-											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500'
-											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300',
-										'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
+											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 ',
+										'mt-6 block w-full cursor-pointer items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-lime-50 disabled:text-lime-600 disabled:ring-1 disabled:ring-lime-200 ',
 									]"
-									>{{
-										subscription.status === 'active' ? 'Manage' : 'Get started'
-									}}</NuxtLink
 								>
+									<div class="flex items-center justify-center">
+										<CheckCircleIcon
+											class="mr-1 h-5 w-5"
+											v-if="subscription_type === tier.id"
+										/>{{
+											subscription_type === tier.id ? 'Active' : 'Get started'
+										}}
+									</div>
+								</button>
 								<p class="mt-4 text-center text-xs">
 									<a
 										href="https://calendly.com/motis-group/intro"
@@ -180,24 +187,31 @@
 </template>
 
 <script setup>
-	import { CheckIcon, MinusIcon } from '@heroicons/vue/20/solid';
+	import {
+		CheckIcon,
+		CheckCircleIcon,
+		MinusIcon,
+	} from '@heroicons/vue/20/solid';
 	import { useAttrs } from 'vue';
 	const emit = defineEmits(['open-modal']);
 	const user = useSupabaseUser();
-	console.log(user.value);
+	const attrs = useAttrs();
+	const profile = attrs.profile;
 
 	const base_price = 6000;
 
 	let subscription = false;
 	let subscription_type = false;
+	let customer = {};
 
 	if (user.value) {
-		const { customer } = await $fetch(
+		customer = await $fetch(
 			`/api/stripe/customer?email=${user.value.email}`,
 			{
 				method: 'get',
 			}
 		);
+		console.log(customer);
 		subscription = await customer.subscriptions.data.find(
 			(o) => o.plan.metadata.type === 'retainer'
 		);
@@ -253,10 +267,10 @@
 		},
 	];
 
-	const handleButtonClick = async (user, subscription, tier) => {
+	const handleButtonClick = async (user, customer, tier) => {
 		if (!user) {
 			emit('open-modal');
-		} else if (subscription) {
+		} else if (customer.id) {
 			navigateTo(
 				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
 				{ external: true }

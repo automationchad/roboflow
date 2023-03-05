@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 		limit: 1,
 		expand: ['data.subscriptions'],
 	});
-	return { customer: customer[0] };
+	return customer[0];
 });
 
 // EDIT: Create listener to update add template_id to supabase once checkout session completed.
