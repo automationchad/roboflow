@@ -39,13 +39,13 @@
 
 	await getSprints();
 	const route = useRoute();
-	console.log(route.query);
+
 
 	const maxSpots = 10;
 
 	const spotsLeft = computed(() => {
 		var arrNum = Math.abs(maxSpots - requests.length);
-		console.log(arrNum);
+	
 		let remaining_days;
 		if (maxSpots <= requests.length) {
 			remaining_days = differenceInDays(

@@ -29,7 +29,7 @@
 			const charges_result = await $fetch(
 				`/api/charges/${data.workspaces.stripe_customer_id}`
 			);
-			console.log(charges_result);
+		
 			charges.value = charges_result;
 		}
 		loading.value = false;

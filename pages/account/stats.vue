@@ -20,8 +20,6 @@
 		invoices.value = invoices_result.data.value;
 	}
 
-	console.log(invoices.value);
-
 	var date = new Date(Date.now());
 	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
 	var d = new Date(new Date().getFullYear(), 0, 1);

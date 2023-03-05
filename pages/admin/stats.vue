@@ -503,7 +503,7 @@
 		}
 	);
 
-	console.log(workflow_runs);
+
 
 	workflow_runs.value = Object.values(
 		result.value.data.timeseries

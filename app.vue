@@ -17,7 +17,6 @@
 <template>
 	<div class="">
 		<div class="h-screen bg-white dark:bg-[#0A101E]">
-			<Navbar class="" @open-modal="showLoginModal = true" :user="user" :profile="profile ?? {}"/>
 			<NuxtPage :user="user" :profile="profile ?? {}" />
 			<LoginModal
 				v-show="showLoginModal"

@@ -205,7 +205,7 @@
 		computed: {
 			spotsLeft() {
 				var arrNum = Math.abs(this.maxSpots - this.requests.length);
-				console.log(arrNum);
+			
 				let remaining_days;
 				if (this.maxSpots <= this.requests.length) {
 					remaining_days = differenceInDays(

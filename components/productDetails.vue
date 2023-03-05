@@ -29,7 +29,7 @@
 				customer: workspace.stripe_customer_id,
 			},
 		});
-		// console.log(url);
+		
 		location.href = url;
 	};
 </script>

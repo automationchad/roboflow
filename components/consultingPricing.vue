@@ -42,7 +42,7 @@
 			<div class="-mt-80">
 				<div class="mx-auto max-w-7xl px-6 lg:px-8">
 					<div
-						class="mx-auto grid max-w-lg grid-cols-3 gap-8 lg:max-w-7xl lg:grid-cols-3"
+						class="mx-auto grid max-w-lg grid-cols-3 gap-8 sm:grid-cols-1 lg:max-w-7xl lg:grid-cols-3"
 					>
 						<div
 							v-for="(tier, idx) in tiers"
@@ -51,7 +51,7 @@
 								tier.mostPopular
 									? 'ring-2 ring-indigo-600'
 									: 'ring-1 ring-gray-900/10',
-								'flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl  sm:p-10',
+								'flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl sm:p-10',
 							]"
 						>
 							<div>
@@ -90,7 +90,7 @@
 								<p class="mt-6 text-base leading-7 text-gray-600">
 									{{ tier.description }}
 								</p>
-								<a
+								<NuxtLink
 									@click="
 										!user
 											? $emit('open-modal')
@@ -103,7 +103,7 @@
 											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300',
 										'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
 									]"
-									>Get started</a
+									>Get started</NuxtLink
 								>
 
 								<ul

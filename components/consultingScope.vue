@@ -63,8 +63,8 @@
 		CloudArrowUpIcon,
 		Cog6ToothIcon,
 		CreditCardIcon,
-        ShieldCheckIcon,
-        SquaresPlusIcon,
+		ShieldCheckIcon,
+		SquaresPlusIcon,
 		TicketIcon,
 		BoltIcon,
 		FingerPrintIcon,
@@ -75,13 +75,14 @@
 	const features = [
 		{
 			name: 'Design board',
-			description: "Add as many design requests to your board as you'd like.",
+			description:
+				"Add as many automation requests to your board as you'd like.",
 			icon: TicketIcon,
 		},
 		{
 			name: 'Lightning fast delivery',
 			description:
-				'Get your design one at a time in just a few days on average.',
+				'Get your automation one at a time in just a few days on average.',
 			icon: BoltIcon,
 		},
 		{
@@ -92,7 +93,7 @@
 		{
 			name: 'Top-notch quality',
 			description:
-				'Insane design quality at your fingertips whenever you need it.',
+				'Insane automation quality at your fingertips whenever you need it.',
 			icon: ShieldCheckIcon,
 		},
 		{
@@ -104,7 +105,7 @@
 		{
 			name: 'Unique and all yours',
 			description:
-				'Each of your designs is made especially for you and is 100% yours.',
+				'Each of your automations is made especially for you and is 100% yours.',
 			icon: FingerPrintIcon,
 		},
 	];

@@ -27,7 +27,7 @@
 		loading.value = false;
 	}
 
-	console.log(templates.value);
+	
 </script>
 
 <template>
