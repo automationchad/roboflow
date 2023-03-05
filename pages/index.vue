@@ -1,6 +1,11 @@
 <template>
 	<div class="">
-		<Navbar class="" @open-modal="showLoginModal = true" :user="user" :profile="profile ?? {}"/>
+		<Navbar
+			class=""
+			@open-modal="showLoginModal = true"
+			:user="user"
+			:profile="profile"
+		/>
 		<div class="bg-white">
 			<div
 				class="relative isolate overflow-hidden bg-gradient-to-b from-indigo-100/20"
@@ -11,7 +16,6 @@
 					<div class="px-6 lg:px-0 lg:pt-4">
 						<div class="mx-auto max-w-2xl">
 							<div class="max-w-lg">
-							
 								<h1
 									class="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"
 								>
@@ -24,13 +28,13 @@
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
-										v-if="!profile.workspaces"
+										v-if="!profile"
 										@click="showLoginModal = true"
-										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold shadow-md text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 										>Book a call</a
 									>
 									<a
-										v-else-if="profile.workspaces"
+										v-else-if="profile"
 										href="/consulting/contact"
 										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 										>Book a call</a
@@ -280,40 +284,8 @@
 								>
 							</li>
 						</ul>
-						<!-- <p class="mt-8">
-							We're a lean, mean, data-integrating machine, and we're not afraid
-							to get our hands dirty (in code, that is).
-						</p>
-						<h2 class="mt-16 text-2xl font-bold tracking-tight text-gray-900">
-							Our approach is simple:
-						</h2>
-						<p class="mt-6 border-l-4 border-gray-500 px-4">
-							We work with you to understand your challenges, and then we
-							develop customized automation solutions to solve them.
-						</p>
-						If you're interested in working together, click below to submit an
-						inquiry and we'll get back to you within 48 hours.
-						<b
-							>Please note that advisory packages are 90-day retainers and cost
-							$4,000 per month.</b
-						>
-						<p></p> -->
 					</div>
 				</div>
-				<!-- <div class="absolute mt-10">
-					<a
-						v-if="!profile.workspaces"
-						@click="showLoginModal = true"
-						class="cursor-pointer rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Book a call</a
-					>
-					<a
-						v-else-if="profile.workspaces"
-						href="/consulting/contact"
-						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Book a call</a
-					>
-				</div> -->
 			</div>
 		</div>
 
@@ -385,13 +357,13 @@
 				</div>
 				<div class="mt-10">
 					<a
-						v-if="!profile.workspaces"
+						v-if="!profile"
 						@click="showLoginModal = true"
 						class="cursor-pointer rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 						>Book a call</a
 					>
 					<a
-						v-else-if="profile.workspaces"
+						v-else-if="profile"
 						href="/consulting/contact"
 						class="rounded-md bg-indigo-600 py-2.5 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 						>Book a call</a
@@ -437,8 +409,8 @@
 	const user = attrs.user;
 	const profile = attrs.profile;
 	const allAccess = ref(false);
-	const workspace = profile?.workspaces;
-	allAccess.value = profile?.workspaces?.all_access;
+	const workspace = profile?.workspaces ?? null;
+	allAccess.value = profile?.workspaces?.all_access ?? null;
 
 	const stats = [
 		{ label: 'Founded', value: '2021' },

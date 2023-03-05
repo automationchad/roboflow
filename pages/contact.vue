@@ -13,10 +13,11 @@
 		ViewfinderCircleIcon,
 		ClockIcon,
 	} from '@heroicons/vue/24/outline';
-
+	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
-	let user = attrs.user ?? {};
-	user.profile = attrs.profile;
+	console.log(attrs);
+	const user = attrs.user;
+	const profile = attrs.profile;
 
 	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
 		'appkU7PnQUq7lePwf'
@@ -40,8 +41,6 @@
 
 	await getSprints();
 	const route = useRoute();
-	console.log(route.query);
-
 	const maxSpots = 6;
 
 	const spotsCalc = async () => {
@@ -64,6 +63,12 @@
 
 <template>
 	<div class="relative isolate h-full bg-gray-900">
+		<Navbar
+			class=""
+			@open-modal="showLoginModal = true"
+			:user="user"
+			:profile="profile"
+		/>
 		<div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
 			<div
 				class="relative px-6 pt-24 pb-20 sm:pt-32 lg:static lg:py-48 lg:px-8"
@@ -156,11 +161,8 @@
 						<div class="flex gap-x-4">
 							<dt class="flex-none">
 								<span class="sr-only">Telephone</span>
-								
-								<MapPinIcon
-									class="h-7 w-6 text-gray-400"
-									aria-hidden="true"
-								/>
+
+								<MapPinIcon class="h-7 w-6 text-gray-400" aria-hidden="true" />
 							</dt>
 							<dd>Remote</dd>
 						</div>

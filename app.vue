@@ -16,7 +16,7 @@
 
 <template>
 	<div class="h-screen bg-white dark:bg-[#0A101E]">
-		<NuxtPage :user="user" :profile="profile ?? {}" />
+		<NuxtPage :user="user" :profile="profile" />
 		<LoginModal
 			v-show="showLoginModal"
 			@close-modal="showLoginModal = false"
