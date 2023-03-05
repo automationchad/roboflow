@@ -98,7 +98,7 @@
 										tier.mostPopular
 											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
 											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 ',
-										'mt-6 block w-full cursor-pointer items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-lime-50 disabled:text-lime-600 disabled:ring-1 disabled:ring-lime-200 ',
+										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-lime-50 disabled:text-lime-600 disabled:ring-1 disabled:ring-lime-200 ',
 									]"
 								>
 									<div class="flex items-center justify-center">
