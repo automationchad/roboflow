@@ -94,7 +94,12 @@
 									@click="
 										!user
 											? $emit('open-modal')
-											: navigateTo('/contact')
+											: handleCheckout(
+													{
+														tray_project_id: null,
+													},
+													profile.workspace
+											  )
 									"
 									:aria-describedby="tier.id"
 									:class="[
@@ -226,6 +231,21 @@
 			],
 		},
 	];
+
+	const handleCheckout = async (product, workspace) => {
+		const { url } = await $fetch('/api/checkout', {
+			method: 'post',
+			body: {
+				type: 'initial',
+				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
+				product: product,
+				project_id: product.tray_project_id,
+				workspace_id: workspace.id,
+				customer: workspace.stripe_customer_id,
+			},
+		});
+		location.href = url;
+	};
 </script>
 
 <script>

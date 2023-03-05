@@ -15,8 +15,9 @@ export default defineEventHandler(async (event) => {
 		subscription = true;
 		promo = true;
 		const retainer_product = await stripe.products.retrieve(
-			'prod_NPb5k2rPILZoN0'
+			'prod_NSMrTLxCzg2BSa'
 		);
+		console.log(retainer_product);
 		line_items.push({
 			price: retainer_product.default_price,
 			quantity: 1,
