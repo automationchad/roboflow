@@ -108,6 +108,14 @@
 											: 'Get started'
 									}}</NuxtLink
 								>
+								<p class="mt-4 text-center text-xs">
+									<a
+										href="https://calendly.com/motis-group/intro"
+										target="_blank"
+										class="underline"
+										>Book a call</a
+									>
+								</p>
 
 								<ul
 									role="list"
