@@ -197,8 +197,8 @@
 
 	const attrs = useAttrs;
 	const profile = attrs.profile;
-	const user = attrs.user;
-
+	const user = useSupabaseUser();
+	
 	const tiers = [
 		{
 			name: 'Monthly',
@@ -249,7 +249,7 @@
 	];
 
 	const handleButtonClick = async (user, profile, tier) => {
-		if (!profile) {
+		if (!user) {
 			emit('open-modal');
 		} else if (
 			profile?.workspaces?.stripe_subscription_id !== '' &&

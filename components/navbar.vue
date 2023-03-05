@@ -13,9 +13,6 @@
 	import { PlusIcon } from '@heroicons/vue/20/solid';
 
 	const props = defineProps({
-		user: {
-			type: Object,
-		},
 		profile: {
 			type: Object,
 		},
@@ -23,6 +20,7 @@
 
 	const route = useRoute();
 
+	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
 	const loading = ref(true);
