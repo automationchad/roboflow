@@ -98,6 +98,7 @@
 													{
 														tray_project_id: null,
 													},
+													tier.id,
 													profile.workspaces
 											  )
 									"
@@ -186,7 +187,7 @@
 	const tiers = [
 		{
 			name: 'Monthly',
-			id: 'tier-hobby',
+			id: 'monthly',
 			mostPopular: true,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
@@ -201,7 +202,7 @@
 		},
 		{
 			name: 'Quarterly',
-			id: 'tier-team',
+			id: 'quarterly',
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Paid quarterly',
@@ -216,7 +217,7 @@
 		},
 		{
 			name: 'Yearly',
-			id: 'tier-team',
+			id: 'yearly',
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Paid annually',
@@ -232,11 +233,12 @@
 		},
 	];
 
-	const handleCheckout = async (product, workspace) => {
+	const handleCheckout = async (product, billing_period, workspace) => {
 		const { url } = await $fetch('/api/checkout', {
 			method: 'post',
 			body: {
 				type: 'retainer',
+				billing_period,
 				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
 				product: product,
 				project_id: product.tray_project_id,

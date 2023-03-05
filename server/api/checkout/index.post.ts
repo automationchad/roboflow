@@ -14,12 +14,13 @@ export default defineEventHandler(async (event) => {
 	if (body.type === 'retainer') {
 		subscription = true;
 		promo = true;
-		const retainer_product = await stripe.products.retrieve(
-			'prod_NSMrTLxCzg2BSa'
-		);
-		console.log(retainer_product);
+		const { data: prices } = await stripe.prices.list({
+			active: true,
+			product: 'prod_NSMrTLxCzg2BSa',
+		});
+		const price = prices.find((o) => o.nickname === body.billing_period).id;
 		line_items.push({
-			price: retainer_product.default_price,
+			price,
 			quantity: 1,
 		});
 	} else if (body.type === 'initial') {
