@@ -98,7 +98,7 @@
 													{
 														tray_project_id: null,
 													},
-													profile.workspace
+													profile.workspaces
 											  )
 									"
 									:aria-describedby="tier.id"
