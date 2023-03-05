@@ -182,7 +182,7 @@
 <script setup>
 	import { CheckIcon, MinusIcon } from '@heroicons/vue/20/solid';
 
-	const base_price = 5000;
+	const base_price = 6000;
 
 	const tiers = [
 		{
@@ -207,7 +207,7 @@
 			href: '#',
 			billingInfo: 'Paid quarterly',
 			priceMonthly: base_price,
-			description: 'Save $500 per month.',
+			description: `Save $${(base_price * 0.1).toLocaleString()} per month.`,
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
@@ -222,7 +222,7 @@
 			href: '#',
 			billingInfo: 'Paid annually',
 			priceMonthly: base_price,
-			description: 'Save $1,000 per month.',
+			description: `Save $${(base_price * 0.2).toLocaleString()} per month.`,
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
