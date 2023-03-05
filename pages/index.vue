@@ -292,6 +292,10 @@
 		<consulting-scope />
 		<projects />
 		<consulting-pricing
+			v-if="
+				!profile?.workspaces.stripe_subscription_id &&
+				!profile?.workspaces.active
+			"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"
@@ -408,12 +412,6 @@
 	const attrs = useAttrs();
 	const user = attrs.user;
 	const profile = attrs.profile;
-	if (
-		profile?.workspaces.stripe_subscription_id &&
-		profile?.workspaces.active
-	) {
-		navigateTo('/account/requests');
-	}
 	const allAccess = ref(false);
 	const workspace = profile?.workspaces ?? null;
 	allAccess.value = profile?.workspaces?.all_access ?? null;
