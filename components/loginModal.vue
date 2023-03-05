@@ -1,16 +1,16 @@
 <template>
 	<div class="relative z-50">
 		<transition
-			enter="ease-out duration-300"
+			enter="ease-out duration-700"
 			enter-from="opacity-0"
 			enter-to="opacity-100"
-			leave="ease-in duration-200"
+			leave="ease-in duration-700"
 			leave-from="opacity-100"
 			leave-to="opacity-0"
 		>
 			<div
 				@click="$emit('close-modal'), (error_message = '')"
-				class="fixed inset-0 bg-gray-500/25 transition-opacity dark:bg-black/75"
+				class="fixed inset-0 bg-gray-500/25 transition-opacity duration-700 dark:bg-black/75 backdrop-blur-md"
 			>
 				<div class="fixed inset-0 z-10 overflow-y-auto">
 					<div

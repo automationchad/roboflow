@@ -255,16 +255,10 @@
 				>
 					<div class="">
 						<button
-							href="/login"
-							class="text-sm font-semibold dark:text-white hover:dark:text-gray-200"
 							@click="$emit('open-modal')"
+							class="-my-2.5 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
 						>
-							Sign in</button
-						><button
-							@click="$emit('open-modal')"
-							class="-my-2.5 ml-8 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-						>
-							<span>Get access <span aria-hidden="true">→</span></span>
+							<span>Log in <span aria-hidden="true">→</span></span>
 						</button>
 					</div>
 				</div>

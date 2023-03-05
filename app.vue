@@ -15,16 +15,14 @@
 </script>
 
 <template>
-	<div class="">
-		<div class="h-screen bg-white dark:bg-[#0A101E]">
-			<NuxtPage :user="user" :profile="profile ?? {}" />
-			<LoginModal
-				v-show="showLoginModal"
-				@close-modal="showLoginModal = false"
-				@show-otp-modal="handleOtpModal()"
-			/>
-			<otpModal v-show="showOtpModal" />
-		</div>
+	<div class="h-screen bg-white dark:bg-[#0A101E]">
+		<NuxtPage :user="user" :profile="profile ?? {}" />
+		<LoginModal
+			v-show="showLoginModal"
+			@close-modal="showLoginModal = false"
+			@show-otp-modal="handleOtpModal()"
+		/>
+		<otpModal v-show="showOtpModal" />
 	</div>
 </template>
 
