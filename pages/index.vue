@@ -35,7 +35,7 @@
 									>
 									<a
 										v-else-if="profile"
-										href="/consulting/contact"
+										href="/contact"
 										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 										>Book a call</a
 									>

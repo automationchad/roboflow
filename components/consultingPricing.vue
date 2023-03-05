@@ -94,7 +94,7 @@
 									@click="
 										!user
 											? $emit('open-modal')
-											: navigateTo('/consulting/contact')
+											: navigateTo('/contact')
 									"
 									:aria-describedby="tier.id"
 									:class="[
