@@ -100,12 +100,7 @@
 										'mt-6 block cursor-pointer rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
 									]"
 									>{{
-										profile ||
-										(profile?.workspaces.stripe_subscription_id !== '' &&
-											profile?.workspaces.stripe_subscription_id &&
-											profile?.workspaces.active)
-											? 'Manage'
-											: 'Get started'
+										subscription.status === 'active' ? 'Manage' : 'Get started'
 									}}</NuxtLink
 								>
 								<p class="mt-4 text-center text-xs">
@@ -172,11 +167,7 @@
 								</p>
 							</div>
 							<a
-								:disabled="
-									profile?.workspaces.stripe_subscription_id === '' &&
-									!profile?.workspaces.stripe_subscription_id &&
-									!profile?.workspaces.active
-								"
+								:disabled="subscription"
 								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>Add on {{ ' ' }}<span aria-hidden="true">&rarr;</span></a
 							>
@@ -191,14 +182,28 @@
 <script setup>
 	import { CheckIcon, MinusIcon } from '@heroicons/vue/20/solid';
 	import { useAttrs } from 'vue';
+	const emit = defineEmits(['open-modal']);
+	const user = useSupabaseUser();
+	console.log(user.value);
 
 	const base_price = 6000;
-	const emit = defineEmits(['open-modal']);
 
-	const attrs = useAttrs;
-	const profile = attrs.profile;
-	const user = useSupabaseUser();
-	
+	let subscription = false;
+	let subscription_type = false;
+
+	if (user.value) {
+		const { customer } = await $fetch(
+			`/api/stripe/customer?email=${user.value.email}`,
+			{
+				method: 'get',
+			}
+		);
+		subscription = await customer.subscriptions.data.find(
+			(o) => o.plan.metadata.type === 'retainer'
+		);
+		subscription_type = subscription.plan.nickname;
+	}
+
 	const tiers = [
 		{
 			name: 'Monthly',
@@ -248,16 +253,12 @@
 		},
 	];
 
-	const handleButtonClick = async (user, profile, tier) => {
+	const handleButtonClick = async (user, subscription, tier) => {
 		if (!user) {
 			emit('open-modal');
-		} else if (
-			profile?.workspaces?.stripe_subscription_id !== '' &&
-			profile?.workspaces?.stripe_subscription_id &&
-			profile?.workspaces?.active
-		) {
+		} else if (subscription) {
 			navigateTo(
-				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${profile.workspaces.billing_email}`,
+				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
 				{ external: true }
 			);
 		} else {
