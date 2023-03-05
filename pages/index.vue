@@ -293,7 +293,7 @@
 		<projects />
 		<consulting-pricing
 			v-if="
-				!profile?.workspaces.stripe_subscription_id === '' &&
+				profile?.workspaces.stripe_subscription_id === '' &&
 				!profile?.workspaces.stripe_subscription_id &&
 				!profile?.workspaces.active
 			"
