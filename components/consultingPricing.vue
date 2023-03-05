@@ -236,7 +236,7 @@
 		const { url } = await $fetch('/api/checkout', {
 			method: 'post',
 			body: {
-				type: 'initial',
+				type: 'retainer',
 				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
 				product: product,
 				project_id: product.tray_project_id,
