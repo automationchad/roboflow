@@ -92,7 +92,10 @@
 								</p>
 								<button
 									@click="handleButtonClick(user, customer, tier)"
-									:disabled="subscription_type === tier.id"
+									:disabled="
+										subscription_type === tier.id &&
+										subscription.status === 'active'
+									"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -104,7 +107,10 @@
 									<div class="flex items-center justify-center">
 										<CheckCircleIcon
 											class="mr-1 h-5 w-5"
-											v-if="subscription_type === tier.id"
+											v-if="
+												subscription_type === tier.id &&
+												subscription.status === 'active'
+											"
 										/>{{
 											subscription_type === tier.id ? 'Active' : 'Get started'
 										}}
@@ -174,19 +180,23 @@
 								</p>
 							</div>
 							<button
-								:disabled="add_on.status === 'active' && subscription"
+								:disabled="
+									add_on.status === 'active' && subscription.status === 'active'
+								"
 								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-lime-600 disabled:ring-lime-200"
-								>{{
-									add_on.status === 'active' && subscription
+							>
+								{{
+									add_on.status === 'active' && subscription.status === 'active'
 										? 'Active'
 										: 'Add on'
 								}}
-								{{ ' ' }}<span aria-hidden="true">{{
-									add_on.status === 'active' && subscription
+								{{ ' '
+								}}<span aria-hidden="true">{{
+									add_on.status === 'active' && subscription.status === 'active'
 										? '&check;'
 										: '&rarr;'
-								}}</span></button
-							>
+								}}</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -213,7 +223,7 @@
 	let subscription_type = false;
 	let add_on = false;
 	let customer = {};
-	const test = false;
+	const test = true;
 
 	if (user.value || test) {
 		const email = test ? 'automation@motis.group' : user.value.email;
@@ -224,12 +234,12 @@
 		subscription = customer.subscriptions.data.find(
 			(o) => o.plan?.metadata.type === 'retainer'
 		);
+		
 		subscription_type = subscription.plan.nickname;
 
 		add_on = customer.subscriptions.data.find((o) =>
 			o.items.data.find((v) => v.plan.nickname === 'software_license')
 		);
-		console.log(add_on);
 	}
 
 	const tiers = [
