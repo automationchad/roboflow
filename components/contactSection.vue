@@ -24,9 +24,6 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="
-								user.profile.first_name != '' && user.profile.first_name != null
-							"
 							required
 							v-model="form.first_name"
 							type="text"
@@ -45,9 +42,6 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="
-								user.profile.last_name != '' && user.profile.last_name != null
-							"
 							required
 							v-model="form.last_name"
 							type="text"
@@ -66,7 +60,6 @@
 					>
 					<div class="mt-2.5">
 						<input
-							:disabled="user.email != '' && user.email != null"
 							v-model="form.email"
 							required
 							type="email"
@@ -87,10 +80,6 @@
 						<div class="absolute inset-y-0 left-0 flex items-center">
 							<label for="country" class="sr-only">Country</label>
 							<select
-								:disabled="
-									user.profile.country_code != '' &&
-									user.profile.country_code != null
-								"
 								v-model="form.phone_country"
 								id="country"
 								name="country"
@@ -104,9 +93,6 @@
 							</select>
 						</div>
 						<input
-							:disabled="
-								user.profile.phone_num != '' && user.profile.phone_num != null
-							"
 							v-model="form.phone"
 							required
 							type="tel"
@@ -187,14 +173,12 @@
 					{ id: 'no', title: 'No' },
 				],
 				form: {
-					first_name: this.user ? this.user?.profile?.first_name : '',
-					last_name: this.user ? this.user?.profile?.last_name : '',
-					phone_country: this.user.profile.country_code
-						? this.user.profile.country_code
-						: '1',
-					phone: this.user.profile.phone_num ? this.user.profile.phone_num : '',
+					first_name: '',
+					last_name: '',
+					phone_country: '1',
+					phone: '',
 					type: this.type ? this.type : 'vendor',
-					email: this.user ? this.user.email : '',
+					email: '',
 					videoUrl: '',
 					softwares: '',
 					description: '',
@@ -205,7 +189,7 @@
 		computed: {
 			spotsLeft() {
 				var arrNum = Math.abs(this.maxSpots - this.requests.length);
-			
+
 				let remaining_days;
 				if (this.maxSpots <= this.requests.length) {
 					remaining_days = differenceInDays(

@@ -408,6 +408,9 @@
 	const attrs = useAttrs();
 	const user = attrs.user;
 	const profile = attrs.profile;
+	if (user) {
+		navigateTo('/account/requests');
+	}
 	const allAccess = ref(false);
 	const workspace = profile?.workspaces ?? null;
 	allAccess.value = profile?.workspaces?.all_access ?? null;
