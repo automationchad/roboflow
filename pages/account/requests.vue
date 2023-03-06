@@ -389,18 +389,21 @@
 	const profile = attrs.profile;
 	const test = false;
 
-  
 	let subscription = { status: false };
-	const email = test ? 'automation@motis.group' : user.value.email;
+	let email;
 	let customer = {};
-	customer = await $fetch(`/api/stripe/customer?email=${email}`, {
-		method: 'get',
-	});
-	if (customer.subscriptions.data.length > 0) {
-		subscription = customer.subscriptions.data.find(
-			(o) => o.plan?.metadata.type === 'retainer'
-		);
+	if (user.value) {
+		const email = test ? 'automation@motis.group' : user.value.email;
+		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
+			method: 'get',
+		});
+		if (customer.subscriptions.data.length > 0) {
+			subscription = customer.subscriptions.data.find(
+				(o) => o.plan?.metadata.type === 'retainer'
+			);
+		}
 	}
+
 	if (!user.value || subscription.status !== 'active' || customer === {}) {
 		navigateTo('/');
 	}
