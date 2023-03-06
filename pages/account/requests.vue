@@ -60,7 +60,7 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
-              <div
+							<div
 								v-if="tickets.filter((o) => o.idList === activeId).length <= 0"
 								type="button"
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -387,16 +387,26 @@
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
 	const profile = attrs.profile;
-	if (!user.value) {
+	const test = false;
+
+  
+	let subscription = { status: false };
+	const email = test ? 'automation@motis.group' : user.value.email;
+	let customer = {};
+	customer = await $fetch(`/api/stripe/customer?email=${email}`, {
+		method: 'get',
+	});
+	if (customer.subscriptions.data.length > 0) {
+		subscription = customer.subscriptions.data.find(
+			(o) => o.plan?.metadata.type === 'retainer'
+		);
+	}
+	if (!user.value || subscription.status !== 'active' || customer === {}) {
 		navigateTo('/');
 	}
 
-	const success = ref(false);
-	const test = false;
-	const showOtpModal = ref(false);
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
-	let email = test ? 'automation@moleculartestinglabs.com' : user.value.email;
 	let domain = email.split('@')[1];
 	let boards = [];
 	boards = await $fetch(
@@ -413,7 +423,7 @@
 		})
 
 		.catch((err) => console.error(err));
-	
+
 	const board = boards.find((board) => board.name === domain);
 	let categories = [];
 	categories = await $fetch(
@@ -448,7 +458,6 @@
 			.catch((err) => console.error(err));
 	};
 	await getTickets(board, auth);
-	console.log(tickets);
 </script>
 
 <script>
