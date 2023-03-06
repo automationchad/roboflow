@@ -19,46 +19,26 @@
 	const user = attrs.user;
 	const profile = attrs.profile;
 
-	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
-		'appkU7PnQUq7lePwf'
-	);
-
-	let requests = [];
-
-	const table = base('sprints');
-
-	const getSprints = async () => {
-		const records = await table
-			.select({
-				view: 'viwjRdvlzpCwm0OuK',
-				sort: [{ field: 'est_finish_date', direction: 'asc' }],
-			})
-			.firstPage();
-		requests = records.map((o) => {
-			return { uuid: o.id, fields: o.fields };
-		});
-	};
-
 	await getSprints();
-	const route = useRoute();
+	
 	const maxSpots = 6;
 
-	const spotsCalc = async () => {
-		var arrNum = Math.abs(maxSpots - requests.length);
-		let remaining_days;
-		if (maxSpots <= requests.length) {
-			remaining_days = differenceInDays(
-				new Date(),
-				new Date(requests[arrNum].fields.est_finish_date)
-			);
-		} else remaining_days = 0;
-		return {
-			spots: requests.length >= maxSpots ? 0 : maxSpots - requests.length,
-			remaining_days,
-		};
-	};
+	// const spotsCalc = async () => {
+	// 	var arrNum = Math.abs(maxSpots - requests.length);
+	// 	let remaining_days;
+	// 	if (maxSpots <= requests.length) {
+	// 		remaining_days = differenceInDays(
+	// 			new Date(),
+	// 			new Date(requests[arrNum].fields.est_finish_date)
+	// 		);
+	// 	} else remaining_days = 0;
+	// 	return {
+	// 		spots: requests.length >= maxSpots ? 0 : maxSpots - requests.length,
+	// 		remaining_days,
+	// 	};
+	// };
 
-	const spotsLeft = await spotsCalc();
+	const spotsLeft = 10;
 </script>
 
 <template>

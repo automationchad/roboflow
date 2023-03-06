@@ -46,7 +46,7 @@
 </script>
 
 <template>
-	<div class="py-32 sm:py-32">
+	<div class="py-32 sm:py-32" id="projects">
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
 			<div class="mx-auto max-w-7xl px-6 lg:px-8">
 				<div class="mx-auto max-w-2xl sm:text-center">
@@ -61,12 +61,10 @@
 				</div>
 			</div>
 			<div class="mt-16 sm:mt-20">
-                
 				<ul
 					role="list"
 					class="grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
 				>
-					
 					<li
 						v-for="project in projects"
 						:key="project.name"

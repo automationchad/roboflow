@@ -40,7 +40,10 @@
 										>Book a call</a
 									>
 									<a
-										v-if="!profile || (profile.workspaces.billing_email === user.email)"
+										v-if="
+											!profile ||
+											profile.workspaces.billing_email === user.email
+										"
 										href="#pricing"
 										class="text-sm font-semibold leading-6 text-gray-900"
 										>See plans <span aria-hidden="true">→</span></a
@@ -298,7 +301,7 @@
 			:user="user"
 			:profile="profile"
 		/>
-		<div class="bg-white">
+		<div class="bg-white" id="faq">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
 					<h2
@@ -358,9 +361,9 @@
 					</div>
 				</div>
 			</div>
-			
 		</div>
-		<Cta/>
+		<Cta />
+		<FooterContent />
 		<LoginModal
 			v-show="showLoginModal"
 			@close-modal="showLoginModal = false"
@@ -397,21 +400,14 @@
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
-
 	const profile = attrs.profile;
-	const allAccess = ref(false);
-
-	const stats = [
-		{ label: 'Founded', value: '2021' },
-		{ label: 'Employees', value: '37' },
-		{ label: 'Countries', value: '12' },
-		{ label: 'Raised', value: '$25M' },
-	];
 
 	const converter = new showdown.Converter();
 	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
 		'appkU7PnQUq7lePwf'
 	);
+
+
 	let faqs = [];
 
 	const table = base('faqs');
