@@ -22,6 +22,13 @@
 			logo: logoAnimaginary,
 		},
 		{
+			name: 'Animaginary',
+			description:
+				'High performance web animation library, hand-written in optimized WASM.',
+			link: { href: '#', label: 'github.com' },
+			logo: logoAnimaginary,
+		},
+		{
 			name: 'HelioStream',
 			description:
 				'Real-time video streaming library, optimized for interstellar transmission.',
