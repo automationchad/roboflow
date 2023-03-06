@@ -18,8 +18,6 @@
 		},
 	});
 
-	const route = useRoute();
-
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
@@ -29,7 +27,7 @@
 		try {
 			loading.value = true;
 			let { error } = await supabase.auth.signOut();
-			location.reload();
+			navigateTo('/');
 			if (error) throw error;
 		} catch (error) {
 			alert(error.message);
@@ -79,7 +77,6 @@
 				customer: workspace.stripe_customer_id,
 			},
 		});
-
 		location.href = url;
 	};
 </script>
