@@ -53,4 +53,7 @@
 			Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
 			sans-serif;
 	}
+	html {
+		scroll-behavior: smooth;
+	}
 </style>

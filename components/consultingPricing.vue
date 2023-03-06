@@ -92,7 +92,7 @@
 								<button
 									@click="
 										handleButtonClick(
-											profile?.workspaces?.billing_email,
+											profile?.workspaces?.billing_email ?? null,
 											customer,
 											tier
 										)
