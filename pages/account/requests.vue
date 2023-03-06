@@ -377,10 +377,11 @@
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
+  const profile = attrs.profile;
 	if (!user.value) {
 		navigateTo('/');
 	}
-	const profile = attrs.profile;
+	
 	const success = ref(false);
 	const test = false;
 	const showOtpModal = ref(false);

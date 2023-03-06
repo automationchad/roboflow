@@ -162,36 +162,13 @@
 								<div class="px-2 py-1">
 									<MenuItem v-slot="{ active }">
 										<a
-											href="/changelog"
+											href="/account/requests"
 											:class="[
 												active ? 'bg-slate-100 ' : 'text-gray-900',
 												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											Changelog
-										</a>
-									</MenuItem>
-
-									<MenuItem v-slot="{ active }">
-										<a
-											href="/support"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											Support
-										</a>
-									</MenuItem>
-									<MenuItem v-slot="{ active }">
-										<a
-											href="/account/license"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											License
+											Requests
 										</a>
 									</MenuItem>
 								</div>
