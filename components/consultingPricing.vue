@@ -219,6 +219,27 @@
 							</button>
 						</div>
 					</div>
+					<div
+						class="mt-24 flex flex-col items-center justify-center text-center align-middle"
+					>
+						<div class="">
+							<h1
+								class="mt-2 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl"
+							>
+								Refer a friend & earn
+							</h1>
+							<p class="mt-2 mb-6">
+								Earn 10% monthly recurring commissions for each referral.
+							</p>
+							<a
+								href="https://app.getrewardful.com/login"
+								target="_blank"
+								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+							>
+								Join now
+							</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
