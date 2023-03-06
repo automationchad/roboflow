@@ -333,7 +333,7 @@
 <script>
 	export default {
 		data() {
-			return { showSubmitModal: false, showOtpModal: false, backLogPage: 1 };
+			return { showSubmitModal: false, showOtpModal: false, backLogPage: 0 };
 		},
 		components: { ShieldCheckIcon, CheckCircleIcon },
 	};
