@@ -91,17 +91,16 @@
 									{{ tier.description }}
 								</p>
 								<button
-									@click="handleButtonClick(user, customer, tier)"
-									:disabled="
-										subscription_type === tier.id &&
-										subscription.status === 'active'
-									"
+									@click="handleButtonClick(profile.workspaces.billing_email, customer, tier)"
 									:aria-describedby="tier.id"
 									:class="[
-										tier.mostPopular
+										subscription_type === tier.id &&
+										subscription.status === 'active'
+											? 'bg-lime-50 text-lime-600 ring-1 ring-lime-200'
+											: tier.mostPopular
 											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
 											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 ',
-										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-lime-50 disabled:text-lime-600 disabled:ring-1 disabled:ring-lime-200 ',
+										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
 									]"
 								>
 									<div class="flex items-center justify-center">
@@ -180,15 +179,26 @@
 								</h3>
 								<p class="mt-1 text-base leading-7 text-gray-600">
 									Get a better automation faster with Tray.io development.
-									Requires an automation subscription.
+									{{
+										!subscription.status
+											? 'Requires an automation subscription.'
+											: ''
+									}}
 								</p>
 							</div>
 							<button
 								:disabled="
-									add_on.status === 'active' && subscription.status === 'active'
+									!subscription.status ||
+									(add_on.status === 'active' &&
+										subscription.status === 'active')
 								"
 								@click="handleCheckout({}, 'add_on', '', profile.workspaces)"
-								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-lime-600 disabled:ring-lime-200"
+								:class="[
+									add_on.status === 'active'
+										? 'text-lime-600 ring-lime-200'
+										: 'hover:ring-indigo-300',
+									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+								]"
 							>
 								{{
 									add_on.status === 'active' && subscription.status === 'active'
@@ -230,8 +240,11 @@
 	let customer = {};
 	const test = false;
 
-	if (user.value) {
-		const email = test ? 'automation@motis.group' : user.value.email;
+	if (profile?.workspaces.billing_email) {
+		const email = test
+			? 'automation@motis.group'
+			: profile.workspaces.billing_email;
+
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',
 		});
@@ -308,7 +321,7 @@
 			emit('open-modal');
 		} else if (customer.subscriptions.data.length > 0) {
 			navigateTo(
-				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
+				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user}`,
 				{ external: true }
 			);
 		} else {
@@ -324,7 +337,7 @@
 	};
 
 	const handleCheckout = async (product, type, billing_period, workspace) => {
-		const { url } = await $fetch('/api/checkout', {
+		const { url } = await $fetch('/api/stripe/checkout', {
 			method: 'post',
 			body: {
 				type,

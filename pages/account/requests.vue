@@ -60,7 +60,8 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
-							<div
+							<button
+								@click="showSubmitModal = true"
 								v-if="tickets.filter((o) => o.idList === activeId).length <= 0"
 								type="button"
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -68,7 +69,7 @@
 								<span class="my-2 block text-sm font-semibold text-gray-900"
 									>Hooray...nothing to see here</span
 								>
-							</div>
+							</button>
 							<div
 								v-for="ticket in tickets.filter((o) => o.idList === activeId)"
 								:key="ticket.id"
@@ -171,7 +172,8 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-							<div
+							<button
+								@click="showSubmitModal = true"
 								v-if="tickets.filter((o) => o.idList === backlogId).length <= 0"
 								type="button"
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -179,7 +181,7 @@
 								<span class="my-2 block text-sm font-semibold text-gray-900"
 									>Hooray...nothing to see here</span
 								>
-							</div>
+							</button>
 							<div
 								v-for="ticket in tickets
 									.filter((o) => o.idList === backlogId)
@@ -287,7 +289,8 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-							<div
+							<button
+								@click="showSubmitModal = true"
 								v-if="
 									tickets.filter((o) => o.idList === completedId).length <= 0
 								"
@@ -297,7 +300,7 @@
 								<span class="my-2 block text-sm font-semibold text-gray-900"
 									>Hooray...nothing to see here</span
 								>
-							</div>
+							</button>
 							<div
 								v-for="ticket in tickets
 									.filter((o) => o.idList === completedId)
@@ -387,13 +390,14 @@
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
 	const profile = attrs.profile;
+	console.log(profile);
 	const test = false;
 
 	let subscription = { status: false };
-	let email;
+	let email = 'automation@motis.group';
 	let customer = {};
-	if (user.value) {
-		const email = test ? 'automation@motis.group' : user.value.email;
+	if (profile?.workspaces.billing_email) {
+		email = test ? 'automation@motis.group' : profile?.workspaces.billing_email;
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',
 		});
@@ -404,13 +408,14 @@
 		}
 	}
 
+	const domain = email.split('@')[1];
+
 	if (!user.value || subscription.status !== 'active' || customer === {}) {
 		navigateTo('/');
 	}
 
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
-	let domain = email.split('@')[1];
 	let boards = [];
 	boards = await $fetch(
 		`https://api.trello.com/1/organizations/motisgroup/boards?filter=open&fields=name,id&${auth}`,
