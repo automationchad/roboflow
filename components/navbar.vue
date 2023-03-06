@@ -27,7 +27,7 @@
 		try {
 			loading.value = true;
 			let { error } = await supabase.auth.signOut();
-			navigateTo('/');
+			location.reload()
 			if (error) throw error;
 		} catch (error) {
 			alert(error.message);
@@ -156,6 +156,7 @@
 										user.email
 									}}</span>
 								</p>
+
 								<div class="px-2 py-1">
 									<MenuItem v-slot="{ active }">
 										<a
@@ -168,9 +169,11 @@
 											Requests
 										</a>
 									</MenuItem>
-								</div>
-								<div class="px-2 py-1">
-									<MenuItem v-slot="{ active }" class="cursor-pointer">
+									<MenuItem
+										v-slot="{ active }"
+										class="cursor-pointer"
+										v-if="profile?.workspaces.billing_email === user?.email"
+									>
 										<a
 											@click="
 												!profile?.workspaces?.active
@@ -188,23 +191,10 @@
 												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ !profile.workspaces.active ? 'Upgrade' : 'Manage' }}
+											{{ !profile.workspaces.active ? 'Upgrade' : 'Billing' }}
 										</a>
 									</MenuItem>
-								</div>
 
-								<div class="px-2 py-1">
-									<MenuItem v-slot="{ active }">
-										<a
-											href="/account/settings"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											Settings
-										</a>
-									</MenuItem>
 									<MenuItem v-slot="{ active }">
 										<button
 											@click="signOut"

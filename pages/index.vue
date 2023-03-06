@@ -408,6 +408,7 @@
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
+
 	const profile = attrs.profile;
 	const allAccess = ref(false);
 

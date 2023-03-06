@@ -387,14 +387,19 @@
 	} from '@heroicons/vue/24/outline';
 	import { format, differenceInDays } from 'date-fns';
 	import { useAttrs } from 'vue';
+	definePageMeta({ middleware: ['auth'] });
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
+	if (!user.value) {
+		navigateTo('/');
+	}
+
 	const profile = attrs.profile;
-	console.log(profile);
+
 	const test = false;
 
 	let subscription = { status: false };
-	let email = 'automation@motis.group';
+	let email;
 	let customer = {};
 	if (profile?.workspaces.billing_email) {
 		email = test ? 'automation@motis.group' : profile?.workspaces.billing_email;
@@ -409,10 +414,6 @@
 	}
 
 	const domain = email.split('@')[1];
-
-	if (!user.value || subscription.status !== 'active' || customer === {}) {
-		navigateTo('/');
-	}
 
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
