@@ -76,9 +76,8 @@
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span class="text-4xl font-bold tracking-tight text-gray-900"
 										>${{
-											(
-												tier.priceMonthly -
-												tier.priceMonthly * idx * 0.1
+											Math.round(
+												tier.priceMonthly - tier.priceMonthly * idx * 0.1
 											).toLocaleString()
 										}}</span
 									>
@@ -237,7 +236,7 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-	const base_price = 6000;
+	const base_price = 3000;
 
 	let subscription = { status: false };
 	let subscription_type = false;
@@ -282,11 +281,7 @@
 			priceMonthly: base_price,
 			description: 'No minimum commitment.',
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
-			addOns: [
-				'Multiple projects at a time',
-				'Weekly session calls',
-				'48-hour support response time',
-			],
+			addOns: ['Multiple projects at a time', '48-hour support response time'],
 		},
 		{
 			name: 'Quarterly',
@@ -295,10 +290,13 @@
 			href: '#',
 			billingInfo: 'Paid quarterly',
 			priceMonthly: base_price,
-			description: `Save $${(base_price * 0.1).toLocaleString()} per month.`,
+			description: `Save $${Math.round(
+				base_price * 0.1
+			).toLocaleString()} per month.`,
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
+				'Ticket escalation',
 				'Weekly session calls',
 				'24-hour support response time',
 			],
@@ -310,12 +308,15 @@
 			href: '#',
 			billingInfo: 'Paid annually',
 			priceMonthly: base_price,
-			description: `Save $${(base_price * 0.2).toLocaleString()} per month.`,
+			description: `Save $${Math.round(
+				base_price * 0.2
+			).toLocaleString()} per month.`,
 			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
 			addOns: [
 				'Multiple projects at a time',
+				'Ticket escalation',
 				'Weekly session calls',
-				'1-hour, dedicated support response time',
+				'12-hour, dedicated support response time',
 				'Advanced analytics',
 			],
 		},

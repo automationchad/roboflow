@@ -40,6 +40,7 @@
 										>Book a call</a
 									>
 									<a
+										v-if="!profile || (profile.workspaces.billing_email === user.email)"
 										href="#pricing"
 										class="text-sm font-semibold leading-6 text-gray-900"
 										>See plans <span aria-hidden="true">→</span></a
