@@ -67,17 +67,18 @@
 												<label
 													for="location"
 													class="block text-sm font-medium leading-6 text-gray-900"
-													>Priority {{ ' ' }}
+													>Type {{ ' ' }}
 													<span class="text-rose-700">*</span></label
 												>
 												<select
+													v-model="type"
 													id="location"
 													name="location"
 													class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
 												>
-													<option>Low</option>
-													<option selected="">Medium</option>
-													<option>High</option>
+													<option value="💎">💎 New workflow</option>
+													<option value="👾">👾 Bug fix</option>
+													<option value="🩹">🩹 Existing workflow mod</option>
 												</select>
 											</div>
 											<div class="sm:col-span-2">
@@ -113,6 +114,7 @@
 												</div>
 												<div class="mt-2.5">
 													<input
+														v-model="link"
 														type="url"
 														name="url"
 														id="url"
@@ -127,7 +129,9 @@
 										<button
 											type="submit"
 											:disabled="loading"
-											@click="handleSubmit({ name, brief })"
+											@click="
+												handleSubmit({ name, brief, type, link, auth, listId })
+											"
 											class="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 										>
 											<span>{{ loading ? 'Loading' : 'Create ticket' }}</span>
@@ -157,18 +161,49 @@
 	const open = ref(true);
 	const name = ref('');
 	const brief = ref('');
+	const link = ref('');
+	const type = ref('');
 	const loading = ref(false);
 	const error_occurred = ref(false);
 
+	function addWorkDays(startDate, days) {
+		if (isNaN(days)) {
+			console.log('Value provided for "days" was not a number');
+			return;
+		}
+		if (!(startDate instanceof Date)) {
+			console.log('Value provided for "startDate" was not a Date object');
+			return;
+		}
+		// Get the day of the week as a number (0 = Sunday, 1 = Monday, .... 6 = Saturday)
+		var dow = startDate.getDay();
+		var daysToAdd = parseInt(days);
+		// If the current day is Sunday add one day
+		if (dow == 0) daysToAdd++;
+		// If the start date plus the additional days falls on or after the closest Saturday calculate weekends
+		if (dow + daysToAdd >= 6) {
+			//Subtract days in current working week from work days
+			var remainingWorkDays = daysToAdd - (5 - dow);
+			//Add current working week's weekend
+			daysToAdd += 2;
+			if (remainingWorkDays > 5) {
+				//Add two days for each working week by calculating how many weeks are included
+				daysToAdd += 2 * Math.floor(remainingWorkDays / 5);
+				//Exclude final weekend if remainingWorkDays resolves to an exact number of weeks
+				if (remainingWorkDays % 5 == 0) daysToAdd -= 2;
+			}
+		}
+		startDate.setDate(startDate.getDate() + daysToAdd);
+		return startDate;
+	}
+
 	const handleSubmit = async (body) => {
 		loading.value = true;
-		var payload = {
-			name: body.name,
-			desc: body.brief,
-			idList: '64040fbc24e31b54998629dc',
-		};
-		fetch(
-			`https://api.trello.com/1/cards?idList=64040fbc24e31b54998629dc&name=${payload.name}&desc=${payload.desc}&key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`,
+		var due_date = addWorkDays(new Date(), 5);
+		const card = await $fetch(
+			`https://api.trello.com/1/cards?idList=${body.listId}&name=${body.type}:${
+				' ' + body.name
+			}&desc=${body.brief}&${body.auth}&due=${due_date}`,
 			{
 				method: 'POST',
 				headers: {
@@ -177,14 +212,32 @@
 			}
 		)
 			.then((response) => {
-				console.log(`Response: ${response.status} ${response.statusText}`);
-				return response.text();
+				return response;
 			})
-			.then((text) => console.log(text))
 			.catch((err) => console.error(err));
-        
+		if (link !== '') {
+			await $fetch(
+				`https://api.trello.com/1/cards/${card.id}/attachments?url=${body.link}&name=videolink&${body.auth}`,
+				{
+					method: 'POST',
+					headers: {
+						Accept: 'application/json',
+					},
+				}
+			)
+				.then((response) => {
+					return response;
+				})
+				.catch((err) => console.error(err));
+		}
 		emit('close-modal');
-		emit('show-otp-modal');
-        location.reload();
+		emit('submit-reload');
+		// location.reload();
+	};
+</script>
+
+<script>
+	export default {
+		props: ['listId', 'auth'],
 	};
 </script>
