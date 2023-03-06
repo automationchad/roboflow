@@ -64,8 +64,8 @@ export default defineEventHandler(async (event) => {
 		phone_number_collection: {
 			enabled: true,
 		},
-		success_url: 'https://motis.group/contact/success',
-		cancel_url: 'https://motis.group',
+		success_url: 'https://motis.group',
+		cancel_url: 'https://motis.group/#pricing',
 		allow_promotion_codes: promo ? true : null,
 		line_items,
 		customer: body.customer ?? null,

@@ -112,7 +112,11 @@
 												subscription.status === 'active'
 											"
 										/>{{
-											subscription_type === tier.id ? 'Active' : 'Get started'
+											subscription_type === tier.id
+												? 'Manage subscription'
+												: subscription.status === 'active'
+												? 'Upgrade'
+												: 'Get started'
 										}}
 									</div>
 								</button>
@@ -183,6 +187,7 @@
 								:disabled="
 									add_on.status === 'active' && subscription.status === 'active'
 								"
+								@click="handleCheckout({}, 'add_on', '', profile.workspaces)"
 								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-lime-600 disabled:ring-lime-200"
 							>
 								{{
@@ -219,27 +224,34 @@
 
 	const base_price = 6000;
 
-	let subscription = false;
+	let subscription = { status: false };
 	let subscription_type = false;
-	let add_on = false;
+	let add_on = { status: false };
 	let customer = {};
 	const test = false;
 
-	if (user.value || test) {
+	if (user.value) {
 		const email = test ? 'automation@motis.group' : user.value.email;
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',
 		});
 
-		subscription = customer.subscriptions.data.find(
-			(o) => o.plan?.metadata.type === 'retainer'
-		);
-		
-		subscription_type = subscription.plan.nickname;
-
-		add_on = customer.subscriptions.data.find((o) =>
-			o.items.data.find((v) => v.plan.nickname === 'software_license')
-		);
+		if (customer.subscriptions.data.length > 0) {
+			subscription = customer.subscriptions.data.find(
+				(o) => o.plan?.metadata.type === 'retainer'
+			);
+			if (subscription.id) {
+				subscription_type = subscription.plan.nickname;
+			}
+			add_on = customer.subscriptions.data.find((o) =>
+				o.items.data.find((v) => v.plan.nickname === 'software_license')
+			)
+				? customer.subscriptions.data.find((o) =>
+						o.items.data.find((v) => v.plan.nickname === 'software_license')
+				  )
+				: { status: false };
+		}
+		console.log(subscription);
 	}
 
 	const tiers = [
@@ -294,7 +306,7 @@
 	const handleButtonClick = async (user, customer, tier) => {
 		if (!user) {
 			emit('open-modal');
-		} else if (customer.id) {
+		} else if (customer.subscriptions.data.length > 0) {
 			navigateTo(
 				`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
 				{ external: true }
@@ -317,7 +329,7 @@
 			body: {
 				type,
 				billing_period,
-				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
+				metadata: { type, workspace_id: workspace.id },
 				product: product,
 				project_id: product.tray_project_id,
 				workspace_id: workspace.id,
@@ -327,9 +339,3 @@
 		location.href = url;
 	};
 </script>
-
-<!-- <script>
-	export default {
-		props: ['user', 'profile'],
-	};
-</script> -->
