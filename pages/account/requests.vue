@@ -310,16 +310,38 @@
 	const profile = attrs.profile;
 	const success = ref(false);
 	const limit = 3;
+	const test = false;
 
 	const showOtpModal = ref(false);
+
+	let auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
 	if (!user.value) {
 		navigateTo('/');
 	}
+	let email = test ? 'automation@motis.group' : user.value.email;
+	let domain = email.split('@')[1];
+	let boards = [];
+	boards = await $fetch(
+		`https://api.trello.com/1/organizations/motisgroup/boards?${auth}`,
+		{
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+			},
+		}
+	)
+		.then((response) => {
+			return response;
+		})
+
+		.catch((err) => console.error(err));
+
+	const board = boards.find((board) => board.name === domain);
 
 	let tickets = [];
 	tickets = await $fetch(
-		`https://api.trello.com/1/boards/4DOSvwSr/cards?key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`,
+		`https://api.trello.com/1/boards/${board.id}/cards?${auth}`,
 		{
 			method: 'GET',
 		}
