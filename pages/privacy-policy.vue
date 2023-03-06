@@ -14,11 +14,11 @@
 			:profile="profile"
 		/>
 		<div class="relative -mt-[5.75rem] overflow-hidden pt-[5.75rem]">
-			<img
+			<!-- <img
 				src="~/assets/images/logo.png"
 				alt=""
 				class="absolute top-0 left-1/2 -ml-[39rem] w-[113.125rem] max-w-none"
-			/>
+			/> -->
 			<div class="px-4 sm:px-6 lg:px-8">
 				<div class="relative mx-auto max-w-[37.5rem] pt-20 pb-24 text-center">
 					<h1
