@@ -223,7 +223,7 @@
 	let subscription_type = false;
 	let add_on = false;
 	let customer = {};
-	const test = true;
+	const test = false;
 
 	if (user.value || test) {
 		const email = test ? 'automation@motis.group' : user.value.email;
