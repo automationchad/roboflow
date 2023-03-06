@@ -232,7 +232,7 @@
 		}
 		emit('close-modal');
 		emit('submit-reload');
-		// location.reload();
+		location.reload();
 	};
 </script>
 

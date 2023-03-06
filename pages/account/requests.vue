@@ -28,7 +28,7 @@
 					</div>
 				</div>
 				<div class="">
-					<div v-if="tickets.length === 0" class="text-center">
+					<!-- <div v-if="tickets.length === 0" class="text-center">
 						<TicketIcon class="mx-auto h-12 w-12 text-gray-400" />
 
 						<h3 class="mt-2 text-sm font-semibold text-gray-900">
@@ -46,8 +46,8 @@
 								New Request
 							</button>
 						</div>
-					</div>
-					<div v-else class="">
+					</div> -->
+					<div class="">
 						<div class="bg-white py-5">
 							<div
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
@@ -60,6 +60,15 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
+              <div
+								v-if="tickets.filter((o) => o.idList === activeId).length <= 0"
+								type="button"
+								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+							>
+								<span class="my-2 block text-sm font-semibold text-gray-900"
+									>Hooray...nothing to see here</span
+								>
+							</div>
 							<div
 								v-for="ticket in tickets.filter((o) => o.idList === activeId)"
 								:key="ticket.id"
@@ -377,11 +386,11 @@
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
-  const profile = attrs.profile;
+	const profile = attrs.profile;
 	if (!user.value) {
 		navigateTo('/');
 	}
-	
+
 	const success = ref(false);
 	const test = false;
 	const showOtpModal = ref(false);
@@ -391,7 +400,7 @@
 	let domain = email.split('@')[1];
 	let boards = [];
 	boards = await $fetch(
-		`https://api.trello.com/1/organizations/motisgroup/boards?fields=name,id&${auth}`,
+		`https://api.trello.com/1/organizations/motisgroup/boards?filter=open&fields=name,id&${auth}`,
 		{
 			method: 'GET',
 			headers: {
@@ -404,7 +413,7 @@
 		})
 
 		.catch((err) => console.error(err));
-
+	
 	const board = boards.find((board) => board.name === domain);
 	let categories = [];
 	categories = await $fetch(
