@@ -127,7 +127,7 @@
 										<button
 											type="submit"
 											:disabled="loading"
-											@click="handleSubmit"
+											@click="handleSubmit({ name, brief })"
 											class="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 										>
 											<span>{{ loading ? 'Loading' : 'Create ticket' }}</span>
@@ -159,18 +159,32 @@
 	const brief = ref('');
 	const loading = ref(false);
 	const error_occurred = ref(false);
-	const handleSubmit = async () => {
-		try {
-			loading.value = true;
 
-			// emit('close-modal');
-			// emit('show-otp-modal');
-		} catch (error) {
-			error_occurred.value = true;
-			error_message.value = error.error_description || error.message;
-			// emit('close-modal', error.error_description || error.message);
-		} finally {
-			loading.value = false;
-		}
+	const handleSubmit = async (body) => {
+		loading.value = true;
+		var payload = {
+			name: body.name,
+			desc: body.brief,
+			idList: '64040fbc24e31b54998629dc',
+		};
+		fetch(
+			`https://api.trello.com/1/cards?idList=64040fbc24e31b54998629dc&name=${payload.name}&desc=${payload.desc}&key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`,
+			{
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+				},
+			}
+		)
+			.then((response) => {
+				console.log(`Response: ${response.status} ${response.statusText}`);
+				return response.text();
+			})
+			.then((text) => console.log(text))
+			.catch((err) => console.error(err));
+        
+		emit('close-modal');
+		emit('show-otp-modal');
+        location.reload();
 	};
 </script>
