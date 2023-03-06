@@ -67,7 +67,7 @@
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
 								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hooray...nothing to see here</span
+									>Hmmm...nothing to see here</span
 								>
 							</button>
 							<div
@@ -179,7 +179,7 @@
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
 								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hooray...nothing to see here</span
+									>Hmmm...nothing to see here</span
 								>
 							</button>
 							<div
@@ -298,7 +298,7 @@
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
 								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hooray...nothing to see here</span
+									>Hmmm...nothing to see here</span
 								>
 							</button>
 							<div
