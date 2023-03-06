@@ -15,7 +15,7 @@
 		/>
 		<div class="relative -mt-[5.75rem] overflow-hidden pt-[5.75rem]">
 			<img
-				src="/img/beams-basic.png"
+				src="~/assets/images/logo.png"
 				alt=""
 				class="absolute top-0 left-1/2 -ml-[39rem] w-[113.125rem] max-w-none"
 			/>
