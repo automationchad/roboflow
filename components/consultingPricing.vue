@@ -91,7 +91,13 @@
 									{{ tier.description }}
 								</p>
 								<button
-									@click="handleButtonClick(profile.workspaces.billing_email, customer, tier)"
+									@click="
+										handleButtonClick(
+											profile?.workspaces?.billing_email,
+											customer,
+											tier
+										)
+									"
 									:aria-describedby="tier.id"
 									:class="[
 										subscription_type === tier.id &&
@@ -231,7 +237,6 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-
 	const base_price = 6000;
 
 	let subscription = { status: false };

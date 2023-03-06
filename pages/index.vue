@@ -292,6 +292,7 @@
 		<consulting-scope />
 		<projects />
 		<consulting-pricing
+			v-if="profile?.workspaces.billing_email === user?.email"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"
@@ -406,11 +407,9 @@
 	import showdown from 'showdown';
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
-	const user = attrs.user;
+	const user = useSupabaseUser();
 	const profile = attrs.profile;
 	const allAccess = ref(false);
-	const workspace = profile?.workspaces ?? null;
-	allAccess.value = profile?.workspaces?.all_access ?? null;
 
 	const stats = [
 		{ label: 'Founded', value: '2021' },
