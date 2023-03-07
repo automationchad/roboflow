@@ -26,21 +26,38 @@
 							leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 						>
 							<div
-								class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all dark:bg-slate-800 sm:my-8 sm:w-full sm:max-w-md sm:p-10"
+								class="relative transform overflow-hidden rounded-lg bg-white pb-4 text-left shadow-xl transition-all dark:bg-slate-800 sm:my-8 sm:w-full sm:max-w-lg"
 							>
-								<div class="">
-									<h3
-										class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white"
-									>
-										Create a new request
-									</h3>
-									<!-- <p class="mt-4 text-sm text-gray-600 dark:text-slate-500">
-										Create or log in to an existing Motis account.
-									</p> -->
+								<div class="relative w-full flex-1 overflow-y-auto">
+									<div class="bg-gray-50 py-6 px-4 sm:px-6">
+										<div class="flex items-center justify-between">
+											<div
+												class="text-base font-semibold leading-6 text-gray-900"
+											>
+												New Project
+											</div>
+											<div class="ml-3 flex h-7 items-center">
+												<button
+													type="button"
+													class="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+													@click="emit('close-modal')"
+												>
+													<span class="sr-only">Close panel</span>
+													<XMarkIcon class="h-6 w-6" aria-hidden="true" />
+												</button>
+											</div>
+										</div>
+										<div class="mt-1">
+											<p class="text-sm text-gray-500">
+												Get started by filling in the information below to
+												create your new project.
+											</p>
+										</div>
+									</div>
 								</div>
 
 								<form
-									class="mt-6 space-y-6"
+									class="mt-6 space-y-6 p-10"
 									@submit.prevent="
 										handleSubmit({ name, brief, type, link, auth, listId })
 									"
@@ -53,7 +70,7 @@
 												<label
 													for="name"
 													class="block text-sm font-semibold leading-6 text-gray-900"
-													>Name {{ ' '
+													>Project name {{ ' '
 													}}<span class="text-rose-700">*</span></label
 												>
 												<div class="mt-2.5">
@@ -91,7 +108,7 @@
 												<label
 													for="message"
 													class="block text-sm font-semibold leading-6 text-gray-900"
-													>Brief {{ ' '
+													>Description {{ ' '
 													}}<span class="text-rose-700">*</span></label
 												>
 												<div class="mt-2.5">
@@ -130,16 +147,26 @@
 											</div>
 										</div>
 									</div>
-
-									<div>
-										<button
-											type="submit"
-											:disabled="loading"
-											class="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-										>
-											<span>{{ loading ? 'Loading' : 'Create ticket' }}</span>
-										</button>
+									<div class="flex-shrink-0 border-t border-gray-200 py-5">
+										<div class="flex justify-end space-x-3">
+											<button
+												type="button"
+												class="rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+												@click="emit('close-modal');"
+											>
+												Cancel
+											</button>
+											<button
+												type="submit"
+												:disabled="loading"
+												class="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+											>
+												{{ loading ? 'Loading' : 'Create' }}
+											</button>
+										</div>
 									</div>
+
+									
 								</form>
 							</div>
 						</transition>
@@ -159,6 +186,7 @@
 		TransitionChild,
 		TransitionRoot,
 	} from '@headlessui/vue';
+	import { XMarkIcon } from '@heroicons/vue/20/solid';
 	import { CheckIcon } from '@heroicons/vue/24/outline';
 	const emit = defineEmits(['close-modal', 'show-otp-modal']);
 	const open = ref(true);

@@ -70,7 +70,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<div
+							<button
+								@click="handleShow(ticket)"
 								v-for="ticket in tickets.filter((o) => o.idList === activeId)"
 								:key="ticket.id"
 								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
@@ -122,7 +123,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</button>
 						</div>
 						<div class="mt-8 bg-white py-5">
 							<div
@@ -182,7 +183,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<div
+							<button
+								@click="handleShow(ticket)"
 								v-for="ticket in tickets
 									.filter((o) => o.idList === backlogId)
 									.slice(backLogPage * limit, backLogPage * limit + limit)"
@@ -241,7 +243,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</button>
 						</div>
 						<div class="mt-4 bg-white py-5">
 							<div
@@ -290,7 +292,7 @@
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 							<button
-								@click="showSubmitModal = true"
+								@click="handleShow(ticket)"
 								v-if="
 									tickets.filter((o) => o.idList === completedId).length <= 0
 								"
@@ -301,7 +303,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<div
+							<button
+								@click="handleShow(ticket)"
 								v-for="ticket in tickets
 									.filter((o) => o.idList === completedId)
 									.slice(completedPage * limit, completedPage * limit + limit)"
@@ -359,7 +362,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -370,6 +373,12 @@
 				@submit-reload="getTickets(board, auth)"
 				:list-id="backlogId"
 				:auth="auth"
+			/>
+			<TicketModal
+				:card="selected_card"
+				:comments="comments"
+				:open="showTicketModal"
+				@close-modal="showTicketModal = false"
 			/>
 		</div>
 	</div>
@@ -389,17 +398,24 @@
 	import { useAttrs } from 'vue';
 	definePageMeta({ middleware: ['auth'] });
 	const attrs = useAttrs();
-	const user = useSupabaseUser();
-	if (!user.value) {
-		navigateTo('/');
-	}
+	const test = true;
+
+	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
+	// if (!user.value) {
+	// 	navigateTo('/');
+	// }
 
 	const profile = attrs.profile;
-
-	const test = false;
+	const selected_card = ref({});
+	const showSubmitModal = ref(false);
+	const showTicketModal = ref(false);
+	const showOtpModal = ref(false);
+	const backLogPage = ref(0);
+	const completedPage = ref(0);
+	const limit = 3;
 
 	let subscription = { status: false };
-	let email;
+	let email = 'automation@motis.group';
 	let customer = {};
 	if (profile?.workspaces.billing_email) {
 		email = test ? 'automation@motis.group' : profile?.workspaces.billing_email;
@@ -466,18 +482,18 @@
 			.catch((err) => console.error(err));
 	};
 	await getTickets(board, auth);
+	console.log(tickets);
+	let comments = [];
+	const handleShow = async (card) => {
+		selected_card.value = card;
+		showTicketModal.value = true;
+	};
 </script>
 
 <script>
 	export default {
 		data() {
-			return {
-				showSubmitModal: false,
-				showOtpModal: false,
-				backLogPage: 0,
-				completedPage: 0,
-				limit: 3,
-			};
+			return {};
 		},
 		components: { ShieldCheckIcon, CheckCircleIcon },
 	};
