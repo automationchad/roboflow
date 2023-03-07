@@ -49,27 +49,6 @@
 											class="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0"
 										>
 											<!-- Project name -->
-											<!-- <div
-												class="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5"
-											>
-												<div>
-													<label
-														for="project-name"
-														class="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-														>Project name</label
-													>
-												</div>
-												<div class="sm:col-span-2">
-													<input
-														disabled
-														:value="card.name"
-														type="text"
-														name="project-name"
-														id="project-name"
-														class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-													/>
-												</div>
-											</div> -->
 
 											<!-- Project description -->
 											<div
@@ -91,6 +70,39 @@
 														rows="3"
 														class="block w-full rounded-md border-0 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
 													/>
+												</div>
+											</div>
+
+											<div v-if="false"
+												class="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5"
+											>
+												<div>
+													<label
+														for="project-name"
+														class="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+														>Project video</label
+													>
+												</div>
+
+												<div class="sm:col-span-2">
+													<div
+														class="relative h-0 overflow-hidden rounded-lg pb-48"
+													>
+														<iframe
+															src="https://www.loom.com/embed/23bc4fa5b0874e438e8346c92bdad161"
+															frameborder="0"
+															webkitallowfullscreen
+															mozallowfullscreen
+															allowfullscreen
+															style="
+																position: absolute;
+																top: 0;
+																left: 0;
+																width: 100%;
+																height: 100%;
+															"
+														></iframe>
+													</div>
 												</div>
 											</div>
 
@@ -305,7 +317,7 @@
 
 	const emit = defineEmits(['close-modal', 'show-otp-modal']);
 
-	const test = true;
+	const test = false;
 	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 

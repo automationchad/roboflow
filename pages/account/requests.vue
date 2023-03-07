@@ -398,7 +398,7 @@
 	import { useAttrs } from 'vue';
 	definePageMeta({ middleware: ['auth'] });
 	const attrs = useAttrs();
-	const test = true;
+	const test = false;
 
 	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
 	// if (!user.value) {
@@ -418,7 +418,7 @@
 	let email = 'automation@motis.group';
 	let customer = {};
 	if (profile?.workspaces.billing_email) {
-		email = test ? 'automation@motis.group' : profile?.workspaces.billing_email;
+		email = profile?.workspaces.billing_email;
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',
 		});
@@ -482,7 +482,6 @@
 			.catch((err) => console.error(err));
 	};
 	await getTickets(board, auth);
-	console.log(tickets);
 	let comments = [];
 	const handleShow = async (card) => {
 		selected_card.value = card;

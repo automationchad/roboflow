@@ -50,9 +50,13 @@
 									<p class="mt-0.5 text-sm text-gray-500">
 										Commented
 										{{
-											formatDistanceStrict(new Date(activityItem.date), new Date(), {
-												addSuffix: true,
-											})
+											formatDistanceStrict(
+												new Date(activityItem.date),
+												new Date(),
+												{
+													addSuffix: true,
+												}
+											)
 										}}
 									</p>
 									<button
@@ -63,7 +67,9 @@
 											)
 										"
 										v-if="
-											activityItem.data.text.startsWith(`\{${user.email}\} ---`)
+											activityItem.data.text.startsWith(
+												`\{${user.email}\} ---`
+											) && calculateDistance(activityItem.date)
 										"
 									>
 										<TrashIcon class="h-4 w-4 text-gray-400" />
@@ -128,6 +134,13 @@
 				? 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80'
 				: 'https://www.motis.group/_nuxt/logo.7722150c.png')
 	);
+
+	const calculateDistance = (date) => {
+		var x = new Date(date);
+		var y = new Date();
+		let seconds = Math.abs(x.getTime() - y.getTime()) / 1000;
+		return seconds < 3600;
+	};
 
 	const handleDeleteComment = async (card, comment) => {
 		const result = await $fetch(
