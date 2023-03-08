@@ -290,7 +290,6 @@
 		<consulting-scope />
 		<projects />
 		<consulting-pricing
-			v-if="profile?.workspaces.billing_email === user?.email"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"
