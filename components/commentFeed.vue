@@ -82,9 +82,10 @@
 								</div>
 							</div>
 							<div class="mt-2 text-sm text-gray-700">
-								<p>
-									{{ activityItem.data.text.replace(regex, '') }}
-								</p>
+								<p
+									class="prose prose-sm"
+									v-html="convert(activityItem.data.text.replace(regex, ''))"
+								></p>
 							</div>
 						</div>
 					</div>
@@ -104,6 +105,9 @@
 	import { TrashIcon } from '@heroicons/vue/24/outline';
 
 	import { formatDistanceStrict } from 'date-fns';
+
+	import showdown from 'showdown';
+	const converter = await new showdown.Converter();
 
 	const props = defineProps(['card']);
 	const { card } = toRefs(props);
@@ -147,6 +151,12 @@
 	const regex = /\{[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\} ---/;
 
 	const calculateMessage = (text) => {};
+
+	const convert = (text) => {
+		let converter = new showdown.Converter();
+		const formatted = converter.makeHtml(text);
+		return formatted;
+	};
 
 	const handleDeleteComment = async (card, comment) => {
 		const result = await $fetch(
