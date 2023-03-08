@@ -73,7 +73,8 @@
 												</div>
 											</div>
 
-											<div v-if="false"
+											<div
+												v-if="false"
 												class="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5"
 											>
 												<div>
@@ -318,7 +319,9 @@
 	const emit = defineEmits(['close-modal', 'show-otp-modal']);
 
 	const test = false;
-	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
+	const user = test
+		? ref({ email: 'automation@motis.group' })
+		: useSupabaseUser();
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
 	const comment_text = ref('');
@@ -337,7 +340,7 @@
 	const handleCommentAdd = async (card_id, text) => {
 		const comment = await $fetch(
 			`https://api.trello.com/1/cards/${card_id}/actions/comments?text=${
-				`\{${user.email}\} --- ` + text
+				`\{${user.value.email}\} --- ` + text
 			}&${auth}`,
 			{
 				method: 'POST',
