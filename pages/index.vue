@@ -6,7 +6,7 @@
 			:user="user"
 			:profile="profile"
 		/>
-		<div class="bg-white">
+		<div class="">
 			<div
 				class="relative isolate overflow-hidden bg-gradient-to-b from-indigo-100/20"
 			>
@@ -366,7 +366,7 @@
 				</div>
 			</div>
 		</div>
-		<Cta />
+		<Cta v-if="!profile" />
 		<FooterContent />
 		<LoginModal
 			v-show="showLoginModal"
