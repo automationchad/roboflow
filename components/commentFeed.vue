@@ -41,8 +41,13 @@
 							<div>
 								<div class="text-sm">
 									<a class="font-medium text-gray-900">{{
-										activityItem.data.text.startsWith(`\{${user.email}\} ---`)
-											? 'You'
+										activityItem.data.text.startsWith(`\{`)
+											? activityItem.data.text
+													.substring(
+														activityItem.data.text.indexOf('\{') + 1,
+														activityItem.data.text.lastIndexOf('\} ---')
+													)
+													.split('@')[0]
 											: 'Motis Group'
 									}}</a>
 								</div>
@@ -78,9 +83,7 @@
 							</div>
 							<div class="mt-2 text-sm text-gray-700">
 								<p>
-									{{
-										activityItem.data.text.replace(`\{${user.email}\} ---`, '')
-									}}
+									{{ activityItem.data.text.replace(regex, '') }}
 								</p>
 							</div>
 						</div>
@@ -130,7 +133,7 @@
 
 	activity.forEach(
 		(element) =>
-			(element.imageUrl = element.data.text.startsWith(`\{${user.email}\} ---`)
+			(element.imageUrl = element.data.text.startsWith(`\{`)
 				? 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80'
 				: 'https://www.motis.group/_nuxt/logo.7722150c.png')
 	);
@@ -141,6 +144,9 @@
 		let seconds = Math.abs(x.getTime() - y.getTime()) / 1000;
 		return seconds < 3600;
 	};
+	const regex = /\{[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\} ---/;
+
+	const calculateMessage = (text) => {};
 
 	const handleDeleteComment = async (card, comment) => {
 		const result = await $fetch(
