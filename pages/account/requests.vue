@@ -8,12 +8,14 @@
 				:profile="profile"
 			/>
 			<div class="mx-auto grid max-w-7xl py-24 sm:py-32">
-				<div class="mb-8 border-b border-gray-200 bg-white py-5">
+				<div class="mb-8 border-b border-gray-200 py-5 dark:border-gray-800">
 					<div
 						class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 					>
 						<div class="ml-4 mt-2">
-							<h3 class="text-xl font-semibold leading-6 text-gray-900">
+							<h3
+								class="text-xl font-semibold leading-6 text-gray-900 dark:text-white"
+							>
 								Requests
 							</h3>
 						</div>
@@ -48,12 +50,14 @@
 						</div>
 					</div> -->
 					<div class="">
-						<div class="bg-white py-5">
+						<div class="py-5">
 							<div
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 							>
 								<div class="ml-4 mt-2">
-									<h3 class="text-base font-semibold leading-6 text-gray-900">
+									<h3
+										class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200"
+									>
 										Active
 									</h3>
 								</div>
@@ -74,7 +78,7 @@
 								@click="handleShow(ticket)"
 								v-for="ticket in tickets.filter((o) => o.idList === activeId)"
 								:key="ticket.id"
-								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
+								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:border-gray-600 dark:bg-slate-800 dark:hover:border-gray-500"
 							>
 								<!-- <div class="flex-shrink-0">
 									<img
@@ -87,10 +91,12 @@
 									<div class="focus:outline-none">
 										<span class="absolute inset-0" aria-hidden="true" />
 										<div
-											class="mb-4 flex justify-between border-b border-gray-100 pb-4"
+											class="mb-4 flex justify-between border-b border-gray-100 dark:border-gray-700 pb-4"
 										>
 											<div class="flex items-center space-x-4">
-												<p class="text-sm font-medium text-gray-900">
+												<p
+													class="text-sm font-medium text-gray-900 dark:text-white"
+												>
 													{{ ticket.name }}
 												</p>
 												<span
@@ -125,19 +131,19 @@
 								</div>
 							</button>
 						</div>
-						<div class="mt-8 bg-white py-5">
+						<div class="mt-8  py-5">
 							<div
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 							>
 								<div class="ml-4 mt-2 flex justify-between">
 									<div class="">
-										<h3 class="text-base font-semibold leading-6 text-gray-900">
+										<h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
 											Backlog
 										</h3>
 									</div>
 								</div>
 								<div class="flex items-center space-x-3">
-									<p class="text-sm">
+									<p class="text-sm dark:text-gray-300">
 										Showing {{ backLogPage * limit + 1 }} to
 										{{
 											tickets.filter((o) => o.idList === backlogId).length /
@@ -189,7 +195,7 @@
 									.filter((o) => o.idList === backlogId)
 									.slice(backLogPage * limit, backLogPage * limit + limit)"
 								:key="ticket.id"
-								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
+								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 dark:bg-slate-800 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
 							>
 								<!-- <div class="flex-shrink-0">
 									<img

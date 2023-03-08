@@ -28,18 +28,12 @@
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
-										v-if="!profile"
-										@click="showLoginModal = true"
+										href="#pricing"
 										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-										>Book a call</a
+										>See plans <span aria-hidden="true">→</span></a
 									>
-									<a
-										v-else-if="profile"
-										href="/contact"
-										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-										>Book a call</a
-									>
-									<a
+
+									<!-- <a
 										v-if="
 											!profile ||
 											profile.workspaces.billing_email === user.email
@@ -47,7 +41,7 @@
 										href="#pricing"
 										class="text-sm font-semibold leading-6 text-gray-900"
 										>See plans <span aria-hidden="true">→</span></a
-									>
+									> -->
 								</div>
 							</div>
 						</div>
@@ -406,7 +400,6 @@
 	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
 		'appkU7PnQUq7lePwf'
 	);
-
 
 	let faqs = [];
 
