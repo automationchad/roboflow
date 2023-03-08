@@ -28,9 +28,19 @@
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
+										v-if="
+											!profile ||
+											profile?.workspaces.billing_email === user?.email
+										"
 										href="#pricing"
 										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 										>See plans <span aria-hidden="true">→</span></a
+									>
+									<a
+										v-else
+										href="/account/requests"
+										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+										>Go to requests <span aria-hidden="true">→</span></a
 									>
 
 									<!-- <a
@@ -290,6 +300,7 @@
 		<consulting-scope />
 		<projects />
 		<consulting-pricing
+			v-if="profile?.workspaces.billing_email === user?.email"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"
