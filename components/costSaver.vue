@@ -275,7 +275,7 @@
 								</div>
 								<div
 									class="mt-4"
-									v-if="profile.workspaces.domain == 'motis.group'"
+									v-if="profile?.workspaces.domain == 'motis.group'"
 								>
 									<div
 										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
