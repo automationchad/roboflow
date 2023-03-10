@@ -31,9 +31,9 @@
 					Save money on your existing license
 				</h2>
 				<p class="mt-6 text-lg leading-8 text-gray-600">
-					Paying an arm and a leg for your automation platform? Migrate over to
-					our Tray.io account and only pay for what you use with consumption
-					based pricing.
+					Paying an arm and a leg for your automation platform and coming up on
+					renewal? Migrate over to our Tray.io account and only pay for what you
+					use with consumption based pricing.
 				</p>
 			</div>
 			<div
@@ -277,7 +277,8 @@
 							>
 								Get access
 							</a>
-							<a v-if="false"
+							<a
+								v-if="false"
 								href="https://calendly.com/motis-group/migration"
 								target="_blank"
 								class="block w-full py-3 text-xs text-gray-700"
