@@ -265,7 +265,7 @@
 									<span>Estimated</span
 									><span
 										>${{
-											Math.round(taskPrice(est_tasks) + 250).toLocaleString()
+											Math.round(taskPrice(est_tasks) + 100).toLocaleString()
 										}}</span
 									>
 								</div>
@@ -373,8 +373,8 @@
 	};
 
 	const totalSavings = (current, tasks) => {
-		if (current > 0) return (current - (taskPrice(tasks) + 250) * 12) / 12;
-		else return Math.abs((current - (taskPrice(tasks) + 250) * 12) / 12);
+		if (current > 0) return (current - (taskPrice(tasks) + 100) * 12) / 12;
+		else return Math.abs((current - (taskPrice(tasks) + 100) * 12) / 12);
 	};
 </script>
 
