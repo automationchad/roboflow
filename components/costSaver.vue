@@ -334,6 +334,12 @@
 		RadioGroupOption,
 	} from '@headlessui/vue';
 
+  import { useAttrs } from 'vue';
+	const emit = defineEmits(['open-modal']);
+	const user = useSupabaseUser();
+	const attrs = useAttrs();
+	const profile = attrs.profile;
+
 	const current_spend = ref(0);
 	const est_tasks = ref(0);
 
