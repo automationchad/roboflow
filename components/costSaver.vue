@@ -31,8 +31,9 @@
 					Save money on your existing license
 				</h2>
 				<p class="mt-6 text-lg leading-8 text-gray-600">
-					Paying an arm and a leg for Tray.io? Migrate over to our account and
-					only pay for what you use with consumption based pricing.
+					Paying an arm and a leg for your automation platform? Migrate over to
+					our Tray.io account and only pay for what you use with consumption
+					based pricing.
 				</p>
 			</div>
 			<div
@@ -221,7 +222,7 @@
 				</div>
 				<div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
 					<div
-						class="h-full rounded-2xl bg-white py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16"
+						class="costs h-full rounded-2xl border border-gray-900/5 bg-white py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
 					>
 						<div class="mx-auto max-w-xs px-8">
 							<p class="text-base font-semibold text-gray-600">
@@ -362,3 +363,9 @@
 		return (current - (taskPrice(tasks) + 250) * 12) / 12;
 	};
 </script>
+
+<style scoped>
+	.costs {
+		box-shadow: 0 0 0 1px white;
+	}
+</style>
