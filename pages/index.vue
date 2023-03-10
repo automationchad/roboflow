@@ -93,7 +93,6 @@
 
 											<div
 												class="max-h-[400px] overflow-hidden bg-none px-6 pt-6 pb-14 font-mono text-sm text-slate-200"
-												v-html="code"
 											></div>
 										</div>
 									</div>
@@ -305,6 +304,7 @@
 			:user="user"
 			:profile="profile"
 		/>
+		<cost-saver />
 		<div class="bg-white" id="faq">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
