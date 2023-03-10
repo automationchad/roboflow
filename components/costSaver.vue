@@ -198,7 +198,7 @@
 					<div
 						class="costs h-full rounded-2xl border border-gray-900/5 bg-white py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
 					>
-						<div class="mt-16 mb-4 flex justify-center">
+						<div class="mb-4 flex justify-center">
 							<RadioGroup
 								v-model="selected_frequency"
 								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200"
