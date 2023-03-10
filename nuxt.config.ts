@@ -8,7 +8,8 @@ export default defineNuxtConfig({
 			meta: [
 				{
 					name: 'description',
-					content: 'A consultancy automating processes small businesses',
+					content:
+						'A dev shop assisting fast growing companies with process automation and software interoperability.',
 				},
 			],
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],

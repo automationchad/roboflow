@@ -23,8 +23,8 @@
 									<p>as a service.</p>
 								</h1>
 								<p class="mt-6 text-lg leading-8 text-gray-600">
-									We’re a dev shop assisting fast growing companies with
-									software interoperability.
+									We’re a dev shop assisting fast growing companies with process
+									automation and software interoperability.
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
