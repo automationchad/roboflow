@@ -298,8 +298,8 @@
 <script setup>
 	import { CheckIcon, BoltIcon } from '@heroicons/vue/24/outline';
 
-	const current_spend = ref(30000);
-	const est_tasks = ref(100000);
+	const current_spend = ref(0);
+	const est_tasks = ref(0);
 
 	const includedFeatures = [
 		'Monthly billing, cancel anytime',
