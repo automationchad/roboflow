@@ -31,9 +31,11 @@
 					Save money on your existing license
 				</h2>
 				<p class="mt-6 text-lg leading-8 text-gray-600">
-					Considering selling a kindey to renew with your automation platform? Don't.
-					Migrate over to our Tray.io account and only pay for what you use with
-					consumption based pricing.
+					Considering selling a kindey to renew with your automation platform?
+					Don't.
+
+					<br />
+					Migrate to our Tray.io account and only pay for what you actually use.
 				</p>
 			</div>
 			<div
