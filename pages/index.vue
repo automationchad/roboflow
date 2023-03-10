@@ -23,8 +23,8 @@
 									<p>as a service.</p>
 								</h1>
 								<p class="mt-6 text-lg leading-8 text-gray-600">
-									We’re a process automation agency, providing advice and
-									delivery to the worlds growing organisations.
+									We’re a dev shop assisting fast growing companies with
+									software interoperability.
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
@@ -34,7 +34,7 @@
 										"
 										href="#pricing"
 										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-										>See plans <span aria-hidden="true">→</span></a
+										>See plans</a
 									>
 									<a
 										v-else
@@ -43,15 +43,15 @@
 										>Go to requests <span aria-hidden="true">→</span></a
 									>
 
-									<!-- <a
+									<a
 										v-if="
 											!profile ||
 											profile.workspaces.billing_email === user.email
 										"
-										href="#pricing"
+										href="#save"
 										class="text-sm font-semibold leading-6 text-gray-900"
-										>See plans <span aria-hidden="true">→</span></a
-									> -->
+										>Save on your license <span aria-hidden="true">→</span></a
+									>
 								</div>
 							</div>
 						</div>

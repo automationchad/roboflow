@@ -178,9 +178,6 @@
 									class="mt-1 text-lg font-semibold leading-8 tracking-tight text-indigo-600"
 								>
 									Tray.io development
-									<span class="ml-1 text-base font-normal text-gray-500"
-										>$500/mo</span
-									>
 								</h3>
 								<p class="mt-1 text-base leading-7 text-gray-600">
 									Get a better automation faster with Tray.io development.
@@ -191,12 +188,35 @@
 									}}
 								</p>
 							</div>
-							<button
-								:disabled="
+
+							<a
+								v-if="
 									!subscription.status ||
 									(add_on.status === 'active' &&
 										subscription.status === 'active')
 								"
+								href="#save"
+								:class="[
+									add_on.status === 'active'
+										? 'text-lime-600 ring-lime-200'
+										: 'hover:ring-indigo-300',
+									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+								]"
+							>
+								{{
+									add_on.status === 'active' && subscription.status === 'active'
+										? 'Active'
+										: 'Add on'
+								}}
+								{{ ' '
+								}}<span aria-hidden="true">{{
+									add_on.status === 'active' && subscription.status === 'active'
+										? '&check;'
+										: '&rarr;'
+								}}</span>
+							</a>
+							<button
+								v-else
 								@click="handleCheckout({}, 'add_on', '', profile.workspaces)"
 								:class="[
 									add_on.status === 'active'

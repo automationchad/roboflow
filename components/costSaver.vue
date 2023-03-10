@@ -1,5 +1,5 @@
 <template>
-	<div class="relative isolate bg-white py-24 sm:py-32">
+	<div class="relative isolate bg-white py-24 sm:py-32" id="save">
 		<div
 			class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
 			aria-hidden="true"
@@ -37,7 +37,7 @@
 				</p>
 			</div>
 			<div
-				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/60 ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
+				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/40 backdrop-blur-md ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
 			>
 				<div class="p-8 sm:p-10 lg:flex-auto">
 					<h3 class="text-2xl font-bold tracking-tight text-gray-900">
@@ -226,7 +226,8 @@
 					>
 						<div class="mx-auto max-w-xs px-8">
 							<p class="text-base font-semibold text-gray-600">
-								Estimated monthly savings*
+								Estimated monthly
+								{{ current_spend > 0 ? 'savings' : 'costs' }} *
 							</p>
 							<p class="mt-6 flex items-baseline justify-center gap-x-2">
 								<span
@@ -252,7 +253,7 @@
 									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 								>
 									<span>Current</span
-									><span>${{ (current_spend / 12).toLocaleString() }}</span>
+									><span>${{ Math.round((current_spend / 12)).toLocaleString() }}</span>
 								</div>
 								<div
 									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
@@ -260,7 +261,7 @@
 									<span>Estimated</span
 									><span
 										>${{
-											Math.round(taskPrice(est_tasks)).toLocaleString()
+											Math.round(taskPrice(est_tasks) + 250).toLocaleString()
 										}}</span
 									>
 								</div>
@@ -360,7 +361,8 @@
 	};
 
 	const totalSavings = (current, tasks) => {
-		return (current - (taskPrice(tasks) + 250) * 12) / 12;
+		if (current > 0) return (current - (taskPrice(tasks) + 250) * 12) / 12;
+		else return Math.abs((current - (taskPrice(tasks) + 250) * 12) / 12);
 	};
 </script>
 
