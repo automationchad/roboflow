@@ -49,7 +49,7 @@
 						Estimate how much you could save by migrating your license with our
 						migration calculator.
 					</p>
-					<!-- <div class="">
+					<div class="" v-if="false">
 						<div class="mt-8 flow-root">
 							<div class="-my-2 overflow-x-auto">
 								<div class="inline-block min-w-full py-2 align-middle">
@@ -60,31 +60,19 @@
 													scope="col"
 													class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
 												>
-													Name
+													Quantity
 												</th>
 												<th
 													scope="col"
 													class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"
 												>
-													Title
+													$/unit
 												</th>
 												<th
 													scope="col"
 													class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"
 												>
-													Email
-												</th>
-												<th
-													scope="col"
-													class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"
-												>
-													Role
-												</th>
-												<th
-													scope="col"
-													class="relative py-3.5 pl-3 pr-4 sm:pr-0"
-												>
-													<span class="sr-only">Edit</span>
+													Band cost
 												</th>
 											</tr>
 										</thead>
@@ -117,29 +105,13 @@
 															.toLocaleString()}`
 													}}
 												</td>
-												<td
-													class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"
-												>
-													{{ price.role }}
-												</td>
-												<td
-													class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
-												>
-													<a
-														href="#"
-														class="text-indigo-600 hover:text-indigo-900"
-														>Edit<span class="sr-only"
-															>, {{ price.name }}</span
-														></a
-													>
-												</td>
 											</tr>
 										</tbody>
 									</table>
 								</div>
 							</div>
 						</div>
-					</div> -->
+					</div>
 					<div class="mt-8 grid grid-cols-2 gap-4">
 						<div class="col-span-1">
 							<label
@@ -226,9 +198,35 @@
 					<div
 						class="costs h-full rounded-2xl border border-gray-900/5 bg-white py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
 					>
-						<div class="mx-auto max-w-xs px-8">
+						<div class="mt-16 mb-4 flex justify-center">
+							<RadioGroup
+								v-model="selected_frequency"
+								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200"
+							>
+								<RadioGroupLabel class="sr-only"
+									>Payment frequency</RadioGroupLabel
+								>
+								<RadioGroupOption
+									as="template"
+									v-for="option in frequencies"
+									:key="option.value"
+									:value="option"
+									v-slot="{ checked }"
+								>
+									<div
+										:class="[
+											checked ? 'bg-indigo-600 text-white' : 'text-gray-500',
+											'cursor-pointer rounded-full py-1 px-2.5',
+										]"
+									>
+										<span>{{ option.label }}</span>
+									</div>
+								</RadioGroupOption>
+							</RadioGroup>
+						</div>
+						<div class="mx-auto min-w-[300px] px-8">
 							<p class="text-base font-semibold text-gray-600">
-								Estimated monthly
+								Estimated {{ selected_frequency.value }}
 								{{ current_spend > 0 ? 'savings' : 'costs' }} *
 							</p>
 							<p class="mt-6 flex items-baseline justify-center gap-x-2">
@@ -250,14 +248,18 @@
 									>USD</span
 								>
 							</p>
-							<div class="mt-4">
+							<div class="mt-8">
 								<div
 									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 								>
 									<span>Current</span
 									><span
 										>${{
-											Math.round(current_spend / 12).toLocaleString()
+											Math.round(
+												selected_frequency.id === 1
+													? current_spend / 12
+													: current_spend
+											).toLocaleString()
 										}}</span
 									>
 								</div>
@@ -270,6 +272,33 @@
 											Math.round(taskPrice(est_tasks)).toLocaleString()
 										}}</span
 									>
+								</div>
+								<div
+									class=""
+									v-if="profile?.workspaces?.domain === 'motis.group'"
+								>
+									<div
+										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
+									>
+										<span>Tray Cost</span
+										><span class="text-rose-600"
+											>(${{
+												Math.round(trayCosts(est_tasks)).toLocaleString()
+											}})</span
+										>
+									</div>
+									<div
+										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
+									>
+										<span>Motis Profit</span
+										><span class="text-green-600"
+											>${{
+												Math.round(
+													taskPrice(est_tasks) - trayCosts(est_tasks)
+												).toLocaleString()
+											}}</span
+										>
+									</div>
 								</div>
 							</div>
 							<a
@@ -299,9 +328,27 @@
 
 <script setup>
 	import { CheckIcon, BoltIcon } from '@heroicons/vue/24/outline';
+	import {
+		RadioGroup,
+		RadioGroupDescription,
+		RadioGroupOption,
+	} from '@headlessui/vue';
 
 	const current_spend = ref(0);
 	const est_tasks = ref(0);
+
+	const frequencies = [
+		{ value: 'monthly', id: 1, label: 'Monthly', priceSuffix: '/month' },
+		{ value: 'annual', id: 12, label: 'Annually', priceSuffix: '/year' },
+	];
+
+	const selected_frequency = ref(frequencies[0]);
+
+	const curr_spend_actual = ref(
+		selected_frequency.value.id === 1
+			? current_spend.value / 12
+			: current_spend.value
+	);
 
 	const includedFeatures = [
 		'Monthly billing, cancel anytime',
@@ -328,7 +375,7 @@
 		let results = [];
 		let currentNumber = startNumber;
 		results.push(startNumber);
-		while (currentNumber <= startNumber ** (tier_num / 2 - 2)) {
+		while (currentNumber <= startNumber ** tier_num) {
 			currentNumber = currentNumber * 5;
 			results.push(currentNumber);
 			let nextNumber = currentNumber * 2;
@@ -338,21 +385,21 @@
 		return results;
 	};
 
-	const tiers = 20;
+	const tiers = 6;
 	const monthly_base = 125;
 
 	const pricing = [...Array(tiers)]
 		.fill(undefined)
 		.map((_, i) => {
-			const initial_value = 0.05;
-			const decay_rate = 0.6;
+			const initial_value = 0.005;
+			const decay_rate = 0.2;
 			return initial_value * (1 - decay_rate) ** i;
 		})
 		.map((o, i) => {
 			const initial_value = 0.05;
 
 			return {
-				quantity: multiplyAndDouble(1000, tiers)[i],
+				quantity: multiplyAndDouble(1000000, tiers)[i],
 				price: o,
 			};
 		});
@@ -372,12 +419,41 @@
 				remainingQuantity -= tierQuantity;
 			}
 		}
-		return price + monthly_base;
+		return (price + monthly_base) * selected_frequency.value.id;
+	};
+
+	const trayCosts = (quantity) => {
+		let price = 0;
+		const trayPricing = [
+			{ quantity: 1000000, price: 2.04 / 1000 },
+			{ quantity: 3000000, price: 1.8 / 1000 },
+			{ quantity: 10000000, price: 1.56 / 1000 },
+			{ quantity: 20000000, price: 1.2 / 1000 },
+			{ quantity: 40000000, price: 0.96 / 1000 },
+		];
+		let remainingQuantity = quantity;
+		for (let i = 0; i < trayPricing.length; i++) {
+			let tier = trayPricing[i];
+			let tierQuantity = tier.quantity;
+			let tierPrice = tier.price;
+			if (remainingQuantity <= tierQuantity) {
+				price += remainingQuantity * tierPrice;
+				break;
+			} else {
+				price += tierQuantity * tierPrice;
+				remainingQuantity -= tierQuantity;
+			}
+		}
+		return price * selected_frequency.value.id;
 	};
 
 	const totalSavings = (current, tasks) => {
-		if (current > 0) return (current - taskPrice(tasks) * 12) / 12;
-		else return Math.abs((current - taskPrice(tasks) * 12) / 12);
+		let currentSpend;
+		if (selected_frequency.value.id === 1) {
+			currentSpend = current / 12;
+		} else currentSpend = current;
+		if (currentSpend > 0) return currentSpend - taskPrice(tasks);
+		else return Math.abs(currentSpend - taskPrice(tasks));
 	};
 </script>
 
