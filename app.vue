@@ -7,7 +7,7 @@
 				.select(
 					`username,first_name,last_name,phone_num,country_code,
     			workspaces (
-      					id, tray_workspace_id, stripe_customer_id, billing_email, stripe_subscription_id, active, type, all_access, templates)`
+      					id, tray_workspace_id, stripe_customer_id, billing_email, stripe_subscription_id, domain, active, type, all_access, templates)`
 				)
 				.eq('id', user.value.id)
 				.single()
