@@ -37,7 +37,7 @@
 				</p>
 			</div>
 			<div
-				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/40 backdrop-blur-md ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
+				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/40 ring-1 ring-gray-200 backdrop-blur-md sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
 			>
 				<div class="p-8 sm:p-10 lg:flex-auto">
 					<h3 class="text-2xl font-bold tracking-tight text-gray-900">
@@ -253,7 +253,11 @@
 									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 								>
 									<span>Current</span
-									><span>${{ Math.round((current_spend / 12)).toLocaleString() }}</span>
+									><span
+										>${{
+											Math.round(current_spend / 12).toLocaleString()
+										}}</span
+									>
 								</div>
 								<div
 									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
@@ -270,7 +274,14 @@
 								href="https://calendly.com/motis-group/migration"
 								target="_blank"
 								class="mt-8 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-								>Get access</a
+							>
+								Get access
+							</a>
+							<a v-if="false"
+								href="https://calendly.com/motis-group/migration"
+								target="_blank"
+								class="block w-full py-3 text-xs text-gray-700"
+								>Book a call</a
 							>
 							<p class="mt-6 text-xs leading-5 text-gray-600">
 								* Your actual savings may vary.
