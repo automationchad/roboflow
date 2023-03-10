@@ -265,7 +265,7 @@
 									<span>Estimated</span
 									><span
 										>${{
-											Math.round(taskPrice(est_tasks) + 100).toLocaleString()
+											Math.round(taskPrice(est_tasks)).toLocaleString()
 										}}</span
 									>
 								</div>
@@ -337,6 +337,7 @@
 	};
 
 	const tiers = 20;
+	const monthly_base = 125;
 
 	const pricing = [...Array(tiers)]
 		.fill(undefined)
@@ -369,12 +370,12 @@
 				remainingQuantity -= tierQuantity;
 			}
 		}
-		return price;
+		return price + monthly_base;
 	};
 
 	const totalSavings = (current, tasks) => {
-		if (current > 0) return (current - (taskPrice(tasks) + 100) * 12) / 12;
-		else return Math.abs((current - (taskPrice(tasks) + 100) * 12) / 12);
+		if (current > 0) return (current - taskPrice(tasks) * 12) / 12;
+		else return Math.abs((current - taskPrice(tasks) * 12) / 12);
 	};
 </script>
 
