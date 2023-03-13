@@ -112,7 +112,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="mt-8 grid grid-cols-2 gap-4">
+					<div class="mt-8 grid grid-cols-2 gap-10">
 						<div class="col-span-1">
 							<label
 								for="current-spend"
@@ -273,10 +273,19 @@
 										}}</span
 									>
 								</div>
-								<div
-									class="mt-4"
-									v-if="profile?.workspaces.domain == 'motis.group'"
-								>
+								<div class="mt-4" v-if="false">
+									<div
+										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
+									>
+										<span>Profit Margin</span
+										><span class="text-gray-600"
+											>%{{
+												((Math.round(
+													taskPrice(est_tasks) - trayCosts(est_tasks)
+												) / Math.round(taskPrice(est_tasks)))*100).toLocaleString()
+											}}</span
+										>
+									</div>
 									<div
 										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 									>
@@ -291,7 +300,14 @@
 										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 									>
 										<span>Motis Profit</span
-										><span class="text-green-600"
+										><span
+											:class="[
+												Math.round(
+													taskPrice(est_tasks) - trayCosts(est_tasks)
+												) >= 0
+													? 'text-green-600'
+													: 'text-red-700',
+											]"
 											>${{
 												Math.round(
 													taskPrice(est_tasks) - trayCosts(est_tasks)
@@ -334,7 +350,7 @@
 		RadioGroupOption,
 	} from '@headlessui/vue';
 
-  import { useAttrs } from 'vue';
+	import { useAttrs } from 'vue';
 	const emit = defineEmits(['open-modal']);
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
@@ -391,8 +407,8 @@
 		return results;
 	};
 
-	const tiers = 6;
-	const monthly_base = 125;
+	const tiers = 10;
+	const monthly_base = 0;
 
 	const pricing = [...Array(tiers)]
 		.fill(undefined)
@@ -403,9 +419,9 @@
 		})
 		.map((o, i) => {
 			const initial_value = 0.05;
-
+			const start_tier = 1000000;
 			return {
-				quantity: multiplyAndDouble(1000000, tiers)[i],
+				quantity: multiplyAndDouble(start_tier, tiers)[i],
 				price: o,
 			};
 		});

@@ -177,15 +177,11 @@
 								<h3
 									class="mt-1 text-lg font-semibold leading-8 tracking-tight text-indigo-600"
 								>
-									Tray.io development
+									Discounted Tray.io development
 								</h3>
 								<p class="mt-1 text-base leading-7 text-gray-600">
-									Get a better automation faster with Tray.io development.
-									{{
-										!subscription.status
-											? 'Requires an automation subscription.'
-											: ''
-									}}
+									Get full access to all of the standard Tray.io license
+									features for 70% of the cost.
 								</p>
 							</div>
 
@@ -206,7 +202,7 @@
 								{{
 									add_on.status === 'active' && subscription.status === 'active'
 										? 'Active'
-										: 'Add on'
+										: 'Buy discounted license'
 								}}
 								{{ ' '
 								}}<span aria-hidden="true">{{
