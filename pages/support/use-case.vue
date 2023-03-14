@@ -782,10 +782,7 @@
 				</p>
 				<p>Here's how the process flow looks like for our example:</p>
 				<p>
-					<img
-						alt="PDD robotsparebin flowchart"
-						src="/docs/static/get-started/courses/software-robot-delivery-process/documenting-the-process/pdd_robotsparebin_flowchart.png"
-					/>
+					
 				</p>
 				<h4>Detailed steps</h4>
 				<p>
