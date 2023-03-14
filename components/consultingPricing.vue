@@ -124,7 +124,13 @@
 										}}
 									</div>
 								</button>
-								<p class="mt-4 text-center text-xs">
+								<p
+									class="mt-4 text-center text-xs"
+									v-if="
+										!subscription_type === tier.id &&
+										!subscription.status === 'active'
+									"
+								>
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"
@@ -273,7 +279,7 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-	const base_price = 7000;
+	const base_price = 5000;
 
 	let subscription = { status: false };
 	let subscription_type = false;
