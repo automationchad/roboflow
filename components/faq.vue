@@ -1,7 +1,7 @@
 <template>
   <section
     id="faqs"
-    class="max-w-container mx-auto pt-32 w-full px-48 dark:bg-[#0A101E] "
+    class="max-w-container mx-auto pt-32 w-full px-48 dark:bg-black"
   >
     <div
       class="mx-auto grid max-w-2xl grid-cols-1  gap-y-16 gap-x-14 lg:max-w-5xl lg:px-8 xl:max-w-none xl:grid-cols-12 xl:px-0"

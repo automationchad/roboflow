@@ -126,11 +126,11 @@
 			:profile="profile"
 		/>
 		<cost-saver />
-		<div class="bg-white" id="faq">
+		<div class="bg-white dark:bg-black" id="faq">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
 					<h2
-						class="text-2xl font-bold leading-10 tracking-tight text-gray-900"
+						class="text-2xl font-bold leading-10 tracking-tight text-gray-900 dark:text-gray-400"
 					>
 						Frequently asked questions
 					</h2>
@@ -140,7 +140,7 @@
 						class="mt-12"
 					>
 						<h3
-							class="text-sm font-semibold capitalize leading-7 text-slate-400"
+							class="text-sm font-semibold capitalize leading-7 text-slate-400 dark:text-indigo-600"
 						>
 							{{ sub_category.substr(sub_category.indexOf('- ') + 1) }}
 						</h3>
@@ -156,7 +156,7 @@
 							>
 								<dt>
 									<DisclosureButton
-										class="flex w-full items-start justify-between text-left text-gray-900"
+										class="flex w-full items-start justify-between text-left text-gray-900 dark:text-slate-300"
 									>
 										<span class="text-base font-semibold leading-7">{{
 											faq.fields.question

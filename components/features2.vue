@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative isolate overflow-hidden bg-white py-24 sm:py-32"
+		class="relative isolate overflow-hidden bg-white dark:bg-black py-24 sm:py-32"
 		id="info"
 	>
 		<svg
@@ -31,11 +31,11 @@
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
 			<div class="mx-auto max-w-2xl lg:mx-0">
 				<h1
-					class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+					class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl"
 				>
 					It’s “you’ll never go back” better
 				</h1>
-				<p class="mt-6 text-xl leading-8 text-gray-700">
+				<p class="mt-6 text-xl leading-8 text-gray-700 dark:text-gray-300">
 					Motis Group replaces unreliable freelancers and expensive agencies for
 					one flat monthly fee, with automations delivered so fast that it will
 					blow your mind.
@@ -70,7 +70,7 @@
 					</svg>
 					<figure class="border-l border-indigo-600 pl-8">
 						<blockquote
-							class="text-xl font-semibold leading-8 tracking-tight text-gray-900"
+							class="text-xl font-semibold leading-8 tracking-tight text-gray-900 dark:text-gray-100"
 						>
 							<p>“{{ caseStudy.fields.quote }}”</p>
 						</blockquote>
@@ -81,10 +81,10 @@
 								class="mt-1 h-10 w-10 flex-none rounded-full bg-gray-50"
 							/>
 							<div class="text-sm leading-6">
-								<div class="font-semibold text-gray-900">
+								<div class="font-semibold text-gray-900 dark:text-gray-100">
 									{{ caseStudy.fields.customerName }}
 								</div>
-								<div class="text-gray-600">
+								<div class="text-gray-600 dark:text-gray-400">
 									{{ caseStudy.fields.customerTitle }}
 								</div>
 							</div>
@@ -137,14 +137,14 @@
 							it will blow your mind.
 						</p> -->
 
-					<ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600">
+					<ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600 dark:text-gray-400">
 						<li class="flex gap-x-3">
 							<VideoCameraSlashIcon
-								class="mt-1 h-5 w-5 flex-none text-indigo-600"
+								class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400"
 							/>
 
 							<span
-								><strong class="font-semibold text-gray-900"
+								><strong class="font-semibold text-gray-900 dark:text-gray-100"
 									>Totally Async.</strong
 								>
 								Don't like meetings? We don't either; so much so that we've
@@ -152,9 +152,9 @@
 							>
 						</li>
 						<li class="flex gap-x-3">
-							<QueueListIcon class="mt-1 h-5 w-5 flex-none text-indigo-600" />
-							<span
-								><strong class="font-semibold text-gray-900"
+							<QueueListIcon class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400" />
+							<span 
+								><strong class="font-semibold text-gray-900 dark:text-gray-100"
 									>Manage with Trello</strong
 								>
 								Manage your automation tasks using Trello. View active, queued
@@ -162,10 +162,10 @@
 							>
 						</li>
 						<li class="flex gap-x-3">
-							<UserGroupIcon class="mt-1 h-5 w-5 flex-none text-indigo-600" />
+							<UserGroupIcon class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400" />
 
 							<span
-								><strong class="font-semibold text-gray-900"
+								><strong class="font-semibold text-gray-900 dark:text-gray-100"
 									>Invite unlimited team members</strong
 								>
 								Invite your entire team, so anyone can submit requests and track

@@ -1,14 +1,14 @@
 <template>
 	<div class="relative">
-		<div class="bg-white py-24 pb-48 sm:py-32">
+		<div class="bg-white py-24 pb-48 sm:py-32 dark:bg-black">
 			<div class="mx-auto max-w-7xl px-6 lg:px-8">
 				<div class="mx-auto max-w-2xl lg:text-center">
 					<p
-						class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+						class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl"
 					>
 						Your Automation Center of Excellence
 					</p>
-					<p class="mt-6 text-lg leading-8 text-gray-600">
+					<p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
 						We build the digital plumbing between your software stack without
 						exposing you to the complexity that actually makes it work.
 					</p>
@@ -28,17 +28,17 @@
 							>
 								<div class="flex justify-center text-center">
 									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-center"
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-400 text-center"
 									>
 										<component
 											:is="feature.icon"
-											class="h-6 w-6 text-white"
+											class="h-6 w-6 text-white dark:text-indigo-700"
 											aria-hidden="true"
 										/>
 									</div>
 								</div>
 							</dt>
-							<dd class="mt-2 text-center text-base leading-7 text-gray-600">
+							<dd class="mt-2 text-center text-base leading-7 text-gray-600 dark:text-gray-400">
 								{{ feature.description }}
 							</dd>
 						</div>
@@ -46,7 +46,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="bg-white py-12 sm:py-16">
+		<div class="bg-white dark:bg-black py-12 sm:py-16">
 			<div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
 				<div
 					class="relative overflow-hidden bg-gray-900 py-20 px-6 shadow-xl sm:rounded-3xl sm:py-24 sm:px-10 md:px-12 lg:px-20"
@@ -56,7 +56,7 @@
 						src="~/assets/images/case-study.jpeg"
 						alt=""
 					/>
-					<div class="absolute inset-0 bg-gray-900/50 mix-blend-multiply" />
+					<div class="absolute inset-0 bg-gray-900/50 dark:bg-gray-900/20 mix-blend-multiply" />
 					<!-- <svg
 						viewBox="0 0 1097 845"
 						aria-hidden="true"

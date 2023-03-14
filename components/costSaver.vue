@@ -1,5 +1,5 @@
 <template>
-	<div class="relative isolate bg-white py-24 sm:py-32" id="save">
+	<div class="relative isolate bg-white dark:bg-black py-24 sm:py-32" id="save">
 		<div
 			class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
 			aria-hidden="true"
@@ -196,12 +196,12 @@
 				</div>
 				<div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
 					<div
-						class="costs h-full rounded-2xl border border-gray-900/5 bg-white py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
+						class="costs h-full rounded-2xl border border-gray-900/5 dark:border-white/15 bg-white dark:bg-black py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
 					>
 						<div class="mb-4 flex justify-center">
 							<RadioGroup
 								v-model="selected_frequency"
-								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200"
+								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-black"
 							>
 								<RadioGroupLabel class="sr-only"
 									>Payment frequency</RadioGroupLabel
@@ -479,8 +479,4 @@
 	};
 </script>
 
-<style scoped>
-	.costs {
-		box-shadow: 0 0 0 1px white;
-	}
-</style>
+

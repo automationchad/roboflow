@@ -1,5 +1,5 @@
 <template>
-	<div class="isolate overflow-hidden bg-gray-900" id="pricing">
+	<div class="isolate overflow-hidden bg-black" id="pricing">
 		<div
 			class="mx-auto max-w-7xl px-6 pb-96 pt-24 text-center sm:pt-32 lg:px-8"
 		>
@@ -38,7 +38,7 @@
 				</svg>
 			</div>
 		</div>
-		<div class="flow-root bg-white pb-24 sm:pb-32">
+		<div class="flow-root bg-white pb-24 dark:bg-black sm:pb-32">
 			<div class="-mt-80">
 				<div class="mx-auto max-w-7xl px-6 lg:px-8">
 					<div
@@ -50,8 +50,8 @@
 							:class="[
 								tier.mostPopular
 									? 'ring-2 ring-indigo-600'
-									: 'ring-1 ring-gray-900/10',
-								'flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl sm:p-10',
+									: 'ring-1 ring-gray-900/10 dark:ring-white/10',
+								'flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl dark:bg-slate-800 sm:p-10',
 							]"
 						>
 							<div>
@@ -59,7 +59,9 @@
 									<h3
 										:id="tier.id"
 										:class="[
-											tier.mostPopular ? 'text-indigo-600' : 'text-gray-900',
+											tier.mostPopular
+												? 'text-indigo-600'
+												: 'text-gray-900 dark:text-gray-100',
 											'text-base font-semibold leading-8',
 										]"
 									>
@@ -74,19 +76,23 @@
 								</div>
 
 								<div class="mt-4 flex items-baseline gap-x-2">
-									<span class="text-4xl font-bold tracking-tight text-gray-900"
+									<span
+										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
 										>${{
 											Math.round(
 												tier.priceMonthly - tier.priceMonthly * idx * 0.1
 											).toLocaleString()
 										}}</span
 									>
-									<span class="text-base font-semibold leading-7 text-gray-600"
+									<span
+										class="text-base font-semibold leading-7 text-gray-600 dark:text-gray-400"
 										>/month</span
 									>
 								</div>
 								<p class="mt-2 text-sm text-gray-400">{{ tier.billingInfo }}</p>
-								<p class="mt-6 text-base leading-7 text-gray-600">
+								<p
+									class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400"
+								>
 									{{ tier.description }}
 								</p>
 								<button
@@ -135,7 +141,7 @@
 
 								<ul
 									role="list"
-									class="my-10 space-y-4 text-sm leading-6 text-gray-600"
+									class="my-10 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300"
 								>
 									<li
 										v-for="feature in tier.features"
@@ -153,15 +159,22 @@
 								<ul
 									v-if="tier.addOns.length > 0"
 									role="list"
-									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600"
+									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600 dark:text-gray-400"
 								>
-									<span>Available add-ons:</span>
+									<div class="flex items-center justify-between">
+										<span class="font-semibold">Available add-ons:</span
+										><span
+											class="inline-flex items-center rounded-full bg-sky-100 px-3 py-0.5 text-xs font-medium text-sky-800"
+											>${{ (1000).toLocaleString() }}/mo</span
+										>
+									</div>
+
 									<li
 										v-for="feature in tier.addOns"
 										:key="feature"
 										class="flex gap-x-3"
 									>
-										<MinusIcon
+										<PlusIcon
 											class="h-6 w-5 flex-none text-slate-600"
 											aria-hidden="true"
 										/>
@@ -171,7 +184,7 @@
 							</div>
 						</div>
 						<div
-							class="flex flex-col items-start gap-y-6 gap-x-8 rounded-3xl p-8 ring-1 ring-gray-900/10 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
+							class="flex flex-col items-start gap-y-6 gap-x-8 rounded-3xl p-8 ring-1 ring-gray-900/10 dark:ring-white/10 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
 						>
 							<div class="lg:min-w-0 lg:flex-1">
 								<h3
@@ -179,7 +192,9 @@
 								>
 									Discounted Tray.io development
 								</h3>
-								<p class="mt-1 text-base leading-7 text-gray-600">
+								<p
+									class="mt-1 text-base leading-7 text-gray-600 dark:text-gray-400"
+								>
 									Get full access to all of the standard Tray.io license
 									features for 70% of the cost.
 								</p>
@@ -196,7 +211,7 @@
 									add_on.status === 'active'
 										? 'text-lime-600 ring-lime-200'
 										: 'hover:ring-indigo-300',
-									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2  focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400 dark:ring-indigo-400',
 								]"
 							>
 								{{
@@ -267,6 +282,7 @@
 		CheckIcon,
 		CheckCircleIcon,
 		MinusIcon,
+		PlusIcon
 	} from '@heroicons/vue/20/solid';
 	import { useAttrs } from 'vue';
 	const emit = defineEmits(['open-modal']);
@@ -317,8 +333,13 @@
 			billingInfo: 'Pause or cancel anytime',
 			priceMonthly: base_price,
 			description: 'No minimum commitment.',
-			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
-			addOns: ['Multiple projects at a time', '48-hour support response time'],
+			features: [
+				'Unlimited requests',
+				'Unlimited changes',
+				'Unlimited users',
+				'48-hour support response time',
+			],
+			addOns: ['Weekly AMA sessions', 'Process documentation hub'],
 		},
 		{
 			name: 'Quarterly',
@@ -330,12 +351,16 @@
 			description: `Save $${Math.round(
 				base_price * 0.1
 			).toLocaleString()} per month.`,
-			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
-			addOns: [
-				'Multiple projects at a time',
-				'Ticket escalation',
-				'Weekly session calls',
+			features: [
+				'Unlimited requests',
+				'Unlimited changes',
+				'Unlimited users',
 				'24-hour support response time',
+			],
+			addOns: [
+				'Weekly AMA sessions',
+				'Process documentation hub',
+				'Ticket escalation',
 			],
 		},
 		{
@@ -348,12 +373,16 @@
 			description: `Save $${Math.round(
 				base_price * 0.2
 			).toLocaleString()} per month.`,
-			features: ['Unlimited requests', 'Unlimited changes', 'Unlimited users'],
+			features: [
+				'Unlimited requests',
+				'Unlimited changes',
+				'Unlimited users',
+				'12-hour support response time',
+			],
 			addOns: [
-				'Multiple projects at a time',
+				'Weekly AMA sessions',
+				'Process documentation hub',
 				'Ticket escalation',
-				'Weekly session calls',
-				'12-hour, dedicated support response time',
 				'Advanced analytics',
 			],
 		},
