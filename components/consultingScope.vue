@@ -1,7 +1,7 @@
 <template>
 	<div class="bg-white py-24 sm:py-32">
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
-			<div class="mx-auto max-w-2xl sm:text-center">
+			<div class="mx-auto max-w-3xl sm:text-center">
 				<h2 class="text-base font-semibold leading-7 text-indigo-600">
 					Everything you need
 				</h2>
@@ -14,6 +14,13 @@
 					Perks so good you'll never need to go anywhere else for your
 					automations. Seriously.
 				</p>
+				<div class="mt-12">
+					<a
+						href="#pricing"
+						class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						>See plans</a
+					>
+				</div>
 			</div>
 		</div>
 		<div class="relative overflow-hidden pt-16">

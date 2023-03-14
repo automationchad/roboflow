@@ -124,13 +124,7 @@
 										}}
 									</div>
 								</button>
-								<p
-									class="mt-4 text-center text-xs"
-									v-if="
-										!subscription_type === tier.id &&
-										!subscription.status === 'active'
-									"
-								>
+								<p class="mt-4 text-center text-xs" v-if="!subscription.status">
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"

@@ -1,6 +1,6 @@
 <template>
 	<div class="relative">
-		<div class="bg-white py-24 sm:py-32">
+		<div class="bg-white py-24 pb-48 sm:py-32">
 			<div class="mx-auto max-w-7xl px-6 lg:px-8">
 				<div class="mx-auto max-w-2xl lg:text-center">
 					<p
@@ -12,6 +12,7 @@
 						We build the digital plumbing between your software stack without
 						exposing you to the complexity that actually makes it work.
 					</p>
+					
 				</div>
 				<div class="mx-auto mt-16 max-w-3xl sm:mt-20 lg:mt-24 lg:max-w-6xl">
 					<dl
@@ -51,12 +52,12 @@
 					class="relative overflow-hidden bg-gray-900 py-20 px-6 shadow-xl sm:rounded-3xl sm:py-24 sm:px-10 md:px-12 lg:px-20"
 				>
 					<img
-						class="absolute inset-0 h-full w-full object-cover brightness-150 saturate-0"
-						src="https://images.unsplash.com/photo-1601381718415-a05fb0a261f3?ixid=MXwxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1216&q=80"
+						class="absolute inset-0 h-full w-full object-cover"
+						src="~/assets/images/case-study.jpeg"
 						alt=""
 					/>
-					<div class="absolute inset-0 bg-gray-900/90 mix-blend-multiply" />
-					<svg
+					<div class="absolute inset-0 bg-gray-900/50 mix-blend-multiply" />
+					<!-- <svg
 						viewBox="0 0 1097 845"
 						aria-hidden="true"
 						class="absolute -top-56 -left-80 w-[68.5625rem] transform-gpu blur-3xl"
@@ -90,26 +91,25 @@
 							fill-opacity=".25"
 							d="M301.174 646.641 193.541 844.786 0 546.172l301.174 100.469 193.845-356.855c1.241 164.891 42.802 431.935 199.124 180.978 195.402-313.696 143.295-588.18 284.729-419.266 113.148 135.13 124.068 367.989 115.378 467.527L811.753 372.553l20.102 451.119-530.681-177.031Z"
 						/>
-					</svg>
+					</svg> -->
 					<div class="relative mx-auto max-w-2xl lg:mx-0">
-						<img
-							class="h-12 w-auto"
-							src="https://tailwindui.com/img/logos/workcation-logo-white.svg"
+						<!-- <img
+							class="h-12 w-auto text-white"
+							src="~/assets/images/logos/novalogo.svg"
 							alt=""
-						/>
+						/> -->
 						<figure>
 							<blockquote
 								class="mt-6 text-lg font-semibold text-white sm:text-xl sm:leading-8"
 							>
 								<p>
-									“Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
-									expedita voluptas culpa sapiente alias molestiae. Numquam
-									corrupti in laborum sed rerum et corporis.”
+									“Motis really helped us automate our contract onboarding
+									processes.”
 								</p>
 							</blockquote>
 							<figcaption class="mt-6 text-base text-white">
-								<div class="font-semibold">Judith Black</div>
-								<div class="mt-1">CEO of Workcation</div>
+								<div class="font-semibold">Michelle Timm</div>
+								<div class="mt-1">Senior Operations Analyst of Nova</div>
 							</figcaption>
 						</figure>
 					</div>
@@ -123,26 +123,27 @@
 	import {
 		ArrowPathIcon,
 		CloudArrowUpIcon,
-		FingerPrintIcon,
+		SparklesIcon,
 		LockClosedIcon,
+		QueueListIcon,
 	} from '@heroicons/vue/24/outline';
 
 	const features = [
 		{
 			name: 'Push to deploy',
 			description:
-				"Subscribe to a plan & request as many designs as you'd like.",
-			icon: CloudArrowUpIcon,
+				"Subscribe to a plan & request as many automations as you'd like.",
+			icon: QueueListIcon,
 		},
 		{
 			name: 'SSL certificates',
 			description:
-				'Receive your design within a few business days on average, Monday to Friday.',
-			icon: LockClosedIcon,
+				'Receive your automation within a few business days on average.',
+			icon: SparklesIcon,
 		},
 		{
 			name: 'Simple queues',
-			description: "We'll revise the designs until you're 100% satisfied.",
+			description: "We'll revise the automations until you're 100% satisfied.",
 			icon: ArrowPathIcon,
 		},
 	];

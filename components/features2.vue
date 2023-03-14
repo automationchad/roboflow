@@ -40,6 +40,7 @@
 					one flat monthly fee, with automations delivered so fast that it will
 					blow your mind.
 				</p>
+				
 			</div>
 
 			<div
@@ -156,8 +157,8 @@
 								><strong class="font-semibold text-gray-900"
 									>Manage with Trello</strong
 								>
-								Manage your design board using Trello. View active, queued and
-								completed tasks with ease.</span
+								Manage your automation tasks using Trello. View active, queued
+								and completed tasks with ease.</span
 							>
 						</li>
 						<li class="flex gap-x-3">
@@ -197,9 +198,9 @@
 		ChevronRightIcon,
 		VideoCameraSlashIcon,
 		WindowIcon,
-        QueueListIcon,
+		QueueListIcon,
 		CreditCardIcon,
-        UserGroupIcon
+		UserGroupIcon,
 	} from '@heroicons/vue/24/outline';
 </script>
 

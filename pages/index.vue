@@ -92,8 +92,12 @@
 											</div>
 
 											<div
-												class="max-h-[400px] overflow-hidden bg-none px-6 pt-6 pb-14 font-mono text-sm text-slate-200"
-											></div>
+												class="max-h-[400px] overflow-hidden whitespace-pre-wrap bg-none px-6 pt-6 pb-14 font-mono text-sm text-slate-200"
+											>
+												<code>
+													<pre>{{ code }}</pre>
+												</code>
+											</div>
 										</div>
 									</div>
 									<div
@@ -114,7 +118,7 @@
 		<features />
 		<features2 :case-study="featured_case_study" />
 		<consulting-scope />
-		<projects />
+		<!-- <projects /> -->
 		<consulting-pricing
 			v-if="profile?.workspaces.billing_email === user?.email"
 			@open-modal="showLoginModal = true"
@@ -205,6 +209,7 @@
 		Disclosure,
 		DisclosureButton,
 		DisclosurePanel,
+		RadioGroupLabel,
 	} from '@headlessui/vue';
 	import {
 		MinusSmallIcon,
@@ -218,6 +223,9 @@
 
 	import Airtable from 'airtable';
 	import showdown from 'showdown';
+
+	import { HighCode } from 'vue-highlight-code';
+	import 'vue-highlight-code/dist/style.css';
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
@@ -251,7 +259,42 @@
 	].sort();
 
 	let case_studies = [];
-	const code = "console.log('Hello World!')";
+	const code = `*** Settings ***
+Documentation       Orders robots from RobotSpareBin Industries Inc.
+
+Library             RPA.Robocorp.Vault
+Library             RPA.Browser.Selenium    auto_close=\${FALSE}
+Library             RPA.HTTP
+Library             RPA.Tables
+Library             RPA.PDF
+
+
+*** Tasks ***
+Place orders on website
+    Open website
+    Get orders
+
+
+*** Keywords ***
+Open website
+    Open Available Browser    https://robotsparebinindustries.com/#/robot-order
+    Wait Until Element Is Visible    css:div.modal-dialog
+    Click Button When Visible    css:button.btn-dark
+
+Get orders
+    Download    https://robotsparebinindustries.com/orders.csv    overwrite=True
+    \${orders}=    Read table from CSV    orders.csv
+    FOR    \${order}    IN    @{orders}
+        Fill the form    \${order}
+    END
+
+Fill the form
+    [Arguments]    \${order}
+    Select From List By Value    head    \${order}[Head]
+    Select Radio Button    stacked    \${order}[Body]
+    Input Text 
+    Input Text    address    \${order}[Address]
+`;
 
 	// shiki
 	// 	.getHighlighter({
@@ -317,6 +360,7 @@
 		components: {
 			WindowIcon,
 			CreditCardIcon,
+			HighCode,
 		},
 	};
 </script>

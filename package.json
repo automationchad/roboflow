@@ -47,6 +47,7 @@
 		"showdown": "^2.1.0",
 		"stripe": "^11.9.1",
 		"vue-chartjs": "^5.2.0",
+		"vue-highlight-code": "^0.1.16",
 		"vue-prism-component": "^2.0.0",
 		"vue-router": "^4.1.6"
 	}
