@@ -555,10 +555,7 @@
 					and follow along:
 				</p>
 				<p>
-					<img
-						alt="PDD"
-						src="/docs/static/get-started/courses/software-robot-delivery-process/documenting-the-process/PDD.png"
-					/>
+					
 				</p>
 				<h3 id="process-name">
 					<button type="button">
