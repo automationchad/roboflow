@@ -407,9 +407,9 @@
 	const test = false;
 
 	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
-	// if (!user.value) {
-	// 	navigateTo('/');
-	// }
+	if (!user.value) {
+		navigateTo('/');
+	}
 
 	const profile = attrs.profile;
 	const selected_card = ref({});
