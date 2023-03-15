@@ -95,7 +95,7 @@
 								>
 									{{ tier.description }}
 								</p>
-								<!-- <button
+								<button
 									@click="
 										handleButtonClick(
 											profile?.workspaces?.billing_email ?? null,
@@ -129,8 +129,8 @@
 												: 'Get started'
 										}}
 									</div>
-								</button> -->
-								<a
+								</button>
+								<!-- <a
 									href="https://calendly.com/motis-group/intro"
 									target="_blank"
 									:aria-describedby="tier.id"
@@ -144,15 +144,15 @@
 									<div class="flex items-center justify-center">
 										{{ 'Get started' }}
 									</div>
-								</a>
-								<!-- <p class="mt-4 text-center text-xs" v-if="!subscription.status">
+								</a> -->
+								<p class="mt-4 text-center text-xs" v-if="!subscription.status">
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"
 										class="underline dark:text-white"
 										>Book a call</a
 									>
-								</p> -->
+								</p>
 
 								<ul
 									role="list"
