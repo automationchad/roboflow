@@ -153,7 +153,7 @@
 									<span class="block text-xs text-gray-500" role="none"
 										>Signed in as</span
 									><span class="mt-0.5 font-semibold" role="none">{{
-										user.email
+										user?.email
 									}}</span>
 								</p>
 
@@ -179,7 +179,7 @@
 												!profile?.workspaces?.active
 													? handleCheckout(
 															{ tray_project_id: null },
-															profile.workspaces
+															profile?.workspaces
 													  )
 													: navigateTo(
 															`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
@@ -191,7 +191,7 @@
 												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
 											]"
 										>
-											{{ !profile.workspaces.active ? 'Upgrade' : 'Billing' }}
+											{{ !profile?.workspaces?.active ? 'Upgrade' : 'Billing' }}
 										</a>
 									</MenuItem>
 
