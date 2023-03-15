@@ -172,7 +172,7 @@
 									<MenuItem
 										v-slot="{ active }"
 										class="cursor-pointer"
-										v-if="profile?.workspaces.billing_email === user?.email"
+										v-if="profile?.workspaces?.billing_email === user?.email"
 									>
 										<a
 											@click="
