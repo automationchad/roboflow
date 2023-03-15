@@ -95,7 +95,7 @@
 								>
 									{{ tier.description }}
 								</p>
-								<button
+								<!-- <button
 									@click="
 										handleButtonClick(
 											profile?.workspaces?.billing_email ?? null,
@@ -110,7 +110,7 @@
 											? 'bg-lime-50 text-lime-600 ring-1 ring-lime-200'
 											: tier.mostPopular
 											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
-											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 dark:text-indigo-200 hover:ring-indigo-300 ',
+											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 dark:text-indigo-200 ',
 										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
 									]"
 								>
@@ -129,15 +129,30 @@
 												: 'Get started'
 										}}
 									</div>
-								</button>
-								<p class="mt-4 text-center text-xs" v-if="!subscription.status">
+								</button> -->
+								<a
+									href="https://calendly.com/motis-group/intro"
+									target="_blank"
+									:aria-describedby="tier.id"
+									:class="[
+										tier.mostPopular
+											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
+											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 dark:text-indigo-200 ',
+										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
+									]"
+								>
+									<div class="flex items-center justify-center">
+										{{ 'Get started' }}
+									</div>
+								</a>
+								<!-- <p class="mt-4 text-center text-xs" v-if="!subscription.status">
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"
 										class="underline dark:text-white"
 										>Book a call</a
 									>
-								</p>
+								</p> -->
 
 								<ul
 									role="list"
@@ -265,7 +280,7 @@
 							<a
 								href="https://app.getrewardful.com/login"
 								target="_blank"
-								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 dark:text-indigo-400 dark:ring-indigo-400 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400 dark:ring-indigo-400"
 							>
 								Join now
 							</a>
@@ -282,7 +297,7 @@
 		CheckIcon,
 		CheckCircleIcon,
 		MinusIcon,
-		PlusIcon
+		PlusIcon,
 	} from '@heroicons/vue/20/solid';
 	import { useAttrs } from 'vue';
 	const emit = defineEmits(['open-modal']);
@@ -321,7 +336,6 @@
 				  )
 				: { status: false };
 		}
-		console.log(subscription);
 	}
 
 	const tiers = [

@@ -46,7 +46,7 @@
 									<a
 										v-if="
 											!profile ||
-											profile.workspaces.billing_email === user.email
+											profile?.workspaces?.billing_email === user?.email
 										"
 										href="#save"
 										class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-300"
@@ -120,7 +120,7 @@
 		<consulting-scope />
 		<!-- <projects /> -->
 		<consulting-pricing
-			v-if="profile?.workspaces.billing_email === user?.email"
+			v-if="profile?.workspaces?.billing_email === user?.email"
 			@open-modal="showLoginModal = true"
 			:user="user"
 			:profile="profile"
