@@ -297,10 +297,10 @@
 	let customer = {};
 	const test = false;
 
-	if (profile?.workspaces.billing_email) {
+	if (profile?.workspaces?.billing_email) {
 		const email = test
 			? 'automation@motis.group'
-			: profile.workspaces.billing_email;
+			: profile?.workspaces?.billing_email;
 
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',

@@ -423,8 +423,8 @@
 	let subscription = { status: false };
 	let email = 'automation@motis.group';
 	let customer = {};
-	if (profile?.workspaces.billing_email) {
-		email = profile?.workspaces.billing_email;
+	if (profile?.workspaces?.billing_email) {
+		email = profile?.workspaces?.billing_email;
 		customer = await $fetch(`/api/stripe/customer?email=${email}`, {
 			method: 'get',
 		});
