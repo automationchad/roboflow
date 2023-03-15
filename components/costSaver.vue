@@ -1,5 +1,5 @@
 <template>
-	<div class="relative isolate bg-white dark:bg-black py-24 sm:py-32" id="save">
+	<div class="relative isolate bg-white py-24 dark:bg-black sm:py-32" id="save">
 		<div
 			class="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
 			aria-hidden="true"
@@ -27,10 +27,12 @@
 		</div>
 		<div class="mx-auto max-w-7xl px-6 lg:px-8">
 			<div class="mx-auto max-w-2xl sm:text-center">
-				<h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+				<h2
+					class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl"
+				>
 					Save money on your existing license
 				</h2>
-				<p class="mt-6 text-lg leading-8 text-gray-600">
+				<p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
 					Considering selling a kindey to renew with your automation platform?
 					Don't.
 
@@ -39,13 +41,15 @@
 				</p>
 			</div>
 			<div
-				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/40 ring-1 ring-gray-200 backdrop-blur-md sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
+				class="mx-auto mt-16 max-w-2xl rounded-3xl bg-white/40 ring-1 ring-gray-200 backdrop-blur-md dark:bg-black/40 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none"
 			>
 				<div class="p-8 sm:p-10 lg:flex-auto">
-					<h3 class="text-2xl font-bold tracking-tight text-gray-900">
+					<h3
+						class="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
+					>
 						Calculate my savings
 					</h3>
-					<p class="mt-6 text-base leading-7 text-gray-600">
+					<p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
 						Estimate how much you could save by migrating your license with our
 						migration calculator.
 					</p>
@@ -116,14 +120,16 @@
 						<div class="col-span-1">
 							<label
 								for="current-spend"
-								class="block text-sm font-medium leading-6 text-gray-900"
+								class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
 								>Current yearly spend</label
 							>
 							<div class="relative mt-2 rounded-md shadow-sm">
 								<div
 									class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
 								>
-									<span class="text-gray-500 sm:text-sm">$</span>
+									<span class="text-gray-500 dark:text-white sm:text-sm"
+										>$</span
+									>
 								</div>
 								<input
 									v-model="current_spend"
@@ -131,7 +137,7 @@
 									type="number"
 									name="current-spend"
 									id="current-spend"
-									class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+									class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-700 dark:text-white dark:ring-slate-400 sm:text-sm sm:leading-6"
 									placeholder="0.00"
 									aria-describedby="current-spend-current"
 								/>
@@ -139,7 +145,7 @@
 									class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
 								>
 									<span
-										class="text-gray-500 sm:text-sm"
+										class="text-gray-500 dark:text-white sm:text-sm"
 										id="current-spend-currency"
 										>USD</span
 									>
@@ -149,7 +155,7 @@
 						<div class="col-span-1">
 							<label
 								for="task-number"
-								class="block text-sm font-medium leading-6 text-gray-900"
+								class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
 								>Est. monthly tasks</label
 							>
 							<div class="relative mt-2 rounded-md shadow-sm">
@@ -158,20 +164,23 @@
 									type="number"
 									name="task-number"
 									id="task-number"
-									class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+									class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-700 dark:text-white dark:ring-slate-400 sm:text-sm sm:leading-6"
 									placeholder="10000000"
 								/>
 								<div
 									class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
 								>
-									<BoltIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+									<BoltIcon
+										class="h-5 w-5 text-gray-400 dark:text-white"
+										aria-hidden="true"
+									/>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="mt-10 flex items-center gap-x-4">
 						<h4
-							class="flex-none text-sm font-semibold leading-6 text-indigo-600"
+							class="flex-none text-sm font-semibold leading-6 text-indigo-600 dark:text-indigo-100"
 						>
 							Say goodbye to complicated licenses
 						</h4>
@@ -179,7 +188,7 @@
 					</div>
 					<ul
 						role="list"
-						class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6"
+						class="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 dark:text-gray-300 sm:grid-cols-2 sm:gap-6"
 					>
 						<li
 							v-for="feature in includedFeatures"
@@ -196,12 +205,12 @@
 				</div>
 				<div class="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
 					<div
-						class="costs h-full rounded-2xl border border-gray-900/5 dark:border-white/15 bg-white dark:bg-black py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16"
+						class="costs dark:border-white/15 h-full rounded-2xl border border-gray-900/5 bg-white py-10 text-center dark:bg-black/50 lg:flex lg:flex-col lg:justify-center lg:py-16"
 					>
 						<div class="mb-4 flex justify-center">
 							<RadioGroup
 								v-model="selected_frequency"
-								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-black"
+								class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-slate-800"
 							>
 								<RadioGroupLabel class="sr-only"
 									>Payment frequency</RadioGroupLabel
@@ -225,7 +234,7 @@
 							</RadioGroup>
 						</div>
 						<div class="mx-auto min-w-[300px] px-8">
-							<p class="text-base font-semibold text-gray-600">
+							<p class="text-base font-semibold text-gray-600 dark:text-white">
 								Estimated {{ selected_frequency.value }}
 								{{ current_spend > 0 ? 'savings' : 'costs' }} *
 							</p>
@@ -233,7 +242,7 @@
 								<span
 									:class="[
 										totalSavings(current_spend, est_tasks) > 0
-											? 'text-gray-900'
+											? 'text-gray-900 dark:text-gray-100'
 											: 'text-rose-600',
 										'text-5xl font-bold tracking-tight ',
 									]"
@@ -244,13 +253,13 @@
 									}}</span
 								>
 								<span
-									class="text-sm font-semibold leading-6 tracking-wide text-gray-600"
+									class="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400"
 									>USD</span
 								>
 							</p>
 							<div class="mt-8">
 								<div
-									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
+									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600 dark:border-slate-800 dark:text-gray-400"
 								>
 									<span>Current</span
 									><span
@@ -264,7 +273,7 @@
 									>
 								</div>
 								<div
-									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
+									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600 dark:border-slate-800 dark:text-gray-400"
 								>
 									<span>Estimated</span
 									><span
@@ -280,9 +289,13 @@
 										<span>Profit Margin</span
 										><span class="text-gray-600"
 											>%{{
-												((Math.round(
-													taskPrice(est_tasks) - trayCosts(est_tasks)
-												) / Math.round(taskPrice(est_tasks)))*100).toLocaleString()
+												(
+													(Math.round(
+														taskPrice(est_tasks) - trayCosts(est_tasks)
+													) /
+														Math.round(taskPrice(est_tasks))) *
+													100
+												).toLocaleString()
 											}}</span
 										>
 									</div>
@@ -408,7 +421,7 @@
 	};
 
 	const tiers = 10;
-	const monthly_base = 0;
+	const monthly_base = 125;
 
 	const pricing = [...Array(tiers)]
 		.fill(undefined)
@@ -478,5 +491,3 @@
 		else return Math.abs(currentSpend - taskPrice(tasks));
 	};
 </script>
-
-

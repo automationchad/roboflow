@@ -110,7 +110,7 @@
 											? 'bg-lime-50 text-lime-600 ring-1 ring-lime-200'
 											: tier.mostPopular
 											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
-											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 ',
+											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 dark:text-indigo-200 hover:ring-indigo-300 ',
 										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
 									]"
 								>
@@ -134,7 +134,7 @@
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"
-										class="underline"
+										class="underline dark:text-white"
 										>Book a call</a
 									>
 								</p>
@@ -255,17 +255,17 @@
 					>
 						<div class="">
 							<h1
-								class="mt-2 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl"
+								class="mt-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-2xl"
 							>
 								Refer a friend & earn
 							</h1>
-							<p class="mt-2 mb-6">
+							<p class="mt-2 mb-6 dark:text-gray-400">
 								Earn 10% monthly recurring commissions for each referral.
 							</p>
 							<a
 								href="https://app.getrewardful.com/login"
 								target="_blank"
-								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								class="rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 dark:text-indigo-400 dark:ring-indigo-400 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
 								Join now
 							</a>

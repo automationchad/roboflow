@@ -34,7 +34,7 @@
 				/>
 				<div class="relative" aria-hidden="true">
 					<div
-						class="absolute -inset-x-20 bottom-0 bg-gradient-to-t from-white pt-[7%]"
+						class="absolute -inset-x-20 bottom-0 bg-gradient-to-t from-white pt-[7%] dark:from-black"
 					/>
 				</div>
 			</div>

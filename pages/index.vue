@@ -11,18 +11,18 @@
 				class="relative isolate overflow-hidden bg-gradient-to-b from-indigo-100/20"
 			>
 				<div
-					class="mx-auto max-w-7xl pt-10 pb-24 sm:pb-32 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:py-40 lg:px-8"
+					class="mx-auto max-w-7xl pt-10 pb-24 sm:pb-32 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:py-40 lg:px-8 "
 				>
-					<div class="px-6 lg:px-0 lg:pt-4">
+					<div class="px-6 lg:px-0 lg:pt-4 ">
 						<div class="mx-auto max-w-2xl">
 							<div class="max-w-lg">
 								<h1
-									class="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"
+									class="mt-10 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl"
 								>
 									<p>AutomationOps,</p>
 									<p>as a service.</p>
 								</h1>
-								<p class="mt-6 text-lg leading-8 text-gray-600">
+								<p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
 									We’re a dev shop assisting fast growing companies with process
 									automation and software interoperability.
 								</p>
@@ -49,7 +49,7 @@
 											profile.workspaces.billing_email === user.email
 										"
 										href="#save"
-										class="text-sm font-semibold leading-6 text-gray-900"
+										class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-300"
 										>Save on your license <span aria-hidden="true">→</span></a
 									>
 								</div>
@@ -60,7 +60,7 @@
 						class="mt-20 sm:mt-24 md:mx-auto md:max-w-2xl lg:mx-0 lg:mt-0 lg:w-screen"
 					>
 						<div
-							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 md:-mr-20 lg:-mr-36"
+							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white dark:bg-black shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 md:-mr-20 lg:-mr-36"
 							aria-hidden="true"
 						/>
 						<div class="shadow-lg md:rounded-3xl">
@@ -110,7 +110,7 @@
 					</div>
 				</div>
 				<div
-					class="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-white sm:h-32"
+					class="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-white dark:from-black sm:h-32"
 				/>
 			</div>
 		</div>
