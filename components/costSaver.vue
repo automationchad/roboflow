@@ -421,7 +421,7 @@
 	};
 
 	const tiers = 10;
-	const monthly_base = 125;
+	const monthly_base = 150;
 
 	const pricing = [...Array(tiers)]
 		.fill(undefined)
