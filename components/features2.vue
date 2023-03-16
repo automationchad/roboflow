@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative isolate overflow-hidden bg-white dark:bg-black py-24 sm:py-32"
+		class="relative isolate overflow-hidden bg-white py-24 dark:bg-black sm:py-32"
 		id="info"
 	>
 		<svg
@@ -40,7 +40,6 @@
 					one flat monthly fee, with automations delivered so fast that it will
 					blow your mind.
 				</p>
-				
 			</div>
 
 			<div
@@ -92,52 +91,12 @@
 					</figure>
 				</div>
 				<div
-					class="prose max-w-xl text-base leading-7 text-gray-700 lg:col-span-7"
+					class="prose max-w-xl text-base leading-7 text-gray-700 dark:text-gray-300 lg:col-span-7"
 				>
-					<!-- <p>
-							As your business expands, your resources become more scarce. You
-							have less time to do all things you want to do, to make the
-							decisions you need to make, to service your customers the way they
-							deserve to be serviced. The paradox of business is this:
-						</p> -->
-
-					<!-- <div class="my-4 border-l-4 border-yellow-400 bg-yellow-50 px-4">
-							<div class="flex items-center">
-								<div class="flex-shrink-0">
-									<ExclamationTriangleIcon
-										class="h-5 w-5 text-yellow-400"
-										aria-hidden="true"
-									/>
-								</div>
-								<div class="ml-3">
-									<p class="text-sm text-yellow-700">
-										The faster you are growing, the tighter cash usually is. So
-										the businesses that need cash most, have it least!
-									</p>
-								</div>
-							</div>
-						</div> -->
-					<!-- <p>
-							The key to freeing up cash flow is building capacity. By extending
-							capacity, you allow more sales and gross margin to accumulate so
-							you can make the investments needed for next stage growth.
-						</p>
-						<p>
-							Automation isn't about making things easier. It isn't about
-							because it's new or tech-forward. It's not even about cutting
-							costs...
-						</p>
-						<p class="font-bold text-indigo-600">
-							The key to the automation is to extend capacity by building high
-							leverage systems.
-						</p> -->
-					<!-- <p>
-							Motis Group replaces unreliable freelancers and expensive agencies
-							for one flat monthly fee, with automations delivered so fast that
-							it will blow your mind.
-						</p> -->
-
-					<ul role="list" class="mt-8 max-w-xl space-y-8 text-gray-600 dark:text-gray-400">
+					<ul
+						role="list"
+						class="mt-8 max-w-xl space-y-8 text-gray-600 dark:text-gray-400"
+					>
 						<li class="flex gap-x-3">
 							<VideoCameraSlashIcon
 								class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400"
@@ -148,12 +107,15 @@
 									>Totally Async.</strong
 								>
 								Don't like meetings? We don't either; so much so that we've
-								outlawed them completely.</span
+								outlawed them completely (unless you
+								<a href="#pricing" class="text-indigo-500">want them</a>).</span
 							>
 						</li>
 						<li class="flex gap-x-3">
-							<QueueListIcon class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400" />
-							<span 
+							<QueueListIcon
+								class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400"
+							/>
+							<span
 								><strong class="font-semibold text-gray-900 dark:text-gray-100"
 									>Manage with Trello</strong
 								>
@@ -162,7 +124,9 @@
 							>
 						</li>
 						<li class="flex gap-x-3">
-							<UserGroupIcon class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400" />
+							<UserGroupIcon
+								class="mt-1 h-5 w-5 flex-none text-indigo-600 dark:text-indigo-400"
+							/>
 
 							<span
 								><strong class="font-semibold text-gray-900 dark:text-gray-100"
