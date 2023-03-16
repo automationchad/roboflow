@@ -232,7 +232,7 @@
 								{{
 									add_on.status === 'active' && subscription.status === 'active'
 										? 'Active'
-										: 'Buy discounted license'
+										: 'Calculate your savings'
 								}}
 								{{ ' '
 								}}<span aria-hidden="true">{{
@@ -254,7 +254,7 @@
 								{{
 									add_on.status === 'active' && subscription.status === 'active'
 										? 'Active'
-										: 'Add on'
+										: 'Buy discounted license'
 								}}
 								{{ ' '
 								}}<span aria-hidden="true">{{
@@ -324,14 +324,18 @@
 		if (customer.subscriptions.data.length > 0) {
 			subscription = customer.subscriptions.data.find(
 				(o) => o.plan?.metadata.type === 'retainer'
-			);
-			if (subscription.id) {
-				subscription_type = subscription.plan.nickname;
+			)
+				? customer.subscriptions.data.find(
+						(o) => o.plan?.metadata.type === 'retainer'
+				  )
+				: { status: false };
+			if (subscription?.id) {
+				subscription_type = subscription?.plan?.nickname;
 			}
-			add_on = customer.subscriptions.data.find((o) =>
+			add_on = customer?.subscriptions?.data?.find((o) =>
 				o.items.data.find((v) => v.plan.nickname === 'software_license')
 			)
-				? customer.subscriptions.data.find((o) =>
+				? customer?.subscriptions?.data?.find((o) =>
 						o.items.data.find((v) => v.plan.nickname === 'software_license')
 				  )
 				: { status: false };

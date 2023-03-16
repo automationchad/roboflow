@@ -14,7 +14,6 @@
 	import { useAttrs } from 'vue';
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
