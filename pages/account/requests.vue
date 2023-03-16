@@ -91,7 +91,7 @@
 									<div class="focus:outline-none">
 										<span class="absolute inset-0" aria-hidden="true" />
 										<div
-											class="mb-4 flex justify-between border-b border-gray-100 dark:border-gray-700 pb-4"
+											class="mb-4 flex justify-between border-b border-gray-100 pb-4 dark:border-gray-700"
 										>
 											<div class="flex items-center space-x-4">
 												<p
@@ -131,13 +131,15 @@
 								</div>
 							</button>
 						</div>
-						<div class="mt-8  py-5">
+						<div class="mt-8 py-5">
 							<div
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 							>
 								<div class="ml-4 mt-2 flex justify-between">
 									<div class="">
-										<h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+										<h3
+											class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+										>
 											Backlog
 										</h3>
 									</div>
@@ -195,7 +197,7 @@
 									.filter((o) => o.idList === backlogId)
 									.slice(backLogPage * limit, backLogPage * limit + limit)"
 								:key="ticket.id"
-								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 dark:bg-slate-800 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
+								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:bg-slate-800"
 							>
 								<!-- <div class="flex-shrink-0">
 									<img
@@ -409,6 +411,7 @@
 	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
 	if (!user.value) {
 		navigateTo('/');
+		location.reload();
 	}
 
 	const profile = attrs.profile;
