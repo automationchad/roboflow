@@ -21,6 +21,7 @@
 					width="158"
 					height="48"
 				/>
+				
 				<img
 					class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
 					src="~/assets/images/logos/mtl-logo.svg"
