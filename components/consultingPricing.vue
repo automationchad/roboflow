@@ -355,16 +355,23 @@
 				'Unlimited requests',
 				'Unlimited changes',
 				'Unlimited users',
-				'48-hour support response time',
+				'48 hours (18/5) response time',
 			],
-			addOns: ['Weekly AMA sessions', 'Process documentation hub'],
+			addOns: [
+				'Weekly tactical sessions',
+				'Monthly strategy sessions',
+				'Documentation (written ONLY)',
+			],
 		},
 		{
 			name: 'Quarterly',
 			id: 'quarterly',
 			mostPopular: false,
 			href: '#',
-			billingInfo: 'Paid quarterly',
+			billingInfo: `Paid quarterly (\$${(
+				(base_price - base_price * 0.1) *
+				3
+			).toLocaleString()})`,
 			priceMonthly: base_price,
 			description: `Save $${Math.round(
 				base_price * 0.1
@@ -373,12 +380,12 @@
 				'Unlimited requests',
 				'Unlimited changes',
 				'Unlimited users',
-				'24-hour support response time',
+				'36-hour (18/5) response time',
 			],
 			addOns: [
-				'Weekly AMA sessions',
-				'Process documentation hub',
-				'Ticket escalation',
+				'Weekly tactical sessions',
+				'Monthly strategy sessions',
+				'Documentation (written + video)',
 			],
 		},
 		{
@@ -386,7 +393,10 @@
 			id: 'yearly',
 			mostPopular: false,
 			href: '#',
-			billingInfo: 'Paid annually',
+			billingInfo: `Paid annually (\$${(
+				(base_price - base_price * 0.2) *
+				12
+			).toLocaleString()})`,
 			priceMonthly: base_price,
 			description: `Save $${Math.round(
 				base_price * 0.2
@@ -395,13 +405,12 @@
 				'Unlimited requests',
 				'Unlimited changes',
 				'Unlimited users',
-				'12-hour support response time',
+				'24-hour (18/7) response time',
 			],
 			addOns: [
-				'Weekly AMA sessions',
-				'Process documentation hub',
-				'Ticket escalation',
-				'Advanced analytics',
+				'Weekly tactical sessions',
+				'Monthly strategy sessions',
+				'Documentation (written + video)',
 			],
 		},
 	];
