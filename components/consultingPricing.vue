@@ -97,7 +97,7 @@
 								</p>
 								<a
 									target="_blank"
-									href="https://motisgroup.manyrequests.com/register"
+									href="https://motisgroup.manyrequests.com/services/prod_NSMrTLxCzg2BSa/checkout"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
