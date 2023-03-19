@@ -97,7 +97,7 @@
 								</p>
 								<a
 									target="_blank"
-									href="https://motisgroup.manyrequests.com/services/prod_NSMrTLxCzg2BSa/checkout"
+									href="https://motisgroup.manyrequests.com/register"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -332,8 +332,8 @@
 			priceMonthly: base_price,
 			description: 'No minimum commitment.',
 			features: [
-				'Unlimited requests',
-				'Unlimited changes',
+				'Unlimited projects',
+				'Unlimited debugging',
 				'Unlimited users',
 				'48 hours (18/5) response time',
 			],
@@ -357,8 +357,8 @@
 				base_price * 0.1
 			).toLocaleString()} per month.`,
 			features: [
-				'Unlimited requests',
-				'Unlimited changes',
+				'Unlimited projects',
+				'Unlimited debugging',
 				'Unlimited users',
 				'36-hour (18/5) response time',
 			],
@@ -382,8 +382,8 @@
 				base_price * 0.2
 			).toLocaleString()} per month.`,
 			features: [
-				'Unlimited requests',
-				'Unlimited changes',
+				'Unlimited projects',
+				'Unlimited debugging',
 				'Unlimited users',
 				'24-hour (18/7) response time',
 			],

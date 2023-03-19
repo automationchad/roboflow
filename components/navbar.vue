@@ -187,7 +187,7 @@
 					class="lg:border-slate-900/15 space-x-4 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8 lg:dark:border-slate-800"
 				>
 					<a
-						href="https://motisgroup.manyrequests.com/services/prod_NSMrTLxCzg2BSa/checkout"
+						href="https://motisgroup.manyrequests.com/register"
 						class=""
 						target="_blank"
 						>Sign up</a
