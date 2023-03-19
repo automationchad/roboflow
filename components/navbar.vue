@@ -184,16 +184,21 @@
 				</div>
 				<div
 					v-else
-					class="lg:border-slate-900/15 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8 lg:dark:border-slate-800"
+					class="lg:border-slate-900/15 space-x-4 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8 lg:dark:border-slate-800"
 				>
-					<div class="">
-						<button
-							@click="$emit('open-modal')"
-							class="-my-2.5 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-						>
-							<span>Log in <span aria-hidden="true">→</span></span>
-						</button>
-					</div>
+					<a
+						href="https://motisgroup.manyrequests.com/register"
+						class=""
+						target="_blank"
+						>Sign up</a
+					>
+					<a
+						target="_blank"
+						href="https://motisgroup.manyrequests.com/login"
+						class="-my-2.5 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
+					>
+						<span>Log in <span aria-hidden="true">→</span></span>
+					</a>
 				</div>
 			</div>
 		</div>

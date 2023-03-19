@@ -95,41 +95,21 @@
 								>
 									{{ tier.description }}
 								</p>
-								<button
-									@click="
-										handleButtonClick(
-											profile?.workspaces?.billing_email ?? null,
-											customer,
-											tier
-										)
-									"
+								<a
+									target="_blank"
+									href="https://motisgroup.manyrequests.com/register"
 									:aria-describedby="tier.id"
 									:class="[
-										subscription_type === tier.id &&
-										subscription.status === 'active'
-											? 'bg-lime-50 text-lime-600 ring-1 ring-lime-200'
-											: tier.mostPopular
+										tier.mostPopular
 											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
 											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 dark:text-indigo-200 ',
 										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
 									]"
 								>
 									<div class="flex items-center justify-center">
-										<CheckCircleIcon
-											class="mr-1 h-5 w-5"
-											v-if="
-												subscription_type === tier.id &&
-												subscription.status === 'active'
-											"
-										/>{{
-											subscription_type === tier.id
-												? 'Manage subscription'
-												: subscription.status === 'active'
-												? 'Upgrade'
-												: 'Get started'
-										}}
+										{{ 'Get started' }}
 									</div>
-								</button>
+								</a>
 								<!-- <a
 									href="https://calendly.com/motis-group/intro"
 									target="_blank"
@@ -145,7 +125,7 @@
 										{{ 'Get started' }}
 									</div>
 								</a> -->
-								<p class="mt-4 text-center text-xs" v-if="!subscription.status">
+								<p class="mt-4 text-center text-xs">
 									<a
 										href="https://calendly.com/motis-group/intro"
 										target="_blank"
@@ -304,7 +284,7 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-	const base_price = 4000;
+	const base_price = 7000;
 
 	let subscription = { status: false };
 	let subscription_type = false;
