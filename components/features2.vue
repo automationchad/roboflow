@@ -117,10 +117,10 @@
 							/>
 							<span
 								><strong class="font-semibold text-gray-900 dark:text-gray-100"
-									>Manage with Trello</strong
+									>Manage with dedicated platform</strong
 								>
-								Manage your automation tasks using Trello. View active, queued
-								and completed tasks with ease.</span
+								Manage your automation tasks using ManyRequests. View active,
+								queued and completed tasks with ease.</span
 							>
 						</li>
 						<li class="flex gap-x-3">
