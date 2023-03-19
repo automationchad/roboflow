@@ -248,7 +248,7 @@
 					<div
 						class="mt-24 flex flex-col items-center justify-center text-center align-middle"
 					>
-						<div class="">
+						<div class="" v-if="false">
 							<h1
 								class="mt-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-2xl"
 							>
