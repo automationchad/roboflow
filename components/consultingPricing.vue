@@ -157,7 +157,7 @@
 									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600 dark:text-gray-400"
 								>
 									<div class="flex items-center justify-between">
-										<span class="font-semibold">Available add-ons:</span
+										<span class="font-semibold">Motis Boost:</span
 										><span
 											class="inline-flex items-center rounded-full bg-sky-100 px-3 py-0.5 text-xs font-medium text-sky-800"
 											>${{ (1000).toLocaleString() }}/mo</span
@@ -338,6 +338,7 @@
 				'48 hours (18/5) response time',
 			],
 			addOns: [
+				'Concurrent requests',
 				'Weekly tactical sessions',
 				'Monthly strategy sessions',
 				'Documentation (written ONLY)',
@@ -363,6 +364,7 @@
 				'36-hour (18/5) response time',
 			],
 			addOns: [
+				'Concurrent requests',
 				'Weekly tactical sessions',
 				'Monthly strategy sessions',
 				'Documentation (written + video)',
@@ -388,6 +390,7 @@
 				'24-hour (18/7) response time',
 			],
 			addOns: [
+				'Concurrent requests',
 				'Weekly tactical sessions',
 				'Monthly strategy sessions',
 				'Documentation (written + video)',
