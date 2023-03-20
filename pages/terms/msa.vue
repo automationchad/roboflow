@@ -92,7 +92,13 @@
 				},
 				{
 					title: 'Payment Terms',
-					description: `Unless an SOW states otherwise, Motis Group will invoice Company (at the address listed above) on a time and materials basis and payment terms will be net fifteen (15) days from Motis Group’s invoice date.  Any invoiced amount not paid when due shall be subject to a service charge at the rate of one and one-half percent (1.5%) per month.  If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending SOWs and/or eliminate any stated discount on fees for Services rendered.`,
+					description: `Charges are collected by credit card/debit card on your membership commencement date.
+
+Subsequent monthly charges will be automatically collected using the method you choose upon signing-up (either credit card/ debit card).
+
+‍You can pause your designdash.co membership at any time.
+
+All account holders are responsible for managing their own account and associated billing conditions. If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending SOWs and/or eliminate any stated discount on fees for Services rendered.`,
 				},
 				{
 					title: 'Taxes',
@@ -104,7 +110,17 @@
 				},
 				{
 					title: 'Cancellation',
-					description: `Company may cancel Services with written notice received by Motis Group at least five (5) business days prior to commencement date of such Service for full refund.  If cancellation notice is received within five (5) business days of the commencement date of such Services, then fifty percent (50%) will be refunded to Company.  If Company does not provide a cancellation notice prior to commencement date, the Company shall not be entitled to any refund.`,
+					description: `You may cancel your subscription with Motis Group at any time. Upon cancellation, you will continue to have access to the Motis Group services through the end of your paid billing term. Motis Group may change its fees from time to time by posting the changes on the Site with 5 days’ prior notice, but with no advance notice required for temporary promotions or reductions in fees.`,
+				},
+				{
+					title: 'Refunds',
+					description: ` You may request a refund within the first 15 days of a purchase of your first subscription plan. Any additional subscription plans will not be eligible for a refund.
+
+Beyond the 15 day window for your first account, there are no refunds for partial subscription plans under any circumstance, including unused time on a plan.
+
+Promotions, upgrades, and adjustments to existing plans are non-refundable.
+
+You, the client are responsible to use Motis Group after payment. Failure to use Motis Group will not warrant a refund, neither in full nor in partial.`,
 				},
 				{
 					title: 'Change of Commencement date',
