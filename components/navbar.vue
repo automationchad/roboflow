@@ -188,7 +188,7 @@
 				>
 					<a
 						href="https://motisgroup.manyrequests.com/register"
-						class=""
+						class="dark:text-white text-sm"
 						target="_blank"
 						>Sign up</a
 					>

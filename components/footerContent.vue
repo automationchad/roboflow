@@ -41,13 +41,13 @@
 			{ name: 'FAQs', href: '#faq' },
 			{ name: 'Contact', href: 'mailto:hello@motis.group', external: true },
 			{ name: 'Client login', href: '#pricing' },
-			{ name: 'Get started', href: '#pricing' },
+			{ name: 'Documentation', href: '/docs' },
 			{ name: 'Terms & conditions', href: '/terms/terms-and-conditions' },
-			{ name: 'Master services agreement', href: '/terms/msa' },
+			{ name: 'MSA', href: '/terms/msa' },
 
 			{ name: 'Privacy policy', href: '/terms/privacy-policy' },
 			{
-				name: 'Professional services agreement',
+				name: 'PSA',
 				href: '/terms/professional-services-agreement',
 			},
 		],

@@ -19,8 +19,8 @@
 								<h1
 									class="mt-10 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl"
 								>
-									<p>Turning operators</p>
-									<p>into owners.</p>
+									<p>Unlimited automation</p>
+									<p>on-demand</p>
 								</h1>
 								<p
 									class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400"
@@ -62,12 +62,12 @@
 						class="mt-20 sm:mt-24 md:mx-auto md:max-w-2xl lg:mx-0 lg:mt-0 lg:w-screen"
 					>
 						<div
-							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 dark:bg-black md:-mr-20 lg:-mr-36"
+							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 dark:ring-blue-800 ring-indigo-50 dark:bg-black md:-mr-20 lg:-mr-36"
 							aria-hidden="true"
 						/>
 						<div class="shadow-lg md:rounded-3xl">
 							<div
-								class="bg-indigo-500 [clip-path:inset(0)] md:[clip-path:inset(0_round_theme(borderRadius.3xl))]"
+								class="bg-sky-500 [clip-path:inset(0)] md:[clip-path:inset(0_round_theme(borderRadius.3xl))]"
 							>
 								<div
 									class="absolute -inset-y-px left-1/2 -z-10 ml-10 w-[200%] skew-x-[-30deg] bg-indigo-100 opacity-20 ring-1 ring-inset ring-white md:ml-20 lg:ml-36"
@@ -128,6 +128,7 @@
 			:profile="profile"
 		/>
 		<cost-saver />
+		<!-- <how-it-works /> -->
 		<div class="bg-white dark:bg-black" id="faq">
 			<div class="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:py-40 lg:px-8">
 				<div class="mx-auto">
