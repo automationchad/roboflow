@@ -284,7 +284,7 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-	const base_price = 4000;
+	const base_price = 2500;
 
 	let subscription = { status: false };
 	let subscription_type = false;
