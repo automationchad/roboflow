@@ -30,26 +30,12 @@
 								</p>
 								<div class="mt-10 flex items-center gap-x-6">
 									<a
-										v-if="
-											!profile ||
-											profile?.workspaces?.billing_email === user?.email
-										"
 										href="#pricing"
-										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-										>See plans</a
-									>
-									<a
-										v-else
-										href="/account/requests"
-										class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-										>Go to requests <span aria-hidden="true">→</span></a
+										class="flex items-center rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+										><SparklesIcon class="mr-1 h-5 w-5" />See plans</a
 									>
 
 									<a
-										v-if="
-											!profile ||
-											profile?.workspaces?.billing_email === user?.email
-										"
 										href="#save"
 										class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-300"
 										>Save on your license <span aria-hidden="true">→</span></a
@@ -62,7 +48,7 @@
 						class="mt-20 sm:mt-24 md:mx-auto md:max-w-2xl lg:mx-0 lg:mt-0 lg:w-screen"
 					>
 						<div
-							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 dark:ring-blue-800 ring-indigo-50 dark:bg-black md:-mr-20 lg:-mr-36"
+							class="absolute inset-y-0 right-1/2 -z-10 -mr-10 w-[200%] skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 dark:bg-black dark:ring-blue-800 md:-mr-20 lg:-mr-36"
 							aria-hidden="true"
 						/>
 						<div class="shadow-lg md:rounded-3xl">
@@ -217,9 +203,8 @@
 	import {
 		MinusSmallIcon,
 		PlusSmallIcon,
-		ExclamationTriangleIcon,
-		ChevronRightIcon,
-		VideoCameraSlashIcon,
+		SparklesIcon,
+		QueueListIcon,
 		WindowIcon,
 		CreditCardIcon,
 	} from '@heroicons/vue/24/outline';
@@ -238,6 +223,9 @@
 	const base = new Airtable({ apiKey: 'keyBl2UOzLvshshLp' }).base(
 		'appkU7PnQUq7lePwf'
 	);
+	const maxSpots = 12;
+	const spotsTaken = 12;
+	const spotsLeft = maxSpots - spotsTaken;
 
 	let faqs = [];
 

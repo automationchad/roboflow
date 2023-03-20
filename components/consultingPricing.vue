@@ -18,6 +18,7 @@
 					Get unlimited automation requests and revisions. No expensive hourly
 					billing or contracts, cancel anytime.
 				</p>
+
 				<svg
 					viewBox="0 0 1208 1024"
 					class="absolute -top-10 left-1/2 -z-10 h-[64rem] -translate-x-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:-top-12 md:-top-20 lg:-top-12 xl:top-0"
@@ -157,20 +158,41 @@
 									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600 dark:text-gray-400"
 								>
 									<div class="flex items-center justify-between">
-										<span class="font-semibold">Motis Boost:</span
-										><span
-											class="inline-flex items-center rounded-full bg-sky-100 px-3 py-0.5 text-xs font-medium text-sky-800"
-											>${{ (1000).toLocaleString() }}/mo</span
+										<span class="text-base font-semibold dark:text-white"
+											>Pro<span class="text-sm font-normal dark:text-gray-400">
+												($1,000/mo)</span
+											></span
 										>
+										<div
+											:class="[
+												spotsLeft.spots > 0 ? 'badge' : 'err-badge',
+												' flex items-center rounded-full px-3 py-0.5 shadow-md',
+											]"
+										>
+											<ClockIcon
+												class="mr-1 h-4 w-4"
+												v-if="!spotsLeft.spots > 0"
+											/>
+											<p class="text-xs font-normal">
+												{{
+													spotsLeft.spots > 0
+														? `${spotsLeft.spots} spots left`
+														: 'Waitlist'
+												}}
+											</p>
+										</div>
 									</div>
-
+									<div class="mt-2 dark:text-gray-300">
+										Everything in <strong class="">{{ tier.name }}</strong
+										>, plus:
+									</div>
 									<li
 										v-for="feature in tier.addOns"
 										:key="feature"
-										class="flex gap-x-3"
+										class="flex gap-x-3 dark:text-gray-300"
 									>
 										<PlusIcon
-											class="h-6 w-5 flex-none text-slate-600"
+											class="h-6 w-5 flex-none text-slate-600 dark:text-slate-500"
 											aria-hidden="true"
 										/>
 										{{ feature }}
@@ -276,6 +298,7 @@
 	import {
 		CheckIcon,
 		CheckCircleIcon,
+		ClockIcon,
 		MinusIcon,
 		PlusIcon,
 	} from '@heroicons/vue/20/solid';
@@ -285,6 +308,8 @@
 	const attrs = useAttrs();
 	const profile = attrs.profile;
 	const base_price = 2500;
+
+	const spotsLeft = { spots: 3, remaining_days: 5 };
 
 	let subscription = { status: false };
 	let subscription_type = false;
@@ -434,3 +459,41 @@
 		location.href = url;
 	};
 </script>
+
+<style setup>
+	.err-badge {
+		background-size: 100% 100%;
+		background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+		background-image: radial-gradient(
+				49% 81% at 45% 47%,
+				#ffe20345 0%,
+				#073aff00 100%
+			),
+			radial-gradient(113% 91% at 17% -2%, #ff5a00ff 1%, #ff000000 99%),
+			radial-gradient(142% 91% at 83% 7%, #ffdb00ff 1%, #ff000000 99%),
+			radial-gradient(142% 91% at -6% 74%, #ff0049ff 1%, #ff000000 99%),
+			radial-gradient(142% 91% at 111% 84%, #ff7000ff 0%, #ff0000ff 100%);
+		color: rgb(0, 0, 0);
+	}
+	.badge {
+		background-size: 100% 100%;
+		background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px,
+			0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+		background-image: radial-gradient(
+				18% 28% at 24% 50%,
+				#cefaffff 7%,
+				#073aff00 100%
+			),
+			radial-gradient(18% 28% at 18% 71%, #ffffff59 6%, #073aff00 100%),
+			radial-gradient(70% 53% at 36% 76%, #73f2ffff 0%, #073aff00 100%),
+			radial-gradient(42% 53% at 15% 94%, #ffffffff 7%, #073aff00 100%),
+			radial-gradient(42% 53% at 34% 72%, #ffffffff 7%, #073aff00 100%),
+			radial-gradient(18% 28% at 35% 87%, #ffffffff 7%, #073aff00 100%),
+			radial-gradient(31% 43% at 7% 98%, #ffffffff 24%, #073aff00 100%),
+			radial-gradient(21% 37% at 72% 23%, #d3ff6d9c 24%, #073aff00 100%),
+			radial-gradient(35% 56% at 91% 74%, #8a4ffff5 9%, #073aff00 100%),
+			radial-gradient(74% 86% at 67% 38%, #6dffaef5 24%, #073aff00 100%),
+			linear-gradient(125deg, #4eb5ffff 1%, #4c00fcff 100%);
+		color: #00373e;
+	}
+</style>
