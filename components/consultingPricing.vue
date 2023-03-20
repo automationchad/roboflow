@@ -307,7 +307,7 @@
 	const user = useSupabaseUser();
 	const attrs = useAttrs();
 	const profile = attrs.profile;
-	const base_price = 2500;
+	const base_price = 3000;
 
 	const spotsLeft = { spots: 3, remaining_days: 5 };
 
