@@ -36,11 +36,11 @@
 
 	const navigation = {
 		main: [
-			{ name: 'Latest projects', href: '#projects' },
+			
 			{ name: 'Pricing', href: '#pricing' },
 			{ name: 'FAQs', href: '#faq' },
 			{ name: 'Contact', href: 'mailto:hello@motis.group', external: true },
-			{ name: 'Client login', href: '#pricing' },
+			{ name: 'Client login', href: 'https://motisgroup.manyrequests.com/login' },
 			{ name: 'Documentation', href: '/docs' },
 			{ name: 'Terms', href: '/terms' },
 		],
