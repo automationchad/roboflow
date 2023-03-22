@@ -42,14 +42,7 @@
 			{ name: 'Contact', href: 'mailto:hello@motis.group', external: true },
 			{ name: 'Client login', href: '#pricing' },
 			{ name: 'Documentation', href: '/docs' },
-			{ name: 'Terms & conditions', href: '/terms/terms-and-conditions' },
-			{ name: 'MSA', href: '/terms/msa' },
-
-			{ name: 'Privacy policy', href: '/terms/privacy-policy' },
-			{
-				name: 'PSA',
-				href: '/terms/professional-services-agreement',
-			},
+			{ name: 'Terms', href: '/terms' },
 		],
 		social: [
 			{
