@@ -16,7 +16,13 @@
 						class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
 						>Get started</a
 					>
-					
+					<a
+						href="/Retainer-Packet.pdf"
+						download
+						target="_blank"
+						class="flex items-center text-sm font-semibold leading-6 text-white"
+						><ArrowDownCircleIcon class="mr-1 h-5 w-5" />Download explainer
+					</a>
 				</div>
 			</div>
 		</div>
@@ -41,3 +47,7 @@
 		</svg>
 	</div>
 </template>
+
+<script setup>
+	import { ArrowDownCircleIcon } from '@heroicons/vue/24/outline';
+</script>
