@@ -102,7 +102,7 @@
 									</p>
 								</div>
 								<div class="mt-4 flex items-center text-xs text-slate-400">
-									{{ 'For companies that need a full-time engineer' }}
+									{{ 'For companies that need a full-time engineer.' }}
 								</div>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
@@ -344,7 +344,7 @@
 								<div
 									class="mt-4 flex max-w-xs items-center whitespace-normal text-xs text-slate-400"
 								>
-									{{ 'For companies with an existing automation platform ' }}
+									{{ 'For companies with an existing automation platform.' }}
 								</div>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
