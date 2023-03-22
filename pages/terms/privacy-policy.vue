@@ -31,7 +31,7 @@
 					</p>
 				</div>
 			</div>
-			<div class="relative px-4 sm:px-6 lg:px-8">
+			<div class="relative px-4 sm:px-6 lg:px-8 py-24">
 				<div
 					class="prose prose-sm prose-slate mx-auto max-w-[40rem] prose-a:font-semibold prose-a:text-sky-500 hover:prose-a:text-sky-600"
 				>
@@ -333,7 +333,15 @@
 						email at
 						<a href="mailto:support@motis.group">support@motis.group</a>.
 					</p>
+					<div class="mt-10">
+					<a
+						href="/terms"
+						class="text-sm font-semibold leading-7 text-indigo-600 no-underline"
+						><span aria-hidden="true">&larr;</span> Back to home</a
+					>
 				</div>
+				</div>
+				
 			</div>
 		</div>
 	</div>

@@ -377,6 +377,13 @@ You, the client are responsible to use Motis Group after payment. Failure to use
 					</li>
 				</ol>
 				<exhibit-a />
+				<div class="mt-10">
+					<a
+						href="/terms"
+						class="text-sm font-semibold leading-7 text-indigo-600 no-underline"
+						><span aria-hidden="true">&larr;</span> Back to home</a
+					>
+				</div>
 			</div>
 		</div>
 	</div>
