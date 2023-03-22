@@ -16,16 +16,21 @@
 					<div class="px-6 lg:px-0 lg:pt-4">
 						<div class="mx-auto max-w-2xl">
 							<div class="max-w-lg">
-								<h1
-									class="mt-10 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl"
-								>
-									<p>Unlimited automation</p>
-									<p>on-demand</p>
-								</h1>
+								<div class="mt-10">
+									
+									<h1
+										class=" text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl"
+									>
+										<p>Unlimited automation</p>
+										<p>on-demand</p>
+									</h1>
+								</div>
+
 								<div class="mt-8 flex flex-wrap">
 									<div
 										class="flex items-center text-sm font-medium text-slate-500"
 									>
+									
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											viewBox="0 0 140 140"
@@ -49,7 +54,6 @@
 											viewBox="0 0 256 256"
 										>
 											<path
-												
 												d="M26 69.6104C26 45.5251 45.5251 26 69.6105 26H186.39C210.475 26 230 45.5251 230 69.6105V186.39C230 210.475 210.475 230 186.39 230H69.6104C45.5251 230 26 210.475 26 186.39V69.6104Z"
 												class="fill-slate-400 dark:fill-slate-400"
 											/>
@@ -244,6 +248,8 @@
 		<otpModal v-show="showOtpModal" />
 	</div>
 </template>
+
+
 
 <script setup>
 	import {

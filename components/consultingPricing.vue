@@ -20,7 +20,7 @@
 				<div class="mt-16 flex justify-center">
 					<RadioGroup
 						v-model="frequency"
-						class="grid grid-cols-2 gap-x-1 rounded-full p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-gray-400"
+						class="grid grid-cols-2 gap-x-1 rounded-full bg-black/20 p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200/20"
 					>
 						<RadioGroupLabel class="sr-only">Payment frequency</RadioGroupLabel>
 						<RadioGroupOption
@@ -32,7 +32,7 @@
 						>
 							<div
 								:class="[
-									checked ? 'bg-indigo-100 text-indigo-800' : 'text-gray-200',
+									checked ? 'badge2' : 'text-gray-200',
 									'cursor-pointer rounded-full py-1 px-2.5',
 								]"
 							>
@@ -41,15 +41,7 @@
 						</RadioGroupOption>
 					</RadioGroup>
 				</div>
-				<div
-					class="mt-4 flex items-center justify-center text-xs text-slate-300"
-				>
-					<InformationCircleIcon class="mr-1 h-5 w-5" />{{
-						frequency.value === 'ps'
-							? 'Get unlimited automation requests, revisions and support '
-							: 'Get unlimited async support for your existing automations '
-					}}
-				</div>
+
 				<svg
 					viewBox="0 0 1208 1024"
 					class="absolute -top-10 left-1/2 -z-10 h-[64rem] -translate-x-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:-top-12 md:-top-20 lg:-top-12 xl:top-0"
@@ -109,7 +101,9 @@
 										Most popular
 									</p>
 								</div>
-
+								<div class="mt-4 flex items-center text-xs text-slate-400">
+									{{ 'For companies that need a full-time engineer' }}
+								</div>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
@@ -145,21 +139,7 @@
 										{{ 'Get started' }}
 									</div>
 								</a>
-								<!-- <a
-									href="https://calendly.com/motis-group/intro"
-									target="_blank"
-									:aria-describedby="tier.id"
-									:class="[
-										tier.mostPopular
-											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
-											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 dark:text-indigo-200 ',
-										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
-									]"
-								>
-									<div class="flex items-center justify-center">
-										{{ 'Get started' }}
-									</div>
-								</a> -->
+
 								<p class="mt-4 text-center text-xs">
 									<a
 										href="https://calendly.com/motis-group/intro"
@@ -361,7 +341,11 @@
 										Most popular
 									</p>
 								</div>
-
+								<div
+									class="mt-4 flex max-w-xs items-center whitespace-normal text-xs text-slate-400"
+								>
+									{{ 'For companies with an existing automation platform ' }}
+								</div>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
@@ -845,6 +829,19 @@
 			radial-gradient(142% 91% at 111% 84%, #ff7000ff 0%, #ff0000ff 100%);
 		color: rgb(0, 0, 0);
 	}
+
+	.badge2 {
+		background: conic-gradient(
+			from 171.52deg at 50% 50%,
+			#f0f1f6 0deg,
+			#a0b9cc 90deg,
+			#dde5f0 180deg,
+			#c5e6f9 234.26deg,
+			#a7b5bb 270deg,
+			#ecf1f4 1turn
+		);
+	}
+
 	.badge {
 		background-size: 100% 100%;
 		background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px,
