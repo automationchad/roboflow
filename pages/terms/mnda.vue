@@ -1,4 +1,9 @@
 <script setup>
+	import { PrinterIcon } from '@heroicons/vue/24/outline';
+	const print = () => {
+		return window.print();
+	};
+
 	const terms = [
 		{
 			title: 'Confidential Information',
@@ -68,9 +73,21 @@
 			</div>
 		</nav>
 		<div class="bg-white py-32 px-6 lg:px-8">
+			<div class="mx-auto mb-8 flex max-w-3xl justify-between">
+				<h2 class="text-2xl font-bold tracking-tight">
+					MUTUAL NON-DISCLOSURE AGREEMENT v1.0.0
+				</h2>
+				<button
+					type="button"
+					@click="print"
+					class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+				>
+					<PrinterIcon class="-ml-0.5 h-5 w-5" aria-hidden="true" />
+					Print
+				</button>
+			</div>
 			<div class="prose mx-auto max-w-3xl text-base leading-7 text-gray-700">
-				<div class="prose">
-					<h2>MUTUAL NON-DISCLOSURE AGREEMENT v1.0.0</h2>
+				<div class="">
 					<p>
 						The effective date of this non-disclosure agreement (“Agreement”)
 						shall commence on the date upon which the Agreement was executed by

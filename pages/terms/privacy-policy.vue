@@ -1,8 +1,13 @@
 <script setup>
 	import { useAttrs } from 'vue';
+	import { format } from 'date-fns';
+	import { PrinterIcon } from '@heroicons/vue/24/outline';
 	const attrs = useAttrs();
 	const user = useSupabaseUser();
 	const profile = attrs.profile;
+	const print = () => {
+		return window.print();
+	};
 </script>
 
 <template>
@@ -26,12 +31,23 @@
 					>
 						Privacy policy
 					</h1>
+
 					<p class="mt-4 text-base leading-7 text-slate-600">
-						Last updated on November 2, 2021
+						Last updated on {{ format(new Date(), 'MMMM dd, yyyy') }}
 					</p>
 				</div>
 			</div>
-			<div class="relative px-4 sm:px-6 lg:px-8 py-24">
+			<div class="mx-auto mb-8 flex max-w-3xl justify-center">
+				<button
+					type="button"
+					@click="print"
+					class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+				>
+					<PrinterIcon class="-ml-0.5 h-5 w-5" aria-hidden="true" />
+					Print
+				</button>
+			</div>
+			<div class="relative px-4 py-24 sm:px-6 lg:px-8">
 				<div
 					class="prose prose-sm prose-slate mx-auto max-w-[40rem] prose-a:font-semibold prose-a:text-sky-500 hover:prose-a:text-sky-600"
 				>
@@ -334,14 +350,13 @@
 						<a href="mailto:support@motis.group">support@motis.group</a>.
 					</p>
 					<div class="mt-10">
-					<a
-						href="/terms"
-						class="text-sm font-semibold leading-7 text-indigo-600 no-underline"
-						><span aria-hidden="true">&larr;</span> Back to home</a
-					>
+						<a
+							href="/terms"
+							class="text-sm font-semibold leading-7 text-indigo-600 no-underline"
+							><span aria-hidden="true">&larr;</span> Back to home</a
+						>
+					</div>
 				</div>
-				</div>
-				
 			</div>
 		</div>
 	</div>

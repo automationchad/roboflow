@@ -1,4 +1,8 @@
 <script setup>
+import { PrinterIcon } from '@heroicons/vue/24/outline';
+	const print = () => {
+		return window.print();
+	};
 	const terms = [
 		{
 			title: 'Fees & Expenses',
@@ -100,8 +104,20 @@
 			</div>
 		</nav>
 		<div class="bg-white py-32 px-6 lg:px-8">
+			<div class="mx-auto mb-8 flex max-w-3xl justify-between">
+				<h2 class="text-2xl font-bold tracking-tight">
+					Motis Group Professional Services Agreement Terms & Conditions
+				</h2>
+				<button
+					type="button"
+					@click="print"
+					class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+				>
+					<PrinterIcon class="-ml-0.5 h-5 w-5" aria-hidden="true" />
+					Print
+				</button>
+			</div>
 			<div class="prose mx-auto max-w-3xl text-base leading-7 text-gray-700">
-				<h2>Motis Group Professional Services Agreement Terms & Conditions</h2>
 				<p>
 					The following Standard Terms & Conditions shall apply to services to
 					be provided by Motis Group, Inc. (MOTIS GROUP) to the Client and are

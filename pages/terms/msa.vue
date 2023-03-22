@@ -1,4 +1,9 @@
 <script setup>
+	import { PrinterIcon } from '@heroicons/vue/24/outline';
+	const print = () => {
+		return window.print();
+	};
+
 	const terms = [
 		{
 			title: 'Effective Date',
@@ -361,8 +366,20 @@ You, the client are responsible to use Motis Group after payment. Failure to use
 			</div>
 		</nav>
 		<div class="bg-white py-32 px-6 lg:px-8">
+			<div class="mx-auto flex max-w-3xl justify-between mb-8">
+				<h2 class="text-2xl font-bold tracking-tight">
+					Motis Group Master Services Agreement v1.0.6
+				</h2>
+				<button
+					type="button"
+					@click="print"
+					class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+				>
+					<PrinterIcon class="-ml-0.5 h-5 w-5" aria-hidden="true" />
+					Print
+				</button>
+			</div>
 			<div class="prose mx-auto max-w-3xl text-base leading-7 text-gray-700">
-				<h2>Motis Group Master Services Agreement v1.0.6</h2>
 				<ol>
 					<li v-for="term in terms" :key="term">
 						<strong>{{ term.title }}</strong
