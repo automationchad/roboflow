@@ -101,9 +101,9 @@
 										Most popular
 									</p>
 								</div>
-								<div class="mt-4 flex items-center text-xs text-slate-400">
+								<!-- <div class="mt-4 flex items-center text-xs text-slate-400">
 									{{ 'For companies that need a full-time engineer.' }}
-								</div>
+								</div> -->
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
@@ -341,11 +341,11 @@
 										Most popular
 									</p>
 								</div>
-								<div
+								<!-- <div
 									class="mt-4 flex max-w-xs items-center whitespace-normal text-xs text-slate-400"
 								>
 									{{ 'For companies with an existing automation platform.' }}
-								</div>
+								</div> -->
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"

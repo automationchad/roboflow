@@ -168,6 +168,7 @@
 		<features />
 		<features2 :case-study="featured_case_study" />
 		<consulting-scope />
+		<benefits/>
 		<!-- <projects /> -->
 		<consulting-pricing
 			v-if="profile?.workspaces?.billing_email === user?.email"
