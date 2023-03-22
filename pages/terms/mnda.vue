@@ -72,7 +72,7 @@
 				<div class="prose">
 					<h2>MUTUAL NON-DISCLOSURE AGREEMENT v1.0.0</h2>
 					<p>
-						The effective date of thisNon-Disclosure Agreement (“Agreement”)
+						The effective date of this non-disclosure agreement (“Agreement”)
 						shall commence on the date upon which the Agreement was executed by
 						both parties.
 					</p>
