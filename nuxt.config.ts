@@ -9,7 +9,7 @@ export default defineNuxtConfig({
 				{
 					name: 'description',
 					content:
-						'A dev shop assisting fast growing companies with process automation and software interoperability.',
+						'A boutique dev shop assisting fast growing companies with process automation and software interoperability.',
 				},
 			],
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],

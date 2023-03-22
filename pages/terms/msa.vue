@@ -90,15 +90,14 @@
 					title: 'Fees',
 					description: `Company agrees to pay Motis Group the fees set forth in the applicable SOW for Services rendered (“Fees”).`,
 				},
+
 				{
-					title: 'Payment Terms',
-					description: `Charges are collected by credit card/debit card on your membership commencement date.
-
-Subsequent monthly charges will be automatically collected using the method you choose upon signing-up (either credit card/ debit card).
-
-‍You can pause your designdash.co membership at any time.
-
-All account holders are responsible for managing their own account and associated billing conditions. If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending SOWs and/or eliminate any stated discount on fees for Services rendered.`,
+					title: 'Payment Terms - Retainer',
+					description: `If work is contractaed under retainer, Client shall pay Motis Group a monthly retainer for the services to be performed under this Agreement. The Retainer Fee shall be due and payable in advance on the first day of each month. Subsequent monthly charges will be automatically collected using the method you choose upon signing-up (either credit card/ debit card or ACH).‍ ‍You can pause your Motis Group membership at any time. All account holders are responsible for managing their own account and associated billing conditions. If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending projects and/or eliminate any stated discount on fees for Services rendered.`,
+				},
+				{
+					title: 'Payment Terms - SOW',
+					description: `Unless an SOW states otherwise, Motis Group will invoice Company (at the address listed above) on a time and materials basis and payment terms will be net fifteen (15) days from Motis Group’s invoice date.  Any invoiced amount not paid when due shall be subject to a service charge at the rate of one and one-half percent (1.5%) per month.  If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending SOWs and/or eliminate any stated discount on fees for Services rendered.`,
 				},
 				{
 					title: 'Taxes',
