@@ -94,36 +94,52 @@
 									>
 										{{ tier.name }}
 									</h3>
-									<p
+									<div
 										v-if="tier.mostPopular"
 										class="rounded-full bg-indigo-600/10 py-1 px-2.5 text-xs font-semibold leading-5 text-indigo-600"
 									>
 										Most popular
-									</p>
+									</div>
+									<div
+										v-if="tier.id === 'enterprise'"
+										:class="[
+											spotsLeft.spots > 0 ? 'badge' : 'err-badge',
+											' flex items-center rounded-full py-1 px-2.5 font-semibold  leading-5 shadow-md',
+										]"
+									>
+										<ClockIcon
+											class="mr-1 h-4 w-4"
+											v-if="!spotsLeft.spots > 0"
+										/>
+										<p class="text-xs text-gray-900/70">
+											{{
+												spotsLeft.spots > 0
+													? `${spotsLeft.spots} spots left`
+													: 'Waitlist'
+											}}
+										</p>
+									</div>
 								</div>
 								<!-- <div class="mt-4 flex items-center text-xs text-slate-400">
 									{{ 'For companies that need a full-time engineer.' }}
 								</div> -->
+								<p class="mt-6 text-sm text-gray-600 dark:text-gray-400">
+									{{ tier.description }}
+								</p>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
-										>${{
-											Math.round(
-												tier.priceMonthly - tier.priceMonthly * idx * 0.1
-											).toLocaleString()
-										}}</span
+										>${{ Math.round(tier.priceMonthly).toLocaleString() }}</span
 									>
 									<span
 										class="text-base font-semibold leading-7 text-gray-600 dark:text-gray-400"
 										>/month</span
 									>
 								</div>
-								<p class="mt-2 text-sm text-gray-400">{{ tier.billingInfo }}</p>
-								<p
-									class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400"
-								>
-									{{ tier.description }}
+								<p class="mt-2 text-sm leading-7 text-gray-400">
+									{{ tier.billingInfo }}
 								</p>
+
 								<a
 									target="_blank"
 									href="https://motisgroup.manyrequests.com/register"
@@ -151,8 +167,18 @@
 
 								<ul
 									role="list"
-									class="my-10 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300"
+									class="mt-10 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300"
 								>
+									<div class="mt-2 dark:text-gray-300">
+										<span v-if="idx === 0">
+											<strong class="">{{ tier.name }}</strong> includes:</span
+										>
+										<span v-else
+											>Everything in
+											<strong class="">{{ tiers[idx - 1].name }}</strong
+											>, plus:</span
+										>
+									</div>
 									<li
 										v-for="feature in tier.features"
 										:key="feature"
@@ -167,7 +193,7 @@
 								</ul>
 
 								<ul
-									v-if="tier.addOns.length > 0"
+									v-if="false"
 									role="list"
 									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600 dark:text-gray-400"
 								>
@@ -309,7 +335,7 @@
 			<div class="-mt-80">
 				<div class="mx-auto max-w-7xl px-6 lg:px-8">
 					<div
-						class="mx-auto grid max-w-lg grid-cols-3 gap-8 sm:grid-cols-1 lg:max-w-7xl lg:grid-cols-3"
+						class="mx-auto grid max-w-lg grid-cols-1 gap-y-8 sm:grid-cols-1 lg:max-w-7xl lg:grid-cols-1"
 					>
 						<div
 							v-for="(tier, idx) in debug_tiers"
@@ -346,29 +372,24 @@
 								>
 									{{ 'For companies with an existing automation platform.' }}
 								</div> -->
+								<p class="mt-6 text-sm text-gray-600 dark:text-gray-400">
+									{{ tier.description }}
+								</p>
 								<div class="mt-4 flex items-baseline gap-x-2">
 									<span
 										class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
-										>${{
-											Math.round(
-												tier.priceMonthly - tier.priceMonthly * idx * 0.05
-											).toLocaleString()
-										}}</span
+										>Custom</span
 									>
-									<span
+									<!-- <span
 										class="text-base font-semibold leading-7 text-gray-600 dark:text-gray-400"
 										>/month</span
-									>
+									> -->
 								</div>
 								<p class="mt-2 text-sm text-gray-400">{{ tier.billingInfo }}</p>
-								<p
-									class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400"
-								>
-									{{ tier.description }}
-								</p>
+
 								<a
 									target="_blank"
-									href="https://motisgroup.manyrequests.com/register"
+									href="https://calendly.com/motis-group/intro"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -381,21 +402,7 @@
 										{{ 'Get started' }}
 									</div>
 								</a>
-								<!-- <a
-									href="https://calendly.com/motis-group/intro"
-									target="_blank"
-									:aria-describedby="tier.id"
-									:class="[
-										tier.mostPopular
-											? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-500 '
-											: 'text-indigo-600 ring-1 ring-inset ring-indigo-200 hover:ring-indigo-300 dark:text-indigo-200 ',
-										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
-									]"
-								>
-									<div class="flex items-center justify-center">
-										{{ 'Get started' }}
-									</div>
-								</a> -->
+
 								<p class="mt-4 text-center text-xs">
 									<a
 										href="https://calendly.com/motis-group/intro"
@@ -409,6 +416,9 @@
 									role="list"
 									class="my-10 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300"
 								>
+									<div class="mt-2 dark:text-gray-300">
+										<strong class="">{{ tier.name }}</strong> includes:
+									</div>
 									<li
 										v-for="feature in tier.features"
 										:key="feature"
@@ -590,8 +600,8 @@
 
 	const spotsLeft = { spots: 3, remaining_days: 5 };
 	const frequencies = [
-		{ value: 'ps', label: 'Growth', priceSuffix: '/month' },
-		{ value: 'cs', label: 'Support', priceSuffix: '/year' },
+		{ value: 'ps', label: 'Retainer', priceSuffix: '/month' },
+		{ value: 'cs', label: 'One Time', priceSuffix: '/year' },
 	];
 	const frequency = ref(frequencies[0]);
 
@@ -633,15 +643,16 @@
 
 	const tiers = [
 		{
-			name: 'Monthly',
-			id: 'monthly',
-			mostPopular: true,
+			name: 'Support',
+			id: 'support',
+			mostPopular: false,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: retainer_base_price,
-			description: 'No minimum commitment.',
+			priceMonthly: 650,
+			description:
+				'Best for people with an existing automation platform that need backup',
 			features: [
-				'Unlimited project requests',
+				'Up to 2 hours of development',
 				'Unlimited debugging',
 				'48 hours (18/5) response time',
 			],
@@ -649,25 +660,21 @@
 				'Concurrent requests',
 				'Weekly tactical sessions',
 				'Monthly strategy sessions',
-				'Documentation (written ONLY)',
+				'Documentation (written + video)',
 			],
 		},
 		{
-			name: 'Quarterly',
-			id: 'quarterly',
-			mostPopular: false,
+			name: 'Growth',
+			id: 'growth',
+			mostPopular: true,
 			href: '#',
-			billingInfo: `Paid quarterly (\$${(
-				(retainer_base_price - retainer_base_price * 0.1) *
-				3
-			).toLocaleString()})`,
-			priceMonthly: retainer_base_price,
-			description: `Save $${Math.round(
-				retainer_base_price * 0.1
-			).toLocaleString()} per month.`,
+			billingInfo: 'Pause or cancel anytime',
+			priceMonthly: 2000,
+			description: `For teams who need automation to power their most important processes.`,
 			features: [
+				'Up to 10 hours of development',
 				'Unlimited project requests',
-				'Unlimited debugging',
+				'Add us to your Slack',
 				'36-hour (18/5) response time',
 			],
 			addOns: [
@@ -678,21 +685,18 @@
 			],
 		},
 		{
-			name: 'Yearly',
-			id: 'yearly',
+			name: 'Enterprise',
+			id: 'enterprise',
 			mostPopular: false,
 			href: '#',
-			billingInfo: `Paid annually (\$${(
-				(retainer_base_price - retainer_base_price * 0.2) *
-				12
-			).toLocaleString()})`,
-			priceMonthly: retainer_base_price,
-			description: `Save $${Math.round(
-				retainer_base_price * 0.2
-			).toLocaleString()} per month.`,
+			billingInfo: 'Pause or cancel anytime',
+			priceMonthly: 9000,
+			description: `For organizations with advanced reporting and support needs.`,
 			features: [
-				'Unlimited project requests',
-				'Unlimited debugging',
+				'Concurrent requests',
+				'Weekly tactical sessions',
+				'Monthly strategy sessions',
+				'Documentation (written + video)',
 				'24-hour (18/7) response time',
 			],
 			addOns: [
@@ -706,75 +710,71 @@
 
 	const debug_tiers = [
 		{
-			name: 'Monthly',
-			id: 'monthly',
-			mostPopular: true,
-			href: '#',
-			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: debug_base_price,
-			description: 'No minimum commitment.',
-			features: [
-				'Unlimited debugging',
-				'Add us to your Slack',
-				'48 hours (18/5) response time',
-			],
-			addOns: [
-				'Concurrent requests',
-				'Weekly tactical sessions',
-				'Monthly strategy sessions',
-				'Documentation (written ONLY)',
-			],
-		},
-		{
-			name: 'Quarterly',
-			id: 'quarterly',
+			name: 'One Time Development',
+			id: 'one-time',
 			mostPopular: false,
 			href: '#',
-			billingInfo: `Paid quarterly (\$${(
-				(debug_base_price - debug_base_price * 0.05) *
-				3
-			).toLocaleString()})`,
+			billingInfo: 'Depending on scope',
 			priceMonthly: debug_base_price,
-			description: `Save $${Math.round(
-				debug_base_price * 0.05
-			).toLocaleString()} per month.`,
+			description:
+				'Best for companies who know what they need automated and need a one time automation development build out.',
 			features: [
-				'Unlimited debugging',
-				'Add us to your Slack',
-				'36-hour (18/5) response time',
+				'Custom integration development',
+				'1-3 week turnaround (depending on project size)',
+				'Q&A Check',
 			],
-			addOns: [
-				'Concurrent requests',
-				'Weekly tactical sessions',
-				'Monthly strategy sessions',
-				'Documentation (written + video)',
-			],
+			addOns: [],
 		},
-		{
-			name: 'Yearly',
-			id: 'yearly',
-			mostPopular: false,
-			href: '#',
-			billingInfo: `Paid annually (\$${(
-				(debug_base_price - debug_base_price * 0.1) *
-				12
-			).toLocaleString()})`,
-			priceMonthly: debug_base_price,
-			description: `Save $${Math.round(
-				debug_base_price * 0.1
-			).toLocaleString()} per month.`,
-			features: [
-				'Unlimited debugging',
-				'Add us to your Slack',
-				'24-hour (18/7) response time',
-			],
-			addOns: [
-				'Concurrent requests',
-				'Weekly tactical sessions',
-				'Monthly strategy sessions',
-				'Documentation (written + video)',
-			],
-		},
+		// {
+		// 	name: 'Quarterly',
+		// 	id: 'quarterly',
+		// 	mostPopular: false,
+		// 	href: '#',
+		// 	billingInfo: `Paid quarterly (\$${(
+		// 		(debug_base_price - debug_base_price * 0.05) *
+		// 		3
+		// 	).toLocaleString()})`,
+		// 	priceMonthly: debug_base_price,
+		// 	description: `Save $${Math.round(
+		// 		debug_base_price * 0.05
+		// 	).toLocaleString()} per month.`,
+		// 	features: [
+		// 		'Unlimited debugging',
+		// 		'Add us to your Slack',
+		// 		'36-hour (18/5) response time',
+		// 	],
+		// 	addOns: [
+		// 		'Concurrent requests',
+		// 		'Weekly tactical sessions',
+		// 		'Monthly strategy sessions',
+		// 		'Documentation (written + video)',
+		// 	],
+		// },
+		// {
+		// 	name: 'Yearly',
+		// 	id: 'yearly',
+		// 	mostPopular: false,
+		// 	href: '#',
+		// 	billingInfo: `Paid annually (\$${(
+		// 		(debug_base_price - debug_base_price * 0.1) *
+		// 		12
+		// 	).toLocaleString()})`,
+		// 	priceMonthly: debug_base_price,
+		// 	description: `Save $${Math.round(
+		// 		debug_base_price * 0.1
+		// 	).toLocaleString()} per month.`,
+		// 	features: [
+		// 		'Unlimited debugging',
+		// 		'Add us to your Slack',
+		// 		'24-hour (18/7) response time',
+		// 	],
+		// 	addOns: [
+		// 		'Concurrent requests',
+		// 		'Weekly tactical sessions',
+		// 		'Monthly strategy sessions',
+		// 		'Documentation (written + video)',
+		// 	],
+		// },
 	];
 
 	const handleButtonClick = async (user, customer, tier) => {
