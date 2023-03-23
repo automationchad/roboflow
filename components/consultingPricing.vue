@@ -669,10 +669,10 @@
 			mostPopular: true,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 2000,
+			priceMonthly: 3000,
 			description: `For teams who need automation to power their most important processes.`,
 			features: [
-				'Up to 10 hours of development',
+				'Up to 20 hours of development',
 				'Unlimited project requests',
 				'Add us to your Slack',
 				'36-hour (18/5) response time',
