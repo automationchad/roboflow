@@ -17,7 +17,7 @@
 		},
 		{
 			title: 'Term',
-			description: `This Agreement shall continue in effect for a period of [TERM OF AGREEMENT] years from the date hereof, unless sooner terminated by either party upon written notice to the other party. The provisions of this Agreement shall survive any termination of this Agreement and shall remain in effect for so long as such Confidential Information remains confidential and proprietary.`,
+			description: `This Agreement shall continue in effect for a period of 10 years from the date hereof, unless sooner terminated by either party upon written notice to the other party. The provisions of this Agreement shall survive any termination of this Agreement and shall remain in effect for so long as such Confidential Information remains confidential and proprietary.`,
 			children: [],
 		},
 		{
@@ -32,7 +32,7 @@
 		},
 		{
 			title: 'Governing Law',
-			description: `This Agreement shall be governed by and construed in accordance with the laws of the State of [STATE], without regard to its conflicts of law principles.`,
+			description: `This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflicts of law principles.`,
 			children: [],
 		},
 		{
