@@ -669,7 +669,7 @@
 			mostPopular: true,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 4000,
+			priceMonthly: 3000,
 			description: `For teams who need automation to power their most important processes.`,
 			features: [
 				'Up to 20 hours of development',
@@ -690,7 +690,7 @@
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 7500,
+			priceMonthly: 5000,
 			description: `For organizations with advanced reporting and support needs.`,
 			features: [
 				'Concurrent requests',
