@@ -98,7 +98,7 @@
 
 				{
 					title: 'Payment Terms - Retainer',
-					description: `If work is contractaed under retainer, Client shall pay Motis Group a monthly retainer for the services to be performed under this Agreement. The Retainer Fee shall be due and payable in advance on the first day of each month. Subsequent monthly charges will be automatically collected using the method you choose upon signing-up (either credit card/ debit card or ACH).‍ ‍You can pause your Motis Group membership at any time. All account holders are responsible for managing their own account and associated billing conditions. If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending projects and/or eliminate any stated discount on fees for Services rendered.`,
+					description: `If work is contracted under retainer, Company shall pay Motis Group a monthly retainer for the services to be performed under this Agreement. The Retainer Fee shall be due and payable in advance on the first day of each month. Subsequent monthly charges will be automatically collected using the method you choose upon signing-up (either credit card/ debit card or ACH).‍ ‍You can pause your Motis Group membership at any time. All account holders are responsible for managing their own account and associated billing conditions. If Company fails to make any payment to Motis Group when due, Motis Group may, at its sole discretion and without affecting its rights under this Agreement, cancel or suspend work on any pending projects and/or eliminate any stated discount on fees for Services rendered.`,
 				},
 				{
 					title: 'Payment Terms - SOW',
@@ -124,7 +124,7 @@ Beyond the 15 day window for your first account, there are no refunds for partia
 
 Promotions, upgrades, and adjustments to existing plans are non-refundable.
 
-You, the client are responsible to use Motis Group after payment. Failure to use Motis Group will not warrant a refund, neither in full nor in partial.`,
+You, the company are responsible to use Motis Group after payment. Failure to use Motis Group will not warrant a refund, neither in full nor in partial.`,
 				},
 				{
 					title: 'Change of Commencement date',
@@ -319,7 +319,7 @@ You, the client are responsible to use Motis Group after payment. Failure to use
 		},
 		{
 			title: 'Dormancy',
-			description: `If the Client fails to provide Motis Group with any necessary information or materials to perform the services, or if the Client fails to respond to Motis Group's inquiries or requests for instructions, Motis Group may place the project on hold ("Dormancy"). If Dormancy occurs, Motis Group may cease working on the project until such time as the necessary information or materials are provided, or until the Client provides instructions to proceed. The Retainer Fee shall continue to be due and payable during any period of Dormancy.
+			description: `If the Company fails to provide Motis Group with any necessary information or materials to perform the services, or if the Company fails to respond to Motis Group's inquiries or requests for instructions, Motis Group may place the project on hold ("Dormancy"). If Dormancy occurs, Motis Group may cease working on the project until such time as the necessary information or materials are provided, or until the Company provides instructions to proceed. The Retainer Fee shall continue to be due and payable during any period of Dormancy.
 `,
 			children: [],
 		},
