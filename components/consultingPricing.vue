@@ -104,7 +104,7 @@
 										v-if="tier.id === 'enterprise'"
 										:class="[
 											spotsLeft.spots > 0 ? 'badge' : 'err-badge',
-											' flex items-center rounded-full py-1 px-2.5 font-semibold  leading-5 shadow-md',
+											' flex items-center rounded-full py-1 px-2.5 font-semibold  leading-5 ring-1 ring-inset ring-gray-900/10',
 										]"
 									>
 										<ClockIcon
@@ -674,6 +674,7 @@
 			features: [
 				'Up to 20 hours of development',
 				'Unlimited project requests',
+				'QA testing',
 				'Add us to your Slack',
 				'36-hour (18/5) response time',
 			],
@@ -693,6 +694,7 @@
 			priceMonthly: 5000,
 			description: `For organizations with advanced reporting and support needs.`,
 			features: [
+				'Regular unit & load testing',
 				'Concurrent requests',
 				'Weekly tactical sessions',
 				'Monthly strategy sessions',
