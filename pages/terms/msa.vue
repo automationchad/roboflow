@@ -68,7 +68,7 @@
 				the agreed-upon specifications, standards or architectures outlined in
 				the applicable SOW or promptly notify Motis Group of any defects
 				(“Defect”). In the event that Company does not notify Motis Group in
-				the manner required by Section 21 of this Agreement of any Defects
+				the manner required by Section 20 of this Agreement of any Defects
 				within the Acceptance Period, such Deliverable shall be deemed
 				accepted. If the Deliverable forms the basis for ongoing work,
 				Motis Group may suspend its performance of such other ongoing work pending
