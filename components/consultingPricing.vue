@@ -389,7 +389,7 @@
 
 								<a
 									target="_blank"
-									href="https://calendly.com/motis-group/intro"
+									href="https://calendly.com/motis-group/custom-dev"
 									:aria-describedby="tier.id"
 									:class="[
 										tier.mostPopular
@@ -405,7 +405,7 @@
 
 								<p class="mt-4 text-center text-xs">
 									<a
-										href="https://calendly.com/motis-group/intro"
+										href="https://calendly.com/motis-group/custom-dev"
 										target="_blank"
 										class="underline dark:text-white"
 										>Book a call</a
