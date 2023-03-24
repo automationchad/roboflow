@@ -12,7 +12,7 @@
 							Motis Group is headquartered in
 						</p>
 						<p class="text-left text-xs leading-5 text-gray-500">
-							San Diego, California.
+							Beaverton, Oregon.
 						</p>
 					</div>
 				</div>
