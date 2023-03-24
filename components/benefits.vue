@@ -9,8 +9,10 @@
 			<p
 				class="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-gray-900/60"
 			>
-				Lorem ipsum dolor sit, amet consectetur adipisicing elit. Velit numquam
-				eligendi quos odit doloribus molestiae voluptatum quos odit doloribus.
+				We bundle our capabilities and expertise into one monthly subscription.
+				It drives ongoing value and optimization for your business beyond just
+				implementation. With Motis, you receive access to strategy, support,
+				training and optimization for your business software systems.
 			</p>
 			<div class="mx-auto max-w-7xl py-24 px-6 sm:py-32 lg:px-8">
 				<!-- Feature comparison (up to lg) -->
