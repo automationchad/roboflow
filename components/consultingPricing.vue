@@ -696,9 +696,9 @@
 			features: [
 				'Regular unit & load testing',
 				'Concurrent requests',
-				'Weekly tactical sessions',
-				'Monthly strategy sessions',
-				'Documentation (written + video)',
+				'Team coaching',
+				'Monthly strategy call',
+				'Process documentation hub',
 				'24-hour (18/7) response time',
 			],
 			addOns: [
