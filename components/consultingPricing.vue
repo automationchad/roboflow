@@ -494,7 +494,7 @@
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 650,
+			priceMonthly: 600,
 			description:
 				'Best for people with an existing automation platform that need backup',
 			features: [
