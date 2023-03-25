@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
 	if (body.type === 'retainer' || body.type === 'waitlist') {
 		subscription = body.type === 'retainer';
-		promo = false;
+		promo = body.type === 'retainer';
 		const { data: product } = await stripe.products.search({
 			limit: 1,
 			query: `metadata[\'id\']:\'${body.product.id}\'`,
