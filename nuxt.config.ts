@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
 	app: {
 		head: {
-			title: 'Motis Group | Automation and Business Process Consulting',
+			title: 'Motis Group | Automation and Business Process Consulting App',
 			charset: 'utf-8',
 			viewport: 'width=device-width, initial-scale=1',
 			meta: [
