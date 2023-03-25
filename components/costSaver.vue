@@ -133,8 +133,8 @@
 								</div>
 								<input
 									v-model="current_spend"
-									max="3000000"
-									type="number"
+									maxlength="10"
+									type="text"
 									name="current-spend"
 									id="current-spend"
 									class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-700 dark:text-white dark:ring-slate-400 sm:text-sm sm:leading-6"
@@ -161,7 +161,8 @@
 							<div class="relative mt-2 rounded-md shadow-sm">
 								<input
 									v-model="est_tasks"
-									type="number"
+									maxlength="10"
+									type="text"
 									name="task-number"
 									id="task-number"
 									class="block w-full rounded-md border-0 py-1.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-700 dark:text-white dark:ring-slate-400 sm:text-sm sm:leading-6"
@@ -236,7 +237,7 @@
 						<div class="mx-auto min-w-[300px] px-8">
 							<p class="text-base font-semibold text-gray-600 dark:text-white">
 								Estimated {{ selected_frequency.value }}
-								{{ current_spend > 0 ? 'savings' : 'costs' }} *
+								{{ current_spend > 0 ? 'savings' : 'costs' }}&dagger;
 							</p>
 							<p class="mt-6 flex items-baseline justify-center gap-x-2">
 								<span
@@ -273,10 +274,10 @@
 									>
 								</div>
 								<div
-									class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600 dark:border-slate-800 dark:text-gray-400"
+									class="flex justify-between border-t border-gray-300 py-2 text-xs text-sky-600 dark:border-slate-800 dark:text-gray-400"
 								>
 									<span>Estimated</span
-									><span
+									><span class="dark:text-sky-400"
 										>${{
 											Math.round(taskPrice(est_tasks)).toLocaleString()
 										}}</span
@@ -332,7 +333,10 @@
 							</div>
 
 							<button
-								v-if="totalSavings(current_spend, est_tasks) > 0 && current_spend > 0"
+								v-if="
+									totalSavings(current_spend, est_tasks) > 0 &&
+									current_spend > 0
+								"
 								@click="handleCheckout({}, 'add_on')"
 								class="mt-8 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
@@ -365,7 +369,7 @@
 							</a>
 
 							<p class="mt-6 text-xs leading-5 text-gray-600">
-								* Your actual savings may vary. Book a call if you're unsure.
+								&dagger; Actual savings may vary.
 							</p>
 						</div>
 					</div>
