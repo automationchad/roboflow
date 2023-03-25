@@ -353,7 +353,7 @@
 												)) *
 												100
 										)
-									}}% OFF</span
+									}}% OFF &rarr;</span
 								>
 							</button>
 							<a
