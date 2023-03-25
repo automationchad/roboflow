@@ -444,7 +444,7 @@
 	const retainer_base_price = 3000;
 	const debug_base_price = 600;
 
-	const spotsLeft = { spots: 0, remaining_days: 5 };
+	const spotsLeft = { spots: 3, remaining_days: 5 };
 	const frequencies = [
 		{ value: 'ps', label: 'Retainer', priceSuffix: '/month' },
 		{ value: 'cs', label: 'One Time', priceSuffix: '/year' },
