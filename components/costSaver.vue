@@ -53,7 +53,7 @@
 						Estimate how much you could save by migrating your license with our
 						migration calculator.
 					</p>
-					<div class="" v-if="false">
+					<div class="" v-if="true">
 						<div class="mt-8 flow-root">
 							<div class="-my-2 overflow-x-auto">
 								<div class="inline-block min-w-full py-2 align-middle">
