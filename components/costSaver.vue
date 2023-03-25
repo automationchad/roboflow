@@ -243,7 +243,7 @@
 									:class="[
 										totalSavings(current_spend, est_tasks) > 0
 											? 'text-gray-900 dark:text-gray-100'
-											: 'text-rose-600',
+											: 'text-rose-800',
 										'text-5xl font-bold tracking-tight ',
 									]"
 									>${{
@@ -303,7 +303,7 @@
 										class="flex justify-between border-t border-gray-300 py-2 text-xs text-gray-600"
 									>
 										<span>Tray Cost</span
-										><span class="text-rose-600"
+										><span class="text-rose-800"
 											>(${{
 												Math.round(trayCosts(est_tasks)).toLocaleString()
 											}})</span
@@ -330,22 +330,42 @@
 									</div>
 								</div>
 							</div>
+
 							<button
+								v-if="totalSavings(current_spend, est_tasks) > 0"
 								@click="handleCheckout({}, 'add_on')"
-								
 								class="mt-8 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
-								Get access
+								Get instant access for
+								<span class="dark:text-white"
+									>{{
+										Math.round(
+											((Math.round(
+												selected_frequency.id === 1
+													? current_spend / 12
+													: current_spend
+											) -
+												Math.round(taskPrice(est_tasks))) /
+												Math.round(
+													selected_frequency.id === 1
+														? current_spend / 12
+														: current_spend
+												)) *
+												100
+										)
+									}}% OFF</span
+								>
 							</button>
 							<a
-								v-if="false"
+								v-else
 								href="https://calendly.com/motis-group/migration"
-								target="_blank"
-								class="block w-full py-3 text-xs text-gray-700"
-								>Book a call</a
+								class="mt-8 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
+								Book a call
+							</a>
+
 							<p class="mt-6 text-xs leading-5 text-gray-600">
-								* Your actual savings may vary.
+								* Your actual savings may vary. Book a call if you're unsure.
 							</p>
 						</div>
 					</div>
@@ -378,12 +398,6 @@
 	];
 
 	const selected_frequency = ref(frequencies[0]);
-
-	const curr_spend_actual = ref(
-		selected_frequency.value.id === 1
-			? current_spend.value / 12
-			: current_spend.value
-	);
 
 	const includedFeatures = [
 		'Monthly billing, cancel anytime',
