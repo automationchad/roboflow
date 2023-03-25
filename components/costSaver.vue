@@ -53,7 +53,7 @@
 						Estimate how much you could save by migrating your license with our
 						migration calculator.
 					</p>
-					<div class="" v-if="true">
+					<div class="" v-if="false">
 						<div class="mt-8 flow-root">
 							<div class="-my-2 overflow-x-auto">
 								<div class="inline-block min-w-full py-2 align-middle">
@@ -330,13 +330,13 @@
 									</div>
 								</div>
 							</div>
-							<a
-								href="https://calendly.com/motis-group/migration"
-								target="_blank"
+							<button
+								@click="handleCheckout({}, 'add_on')"
+								
 								class="mt-8 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
 								Get access
-							</a>
+							</button>
 							<a
 								v-if="false"
 								href="https://calendly.com/motis-group/migration"
@@ -489,5 +489,16 @@
 		} else currentSpend = current;
 		if (currentSpend > 0) return currentSpend - taskPrice(tasks);
 		else return Math.abs(currentSpend - taskPrice(tasks));
+	};
+
+	const handleCheckout = async (product, type) => {
+		const { url } = await $fetch('/api/stripe/checkout', {
+			method: 'post',
+			body: {
+				product,
+				type,
+			},
+		});
+		location.href = url;
 	};
 </script>

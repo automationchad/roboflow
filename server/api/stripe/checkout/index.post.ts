@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
 	let subscription = false;
 	let promo = false;
 
-	if (body.type === 'retainer') {
-		subscription = true;
-		promo = true;
+	if (body.type === 'retainer' || body.type === 'waitlist') {
+		subscription = body.type === 'retainer';
+		promo = false;
 		const { data: product } = await stripe.products.search({
 			limit: 1,
 			query: `metadata[\'id\']:\'${body.product.id}\'`,
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
 	let details = {
 		success_url: 'https://motis.group',
 		cancel_url: 'https://motis.group/#pricing',
-		allow_promotion_codes: promo ? true : null,
+		allow_promotion_codes: promo,
 		line_items,
 		payment_method_types: ['card', 'us_bank_account'],
 		mode: subscription ? 'subscription' : 'payment',

@@ -139,8 +139,21 @@
 								<p class="mt-2 text-sm leading-7 text-gray-400">
 									{{ tier.billingInfo }}
 								</p>
-
 								<button
+									v-if="tier.id === 'enterprise' && spotsLeft.spots === 0"
+									@click="handleCheckout({ id: 'waitlist' }, 'waitlist')"
+									:aria-describedby="tier.id"
+									:class="[
+										'bg-slate-700 text-white shadow-lg hover:bg-slate-500 ring-1 ring-slate-500',
+										'mt-6 block w-full items-center rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600  ',
+									]"
+								>
+									<div class="flex items-center justify-center">
+										{{ 'Join waitlist' }}
+									</div>
+								</button>
+								<button
+									v-else
 									@click="handleCheckout({ id: tier.id }, 'retainer')"
 									:aria-describedby="tier.id"
 									:class="[
@@ -209,27 +222,18 @@
 								</p>
 							</div>
 
-							<button
-								@click="handleCheckout({}, 'add_on')"
+							<a
+								href="#save"
 								:class="[
 									add_on.status === 'active'
 										? 'text-lime-600 ring-lime-200'
 										: 'hover:ring-indigo-300',
-									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2  focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400 dark:ring-indigo-400',
 								]"
 							>
-								{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? 'Active'
-										: 'Buy discounted license'
-								}}
-								{{ ' '
-								}}<span aria-hidden="true">{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? '&check;'
-										: '&rarr;'
-								}}</span>
-							</button>
+								{{ 'Calculate your savings' }}
+								{{ ' ' }}<span aria-hidden="true">&rarr;</span>
+							</a>
 						</div>
 					</div>
 					<div
@@ -356,53 +360,6 @@
 										{{ feature }}
 									</li>
 								</ul>
-
-								<ul
-									v-if="tier.addOns.length > 0"
-									role="list"
-									class="mt-10 space-y-4 border-t border-gray-400 pt-10 text-sm leading-6 text-gray-600 dark:text-gray-400"
-								>
-									<div class="flex items-center justify-between">
-										<span class="text-base font-semibold dark:text-white"
-											>Pro<span class="text-sm font-normal dark:text-gray-400">
-												($1,000/mo)</span
-											></span
-										>
-										<div
-											:class="[
-												spotsLeft.spots > 0 ? 'badge' : 'err-badge',
-												' flex items-center rounded-full px-3 py-0.5 shadow-md',
-											]"
-										>
-											<ClockIcon
-												class="mr-1 h-4 w-4"
-												v-if="!spotsLeft.spots > 0"
-											/>
-											<p class="text-xs font-normal">
-												{{
-													spotsLeft.spots > 0
-														? `${spotsLeft.spots} spots left`
-														: 'Waitlist'
-												}}
-											</p>
-										</div>
-									</div>
-									<div class="mt-2 dark:text-gray-300">
-										Everything in <strong class="">{{ tier.name }}</strong
-										>, plus:
-									</div>
-									<li
-										v-for="feature in tier.addOns"
-										:key="feature"
-										class="flex gap-x-3 dark:text-gray-300"
-									>
-										<PlusIcon
-											class="h-6 w-5 flex-none text-slate-600 dark:text-slate-500"
-											aria-hidden="true"
-										/>
-										{{ feature }}
-									</li>
-								</ul>
 							</div>
 						</div>
 						<div
@@ -423,11 +380,6 @@
 							</div>
 
 							<a
-								v-if="
-									!subscription.status ||
-									(add_on.status === 'active' &&
-										subscription.status === 'active')
-								"
 								href="#save"
 								:class="[
 									add_on.status === 'active'
@@ -436,40 +388,9 @@
 									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200 focus-visible:outline focus-visible:outline-2  focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400 dark:ring-indigo-400',
 								]"
 							>
-								{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? 'Active'
-										: 'Calculate your savings'
-								}}
-								{{ ' '
-								}}<span aria-hidden="true">{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? '&check;'
-										: '&rarr;'
-								}}</span>
+								{{ 'Calculate your savings' }}
+								{{ ' ' }}<span aria-hidden="true">&rarr;</span>
 							</a>
-							<button
-								v-else
-								@click="handleCheckout({}, 'add_on', '', profile.workspaces)"
-								:class="[
-									add_on.status === 'active'
-										? 'text-lime-600 ring-lime-200'
-										: 'hover:ring-indigo-300',
-									'rounded-md px-3.5 py-2 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-200  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-								]"
-							>
-								{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? 'Active'
-										: 'Buy discounted license'
-								}}
-								{{ ' '
-								}}<span aria-hidden="true">{{
-									add_on.status === 'active' && subscription.status === 'active'
-										? '&check;'
-										: '&rarr;'
-								}}</span>
-							</button>
 						</div>
 					</div>
 					<div
@@ -523,7 +444,7 @@
 	const retainer_base_price = 3000;
 	const debug_base_price = 600;
 
-	const spotsLeft = { spots: 3, remaining_days: 5 };
+	const spotsLeft = { spots: 0, remaining_days: 5 };
 	const frequencies = [
 		{ value: 'ps', label: 'Retainer', priceSuffix: '/month' },
 		{ value: 'cs', label: 'One Time', priceSuffix: '/year' },
