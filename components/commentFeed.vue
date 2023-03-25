@@ -112,17 +112,19 @@
 	const props = defineProps(['card']);
 	const { card } = toRefs(props);
 
-	const test = false;
+	const test = true;
 
 	const emit = defineEmits(['delete-comment']);
 
 	const user = test ? ref({ email: 'automation@motis.group' }) : useSupabaseUser();
 
+	const route = useRoute();
+
 	const auth = `key=8ec73785de7fe1ccc3f8c83aa07f85bd&token=ATTA9da8c99ddba28fd8b218a814b05c0dc3b05c7be57eb004508cc37467b6a162e914BB2F03`;
 
 	let activity = [];
 	activity = await $fetch(
-		`https://api.trello.com/1/cards/${card.value.id}/actions?filter=commentCard&${auth}`,
+		`https://api.trello.com/1/cards/${route.params.id}/actions?filter=commentCard&${auth}`,
 		{
 			method: 'GET',
 			headers: {

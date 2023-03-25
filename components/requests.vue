@@ -1,13 +1,7 @@
 <template>
 	<div>
-		<div class="relative h-full">
-			<Navbar
-				class=""
-				@open-modal="showLoginModal = true"
-				:user="user"
-				:profile="profile"
-			/>
-			<div class="mx-auto grid max-w-7xl py-24 sm:py-32">
+		<div class="">
+			<div class="mx-auto grid max-w-7xl">
 				<div class="mb-8 border-b border-gray-200 py-5 dark:border-gray-800">
 					<div
 						class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
@@ -30,7 +24,7 @@
 					</div>
 				</div>
 				<div class="">
-					<!-- <div v-if="tickets.length === 0" class="text-center">
+					<div v-if="tickets.length === 0" class="text-center">
 						<TicketIcon class="mx-auto h-12 w-12 text-gray-400" />
 
 						<h3 class="mt-2 text-sm font-semibold text-gray-900">
@@ -48,7 +42,7 @@
 								New Request
 							</button>
 						</div>
-					</div> -->
+					</div>
 					<div class="">
 						<div class="py-5">
 							<div
@@ -74,8 +68,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<button
-								@click="handleShow(ticket)"
+							<a
+								:href="`/tickets/${ticket.id}`"
 								v-for="ticket in tickets.filter((o) => o.idList === activeId)"
 								:key="ticket.id"
 								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:border-gray-600 dark:bg-slate-800 dark:hover:border-gray-500"
@@ -129,7 +123,7 @@
 										</div>
 									</div>
 								</div>
-							</button>
+							</a>
 						</div>
 						<div class="mt-8 py-5">
 							<div
@@ -191,8 +185,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<button
-								@click="handleShow(ticket)"
+							<a
+								:href="`/tickets/${ticket.id}`"
 								v-for="ticket in tickets
 									.filter((o) => o.idList === backlogId)
 									.slice(backLogPage * limit, backLogPage * limit + limit)"
@@ -208,10 +202,7 @@
 								</div> -->
 								<div class="min-w-0 flex-1">
 									<div class="focus:outline-none">
-										<span class="absolute inset-0" aria-hidden="true" />
-										<div
-											class="mb-4 grid grid-cols-3 justify-between border-b border-gray-100 pb-4"
-										>
+										<div class="grid grid-cols-3 justify-between">
 											<div
 												class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
 											>
@@ -237,7 +228,7 @@
 											</div>
 										</div>
 
-										<div class="flex justify-between space-x-4">
+										<!-- <div class="flex justify-between space-x-4">
 											<p class="truncate text-sm text-gray-500">
 												{{ ticket.desc }}
 											</p>
@@ -248,10 +239,10 @@
 											>
 												<PaperClipIcon class="h-5 w-5" />
 											</a>
-										</div>
+										</div> -->
 									</div>
 								</div>
-							</button>
+							</a>
 						</div>
 						<div class="mt-4 bg-white py-5">
 							<div
@@ -311,8 +302,8 @@
 									>Hmmm...nothing to see here</span
 								>
 							</button>
-							<button
-								@click="handleShow(ticket)"
+							<a
+								:href="`/tickets/${ticket.id}`"
 								v-for="ticket in tickets
 									.filter((o) => o.idList === completedId)
 									.slice(completedPage * limit, completedPage * limit + limit)"
@@ -370,7 +361,7 @@
 										</div>
 									</div>
 								</div>
-							</button>
+							</a>
 						</div>
 					</div>
 				</div>
@@ -406,13 +397,9 @@
 	import { useAttrs } from 'vue';
 	definePageMeta({ middleware: ['auth'] });
 	const attrs = useAttrs();
-	const test = false;
+	const test = true;
 
 	const user = test ? { email: 'automation@motis.group' } : useSupabaseUser();
-	if (!user.value) {
-		navigateTo('/');
-		location.reload();
-	}
 
 	const profile = attrs.profile;
 	const selected_card = ref({});

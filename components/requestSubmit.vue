@@ -57,7 +57,7 @@
 								</div>
 
 								<form
-									class="mt-6 space-y-6 p-10"
+									class="space-y-6 p-10"
 									@submit.prevent="
 										handleSubmit({ name, brief, type, link, auth, listId })
 									"
@@ -70,7 +70,7 @@
 												<label
 													for="name"
 													class="block text-sm font-semibold leading-6 text-gray-900"
-													>Project name {{ ' '
+													>Title {{ ' '
 													}}<span class="text-rose-700">*</span></label
 												>
 												<div class="mt-2.5">
@@ -80,29 +80,60 @@
 														type="text"
 														name="text"
 														id="name"
+														placeholder="A brief summary of the project / issue"
 														class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 													/>
 												</div>
 											</div>
 
 											<div class="sm:col-span-2">
-												<label
-													for="location"
-													class="block text-sm font-medium leading-6 text-gray-900"
-													>Type {{ ' ' }}
-													<span class="text-rose-700">*</span></label
-												>
-												<select
-													required
-													v-model="type"
-													id="location"
-													name="location"
-													class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-												>
-													<option value="💎">💎 New workflow</option>
-													<option value="👾">👾 Bug fix</option>
-													<option value="🩹">🩹 Existing workflow mod</option>
-												</select>
+												<div>
+													<label class="text-sm font-semibold text-gray-900"
+														>Type {{ ' ' }}
+														<span class="text-rose-700">*</span></label
+													>
+
+													<fieldset class="mt-4">
+														<legend class="sr-only">Notification method</legend>
+														<div
+															class="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10"
+														>
+															<div
+																v-for="ticketType in ticketTypes"
+																:key="ticketType.id"
+																class="flex items-center"
+															>
+																<input
+																	:id="ticketType.id"
+																	v-model="type"
+																	type="radio"
+																	:value="ticketType.id"
+																	:checked="ticketType.id === 'mod'"
+																	class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+																/>
+																<label
+																	:for="ticketType.id"
+																	class="ml-3 block text-sm font-medium leading-6 text-gray-900"
+																	>{{ ticketType.title }}</label
+																>
+															</div>
+														</div>
+													</fieldset>
+													<div
+														class="prose mt-2 rounded-lg bg-gray-50 p-4 text-xs text-gray-500"
+													>
+														<p>
+															<strong>💎 New:</strong> If you have a project
+															recommendation, an idea, major process change
+															request, or any other larger initiative.
+														</p>
+														<p>
+															<strong>👾 Mod:</strong> Small-scale request such
+															as a bug fix, troubleshooting issue, small or
+															straightforward change to an existing process
+														</p>
+													</div>
+												</div>
 											</div>
 											<div class="sm:col-span-2">
 												<label
@@ -118,6 +149,7 @@
 														name="message"
 														id="message"
 														rows="4"
+														placeholder="Summary statement of the project / issue"
 														class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 													/>
 												</div>
@@ -152,7 +184,7 @@
 											<button
 												type="button"
 												class="rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-												@click="emit('close-modal');"
+												@click="emit('close-modal')"
 											>
 												Cancel
 											</button>
@@ -165,8 +197,6 @@
 											</button>
 										</div>
 									</div>
-
-									
 								</form>
 							</div>
 						</transition>
@@ -196,6 +226,11 @@
 	const type = ref('');
 	const loading = ref(false);
 	const error_occurred = ref(false);
+
+	const ticketTypes = [
+		{ id: '👾', title: '👾 Mod' },
+		{ id: '💎', title: '💎 New' },
+	];
 
 	function addWorkDays(startDate, days) {
 		if (isNaN(days)) {

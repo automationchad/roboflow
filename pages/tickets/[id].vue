@@ -1,6 +1,26 @@
-
+<!--
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
 <template>
+	<!--
+    This example requires updating your template:
 
+    ```
+    <html class="h-full bg-white">
+    <body class="h-full">
+    ```
+  -->
 	<div>
 		<navbar/>
 
@@ -93,13 +113,7 @@
 												active ? 'bg-gray-50' : '',
 												'block px-3 py-1 text-sm leading-6 text-gray-900',
 											]"
-											>{{ item.name
-											}}<span
-												v-if="item.count"
-												class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-600 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
-												aria-hidden="true"
-												>{{ item.count }}</span
-											></a
+											>{{ item.name }}</a
 										>
 									</MenuItem>
 								</MenuItems>
@@ -112,6 +126,7 @@
 			<main class="py-10">
 				<div class="px-4 sm:px-6 lg:px-8">
 					<!-- Your content -->
+					<ticket/>
 				</div>
 			</main>
 		</div>
@@ -148,32 +163,10 @@
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
-	navigateTo('/tickets')
-
-	const abbreviatedNumber = (number) => {
-		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
-		const tier = (Math.log10(Math.abs(number)) / 3) | 0;
-		if (tier === 0) {
-			return number;
-		}
-		const suffix = SI_SYMBOL[tier];
-		const scale = 10 ** (tier * 3);
-		const scaled = number / scale;
-		const length = scaled.toFixed(1).toString();
-		const precision = length > 3 ? 0 : 1;
-		return scaled.toFixed(precision) + suffix;
-	};
-
 	const navigation = [
 		{ name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
 		{ name: 'Team', href: '/users', icon: UsersIcon, current: false },
-		{
-			name: 'Tickets',
-			href: '/tickets',
-			icon: QueueListIcon,
-			count: 10,
-			current: false,
-		},
+		{ name: 'Tickets', href: '/tickets', icon: QueueListIcon, current: false },
 		{ name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
 		{
 			name: 'Documents',
@@ -194,4 +187,6 @@
 	];
 
 	const sidebarOpen = ref(false);
+
+	
 </script>

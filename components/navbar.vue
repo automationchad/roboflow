@@ -1,212 +1,328 @@
+<template>
+	<div>
+		<TransitionRoot as="template" :show="sidebarOpen">
+			<Dialog
+				as="div"
+				class="relative z-50 lg:hidden"
+				@close="sidebarOpen = false"
+			>
+				<TransitionChild
+					as="template"
+					enter="transition-opacity ease-linear duration-300"
+					enter-from="opacity-0"
+					enter-to="opacity-100"
+					leave="transition-opacity ease-linear duration-300"
+					leave-from="opacity-100"
+					leave-to="opacity-0"
+				>
+					<div class="fixed inset-0 bg-gray-900/80" />
+				</TransitionChild>
+
+				<div class="fixed inset-0 flex">
+					<TransitionChild
+						as="template"
+						enter="transition ease-in-out duration-300 transform"
+						enter-from="-translate-x-full"
+						enter-to="translate-x-0"
+						leave="transition ease-in-out duration-300 transform"
+						leave-from="translate-x-0"
+						leave-to="-translate-x-full"
+					>
+						<DialogPanel class="relative mr-16 flex w-full max-w-xs flex-1">
+							<TransitionChild
+								as="template"
+								enter="ease-in-out duration-300"
+								enter-from="opacity-0"
+								enter-to="opacity-100"
+								leave="ease-in-out duration-300"
+								leave-from="opacity-100"
+								leave-to="opacity-0"
+							>
+								<div
+									class="absolute top-0 left-full flex w-16 justify-center pt-5"
+								>
+									<button
+										type="button"
+										class="-m-2.5 p-2.5"
+										@click="sidebarOpen = false"
+									>
+										<span class="sr-only">Close sidebar</span>
+										<XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
+									</button>
+								</div>
+							</TransitionChild>
+							<!-- Sidebar component, swap this element with another sidebar if you like -->
+							<div
+								class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10"
+							>
+								<div class="flex h-16 shrink-0 items-center">
+									<img
+										class="h-8 w-auto"
+										src="~/assets/images/logo.png"
+										alt="Your Company"
+									/>
+								</div>
+								<nav class="flex flex-1 flex-col">
+									<ul role="list" class="flex flex-1 flex-col gap-y-7">
+										<li>
+											<ul role="list" class="-mx-2 space-y-1">
+												<li v-for="item in navigation" :key="item.name">
+													<a
+														:href="item.href"
+														:class="[
+															item.current
+																? 'bg-gray-800 text-white'
+																: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+														]"
+													>
+														<component
+															:is="item.icon"
+															class="h-6 w-6 shrink-0"
+															aria-hidden="true"
+														/>
+														{{ item.name
+														}}<span
+															v-if="item.count"
+															class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
+															aria-hidden="true"
+															>{{ abbreviatedNumber(item.count) }}</span
+														>
+													</a>
+												</li>
+											</ul>
+										</li>
+										<li>
+											<div
+												class="text-xs font-semibold leading-6 text-gray-400"
+											>
+												Your teams
+											</div>
+											<ul role="list" class="-mx-2 mt-2 space-y-1">
+												<li v-for="team in teams" :key="team.name">
+													<a
+														:href="team.href"
+														:class="[
+															team.current
+																? 'bg-gray-800 text-white'
+																: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+														]"
+													>
+														<span
+															class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+															>{{ team.initial }}</span
+														>
+														<span class="truncate">{{ team.name }}</span>
+													</a>
+												</li>
+											</ul>
+										</li>
+										<li class="mt-auto">
+											<a
+												href="#"
+												class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
+											>
+												<Cog6ToothIcon
+													class="h-6 w-6 shrink-0"
+													aria-hidden="true"
+												/>
+												Settings
+											</a>
+										</li>
+									</ul>
+								</nav>
+							</div>
+						</DialogPanel>
+					</TransitionChild>
+				</div>
+			</Dialog>
+		</TransitionRoot>
+
+		<!-- Static sidebar for desktop -->
+		<div
+			class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
+		>
+			<!-- Sidebar component, swap this element with another sidebar if you like -->
+			<div
+				class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4"
+			>
+				<div class="flex h-16 shrink-0 items-center">
+					<img
+						class="h-8 w-auto"
+						src="~/assets/images/logo.png"
+						alt="Your Company"
+					/>
+				</div>
+				<nav class="flex flex-1 flex-col">
+					<ul role="list" class="flex flex-1 flex-col gap-y-7">
+						<li>
+							<ul role="list" class="-mx-2 space-y-1">
+								<li v-for="item in navigation" :key="item.name">
+									<a
+										:href="!active ? '/settings' : item.href"
+										:class="[
+											item.current
+												? 'bg-gray-800 text-white'
+												: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+											'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+										]"
+									>
+										<component
+											:is="item.icon"
+											class="h-6 w-6 shrink-0"
+											aria-hidden="true"
+										/>
+										{{ item.name
+										}}<span
+											v-if="item.count && active"
+											class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
+											aria-hidden="true"
+											>{{ abbreviatedNumber(item.count) }}</span
+										><span
+											v-if="!active && item.gated"
+											class="ml-auto w-9 min-w-max whitespace-nowrap"
+											><LockClosedIcon class="h-5 w-5 text-gray-200"
+										/></span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<div class="text-xs font-semibold leading-6 text-gray-400">
+								Your teams
+							</div>
+							<ul role="list" class="-mx-2 mt-2 space-y-1">
+								<li v-for="team in teams" :key="team.name">
+									<a
+										:href="team.href"
+										:class="[
+											team.current
+												? 'bg-gray-800 text-white'
+												: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+											'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+										]"
+									>
+										<span
+											class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+											>{{ team.initial }}</span
+										>
+										<span class="truncate">{{ team.name }}</span>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="mt-auto">
+							<a
+								href="/settings"
+								class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
+							>
+								<Cog6ToothIcon class="h-6 w-6 shrink-0" aria-hidden="true" />
+								Settings
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+</template>
+
 <script setup>
+	import { ref } from 'vue';
 	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
+		Dialog,
+		DialogPanel,
 		Menu,
 		MenuButton,
 		MenuItem,
 		MenuItems,
+		TransitionChild,
+		TransitionRoot,
 	} from '@headlessui/vue';
-	import logo from '~/assets/images/logo.png';
-	import { ShoppingCartIcon, ChevronDownIcon } from '@heroicons/vue/24/outline';
-	import { PlusIcon } from '@heroicons/vue/20/solid';
-	import { useAttrs } from 'vue';
-	const attrs = useAttrs();
-	const profile = attrs.profile;
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
+	import {
+		Bars3Icon,
+		BellIcon,
+		CalendarIcon,
+		ChartPieIcon,
+		Cog6ToothIcon,
+		DocumentDuplicateIcon,
+		CircleStackIcon,
+		QueueListIcon,
+		FolderIcon,
+		HomeIcon,
+		UsersIcon,
+		TicketIcon,
+		XMarkIcon,
+		LockClosedIcon,
+	} from '@heroicons/vue/24/outline';
+	import {
+		ChevronDownIcon,
+		MagnifyingGlassIcon,
+	} from '@heroicons/vue/20/solid';
 
-	const loading = ref(true);
-
-	async function signOut() {
-		try {
-			loading.value = true;
-			let { error } = await supabase.auth.signOut();
-			location.reload();
-			if (error) throw error;
-		} catch (error) {
-			alert(error.message);
-		} finally {
-			loading.value = false;
+	const abbreviatedNumber = (number) => {
+		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
+		const tier = (Math.log10(Math.abs(number)) / 3) | 0;
+		if (tier === 0) {
+			return number;
 		}
-	}
+		const suffix = SI_SYMBOL[tier];
+		const scale = 10 ** (tier * 3);
+		const scaled = number / scale;
+		const length = scaled.toFixed(1).toString();
+		const precision = length > 3 ? 0 : 1;
+		return scaled.toFixed(precision) + suffix;
+	};
 
-	const paths = [
+	const active = true;
+
+	const route = useRoute();
+
+	const navigation = [
+		{
+			name: 'Dashboard',
+			href: '/',
+			icon: HomeIcon,
+			current: route.path === '/',
+		},
+		{
+			name: 'Team',
+			href: '/users',
+			icon: UsersIcon,
+			current: route.path === '/users',
+		},
+		{
+			name: 'Tickets',
+			href: '/tickets',
+			icon: TicketIcon,
+			count: 10,
+			gated: true,
+			current: route.path.includes('/tickets'),
+		},
+		// { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
 		// {
-		// 	id: '/consulting',
-		// 	target: '_parent',
-		// 	title: 'Consulting',
-		// 	active: route.path === '/consulting' || route.path.includes('contact'),
+		// 	name: 'Storage',
+		// 	href: '#',
+		// 	icon: CircleStackIcon,
+		// 	gated: true,
+		// 	current: false,
 		// },
 		// {
-		// 	id: '/blueprints',
-		// 	title: 'Blueprints',
-		// 	active: route.path === '/blueprints' || route.path.includes('blueprint'),
-		// },
-		// {
-		// 	id: '/components',
-		// 	title: 'Components',
-		// 	active: route.path === '/components' || route.path.includes('components'),
-		// },
-		// {
-		// 	id: 'https://www.google.com',
-		// 	target: '_blank',
-		// 	title: 'Podcast',
-		// 	active: route.path === '/feed' || route.path.includes('post'),
+		// 	name: 'Reports',
+		// 	href: '#',
+		// 	icon: ChartPieIcon,
+		// 	gated: true,
+		// 	current: false,
 		// },
 	];
+	const teams = [
+		{ id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
+	];
+	const userNavigation = [
+		{ name: 'Your profile', href: '#' },
+		{ name: 'Sign out', href: '#' },
+	];
 
-	const product = {
-		tray_project_id: null,
-	};
-
-	const handleCheckout = async (product, workspace) => {
-		const { url } = await $fetch('/api/checkout', {
-			method: 'post',
-			body: {
-				type: 'initial',
-				metadata: { type: 'initial_subscription', workspace_id: workspace.id },
-				product: product,
-				project_id: product.tray_project_id,
-				workspace_id: workspace.id,
-				customer: workspace.stripe_customer_id,
-			},
-		});
-		location.href = url;
-	};
-</script>
-
-<template>
-	<Disclosure
-		as="nav"
-		class="sticky top-0 z-50 bg-white shadow backdrop-blur-xl dark:bg-slate-900/30"
-	>
-		<div class="mx-auto px-48">
-			<div class="flex h-16 justify-between">
-				<div class="flex">
-					<div class="flex flex-shrink-0 items-center">
-						<a href="/"
-							><img class="block h-8 w-auto lg:hidden" :src="logo" />
-							<img class="hidden h-8 w-auto lg:block" :src="logo"
-						/></a>
-					</div>
-				</div>
-				<div
-					v-if="user"
-					class="lg:border-slate-900/15 border-slate-100 dark:border-slate-800 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8"
-				>
-					<Menu as="div" class="relative inline-block text-left">
-						<div>
-							<MenuButton
-								class="inline-flex w-full justify-center rounded-md px-4 py-2 text-sm font-medium text-black hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 dark:text-white"
-							>
-								Account
-								<ChevronDownIcon
-									class="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
-									aria-hidden="true"
-								/>
-							</MenuButton>
-						</div>
-
-						<transition
-							enter-active-class="transition duration-100 ease-out"
-							enter-from-class="transform scale-95 opacity-0"
-							enter-to-class="transform scale-100 opacity-100"
-							leave-active-class="transition duration-75 ease-in"
-							leave-from-class="transform scale-100 opacity-100"
-							leave-to-class="transform scale-95 opacity-0"
-						>
-							<MenuItems
-								class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-							>
-								<p class="truncate py-3 px-3.5" role="none">
-									<span class="block text-xs text-gray-500" role="none"
-										>Signed in as</span
-									><span class="mt-0.5 font-semibold" role="none">{{
-										user?.email
-									}}</span>
-								</p>
-
-								<div class="px-2 py-1">
-									<MenuItem v-slot="{ active }">
-										<a
-											href="/account/requests"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											Requests
-										</a>
-									</MenuItem>
-									<MenuItem
-										v-slot="{ active }"
-										class="cursor-pointer"
-										v-if="profile?.workspaces?.billing_email === user?.email"
-									>
-										<a
-											@click="
-												!profile?.workspaces?.active
-													? handleCheckout(
-															{ tray_project_id: null },
-															profile?.workspaces
-													  )
-													: navigateTo(
-															`https://billing.stripe.com/p/login/cN2eWV7TNf8MeWY3cc?prefilled_email=${user.email}`,
-															{ external: true }
-													  )
-											"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full  items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											{{ !profile?.workspaces?.active ? 'Upgrade' : 'Billing' }}
-										</a>
-									</MenuItem>
-
-									<MenuItem v-slot="{ active }">
-										<button
-											@click="signOut"
-											:class="[
-												active ? 'bg-slate-100 ' : 'text-gray-900',
-												'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-											]"
-										>
-											Sign Out
-										</button>
-									</MenuItem>
-								</div>
-							</MenuItems>
-						</transition>
-					</Menu>
-				</div>
-				<div
-					v-else
-					class="lg:border-slate-900/15 space-x-4 lg:ml-8 lg:flex lg:items-center lg:border-l lg:pl-8 lg:dark:border-slate-800"
-				>
-					<a
-						href="https://motisgroup.manyrequests.com/register"
-						class="dark:text-white text-sm"
-						target="_blank"
-						>Sign up</a
-					>
-					<a
-						target="_blank"
-						href="https://motisgroup.manyrequests.com/login"
-						class="-my-2.5 inline-flex justify-center rounded-lg bg-slate-900 py-2.5 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-					>
-						<span>Log in <span aria-hidden="true">→</span></span>
-					</a>
-				</div>
-			</div>
-		</div>
-	</Disclosure>
-</template>
-
-<script>
-	export default {
-		components: { ChevronDownIcon },
-	};
+	const sidebarOpen = ref(false);
 </script>

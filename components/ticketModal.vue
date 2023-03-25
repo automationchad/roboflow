@@ -318,7 +318,7 @@
 
 	const emit = defineEmits(['close-modal', 'show-otp-modal']);
 
-	const test = false;
+	const test = true;
 	const user = test
 		? ref({ email: 'automation@motis.group' })
 		: useSupabaseUser();
