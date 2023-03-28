@@ -94,16 +94,17 @@
 										</li>
 										<li>
 											<div
-												class="text-xs font-semibold leading-6 text-gray-400"
+												class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 											>
-												Your teams
+												<div>Your teams</div>
+												<button><PlusIcon class="h-5 w-5 text-white" /></button>
 											</div>
 											<ul role="list" class="-mx-2 mt-2 space-y-1">
 												<li v-for="team in teams" :key="team.name">
 													<a
-														:href="team.href"
+														:href="'/tickets/' + team.id"
 														:class="[
-															team.current
+															route.params.team == team.id
 																? 'bg-gray-800 text-white'
 																: 'text-gray-400 hover:bg-gray-800 hover:text-white',
 															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
@@ -189,33 +190,78 @@
 							</ul>
 						</li>
 						<li>
-							<div class="text-xs font-semibold leading-6 text-gray-400">
-								Your teams
+							<div
+								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
+							>
+								<div>Your teams</div>
+								<button class="text-white hover:text-gray-300">
+									<PlusIcon class="h-4 w-4" />
+								</button>
 							</div>
-							<ul role="list" class="-mx-2 mt-2 space-y-1">
+							<ul role="list" class="-ml-2 mt-2 space-y-1">
 								<li v-for="team in teams" :key="team.name">
 									<a
-										:href="team.href"
+										:href="'/tickets/' + team.id"
 										:class="[
-											team.current
+											route.params.team == team.id
 												? 'bg-gray-800 text-white'
 												: 'text-gray-400 hover:bg-gray-800 hover:text-white',
-											'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+											'group flex items-center justify-between rounded-md p-2 text-sm font-semibold leading-6',
 										]"
 									>
-										<span
-											class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
-											>{{ team.initial }}</span
-										>
-										<span class="truncate">{{ team.name }}</span>
+										<div class="flex gap-x-3">
+											<span
+												class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+												>{{ team.name[0] }}</span
+											>
+											<span class="truncate">{{ team.name }}</span>
+										</div>
+										<div class="flex items-center">
+											<span
+												v-if="!active && item.gated"
+												class="ml-auto w-9 min-w-max whitespace-nowrap"
+												><LockClosedIcon class="h-5 w-5 text-gray-200"
+											/></span>
+											<button>
+												<StarIcon
+													:class="[
+														User.defaultTeamId == team.id
+															? ' text-yellow-500'
+															: 'text-slate-600',
+														'h-4 w-4',
+													]"
+												/>
+											</button>
+										</div>
 									</a>
 								</li>
 							</ul>
 						</li>
-						<li class="mt-auto">
+
+						<li class="mt-auto space-y-2">
+							<a
+								href="/support"
+								:class="[
+									route.path === '/support'
+										? 'bg-gray-800 text-white'
+										: 'text-gray-400 hover:bg-gray-800 hover:text-gray-300',
+									'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ',
+								]"
+							>
+								<QuestionMarkCircleIcon
+									class="h-6 w-6 shrink-0"
+									aria-hidden="true"
+								/>
+								Support
+							</a>
 							<a
 								href="/settings"
-								class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
+								:class="[
+									route.path === '/settings'
+										? 'bg-gray-800 text-white'
+										: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+									'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ',
+								]"
 							>
 								<Cog6ToothIcon class="h-6 w-6 shrink-0" aria-hidden="true" />
 								Settings
@@ -251,15 +297,52 @@
 		QueueListIcon,
 		FolderIcon,
 		HomeIcon,
+		PlusIcon,
 		UsersIcon,
 		TicketIcon,
+		QuestionMarkCircleIcon,
 		XMarkIcon,
 		LockClosedIcon,
 	} from '@heroicons/vue/24/outline';
 	import {
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
+		StarIcon,
 	} from '@heroicons/vue/20/solid';
+
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`id, defaultTeamId,
+		Account (
+	     id,
+		 
+		 Team (
+			id,
+			name
+		 ),
+		 Ticket (
+			count
+		 )
+	   )
+	 `
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	console.log(User);
+	let teams = User.Account.Team;
+	let teams_sorted = teams;
+
+	const index = teams_sorted.indexOf((o) => User.defaultTeamId == o.id);
+
+	const item = teams_sorted.splice(index, 1)[0];
+
+	teams_sorted.unshift(item);
 
 	const abbreviatedNumber = (number) => {
 		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
@@ -282,9 +365,9 @@
 	const navigation = [
 		{
 			name: 'Dashboard',
-			href: '/',
+			href: '/home',
 			icon: HomeIcon,
-			current: route.path === '/',
+			current: route.path === '/home',
 		},
 		{
 			name: 'Team',
@@ -292,22 +375,14 @@
 			icon: UsersIcon,
 			current: route.path === '/users',
 		},
-		{
-			name: 'Tickets',
-			href: '/tickets',
-			icon: TicketIcon,
-			count: 10,
-			gated: true,
-			current: route.path.includes('/tickets'),
-		},
+
 		// { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-		// {
-		// 	name: 'Storage',
-		// 	href: '#',
-		// 	icon: CircleStackIcon,
-		// 	gated: true,
-		// 	current: false,
-		// },
+		{
+			name: 'Documentation',
+			href: '/documentation',
+			icon: FolderIcon,
+			current: route.path === '/documentation',
+		},
 		// {
 		// 	name: 'Reports',
 		// 	href: '#',
@@ -316,9 +391,7 @@
 		// 	current: false,
 		// },
 	];
-	const teams = [
-		{ id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-	];
+
 	const userNavigation = [
 		{ name: 'Your profile', href: '#' },
 		{ name: 'Sign out', href: '#' },

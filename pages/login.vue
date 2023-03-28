@@ -19,17 +19,35 @@
 						alt="Your Company"
 					/>
 					<h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">
-						Create your account
+						Sign in to your account
 					</h2>
 					<p class="mt-2 text-sm text-gray-600">
 						Or
 						{{ ' ' }}
 						<a
-							href="/login"
+							href="/"
 							class="font-medium text-indigo-600 hover:text-indigo-500"
-							>login to an existing account</a
+							>create a new account</a
 						>
 					</p>
+				</div>
+
+				<div class="rounded-md bg-red-50 p-4" v-if="is_error">
+					<div class="flex">
+						<div class="flex-shrink-0">
+							<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+						</div>
+						<div class="ml-3">
+							<h3 class="text-sm font-medium text-red-800">
+								There was an error
+							</h3>
+							<div class="mt-2 text-sm text-red-700">
+								<ul role="list" class="list-disc space-y-1 pl-5">
+									<li>{{ error_message }}</li>
+								</ul>
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<div class="mt-8">
@@ -79,57 +97,6 @@
 
 					<div class="mt-6">
 						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
-							<div>
-								<label
-									for="first-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
-									>First name</label
-								>
-								<div class="mt-2.5">
-									<input
-										v-model="first_name"
-										type="text"
-										name="first-name"
-										id="first-name"
-										autocomplete="given-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
-							<div>
-								<label
-									for="last-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
-									>Last name</label
-								>
-								<div class="mt-2.5">
-									<input
-										v-model="last_name"
-										type="text"
-										name="last-name"
-										id="last-name"
-										autocomplete="family-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
-							<div class="sm:col-span-2">
-								<label
-									for="company"
-									class="block text-sm font-semibold leading-6 text-gray-900"
-									>Company</label
-								>
-								<div class="mt-2.5">
-									<input
-										v-model="company_name"
-										type="text"
-										name="company"
-										id="company"
-										autocomplete="organization"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
 							<div class="sm:col-span-2">
 								<label
 									for="email"
@@ -168,6 +135,30 @@
 								</div>
 							</div>
 
+							<div class="flex items-center justify-between sm:col-span-2">
+								<div class="flex items-center">
+									<input
+										id="remember-me"
+										name="remember-me"
+										type="checkbox"
+										class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+									/>
+									<label
+										for="remember-me"
+										class="ml-2 block text-sm text-gray-900"
+										>Remember me</label
+									>
+								</div>
+
+								<div class="text-sm">
+									<a
+										href="/password"
+										class="font-medium text-indigo-600 hover:text-indigo-500"
+										>Forgot your password?</a
+									>
+								</div>
+							</div>
+
 							<div class="sm:col-span-2">
 								<button
 									@click="isSignUp ? signUp() : login()"
@@ -192,8 +183,6 @@
 </template>
 
 <script setup>
-	definePageMeta({ middleware: ['auth'] });
-
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 	const email = ref('');
@@ -201,8 +190,8 @@
 	const company_name = ref('');
 	const first_name = ref('');
 	const last_name = ref('');
-	const isSignUp = ref(true);
-	const error = ref(false);
+	const isSignUp = ref(false);
+	const is_error = ref(false);
 	const error_message = ref('');
 
 	const signUp = async () => {
@@ -213,12 +202,7 @@
 				company_name: company_name.value,
 			},
 		});
-		const subscription = await $fetch('/api/stripe/subscription/create', {
-			method: 'post',
-			body: {
-				customer,
-			},
-		});
+		console.log(customer);
 		const { user, error } = await supabase.auth.signUp({
 			email: email.value,
 			password: password.value,
@@ -228,14 +212,9 @@
 					last_name: last_name.value,
 					company_name: company_name.value,
 					stripe_customer_id: customer.id,
-					stripe_subscription_id: subscription.id,
 				},
 			},
 		});
-		if (error) {
-			error.value = true;
-			error_message.value = error;
-		}
 		email.value = '';
 		password.value = '';
 		company_name.value = '';
@@ -250,6 +229,12 @@
 			email: email.value,
 			password: password.value,
 		});
+		if (error != '') {
+			is_error.value = true;
+			error_message.value = error;
+		}
+		email.value = '';
+		password.value = '';
 		console.log('user', user);
 		console.log('error', error);
 	};

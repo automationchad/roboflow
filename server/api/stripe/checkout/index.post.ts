@@ -7,22 +7,27 @@ export default defineEventHandler(async (event) => {
 	const tray_platform_usage_stripe = 'prod_NabhFNPo6uszbl';
 
 	let line_items = [];
+	const test = true;
+	const base_url = test ? 'http://localhost:3000' : 'https://app.motis.group';
 
 	let subscription = false;
 	let promo = false;
 
 	if (body.type === 'retainer' || body.type === 'waitlist') {
-		subscription = body.type === 'retainer';
-		promo = body.type === 'retainer';
-		const { data: product } = await stripe.products.search({
-			limit: 1,
-			query: `metadata[\'id\']:\'${body.product.id}\'`,
-		});
-
-		line_items.push({
-			price: product[0].default_price,
-			quantity: 1,
-		});
+		// const session = await stripe.billingPortal.sessions.create({
+		// 	customer: 'cus_NbOAJLeFal9iV5',
+		// 	return_url: 'https://example.com/account',
+		// });
+		// subscription = body.type === 'retainer';
+		// promo = body.type === 'retainer';
+		// const { data: product } = await stripe.products.search({
+		// 	limit: 1,
+		// 	query: `metadata[\'id\']:\'${body.product.id}\'`,
+		// });
+		// line_items.push({
+		// 	price: product[0].default_price,
+		// 	quantity: 1,
+		// });
 	} else if (body.type === 'initial' || body.type === 'add_on') {
 		subscription = true;
 		promo = true;
@@ -38,15 +43,21 @@ export default defineEventHandler(async (event) => {
 		);
 	}
 	let details = {
-		success_url: 'https://motis.group',
-		cancel_url: 'https://motis.group/#pricing',
+		success_url: `${base_url}/home`,
+		cancel_url: `${base_url}/home`,
 		allow_promotion_codes: promo,
 		line_items,
+		customer: body.customer,
 		payment_method_types: ['card', 'us_bank_account'],
 		mode: subscription ? 'subscription' : 'payment',
 		metadata: { type: body.type, product: body.product.id },
 	};
-	const session = await stripe.checkout.sessions.create(details);
+
+	// const session = await stripe.checkout.sessions.create(details);
+	const session = await stripe.billingPortal.sessions.create({
+		customer: body.customer,
+		return_url: `${base_url}/home`,
+	});
 	return { url: session.url };
 });
 

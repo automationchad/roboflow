@@ -104,7 +104,7 @@
 			<main class="py-10">
 				<div class="px-4 sm:px-6 lg:px-8">
 					<!-- Your content -->
-					<user-settings />
+					<ticket />
 				</div>
 			</main>
 		</div>
@@ -140,41 +140,8 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
-
-	const route = useRoute();
-
-	const navigation = [
-		{
-			name: 'Dashboard',
-			href: '/',
-			icon: HomeIcon,
-			current: route.path === '',
-		},
-		{
-			name: 'Team',
-			href: '/users',
-			icon: UsersIcon,
-			current: route.path === 'users',
-		},
-		{ name: 'Tickets', href: '/tickets', icon: QueueListIcon, current: false },
-		{ name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-		{
-			name: 'Documents',
-			href: '#',
-			icon: DocumentDuplicateIcon,
-			current: false,
-		},
-		{ name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
-	];
-	const teams = [
-		{ id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-		{ id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-		{ id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
-	];
 	const userNavigation = [
 		{ name: 'Your profile', href: '#' },
 		{ name: 'Sign out', href: '#' },
 	];
-
-	const sidebarOpen = ref(false);
 </script>

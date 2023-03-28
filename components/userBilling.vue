@@ -1,24 +1,37 @@
 <template>
 	<div class="">
-		<div class="mt-4 rounded-md bg-red-50 p-4">
+		<div
+			class="mt-4 rounded-md bg-red-50 p-4"
+			v-if="User.systemRole !== 'owner'"
+		>
 			<div class="flex">
 				<div class="flex-shrink-0">
 					<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
 				</div>
 				<div class="ml-3">
 					<h3 class="text-sm font-medium text-red-800">
-						You don't have access to change billing details
+						You currently don't have access to change billing details
 					</h3>
 
 					<span class="mt-2 text-sm text-red-700">
-						Contact your billing admin if you wish to change these.
+						Contact your admin
+						<a
+							:href="`mailto:${User.Account.billingEmail}`"
+							target="_blank"
+							class="underline"
+							>{{ User.Account.billingEmail }}</a
+						>
+						to request these changes.
 					</span>
 				</div>
 			</div>
 		</div>
-		<div class="mt-10 space-y-6 lg:px-0">
-			<section aria-labelledby="payment-details-heading" class="opacity-50">
-				<form action="#" method="POST">
+		<div class="mt-4 space-y-6 lg:px-0">
+			<section aria-labelledby="payment-details-heading" v-if="false">
+				<fieldset
+					:disabled="User.systemRole !== 'owner'"
+					class="disabled:opacity-60"
+				>
 					<div class="sm:overflow-hidden sm:rounded-md">
 						<div class="bg-white pb-6">
 							<div>
@@ -159,11 +172,14 @@
 							</button>
 						</div>
 					</div>
-				</form>
+				</fieldset>
 			</section>
 			<!-- Plan -->
-			<section aria-labelledby="plan-heading" class="opacity-50">
-				<form action="#" method="POST">
+			<section aria-labelledby="plan-heading">
+				<fieldset
+					:disabled="User.systemRole !== 'owner'"
+					class="disabled:opacity-60"
+				>
 					<div class="sm:overflow-hidden sm:rounded-md">
 						<div class="space-y-6 bg-white py-6">
 							<div>
@@ -276,20 +292,28 @@
 						</div>
 						<div class="space-x-3 bg-gray-50 px-3 py-3 text-right sm:px-3">
 							<button
+								v-if="User.subscription"
 								type="submit"
 								class="inline-flex justify-center rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 ring-1 ring-gray-400 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
 								Cancel subscription
 							</button>
 							<button
-								type="submit"
+								@click="
+									handleCheckout(
+										{ id: selectedPlan.id },
+										'retainer',
+										User.Account.stripeCustomerId,
+										User.Account.subscription
+									)
+								"
 								class="inline-flex justify-center rounded-md bg-indigo-500 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
 								Change plan
 							</button>
 						</div>
 					</div>
-				</form>
+				</fieldset>
 			</section>
 
 			<!-- Billing history -->
@@ -346,25 +370,29 @@
 												<td
 													class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"
 												>
-													<time :datetime="payment.datetime">{{
-														payment.date
-													}}</time>
+													<span>{{
+														format(
+															new Date(payment.created * 1000),
+															'MMM dd, yyyy'
+														)
+													}}</span>
 												</td>
 												<td
 													class="whitespace-nowrap px-6 py-4 text-sm text-gray-500"
 												>
-													{{ payment.description }}
+													{{ payment.number }}
 												</td>
 												<td
 													class="whitespace-nowrap px-6 py-4 text-sm text-gray-500"
 												>
-													${{ (payment.amount / 100).toLocaleString() }}
+													${{ (payment.amount_due / 100).toLocaleString() }}
 												</td>
 												<td
 													class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium"
 												>
 													<a
-														:href="payment.href"
+														:href="payment.hosted_invoice_url"
+														target="_blank"
 														class="text-indigo-600 hover:text-indigo-900"
 														>View receipt</a
 													>
@@ -417,12 +445,45 @@
 		XMarkIcon,
 	} from '@heroicons/vue/24/outline';
 
-	const user = {
-		name: 'Lisa Marie',
-		email: 'lisamarie@example.com',
-		imageUrl:
-			'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80',
+	import { format } from 'date-fns';
+
+	const user = useSupabaseUser();
+
+	const supabase = useSupabaseClient();
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 billingEmail,
+		 stripeCustomerId,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	console.log(User);
+
+	const handleCheckout = async (product, type, customer, subscription) => {
+		const { url } = await $fetch('/api/stripe/checkout', {
+			method: 'post',
+			body: {
+				customer,
+				subscription,
+				product,
+				type,
+			},
+		});
+		location.href = url;
 	};
+
 	const navigation = [
 		{ name: 'Dashboard', href: '#' },
 		{ name: 'Jobs', href: '#' },
@@ -434,46 +495,43 @@
 		{ name: 'Settings', href: '#' },
 		{ name: 'Sign out', href: '#' },
 	];
-	const subNavigation = [
-		{ name: 'Profile', href: '#', icon: UserCircleIcon, current: false },
-		{ name: 'Account', href: '#', icon: CogIcon, current: false },
-		{ name: 'Password', href: '#', icon: KeyIcon, current: false },
-		{ name: 'Notifications', href: '#', icon: BellIcon, current: false },
-		{ name: 'Plan & Billing', href: '#', icon: CreditCardIcon, current: true },
-		{ name: 'Integrations', href: '#', icon: SquaresPlusIcon, current: false },
-	];
+
 	const plans = [
 		{
+			name: 'Free',
+			id: 'free',
+			priceMonthly: 0,
+			priceYearly: 0,
+			limit: 'No requests',
+		},
+		{
 			name: 'Support',
+			id: 'support',
 			priceMonthly: 600,
 			priceYearly: 6000,
 			limit: 'Up to 5 active requests',
 		},
 		{
 			name: 'Growth',
+			id: 'growth',
 			priceMonthly: 2000,
 			priceYearly: 20000,
 			limit: 'Up to 25 active requests',
 		},
 		{
 			name: 'Enterprise',
+			id: 'enterprise',
 			priceMonthly: 5000,
 			priceYearly: 50000,
 			limit: 'Unlimited active requests',
 		},
 	];
-	const payments = [
-		{
-			id: 1,
-			date: '1/1/2020',
-			datetime: '2020-01-01',
-			description: 'Business Plan - Annual Billing',
-			amount: 10900,
-			href: '#',
-		},
-		// More payments...
-	];
+	const { data: payments } = await $fetch(
+		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
+	);
 
-	const selectedPlan = ref(plans[1]);
+	console.log(payments);
+
+	const selectedPlan = ref(plans[0]);
 	const annualBillingEnabled = ref(true);
 </script>

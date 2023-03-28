@@ -13,7 +13,9 @@
 					<div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
 						<dt class="text-sm font-medium text-gray-500">Name</dt>
 						<dd class="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-							<span class="flex-grow">Chelsea Hagon</span>
+							<span class="flex-grow"
+								>{{ User.firstName }} {{ User.lastName }}</span
+							>
 							<span class="ml-4 flex-shrink-0">
 								<button
 									type="button"
@@ -54,7 +56,7 @@
 					<div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:pt-5">
 						<dt class="text-sm font-medium text-gray-500">Email</dt>
 						<dd class="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-							<span class="flex-grow">chelsea.hagon@example.com</span>
+							<span class="flex-grow">{{ User.email }}</span>
 							<span class="ml-4 flex-shrink-0">
 								<button
 									type="button"
@@ -70,7 +72,7 @@
 					>
 						<dt class="text-sm font-medium text-gray-500">Job title</dt>
 						<dd class="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-							<span class="flex-grow">Human Resources Manager</span>
+							<span class="flex-grow">{{ User.jobTitle }}</span>
 							<span class="ml-4 flex-shrink-0">
 								<button
 									type="button"
@@ -85,7 +87,7 @@
 			</div>
 		</div>
 
-		<div class="mt-10 divide-y divide-gray-200">
+		<div class="mt-10 divide-y divide-gray-200" v-if="false">
 			<div class="space-y-1">
 				<h3 class="text-lg font-medium leading-6 text-gray-900">Account</h3>
 				<p class="max-w-2xl text-sm text-gray-500">
@@ -196,3 +198,27 @@
 		</div>
 	</div>
 </template>
+
+<script setup>
+	const user = useSupabaseUser();
+	console.log(user.value);
+	const supabase = useSupabaseClient();
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	console.log(User);
+</script>

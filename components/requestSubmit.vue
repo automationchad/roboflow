@@ -219,6 +219,8 @@
 	import { XMarkIcon } from '@heroicons/vue/20/solid';
 	import { CheckIcon } from '@heroicons/vue/24/outline';
 	const emit = defineEmits(['close-modal', 'show-otp-modal']);
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
 	const open = ref(true);
 	const name = ref('');
 	const brief = ref('');
@@ -226,10 +228,21 @@
 	const type = ref('');
 	const loading = ref(false);
 	const error_occurred = ref(false);
+	const route = useRoute();
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id)`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
 
 	const ticketTypes = [
-		{ id: '👾', title: '👾 Mod' },
-		{ id: '💎', title: '💎 New' },
+		{ id: 'bug', title: '👾 Mod' },
+		{ id: 'new', title: '💎 New' },
 	];
 
 	function addWorkDays(startDate, days) {
@@ -266,36 +279,35 @@
 	const handleSubmit = async (body) => {
 		loading.value = true;
 		var due_date = addWorkDays(new Date(), 5);
-		const card = await $fetch(
-			`https://api.trello.com/1/cards?idList=${body.listId}&name=${body.type}:${
-				' ' + body.name
-			}&desc=${body.brief}&${body.auth}&due=${due_date}`,
+
+		const { data, error } = await supabase.from('Ticket').insert([
 			{
-				method: 'POST',
-				headers: {
-					Accept: 'application/json',
-				},
-			}
-		)
-			.then((response) => {
-				return response;
-			})
-			.catch((err) => console.error(err));
-		if (link !== '') {
-			await $fetch(
-				`https://api.trello.com/1/cards/${card.id}/attachments?url=${body.link}&name=videolink&${body.auth}`,
-				{
-					method: 'POST',
-					headers: {
-						Accept: 'application/json',
-					},
-				}
-			)
-				.then((response) => {
-					return response;
-				})
-				.catch((err) => console.error(err));
-		}
+				name: body.name,
+				type: body.type,
+				status: 'backlog',
+				createdBy: user.value.id,
+				dueDate: due_date,
+				accountId: User.Account.id,
+				teamId: route.params.team,
+				desc: body.brief + (link.value ? `\n [Video link](${link.value})` : ''),
+			},
+		]);
+
+		// if (link !== '') {
+		// 	await $fetch(
+		// 		`https://api.trello.com/1/cards/${card.id}/attachments?url=${body.link}&name=videolink&${body.auth}`,
+		// 		{
+		// 			method: 'POST',
+		// 			headers: {
+		// 				Accept: 'application/json',
+		// 			},
+		// 		}
+		// 	)
+		// 		.then((response) => {
+		// 			return response;
+		// 		})
+		// 		.catch((err) => console.error(err));
+		// }
 		emit('close-modal');
 		emit('submit-reload');
 		location.reload();

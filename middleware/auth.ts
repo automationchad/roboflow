@@ -1,6 +1,9 @@
-export default defineNuxtRouteMiddleware((to) => {
-	const user = useSupabaseUser();
-	if (!user.value && to.path === '/account/settings') {
-		navigateTo('/');
+export default defineNuxtRouteMiddleware((to, _from) => {
+	if ((to.path !== '/' && to.path !== '/password' && to.path !== '/login') || to.path.includes('protectedRoute')) {
+		const user = useSupabaseUser();
+		if (user.value) {
+			return;
+		}
+		return navigateTo('/');
 	}
 });
