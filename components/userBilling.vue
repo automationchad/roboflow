@@ -2,7 +2,7 @@
 	<div class="">
 		<div
 			class="mt-4 rounded-md bg-red-50 p-4"
-			v-if="User.systemRole !== 'owner'"
+			v-if="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
 		>
 			<div class="flex">
 				<div class="flex-shrink-0">
@@ -14,14 +14,7 @@
 					</h3>
 
 					<span class="mt-2 text-sm text-red-700">
-						Contact your admin
-						<a
-							:href="`mailto:${User.Account.billingEmail}`"
-							target="_blank"
-							class="underline"
-							>{{ User.Account.billingEmail }}</a
-						>
-						to request these changes.
+						Contact an owner to request these changes.
 					</span>
 				</div>
 			</div>
@@ -29,7 +22,7 @@
 		<div class="mt-4 space-y-6 lg:px-0">
 			<section aria-labelledby="payment-details-heading" v-if="false">
 				<fieldset
-					:disabled="User.systemRole !== 'owner'"
+					:disabled="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
 					class="disabled:opacity-60"
 				>
 					<div class="sm:overflow-hidden sm:rounded-md">
@@ -177,7 +170,7 @@
 			<!-- Plan -->
 			<section aria-labelledby="plan-heading">
 				<fieldset
-					:disabled="User.systemRole !== 'owner'"
+					:disabled="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
 					class="disabled:opacity-60"
 				>
 					<div class="sm:overflow-hidden sm:rounded-md">

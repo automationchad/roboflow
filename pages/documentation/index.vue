@@ -1,28 +1,6 @@
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
 <template>
-	<!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
 	<div>
-		<navbar/>
+		<navbar />
 
 		<div class="lg:pl-72">
 			<div
@@ -125,7 +103,10 @@
 
 			<main class="py-10">
 				<div class="px-4 sm:px-6 lg:px-8">
-					<docs />
+					<!-- Your content -->
+					<BlogPosts
+						:posts="Documents.filter((o) => o.Account.User.length > 0)"
+					/>
 				</div>
 			</main>
 		</div>
@@ -161,6 +142,51 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+	definePageMeta({ middleware: ['auth'] });
 
-	
+	const user = useSupabaseUser();
+
+	const supabase = useSupabaseClient();
+
+	let { data: Documents, error } = await supabase
+		.from('Documents')
+		.select('*,Account(*,User(*)),User(firstName,lastName)')
+		.eq('Account.User.id', user.value.id);
+
+	console.log(Documents);
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 billingEmail,
+		 stripeCustomerId,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	const activeSub =
+		User.Account.Subscription[0].status === 'active' &&
+		User.Account.Subscription[0].plan.metadata.plan !== 'Free';
+
+	onMounted(() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo('/');
+			}
+		});
+	});
+
+	const userNavigation = [
+		{ name: 'Your profile', href: '#' },
+		{ name: 'Sign out', href: '#' },
+	];
 </script>
