@@ -4,7 +4,7 @@ const stripe = Stripe(process.env.STRIPE_KEY);
 export default defineEventHandler(async (event) => {
 	const body = await readBody(event);
 	let customer = stripe.customers.list({ email: body.email, limit: 1 });
-	if (customer.data.length > 0) {
+	if (customer?.data) {
 		customer = customer.data[0];
 		// Customer already exists, do nothing
 		console.log('Customer already exists:', customer.data[0]);

@@ -494,7 +494,7 @@
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 600,
+			priceMonthly: 850,
 			description:
 				'Best for people with an existing automation platform that need backup',
 			features: [
@@ -515,7 +515,7 @@
 			mostPopular: true,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 3000,
+			priceMonthly: 4000,
 			description: `For teams who need automation to power their most important processes.`,
 			features: [
 				'Up to 20 hours of development',
@@ -537,7 +537,7 @@
 			mostPopular: false,
 			href: '#',
 			billingInfo: 'Pause or cancel anytime',
-			priceMonthly: 5000,
+			priceMonthly: 7200,
 			description: `For organizations with advanced reporting and support needs.`,
 			features: [
 				'Regular unit & load testing',
