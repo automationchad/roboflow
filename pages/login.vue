@@ -7,7 +7,7 @@
     <body class="h-full">
     ```
   -->
-	<div class="flex min-h-full">
+	<div class="flex h-screen">
 		<div
 			class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
 		>
@@ -163,10 +163,10 @@
 
 							<div class="sm:col-span-2">
 								<button
-									@click="isSignUp ? signUp() : login()"
+									@click="login()"
 									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
-									{{ isSignUp ? 'Sign up' : 'Log in' }}
+									{{ 'Log in' }}
 								</button>
 							</div>
 						</div>
@@ -189,41 +189,11 @@
 	const supabase = useSupabaseClient();
 	const email = ref('');
 	const password = ref('');
-	const company_name = ref('');
-	const first_name = ref('');
-	const last_name = ref('');
 	const isSignUp = ref(false);
 	const is_error = ref(false);
 	const error_message = ref('');
 
-	const signUp = async () => {
-		const customer = await $fetch('/api/stripe/customer/create', {
-			method: 'post',
-			body: {
-				email: email.value,
-				company_name: company_name.value,
-			},
-		});
-		const { user, error } = await supabase.auth.signUp({
-			email: email.value,
-			password: password.value,
-			options: {
-				data: {
-					first_name: first_name.value,
-					last_name: last_name.value,
-					company_name: company_name.value,
-					stripe_customer_id: customer.id,
-				},
-			},
-		});
-		email.value = '';
-		password.value = '';
-		company_name.value = '';
-		first_name.value = '';
-		last_name.value = '';
-		console.log('user', user);
-		console.log('error', error);
-	};
+	definePageMeta({ middleware: ['auth'] });
 
 	const login = async () => {
 		const { user, error } = await supabase.auth.signInWithPassword({
@@ -240,10 +210,13 @@
 		console.log('error', error);
 	};
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,
+	onMounted(() => {
+		watchEffect(async () => {
+			if (user.value) {
+				let { data: User, error: userError } = await supabase
+					.from('User')
+					.select(
+						`*,
 		Account (
 	     id,
 		 Team (
@@ -255,15 +228,11 @@
 		 )
 	   )
 	 `
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	onMounted(() => {
-		watchEffect(() => {
-			if (user.value) {
-				navigateTo(`${User.Account.id}/dashboard`);
+					)
+					.eq('id', user.value.id)
+					.limit(1)
+					.single();
+				navigateTo(`/${User.Account.id}/dashboard`);
 			}
 		});
 	});

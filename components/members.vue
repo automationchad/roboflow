@@ -24,7 +24,7 @@
 					<div class="mt-8">
 						<ul class="space-y-4">
 							<li
-								v-for="person in User.Account.User"
+								v-for="person in moveUserToFront(User.Account.User)"
 								:key="person.email"
 								class="flex items-center justify-between"
 							>
@@ -43,17 +43,14 @@
 									</div>
 								</div>
 								<div class="flex flex-grow-0 space-x-4 pl-8">
-									<Listbox
-										as="div"
-										v-model="selected"
-										disabled
-										class="w-[160px]"
-									>
+									<Listbox as="div" disabled class="w-[160px]">
 										<div class="relative">
 											<ListboxButton
 												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 sm:text-sm sm:leading-6"
 											>
-												<span class="block truncate">{{ selected.name }}</span>
+												<span class="block truncate capitalize">{{
+													person.systemRole
+												}}</span>
 												<span
 													class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
 												>
@@ -74,9 +71,9 @@
 												>
 													<ListboxOption
 														as="template"
-														v-for="person in people"
-														:key="person.id"
-														:value="person"
+														v-for="role in roles"
+														:key="role.id"
+														:value="role"
 														v-slot="{ active, selected }"
 													>
 														<li
@@ -182,6 +179,15 @@
 		.limit(1)
 		.single();
 
+	function moveUserToFront(arr) {
+		const orgIndex = arr.findIndex((obj) => obj.id === user.value.id);
+		if (orgIndex > -1) {
+			const orgObj = arr.splice(orgIndex, 1)[0];
+			arr.unshift(orgObj);
+		}
+		return arr;
+	}
+
 	// const { data: images } = await client.storage
 	// 	.from('images')
 	// 	.list(`blueprints/${event.context.params.id}`, {
@@ -189,11 +195,11 @@
 	// 		offset: 0,
 	// 		sortBy: { column: 'name', order: 'asc' },
 	// 	});
-	const people = [
+	const roles = [
 		{ id: 1, name: 'Owner' },
 		{ id: 2, name: 'Arlene Mccoy' },
 	];
 
-	const selected = ref(people[0]);
+	const selected = ref(roles[0]);
 	console.log(User);
 </script>

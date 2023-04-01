@@ -12,12 +12,45 @@
 									<main class="max-w-7xl flex-1">
 										<div class="relative mx-auto">
 											<div class="pt-10 pb-16">
-												<div class="px-4 sm:px-6 lg:px-0">
+												<div class="flex justify-between px-4 sm:px-6 lg:px-0">
 													<h1
 														class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
 													>
 														Account settings
 													</h1>
+													<button
+														@click="signOut"
+														class="flex items-center rounded-lg border border-gray-200 px-4 py-1"
+													>
+														<svg
+															class="mr-1 h-6 w-6"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M15.75 8.75L19.25 12L15.75 15.25"
+															></path>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M19 12H10.75"
+															></path>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M15.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H15.25"
+															></path>
+														</svg>
+														Log out
+													</button>
 												</div>
 												<div class="px-4 sm:px-6 lg:px-0">
 													<TabGroup class="py-6" as="div">
@@ -122,6 +155,16 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+
+	definePageMeta({ middleware: ['auth'] });
+
+	onMounted(() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo(`/login`);
+			}
+		});
+	});
 
 	const route = useRoute();
 

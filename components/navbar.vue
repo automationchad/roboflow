@@ -168,7 +168,7 @@
 						>
 							<div :class="['flex gap-x-3']">
 								<span
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border dark:border-gray-700 border-gray-400 bg-gray-800 text-sm font-medium text-white"
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-400 bg-gray-800 text-sm font-medium text-white dark:border-gray-700"
 									>{{ User.Account.name[0] }}</span
 								>
 								<div class="">
@@ -232,9 +232,6 @@
 								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 							>
 								<div>Request teams</div>
-								<button class="text-white hover:text-gray-300">
-									<PlusIcon class="h-4 w-4" />
-								</button>
 							</div>
 							<ul role="list" class="-ml-2 mt-2 space-y-1">
 								<li
@@ -247,7 +244,9 @@
 											route.params.team == team.id
 												? ' dark:text-white'
 												: 'text-gray-600 dark:text-gray-400  dark:hover:text-white',
-											idx === 0 ? 'border-b dark:border-gray-800 border-gray-300' : '',
+											idx === 0
+												? 'border-b border-gray-300 dark:border-gray-800'
+												: '',
 											'group flex items-center justify-between text-sm font-semibold leading-6 ',
 										]"
 									>
@@ -257,7 +256,7 @@
 													route.params.team == team.id
 														? 'text-gray-900 dark:text-white'
 														: '',
-													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-gray-400 dark:group-hover:text-white group-hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800',
+													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-gray-400 group-hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:group-hover:text-white',
 												]"
 												>{{ team.name[0] }}</span
 											>
@@ -272,6 +271,12 @@
 										</div>
 									</a>
 								</li>
+								<button
+									disabled
+									class="flex items-center py-3 px-1 text-sm text-gray-500 disabled:text-gray-300"
+								>
+									<PlusIcon class="mr-2 h-4 w-4" />New Workspace
+								</button>
 							</ul>
 						</li>
 
