@@ -351,7 +351,7 @@
 								"
 								class="inline-flex justify-center rounded-md bg-indigo-500 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
-								Change plan
+								Change retainer
 							</button>
 						</div>
 					</div>
@@ -558,15 +558,15 @@
 		{
 			name: 'Growth',
 			id: 'growth',
-			priceMonthly: 2000,
-			priceYearly: 20000,
+			priceMonthly: 1800,
+			priceYearly: 18000,
 			limit: 'Up to 25 active requests',
 		},
 		{
 			name: 'Enterprise',
 			id: 'enterprise',
-			priceMonthly: 5000,
-			priceYearly: 50000,
+			priceMonthly: 5400,
+			priceYearly: 54000,
 			limit: 'Unlimited active requests',
 		},
 	];
