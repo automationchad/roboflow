@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 	}
 	let details = {
 		success_url: `${base_url}/home`,
-		cancel_url: `${base_url}/home`,
+		cancel_url: `${base_url}/settings`,
 		allow_promotion_codes: promo,
 		line_items,
 		customer: body.customer,
