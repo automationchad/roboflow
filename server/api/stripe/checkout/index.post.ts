@@ -50,14 +50,22 @@ export default defineEventHandler(async (event) => {
 		customer: body.customer,
 		payment_method_types: ['card', 'us_bank_account'],
 		mode: subscription ? 'subscription' : 'payment',
-		metadata: { type: body.type, product: body.product.id },
+		subscription_data: { description: 'Tray Platform License' },
+		metadata: {
+			type: body.type,
+			product: body.product.id,
+			account: body.account.id,
+		},
 	};
 
-	// const session = await stripe.checkout.sessions.create(details);
-	const session = await stripe.billingPortal.sessions.create({
-		customer: body.customer,
-		return_url: `${base_url}/home`,
-	});
+	const session =
+		body.type === 'add_on'
+			? await stripe.checkout.sessions.create(details)
+			: await stripe.billingPortal.sessions.create({
+					customer: body.customer,
+					return_url: `${base_url}/home`,
+			  });
+
 	return { url: session.url };
 });
 

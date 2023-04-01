@@ -213,12 +213,14 @@
 				company_name: company_name.value,
 			},
 		});
+		console.log(customer);
 		const subscription = await $fetch('/api/stripe/subscription/create', {
 			method: 'post',
 			body: {
 				customer,
 			},
 		});
+		console.log(subscription);
 		const { user, error } = await supabase.auth.signUp({
 			email: email.value,
 			password: password.value,
@@ -229,13 +231,15 @@
 					company_name: company_name.value,
 					stripe_customer_id: customer.id,
 					stripe_subscription_id: subscription.id,
+					stripe_plan: subscription.plan,
 				},
 			},
 		});
 		if (error) {
 			error.value = true;
 			error_message.value = error;
-		}
+			alert(error);
+		} else alert('Success, check your email for verification link');
 		email.value = '';
 		password.value = '';
 		company_name.value = '';

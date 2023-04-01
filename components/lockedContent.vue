@@ -21,16 +21,8 @@
 							Get started by subscribing to a plan.
 						</p>
 						<div class="mt-6">
-							<button
-								type="button"
-								@click="
-									handleCheckout(
-										{ id: null },
-										'retainer',
-										User.Account.stripeCustomerId,
-										User.Account.subscription
-									)
-								"
+							<a
+								href="/settings"
 								class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
 								<CreditCardIcon
@@ -38,7 +30,7 @@
 									aria-hidden="true"
 								/>
 								Subscribe
-							</button>
+							</a>
 						</div>
 					</div>
 				</div>

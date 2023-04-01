@@ -22,7 +22,9 @@
 		<div class="mt-4 space-y-6 lg:px-0">
 			<section aria-labelledby="payment-details-heading" v-if="false">
 				<fieldset
-					:disabled="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
+					:disabled="
+						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
+					"
 					class="disabled:opacity-60"
 				>
 					<div class="sm:overflow-hidden sm:rounded-md">
@@ -170,21 +172,46 @@
 			<!-- Plan -->
 			<section aria-labelledby="plan-heading">
 				<fieldset
-					:disabled="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
+					:disabled="
+						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
+					"
 					class="disabled:opacity-60"
 				>
 					<div class="sm:overflow-hidden sm:rounded-md">
 						<div class="space-y-6 bg-white py-6">
-							<div>
+							<div class="flex justify-between">
 								<h2
 									id="plan-heading"
 									class="text-lg font-medium leading-6 text-gray-900"
 								>
 									Plan
 								</h2>
+								<button
+									@click="
+										User.Account.trayWorkspaceId
+											? handleCheckout(
+													{ id: selectedPlan.id },
+													'retainer',
+													User.Account.stripeCustomerId,
+													User.Account.subscription
+											  )
+											: handleCheckout(
+													{},
+													'add_on',
+													User.Account.stripeCustomerId
+											  )
+									"
+									class="inline-flex items-center rounded-lg bg-black py-2 px-3 text-sm font-medium text-white shadow"
+								>
+									<SparklesIcon class="mr-1 h-5 w-5" />{{
+										User.Account.trayWorkspaceId
+											? 'Manage License'
+											: 'Upgrade License'
+									}}
+								</button>
 							</div>
 
-							<RadioGroup v-model="selectedPlan">
+							<RadioGroup v-model="selectedPlan" disabled>
 								<RadioGroupLabel class="sr-only">
 									Pricing plans
 								</RadioGroupLabel>
@@ -202,7 +229,9 @@
 												planIdx === plans.length - 1
 													? 'rounded-bl-md rounded-br-md'
 													: '',
-												checked
+												User.Account.Subscription.find(
+													(o) => o.plan.nickname === null
+												).plan.metadata.plan === plan.name
 													? 'z-10 border-indigo-200 bg-indigo-50'
 													: 'border-gray-200',
 												'relative flex cursor-pointer flex-col border p-4 focus:outline-none md:grid md:grid-cols-3 md:pr-6',
@@ -211,7 +240,9 @@
 											<span class="flex items-center text-sm">
 												<span
 													:class="[
-														checked
+														User.Account.Subscription.find(
+															(o) => o.plan.nickname === null
+														).plan.metadata.plan === plan.name
 															? 'border-transparent bg-indigo-500'
 															: 'border-gray-300 bg-white',
 														active ? 'ring-2 ring-gray-900 ring-offset-2' : '',
@@ -236,21 +267,35 @@
 											>
 												<span
 													:class="[
-														checked ? 'text-indigo-900' : 'text-gray-900',
+														User.Account.Subscription.find(
+															(o) => o.plan.nickname === null
+														).plan.metadata.plan === plan.name
+															? 'text-indigo-900'
+															: 'text-gray-900',
 														'font-medium',
 													]"
 													>${{ plan.priceMonthly.toLocaleString() }} / mo</span
 												>
 												{{ ' ' }}
 												<span
-													:class="checked ? 'text-indigo-700' : 'text-gray-500'"
+													:class="
+														User.Account.Subscription.find(
+															(o) => o.plan.nickname === null
+														).plan.metadata.plan === plan.name
+															? 'text-indigo-700'
+															: 'text-gray-500'
+													"
 													>(${{ plan.priceYearly.toLocaleString() }} / yr)</span
 												>
 											</RadioGroupDescription>
 											<RadioGroupDescription
 												as="span"
 												:class="[
-													checked ? 'text-indigo-700' : 'text-gray-500',
+													User.Account.Subscription.find(
+														(o) => o.plan.nickname === null
+													).plan.metadata.plan === plan.name
+														? 'text-indigo-700'
+														: 'text-gray-500',
 													'ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right',
 												]"
 												>{{ plan.limit }}</RadioGroupDescription
@@ -285,7 +330,11 @@
 						</div>
 						<div class="space-x-3 bg-gray-50 px-3 py-3 text-right sm:px-3">
 							<button
-								v-if="User.subscription"
+								v-if="
+									User.Account.Subscription.find(
+										(o) => o.plan.nickname === null
+									).plan.metadata.plan !== 'Free'
+								"
 								type="submit"
 								class="inline-flex justify-center rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 ring-1 ring-gray-400 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
@@ -432,6 +481,7 @@
 		ExclamationTriangleIcon,
 		CogIcon,
 		CreditCardIcon,
+		SparklesIcon,
 		KeyIcon,
 		SquaresPlusIcon,
 		UserCircleIcon,
@@ -451,6 +501,7 @@
 	     id,
 		 billingEmail,
 		 stripeCustomerId,
+		 trayWorkspaceId,
 		 Subscription(*),
 		 Team (
 			id,
@@ -464,14 +515,14 @@
 
 	console.log(User);
 
-	const handleCheckout = async (product, type, customer, subscription) => {
+	const handleCheckout = async (product, type, customer) => {
 		const { url } = await $fetch('/api/stripe/checkout', {
 			method: 'post',
 			body: {
-				customer,
-				subscription,
 				product,
 				type,
+				customer,
+				account: User.Account,
 			},
 		});
 		location.href = url;
@@ -523,8 +574,6 @@
 		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
 	);
 
-	console.log(payments);
-
 	const selectedPlan = ref(plans[0]);
-	const annualBillingEnabled = ref(true);
+	const annualBillingEnabled = ref(false);
 </script>

@@ -7,4 +7,5 @@ export default defineEventHandler(async (event) => {
 		customer: body.customer.id,
 		items: [{ price: 'price_1MqAyjFWnSaQbLv1HY5qo04d' }],
 	});
+	return subscription;
 });
