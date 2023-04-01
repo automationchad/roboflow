@@ -65,16 +65,7 @@ export default defineEventHandler(async (event) => {
 			? await stripe.checkout.sessions.create(details)
 			: await stripe.billingPortal.sessions.create({
 					customer: body.customer,
-					features: {
-						subscription_pause: {
-							enabled: true,
-						},
-						subscription_update: {
-							default_allowed_updates: ['price'],
-							enabled: true,
-							proration_behavior: 'create_prorations',
-						},
-					},
+					
 					return_url: `${base_url}`,
 			  });
 
