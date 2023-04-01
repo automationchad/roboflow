@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
 			? await stripe.checkout.sessions.create(details)
 			: await stripe.billingPortal.sessions.create({
 					customer: body.customer,
-					return_url: `${base_url}/home`,
+					return_url: `${base_url}`,
 			  });
 
 	return { url: session.url };

@@ -194,6 +194,14 @@
 <script setup>
 	definePageMeta({ middleware: ['auth'] });
 
+	onMounted(() => {
+		watchEffect(() => {
+			if (user.value) {
+				navigateTo('/home');
+			}
+		});
+	});
+
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 	const email = ref('');
@@ -258,11 +266,5 @@
 		console.log('error', error);
 	};
 
-	onMounted(() => {
-		watchEffect(() => {
-			if (user.value) {
-				navigateTo('/home');
-			}
-		});
-	});
+	
 </script>
