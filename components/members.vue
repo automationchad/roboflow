@@ -22,7 +22,7 @@
 						</div>
 					</div>
 					<div class="mt-8">
-						<ul>
+						<ul class="space-y-4">
 							<li
 								v-for="person in User.Account.User"
 								:key="person.email"

@@ -6,7 +6,7 @@
 			<main class="py-10">
 				<div class="px-4 sm:px-6 lg:px-8">
 					<!-- Your content -->
-					<requests  />
+					<requests />
 					<!-- <locked-content v-else /> -->
 				</div>
 			</main>
@@ -69,8 +69,8 @@
 	console.log(User);
 
 	const activeSub =
-		User.Account.Subscription[0].status === 'active' &&
-		User.Account.Subscription[0].plan.metadata.plan !== 'Free';
+		User.Account.Subscription.find((o) => o.type === 'retainer').tier !==
+		'free';
 
 	onMounted(() => {
 		watchEffect(() => {

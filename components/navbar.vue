@@ -145,7 +145,9 @@
 			class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
 		>
 			<!-- Sidebar component, swap this element with another sidebar if you like -->
-			<div class="flex grow flex-col overflow-y-auto bg-gray-900 px-6 pb-4">
+			<div
+				class="flex grow flex-col overflow-y-auto bg-gray-50 px-6 pb-4 dark:bg-gray-900"
+			>
 				<div class="flex shrink-0 items-center justify-center py-4">
 					<img
 						class="mr-1 h-4 w-auto"
@@ -161,16 +163,20 @@
 								moveOrgToFront(teams)[0].id
 							}`"
 							:class="[
-								'group -mx-6 flex py-4 px-4 items-center justify-between text-sm font-semibold leading-6 text-white hover:bg-gray-800',
+								'group -mx-6 flex items-center justify-between py-4 px-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
 							]"
 						>
 							<div :class="['flex gap-x-3']">
 								<span
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-sm font-medium text-white"
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border dark:border-gray-700 border-gray-400 bg-gray-800 text-sm font-medium text-white"
 									>{{ User.Account.name[0] }}</span
 								>
 								<div class="">
-									<p class="text-xs font-normal text-slate-400">Organization</p>
+									<p
+										class="text-xs font-normal text-slate-600 dark:text-slate-400"
+									>
+										Organization
+									</p>
 									<span class="truncate text-base">{{
 										User.Account.name
 									}}</span>
@@ -191,15 +197,17 @@
 										:href="!active ? '/settings' : item.href"
 										:class="[
 											item.current
-												? ' text-white'
-												: 'text-gray-400  hover:text-white',
+												? ' text-gray-900 dark:text-white'
+												: 'text-gray-700 hover:text-gray-900 dark:text-gray-400  dark:hover:text-white',
 											'group flex items-center gap-x-3 rounded-md p-1 text-sm font-normal leading-6 transition-colors',
 										]"
 									>
 										<component
 											:is="item.icon"
 											:class="[
-												item.current ? 'text-indigo-500' : '',
+												item.current
+													? 'text-gray-900 dark:text-indigo-500'
+													: 'text-gray-700',
 												'h-5 w-5 shrink-0',
 											]"
 											aria-hidden="true"
@@ -234,18 +242,23 @@
 									:key="team.name"
 								>
 									<a
-										:href="'/tickets/' + team.id"
+										:href="`/${User.Account.id}/tickets/${team.id}`"
 										:class="[
 											route.params.team == team.id
-												? ' text-white'
-												: 'text-gray-400  hover:text-white',
-											idx === 0 ? 'border-b border-gray-800' : '',
+												? ' dark:text-white'
+												: 'text-gray-600 dark:text-gray-400  dark:hover:text-white',
+											idx === 0 ? 'border-b dark:border-gray-800 border-gray-300' : '',
 											'group flex items-center justify-between text-sm font-semibold leading-6 ',
 										]"
 									>
 										<div :class="['flex gap-x-3  p-2']">
 											<span
-												class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+												:class="[
+													route.params.team == team.id
+														? 'text-gray-900 dark:text-white'
+														: '',
+													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-gray-400 dark:group-hover:text-white group-hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800',
+												]"
 												>{{ team.name[0] }}</span
 											>
 											<span class="truncate">{{ team.name }}</span>

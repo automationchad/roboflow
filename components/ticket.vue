@@ -54,9 +54,11 @@
 												{{ ' ' }}
 												in
 												{{ ' ' }}
-												<a href="#" class="font-medium text-gray-900">{{
-													Ticket.Team.name
-												}}</a>
+												<a
+													:href="`/${User.Account.id}/tickets/${Ticket.Team.id}`"
+													class="font-medium text-gray-900"
+													>{{ Ticket.Team.name }}</a
+												>
 											</p>
 										</div>
 									</div>
@@ -919,10 +921,28 @@
 
 	const supabase = useSupabaseClient();
 
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 billingEmail,
+		 stripeCustomerId,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(name), Comment(*,User(firstName,lastName,systemRole,id),Comment(*,User(firstName,lastName,systemRole,id))), User(*)'
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id),Comment(*,User(firstName,lastName,systemRole,id))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)

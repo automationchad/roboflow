@@ -16,9 +16,10 @@
 						<div class="ml-4 mt-2 flex-shrink-0">
 							<button
 								@click="showSubmitModal = true"
-								class="relative inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								class="relative inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 							>
-								Create new request
+								<PlusCircleIcon class="h-5 w-5 mr-2" />
+								Add
 							</button>
 						</div>
 					</div>
@@ -57,7 +58,7 @@
 								>
 							</div>
 							<a
-								:href="`/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
 								v-for="ticket in active_tickets"
 								:key="ticket.id"
 								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:border-gray-600 dark:bg-slate-800 dark:hover:border-gray-500"
@@ -187,7 +188,7 @@
 								>
 							</button>
 							<a
-								:href="`/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
 								v-for="ticket in backlog_tickets.slice(
 									backLogPage * limit,
 									backLogPage * limit + limit
@@ -309,7 +310,7 @@
 								>
 							</div>
 							<a
-								:href="`/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
 								v-for="ticket in done_tickets.slice(
 									completedPage * limit,
 									completedPage * limit + limit
@@ -411,6 +412,7 @@
 		CalendarIcon,
 		ShieldCheckIcon,
 		CheckCircleIcon,
+		PlusCircleIcon,
 		PaperClipIcon,
 	} from '@heroicons/vue/24/outline';
 	import { format, formatDistance } from 'date-fns';

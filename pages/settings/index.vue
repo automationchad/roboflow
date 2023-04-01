@@ -66,8 +66,9 @@
 															</div>
 														</TabList>
 														<TabPanels>
-															<TabPanel><org-settings /></TabPanel>
-															<TabPanel><members /></TabPanel>
+															<TabPanel><profile-settings /></TabPanel>
+															<TabPanel><profile-preferences /></TabPanel>
+															<TabPanel><profile-credentials /></TabPanel>
 														</TabPanels>
 
 														<!-- Description list with inline editing -->
@@ -160,6 +161,11 @@
 		},
 		{
 			name: 'Preferences',
+			href: `/${User.Account.id}/settings/billing/billing-info`,
+			current: false,
+		},
+		{
+			name: 'Access Credentials',
 			href: `/${User.Account.id}/settings/billing/billing-info`,
 			current: false,
 		},
