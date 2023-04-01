@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
 	const tray_platform_usage_stripe = 'prod_NabhFNPo6uszbl';
 
 	let line_items = [];
-	const test = true;
-	const base_url = test ? 'http://localhost:3000' : 'https://app.motis.group';
+	const test = false;
+	const base_url = test ? 'http://localhost:3000' : 'https://app.motis.group/settings';
 
 	let subscription = false;
 	let promo = false;
