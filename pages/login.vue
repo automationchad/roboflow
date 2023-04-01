@@ -202,7 +202,6 @@
 				company_name: company_name.value,
 			},
 		});
-		console.log(customer);
 		const { user, error } = await supabase.auth.signUp({
 			email: email.value,
 			password: password.value,
@@ -229,7 +228,7 @@
 			email: email.value,
 			password: password.value,
 		});
-		if (error != '') {
+		if (error != null) {
 			is_error.value = true;
 			error_message.value = error;
 		}
