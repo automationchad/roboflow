@@ -78,7 +78,7 @@
 													>
 														<component
 															:is="item.icon"
-															class="h-6 w-6 shrink-0"
+															class="h-4 w-4 shrink-0"
 															aria-hidden="true"
 														/>
 														{{ item.name
@@ -96,7 +96,7 @@
 											<div
 												class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 											>
-												<div>Your teams</div>
+												<div>Request teams</div>
 												<button><PlusIcon class="h-5 w-5 text-white" /></button>
 											</div>
 											<ul role="list" class="-mx-2 mt-2 space-y-1">
@@ -145,18 +145,45 @@
 			class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
 		>
 			<!-- Sidebar component, swap this element with another sidebar if you like -->
-			<div
-				class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4"
-			>
-				<div class="flex h-16 shrink-0 items-center">
+			<div class="flex grow flex-col overflow-y-auto bg-gray-900 px-6 pb-4">
+				<div class="flex shrink-0 items-center justify-center py-4">
 					<img
-						class="h-8 w-auto"
+						class="mr-1 h-4 w-auto"
 						src="~/assets/images/logo.png"
 						alt="Your Company"
 					/>
+					<p class="text-xs text-slate-400">Motis Group</p>
 				</div>
 				<nav class="flex flex-1 flex-col">
 					<ul role="list" class="flex flex-1 flex-col gap-y-7">
+						<a
+							:href="`/${User.Account.id}/tickets/${
+								moveOrgToFront(teams)[0].id
+							}`"
+							:class="[
+								'group -mx-6 flex py-4 px-4 items-center justify-between text-sm font-semibold leading-6 text-white hover:bg-gray-800',
+							]"
+						>
+							<div :class="['flex gap-x-3']">
+								<span
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-sm font-medium text-white"
+									>{{ User.Account.name[0] }}</span
+								>
+								<div class="">
+									<p class="text-xs font-normal text-slate-400">Organization</p>
+									<span class="truncate text-base">{{
+										User.Account.name
+									}}</span>
+								</div>
+							</div>
+							<div class="flex items-center">
+								<span
+									v-if="!active && item.gated"
+									class="ml-auto w-9 min-w-max whitespace-nowrap"
+									><LockClosedIcon class="h-5 w-5 text-gray-200"
+								/></span>
+							</div>
+						</a>
 						<li>
 							<ul role="list" class="-mx-2 space-y-1">
 								<li v-for="item in navigation" :key="item.name">
@@ -164,14 +191,17 @@
 										:href="!active ? '/settings' : item.href"
 										:class="[
 											item.current
-												? 'bg-gray-800 text-white'
-												: 'text-gray-400 hover:bg-gray-800 hover:text-white',
-											'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+												? ' text-white'
+												: 'text-gray-400  hover:text-white',
+											'group flex items-center gap-x-3 rounded-md p-1 text-sm font-normal leading-6 transition-colors',
 										]"
 									>
 										<component
 											:is="item.icon"
-											class="h-6 w-6 shrink-0"
+											:class="[
+												item.current ? 'text-indigo-500' : '',
+												'h-5 w-5 shrink-0',
+											]"
 											aria-hidden="true"
 										/>
 										{{ item.name
@@ -193,23 +223,27 @@
 							<div
 								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 							>
-								<div>Your teams</div>
+								<div>Request teams</div>
 								<button class="text-white hover:text-gray-300">
 									<PlusIcon class="h-4 w-4" />
 								</button>
 							</div>
 							<ul role="list" class="-ml-2 mt-2 space-y-1">
-								<li v-for="team in teams" :key="team.name">
+								<li
+									v-for="(team, idx) in moveOrgToFront(teams)"
+									:key="team.name"
+								>
 									<a
 										:href="'/tickets/' + team.id"
 										:class="[
 											route.params.team == team.id
-												? 'bg-gray-800 text-white'
-												: 'text-gray-400 hover:bg-gray-800 hover:text-white',
-											'group flex items-center justify-between rounded-md p-2 text-sm font-semibold leading-6',
+												? ' text-white'
+												: 'text-gray-400  hover:text-white',
+											idx === 0 ? 'border-b border-gray-800' : '',
+											'group flex items-center justify-between text-sm font-semibold leading-6 ',
 										]"
 									>
-										<div class="flex gap-x-3">
+										<div :class="['flex gap-x-3  p-2']">
 											<span
 												class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
 												>{{ team.name[0] }}</span
@@ -222,16 +256,6 @@
 												class="ml-auto w-9 min-w-max whitespace-nowrap"
 												><LockClosedIcon class="h-5 w-5 text-gray-200"
 											/></span>
-											<button>
-												<StarIcon
-													:class="[
-														User.defaultTeamId == team.id
-															? ' text-yellow-500'
-															: 'text-slate-600',
-														'h-4 w-4',
-													]"
-												/>
-											</button>
 										</div>
 									</a>
 								</li>
@@ -239,33 +263,25 @@
 						</li>
 
 						<li class="mt-auto space-y-2">
-							<a
-								href="/support"
-								:class="[
-									route.path === '/support'
-										? 'bg-gray-800 text-white'
-										: 'text-gray-400 hover:bg-gray-800 hover:text-gray-300',
-									'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ',
-								]"
-							>
-								<QuestionMarkCircleIcon
-									class="h-6 w-6 shrink-0"
-									aria-hidden="true"
-								/>
-								Support
-							</a>
-							<a
-								href="/settings"
-								:class="[
-									route.path === '/settings'
-										? 'bg-gray-800 text-white'
-										: 'text-gray-400 hover:bg-gray-800 hover:text-white',
-									'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 ',
-								]"
-							>
-								<Cog6ToothIcon class="h-6 w-6 shrink-0" aria-hidden="true" />
-								Settings
-							</a>
+							<div class="relative">
+								<a class="-m-1.5 flex items-center p-1.5" href="/settings">
+									<span class="sr-only">Open user menu</span>
+									<div
+										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs"
+										src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+										alt=""
+									>
+										{{ User.firstName[0] }}
+									</div>
+									<span class="hidden lg:flex lg:items-center">
+										<span
+											class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white"
+											aria-hidden="true"
+											>{{ User.firstName }} {{ User.lastName }}</span
+										>
+									</span>
+								</a>
+							</div>
 						</li>
 					</ul>
 				</nav>
@@ -290,8 +306,9 @@
 		Bars3Icon,
 		BellIcon,
 		CalendarIcon,
-		ChartPieIcon,
 		Cog6ToothIcon,
+		Cog8ToothIcon,
+		CodeBracketIcon,
 		DocumentDuplicateIcon,
 		CircleStackIcon,
 		QueueListIcon,
@@ -301,12 +318,15 @@
 		UsersIcon,
 		TicketIcon,
 		QuestionMarkCircleIcon,
+		CreditCardIcon,
 		XMarkIcon,
 		LockClosedIcon,
+		CpuChipIcon,
 	} from '@heroicons/vue/24/outline';
 	import {
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
+		ChartBarIcon,
 		StarIcon,
 	} from '@heroicons/vue/20/solid';
 
@@ -316,10 +336,10 @@
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
-			`id, defaultTeamId,
+			`*,
 		Account (
 	     id,
-		 
+		 name,
 		 Team (
 			id,
 			name
@@ -358,6 +378,15 @@
 		return scaled.toFixed(precision) + suffix;
 	};
 
+	function moveOrgToFront(arr) {
+		const orgIndex = arr.findIndex((obj) => obj.name === 'Organization');
+		if (orgIndex > -1) {
+			const orgObj = arr.splice(orgIndex, 1)[0];
+			arr.unshift(orgObj);
+		}
+		return arr;
+	}
+
 	const active = true;
 
 	const route = useRoute();
@@ -365,31 +394,22 @@
 	const navigation = [
 		{
 			name: 'Dashboard',
-			href: '/home',
-			icon: HomeIcon,
-			current: route.path === '/home',
+			href: `/${User.Account.id}/dashboard`,
+			icon: ChartBarIcon,
+			current: route.path === `/${User.Account.id}/dashboard`,
 		},
 		{
-			name: 'Team',
-			href: '/users',
-			icon: UsersIcon,
-			current: route.path === '/users',
+			name: 'Plan & Billing',
+			href: `/${User.Account.id}/settings/billing`,
+			icon: CreditCardIcon,
+			current: route.path === `/${User.Account.id}/settings/billing`,
 		},
-
-		// { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
 		{
-			name: 'Documentation',
-			href: '/documentation',
-			icon: FolderIcon,
-			current: route.path === '/documentation',
+			name: 'Settings & Members',
+			href: `/${User.Account.id}/settings`,
+			icon: Cog8ToothIcon,
+			current: route.path === `/${User.Account.id}/settings`,
 		},
-		// {
-		// 	name: 'Reports',
-		// 	href: '#',
-		// 	icon: ChartPieIcon,
-		// 	gated: true,
-		// 	current: false,
-		// },
 	];
 
 	const userNavigation = [

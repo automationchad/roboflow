@@ -18,7 +18,9 @@
 						src="~/assets/images/logo.png"
 						alt="Your Company"
 					/>
-					<h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+					<h2
+						class="mt-6 text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
+					>
 						Sign in to your account
 					</h2>
 					<p class="mt-2 text-sm text-gray-600">
@@ -26,7 +28,7 @@
 						{{ ' ' }}
 						<a
 							href="/"
-							class="font-medium text-indigo-600 hover:text-indigo-500"
+							class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
 							>create a new account</a
 						>
 					</p>
@@ -100,7 +102,7 @@
 							<div class="sm:col-span-2">
 								<label
 									for="email"
-									class="block text-sm font-medium leading-6 text-gray-900"
+									class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200"
 									>Email address</label
 								>
 								<div class="mt-2">
@@ -111,7 +113,7 @@
 										type="email"
 										autocomplete="email"
 										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-white dark:ring-slate-600 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -119,7 +121,7 @@
 							<div class="sm:col-span-2">
 								<label
 									for="password"
-									class="block text-sm font-medium leading-6 text-gray-900"
+									class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200"
 									>Password</label
 								>
 								<div class="mt-2">
@@ -130,7 +132,7 @@
 										type="password"
 										autocomplete="current-password"
 										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-white dark:ring-slate-600 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -141,11 +143,11 @@
 										id="remember-me"
 										name="remember-me"
 										type="checkbox"
-										class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+										class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-800"
 									/>
 									<label
 										for="remember-me"
-										class="ml-2 block text-sm text-gray-900"
+										class="ml-2 block text-sm text-gray-900 dark:text-gray-300"
 										>Remember me</label
 									>
 								</div>
@@ -238,10 +240,30 @@
 		console.log('error', error);
 	};
 
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,
+		Account (
+	     id,
+		 Team (
+			id,
+			name
+		 ),
+		 Ticket (
+			count
+		 )
+	   )
+	 `
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
 	onMounted(() => {
 		watchEffect(() => {
 			if (user.value) {
-				navigateTo('/home');
+				navigateTo(`${User.Account.id}/dashboard`);
 			}
 		});
 	});

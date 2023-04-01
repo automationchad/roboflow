@@ -15,7 +15,7 @@
 </script>
 
 <template>
-	<div class="h-screen bg-white dark:bg-black">
+	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
 		<NuxtPage :profile="profile" />
 		<LoginModal
 			v-show="showLoginModal"

@@ -1,8 +1,6 @@
 <template>
 	<div>
-		<!-- Static sidebar for desktop -->
-
-		<!-- Content area -->
+		
 		<div class="">
 			<div class="lg:px-8">
 				<div class="mx-auto flex flex-col lg:max-w-7xl">
@@ -105,24 +103,7 @@
 	} from '@heroicons/vue/24/outline';
 	import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 
-	const navigation = [
-		{ name: 'Home', href: '#', icon: HomeIcon, current: false },
-		{ name: 'Jobs', href: '#', icon: BriefcaseIcon, current: false },
-		{
-			name: 'Applications',
-			href: '#',
-			icon: DocumentMagnifyingGlassIcon,
-			current: false,
-		},
-		{
-			name: 'Messages',
-			href: '#',
-			icon: ChatBubbleOvalLeftEllipsisIcon,
-			current: false,
-		},
-		{ name: 'Team', href: '#', icon: UsersIcon, current: false },
-		{ name: 'Settings', href: '#', icon: CogIcon, current: true },
-	];
+	
 	const secondaryNavigation = [
 		{ name: 'Help', href: '#', icon: QuestionMarkCircleIcon },
 		{ name: 'Logout', href: '#', icon: ArrowLeftOnRectangleIcon },

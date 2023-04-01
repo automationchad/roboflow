@@ -25,23 +25,9 @@
 				</div>
 				<div class="">
 					<div v-if="tickets.length === 0" class="text-center">
-						<TicketIcon class="mx-auto h-12 w-12 text-gray-400" />
-
-						<h3 class="mt-2 text-sm font-semibold text-gray-900">
-							No requests
-						</h3>
-						<p class="mt-1 text-sm text-gray-500">
-							Get started by creating a new requests.
+						<p class="my-12 text-sm text-gray-500 dark:text-slate-300">
+							No requests.
 						</p>
-						<div class="mt-6">
-							<button
-								@click="showSubmitModal = true"
-								class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-							>
-								<PlusIcon class="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
-								New Request
-							</button>
-						</div>
 					</div>
 					<div class="" v-else>
 						<div class="py-5">
@@ -61,16 +47,15 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
-							<button
-								@click="showSubmitModal = true"
+							<div
 								v-if="active_tickets.length <= 0"
-								type="button"
-								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800"
 							>
-								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hmmm...nothing to see here</span
+								<span
+									class="my-2 block text-sm font-normal text-gray-900 dark:text-slate-400"
+									>No active requests</span
 								>
-							</button>
+							</div>
 							<a
 								:href="`/tickets/${route.params.team}/${ticket.id}`"
 								v-for="ticket in active_tickets"
@@ -269,7 +254,7 @@
 								</div>
 							</a>
 						</div>
-						<div class="mt-4 bg-white py-5">
+						<div class="mt-4 py-5">
 							<div
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 							>
@@ -282,7 +267,7 @@
 									</h3>
 								</div>
 								<div class="flex items-center space-x-3">
-									<p class="text-sm">
+									<p class="text-sm" v-if="done_tickets.length > 0">
 										Showing {{ completedPage * limit + 1 }} to
 										{{
 											done_tickets.length / (completedPage + 1) <= limit
@@ -314,16 +299,15 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-							<button
-								@click="handleShow(ticket)"
+							<div
 								v-if="done_tickets.length <= 0"
-								type="button"
-								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800"
 							>
-								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hmmm...nothing to see here</span
+								<span
+									class="my-2 block text-sm font-normal text-gray-900 dark:text-slate-400"
+									>No completed requests</span
 								>
-							</button>
+							</div>
 							<a
 								:href="`/tickets/${route.params.team}/${ticket.id}`"
 								v-for="ticket in done_tickets.slice(

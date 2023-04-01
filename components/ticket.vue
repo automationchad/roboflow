@@ -531,7 +531,7 @@
 																				{{ reply.User.lastName
 																				}}<span
 																					v-if="
-																						activityItem.User.systemRole ===
+																						reply.User.systemRole ===
 																						'super_admin'
 																					"
 																					class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs"
@@ -927,6 +927,8 @@
 		.eq('id', route.params.id)
 		.limit(1)
 		.single();
+
+	console.log(Ticket);
 
 	const input = ref(Ticket.desc);
 
