@@ -2,8 +2,10 @@
 	<div>
 		<main class="py-10">
 			<div class="">
-				<div class="bg-slate-900 p-6">
-					<div class="flex items-center border-b border-slate-700 pb-4">
+				<div class="p-6 dark:bg-slate-900">
+					<div
+						class="flex items-center border-b border-slate-300 pb-4 dark:border-slate-700"
+					>
 						<div class="flex-auto">
 							<h1
 								class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
@@ -14,7 +16,7 @@
 						<div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
 							<button
 								type="button"
-								class="flex items-center rounded-md bg-indigo-600 py-2 px-4 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-slate-800"
+								class="flex items-center rounded-md border border-slate-300 dark:border-transparent py-2 px-4 text-center text-sm font-normal shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-slate-800 dark:text-white"
 							>
 								<PlusCircleIcon class="mr-2 h-5 w-5" />
 								Add
@@ -36,10 +38,12 @@
 									/>
 								</div>
 								<div class="ml-4 flex-grow">
-									<div class="flex flex-col space-x-2 text-white">
+									<div class="flex flex-col space-x-2 dark:text-white">
 										{{ person.firstName }} {{ person.lastName }}
 										{{ person.id === user.id ? '(You)' : '' }}
-										<small class="text-slate-300">{{ person.email }}</small>
+										<small class="text-gray-700 dark:text-slate-300">{{
+											person.email
+										}}</small>
 									</div>
 								</div>
 								<div class="flex flex-grow-0 space-x-4 pl-8">
@@ -108,7 +112,7 @@
 										</div>
 									</Listbox>
 									<button
-										class="rounded-lg bg-slate-700 p-2 text-slate-400 disabled:cursor-not-allowed disabled:bg-slate-800"
+										class="rounded-lg bg-slate-200 p-2 text-slate-600 disabled:cursor-not-allowed dark:bg-slate-700 dark:text-slate-400 dark:disabled:bg-slate-800"
 										:disabled="true"
 									>
 										<TrashIcon class="h-5 w-5" />

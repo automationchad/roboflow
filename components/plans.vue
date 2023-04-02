@@ -54,10 +54,10 @@
 								<li
 									v-for="(plan, idx) in plans"
 									:key="plan.id"
-									class="col-span-1 flex min-h-[500px] flex-col rounded-lg border bg-white text-center dark:border-slate-700 dark:bg-slate-800"
+									class="col-span-1 flex min-h-[500px] flex-col border bg-white text-center dark:border-white/10 dark:bg-slate-800"
 								>
 									<div
-										class="group relative h-full overflow-hidden rounded-lg ring-2 ring-inset ring-black/20"
+										class="group relative h-full overflow-hidden ring-2 ring-inset ring-black/20"
 									>
 										<img
 											class="h-full w-full object-cover transition-opacity group-hover:opacity-95"
@@ -136,7 +136,7 @@
 															User.Account.subscription
 														)
 													"
-													class="w-full rounded-lg bg-indigo-500 px-8 py-1 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-400"
+													class="w-full rounded-lg bg-indigo-500 px-8 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-400"
 												>
 													{{
 														idx <
@@ -163,24 +163,26 @@
 					class="disabled:opacity-60"
 				>
 					<div class="mt-8">
-						<div class="space-y-6 dark:bg-slate-800">
-							<div class="flex justify-between border-b border-slate-200 py-6">
+						<div class="space-y-6">
+							<div
+								class="flex justify-between border-b border-slate-200 py-6 dark:border-slate-700"
+							>
 								<h2 class="font-semibold dark:text-white">Hosting</h2>
 							</div>
 							<div class="py-12 text-sm text-slate-400">
 								<!-- <div class="">No add on added</div> -->
 								<div
-									class="flex flex-col items-start gap-y-6 gap-x-8 bg-gray-50 p-8 ring-1 ring-gray-900/10 dark:ring-white/10 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
+									class="flex flex-col items-start gap-y-6 gap-x-8 border border-gray-900/10 bg-gray-50 p-8 dark:border-white/10 dark:bg-slate-800 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
 								>
 									<div class="lg:min-w-0 lg:flex-1">
 										<div class="mt-1 flex items-center">
 											<h3
-												class="text-lg font-semibold leading-8 tracking-tight text-indigo-600"
+												class="text-lg font-semibold leading-8 tracking-tight text-slate-600 dark:text-white"
 											>
 												Tray.io hosting
 											</h3>
 											<div
-												class="flex items-center rounded-lg py-1 text-sm text-lime-400 ml-3"
+												class="ml-3 flex items-center rounded-lg py-1 text-sm text-lime-600 dark:text-lime-400"
 												v-if="hosting"
 											>
 												<CheckCircleIcon class="mr-1 h-5 w-5" />
@@ -189,10 +191,10 @@
 										</div>
 
 										<p
-											class="mt-1 text-sm leading-7 text-gray-600 dark:text-gray-400"
+											class="mt-1 text-sm leading-7 text-gray-600 dark:text-slate-300"
 										>
 											Get full access to all of the standard Tray.io license
-											features for 70% of the cost.
+											features for 70% of the cost by joining us.
 										</p>
 									</div>
 
@@ -211,7 +213,7 @@
 														User.Account.stripeCustomerId
 												  )
 										"
-										class="inline-flex items-center rounded-lg bg-black py-2 px-3 text-sm font-medium text-white shadow"
+										class="inline-flex items-center rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm font-medium text-black shadow dark:bg-slate-100"
 									>
 										<SparklesIcon class="mr-1 h-5 w-5" />{{
 											hosting ? 'Manage License' : 'Upgrade License'
@@ -334,6 +336,7 @@
 			name: 'Free',
 			id: 'free',
 			desc: 'Experiment for free',
+			features: ['No requests'],
 			image: free,
 			priceMonthly: 0,
 			priceYearly: 0,

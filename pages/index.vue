@@ -195,9 +195,28 @@
 	definePageMeta({ middleware: ['auth'] });
 
 	onMounted(() => {
-		watchEffect(() => {
+		watchEffect(async () => {
 			if (user.value) {
-				navigateTo('/home');
+				let { data: User, error: userError } = await supabase
+					.from('User')
+					.select(
+						`*,
+		Account (
+	     id,
+		 Team (
+			id,
+			name
+		 ),
+		 Ticket (
+			count
+		 )
+	   )
+	 `
+					)
+					.eq('id', user.value.id)
+					.limit(1)
+					.single();
+				navigateTo(`/${User.Account.id}/dashboard`);
 			}
 		});
 	});
@@ -265,6 +284,4 @@
 		console.log('user', user);
 		console.log('error', error);
 	};
-
-	
 </script>

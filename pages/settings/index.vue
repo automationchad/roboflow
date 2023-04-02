@@ -100,8 +100,8 @@
 														</TabList>
 														<TabPanels>
 															<TabPanel><profile-settings /></TabPanel>
-															<TabPanel><profile-preferences /></TabPanel>
-															<TabPanel><profile-credentials /></TabPanel>
+															<!-- <TabPanel><profile-preferences /></TabPanel>
+															<TabPanel><profile-credentials /></TabPanel> -->
 														</TabPanels>
 
 														<!-- Description list with inline editing -->
@@ -202,16 +202,16 @@
 			href: `/${User.Account.id}/settings`,
 			current: true,
 		},
-		{
-			name: 'Preferences',
-			href: `/${User.Account.id}/settings/billing/billing-info`,
-			current: false,
-		},
-		{
-			name: 'Access Credentials',
-			href: `/${User.Account.id}/settings/billing/billing-info`,
-			current: false,
-		},
+		// {
+		// 	name: 'Preferences',
+		// 	href: `/${User.Account.id}/settings/billing/billing-info`,
+		// 	current: false,
+		// },
+		// {
+		// 	name: 'Access Credentials',
+		// 	href: `/${User.Account.id}/settings/billing/billing-info`,
+		// 	current: false,
+		// },
 	];
 
 	const sidebarOpen = ref(false);

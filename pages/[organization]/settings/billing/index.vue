@@ -69,7 +69,7 @@
 														<TabPanels>
 		
 															<TabPanel><plans /></TabPanel>
-															<TabPanel><billing-info /></TabPanel>
+															<!-- <TabPanel><billing-info /></TabPanel> -->
 															<TabPanel><invoices /></TabPanel>
 															<TabPanel><cost-management /></TabPanel>
 														</TabPanels>
@@ -163,11 +163,11 @@
 			href: `/${User.Account.id}/settings/billing`,
 			current: true,
 		},
-		{
-			name: 'Billing info',
-			href: `/${User.Account.id}/settings/billing/billing-info`,
-			current: false,
-		},
+		// {
+		// 	name: 'Billing info',
+		// 	href: `/${User.Account.id}/settings/billing/billing-info`,
+		// 	current: false,
+		// },
 		{
 			name: 'Invoices',
 			href: `/${User.Account.id}/settings/billing/invoices`,

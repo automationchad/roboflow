@@ -15,11 +15,29 @@
 						</div>
 						<div class="ml-4 mt-2 flex-shrink-0">
 							<button
+								:disabled="upgrade_needed"
+								data-tooltip-target="tooltip-default"
 								@click="showSubmitModal = true"
-								class="relative inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-4 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
 							>
-								<PlusCircleIcon class="h-5 w-5 mr-2" />
+								<PlusCircleIcon class="mr-2 h-5 w-5" />
 								Add
+								<div
+									v-if="upgrade_needed"
+									id="tooltip-default"
+									role="tooltip"
+									class="absolute bottom-0 left-1/2 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 dark:border-slate-800 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:bg-gray-900 dark:text-white"
+								>
+									<span class="text-left text-slate-900 dark:text-white">
+										Upgrade your organization’s plan to add more requests.
+									</span>
+
+									<a
+										:href="`/${User.Account.id}/settings/billing`"
+										class="mt-4 rounded-lg border border-slate-300 px-3 py-1 text-slate-900 dark:text-white dark:border-transparent dark:bg-slate-700"
+										>Upgrade plan</a
+									>
+								</div>
 							</button>
 						</div>
 					</div>
@@ -37,12 +55,9 @@
 							>
 								<div class="ml-4 mt-2">
 									<h3
-										class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200"
+										class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
 									>
-										<span
-											class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 font-medium text-yellow-800"
-											>🧱 Building</span
-										>
+										Building
 									</h3>
 								</div>
 							</div>
@@ -134,18 +149,14 @@
 								<div class="ml-4 mt-2 flex justify-between">
 									<div class="">
 										<h3
-											class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+											class="text-sm font-semibold leading-6 text-gray-900 dark:text-white"
 										>
-											<div
-												class="inline-flex items-center rounded-full bg-pink-100 px-2.5 py-0.5 font-medium text-pink-800"
-											>
-												{{ '😭 Backlog' }}
-											</div>
+											Backlog
 										</h3>
 									</div>
 								</div>
 								<div class="flex items-center space-x-3">
-									<p class="text-sm dark:text-gray-300">
+									<p class="text-xs dark:text-gray-300">
 										Showing {{ backLogPage * limit + 1 }} to
 										{{
 											backlog_tickets.length / (backLogPage + 1) <= limit
@@ -260,15 +271,12 @@
 								class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 							>
 								<div class="ml-4 mt-2">
-									<h3 class="text-base font-semibold leading-6 text-gray-900">
-										<span
-											class="inline-flex items-center rounded-full bg-lime-100 px-2.5 py-0.5 font-medium text-lime-800"
-											>{{ '✅ Done' }}</span
-										>
+									<h3 class="text-sm font-semibold leading-6 text-gray-900">
+										Done
 									</h3>
 								</div>
 								<div class="flex items-center space-x-3">
-									<p class="text-sm" v-if="done_tickets.length > 0">
+									<p class="text-xs" v-if="done_tickets.length > 0">
 										Showing {{ completedPage * limit + 1 }} to
 										{{
 											done_tickets.length / (completedPage + 1) <= limit
@@ -440,7 +448,8 @@
 	     id,
 		 Ticket (
 			*
-		 )
+		 ),
+		 Subscription(*)
 	   )
 	 `
 		)
@@ -451,10 +460,27 @@
 	const tickets = User.Account.Ticket.filter(
 		(o) => o.teamId == route.params.team
 	);
-	console.log(tickets);
+
+	console.log(User);
+
 	const active_tickets = tickets.filter((o) => o.status === 'active');
 	const backlog_tickets = tickets.filter((o) => o.status === 'backlog');
 	const done_tickets = tickets.filter((o) => o.status === 'done');
+
+	const entitlements = [
+		{ plan: 'free', count: 0 },
+		{ plan: 'support', count: 5 },
+		{ plan: 'growth', count: 25 },
+		{ plan: 'enterprise', count: 100 },
+	];
+
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+	const totalActive = User.Account.Ticket.filter(
+		(o) => o.status === 'active'
+	).length;
+	const entitlement = entitlements.find((v) => v.plan === retainer.tier);
+	const upgrade_needed =
+		totalActive >= entitlement.count || retainer.status !== 'active';
 </script>
 
 <script>

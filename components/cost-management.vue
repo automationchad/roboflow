@@ -6,82 +6,104 @@
 					<div class="">
 						<div class="flex w-full">
 							<div class="sc-gsnTZi w-1/3">
-								<p class="sc-kLLXSd text-base text-slate-200">PLAN</p>
-								<h3 class="my-8 text-2xl font-semibold text-white">
+								<p
+									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+								>
+									PLAN
+								</p>
+								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									${{ monthly_base }}.00
 								</h3>
 							</div>
 							<div class="sc-gsnTZi w-1/3">
-								<p class="sc-kLLXSd text-base text-slate-200">TASKS</p>
-								<h3 class="my-8 text-2xl font-semibold text-white">
-									${{ taskPrice(100000) }}.00
+								<p
+									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+								>
+									TASKS
+								</p>
+								<h3 class="my-8 text-2xl font-semibold dark:text-white">
+									${{ taskPrice(0) }}.00
 								</h3>
 							</div>
 
 							<div class="sc-gsnTZi w-1/3">
-								<p class="sc-kLLXSd text-base text-slate-200">TOTAL COST</p>
-								<h3 class="my-8 text-2xl font-semibold text-white">
+								<p
+									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+								>
+									TOTAL COST
+								</p>
+								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									${{ taskPrice(100000) + monthly_base }}.00
 								</h3>
 							</div>
 						</div>
-						<div class="sc-gsnTZi mb-4 text-white">Mar 27 - Apr 27 2023</div>
+						<div class="sc-gsnTZi mb-4 dark:text-white">
+							{{
+								format(new Date(), 'MMM d') +
+								' - ' +
+								format(addDays(new Date(), 30), 'MMM d yyyy')
+							}}
+						</div>
 					</div>
 				</div>
-				<div display="flex" class="sc-gsnTZi esrEWY">
-					<div class="sc-gsnTZi gwIZYl">
+				<div class="grid grid-cols-2 gap-8">
+					<div class="gwIZYl bg-gray-50 p-6">
 						<div class="sc-ckMVTt jUiJgh">
-							<div display="flex" class="sc-gsnTZi eMxiQG">
-								<h4 class="sc-fbPSWO bOtoTi">Run Minutes</h4>
+							<div class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3">
+								<h4 class="bOtoTi text-base font-semibold">Run Minutes</h4>
 								<div class="sc-TRNrF iPuFes"></div>
 							</div>
-							<hr
-								orientation="horizontal"
-								role="separator"
-								class="sc-lbOyJj hSZvBg"
-							/>
-							<div display="flex" class="sc-gsnTZi hsHyHg">
-								<div display="flex" class="sc-gsnTZi cnqWna">
-									<div class="sc-gsnTZi kJQFiu">
-										<div class="sc-gsnTZi kJQFiu">
-											<p class="sc-kLLXSd eZQsKN">0/240</p>
+
+							<div class="my-4 text-slate-600">
+								<div class="flex">
+									<div>
+										<div>
+											<p class="text-3xl font-semibold text-slate-800">
+												{{ current_usage.toLocaleString() }}/{{
+													task_entitlement.toLocaleString()
+												}}
+											</p>
 										</div>
-										<div class="sc-gsnTZi kJQFiu">
-											<p class="sc-kLLXSd iZhyin">Plan minutes used</p>
+										<div>
+											<p class="text-sm">Plan tasks used</p>
 										</div>
 									</div>
 								</div>
-								<div class="sc-gsnTZi lfbUMF">
-									<div class="sc-gsnTZi ctQzQb">
+								<div class="mt-2">
+									<div class="">
 										<div class="sc-hiMGwR dkaYIm">
-											<svg class="sc-bBXxYQ bNugWl"></svg>
+											<progress
+												id="file"
+												:value="(current_usage / task_entitlement) * 100"
+												max="100"
+											>
+												{{ (current_usage / task_entitlement) * 100 }}%
+											</progress>
 										</div>
 									</div>
-									<div display="flex" class="sc-gsnTZi fMimhH">
-										<p class="sc-kLLXSd dKpaiX">0 Self-hosted minutes</p>
+									<div class="flex">
+										<p class="text-sm">0 Self-hosted minutes</p>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="sc-gsnTZi hEMNGs">
+					<div class="hEMNGs bg-gray-50 p-6">
 						<div class="sc-ckMVTt jUiJgh">
-							<div display="flex" class="sc-gsnTZi eMxiQG">
-								<h4 class="sc-fbPSWO bOtoTi">Assistant user seats</h4>
-								<div class="sc-TRNrF iPuFes"></div>
+							<div
+								display="flex"
+								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3"
+							>
+								<h4 class="text-md bOtoTi font-semibold">
+									Assistant user seats
+								</h4>
 							</div>
-							<hr
-								orientation="horizontal"
-								role="separator"
-								class="sc-lbOyJj hSZvBg"
-							/>
-							<div class="sc-gsnTZi cPuxZH">
+
+							<div class="my-4 text-slate-600">
 								<p class="sc-kLLXSd dNFiIX">
 									Assistant seat pricing is not active yet.
 								</p>
-								<p class="sc-kLLXSd iZhyin">
-									Assistant use won't be charged for the time being.
-								</p>
+								<p>Assistant use won't be charged for the time being.</p>
 							</div>
 						</div>
 					</div>
@@ -90,6 +112,34 @@
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	progress[value] {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 100%;
+		height: 0.5rem;
+	}
+
+	progress[value]::-webkit-progress-bar {
+		background-color: hsl(221, 100%, 96%);
+		border-radius: 0.5rem;
+
+		overflow: hidden;
+	}
+
+	progress[value]::-webkit-progress-value {
+		background-image: -webkit-linear-gradient(
+				top,
+				rgba(255, 255, 255, 0.25),
+				rgba(0, 0, 0, 0.25)
+			),
+			-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+
+		border-radius: 0.5rem;
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+</style>
 
 <script setup>
 	import { ref } from 'vue';
@@ -127,11 +177,14 @@
 		XMarkIcon,
 	} from '@heroicons/vue/24/outline';
 
-	import { format } from 'date-fns';
+	import { format, addDays } from 'date-fns';
 
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
+
+	const task_entitlement = 100000;
+	const current_usage = 50000;
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
