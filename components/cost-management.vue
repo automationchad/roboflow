@@ -47,18 +47,24 @@
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-8">
-					<div class="gwIZYl bg-gray-50 p-6">
+					<div class="gwIZYl bg-gray-50 p-6 dark:bg-slate-800">
 						<div class="sc-ckMVTt jUiJgh">
-							<div class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3">
-								<h4 class="bOtoTi text-base font-semibold">Run Minutes</h4>
+							<div
+								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3 dark:border-slate-600"
+							>
+								<h4 class="bOtoTi text-base font-semibold dark:text-white">
+									Run Minutes
+								</h4>
 								<div class="sc-TRNrF iPuFes"></div>
 							</div>
 
-							<div class="my-4 text-slate-600">
+							<div class="my-4 text-slate-600 dark:text-slate-300">
 								<div class="flex">
 									<div>
 										<div>
-											<p class="text-3xl font-semibold text-slate-800">
+											<p
+												class="text-3xl font-semibold text-slate-800 dark:text-white"
+											>
 												{{ current_usage.toLocaleString() }}/{{
 													task_entitlement.toLocaleString()
 												}}
@@ -88,21 +94,19 @@
 							</div>
 						</div>
 					</div>
-					<div class="hEMNGs bg-gray-50 p-6">
+					<div class="bg-gray-50 p-6 dark:bg-slate-800">
 						<div class="sc-ckMVTt jUiJgh">
 							<div
 								display="flex"
-								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3"
+								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3 dark:border-slate-600"
 							>
-								<h4 class="text-md bOtoTi font-semibold">
+								<h4 class="text-md font-semibold dark:text-white">
 									Assistant user seats
 								</h4>
 							</div>
 
-							<div class="my-4 text-slate-600">
-								<p class="sc-kLLXSd dNFiIX">
-									Assistant seat pricing is not active yet.
-								</p>
+							<div class="my-4 text-sm text-slate-600 dark:text-slate-300">
+								<p class="">Assistant seat pricing is not active yet.</p>
 								<p>Assistant use won't be charged for the time being.</p>
 							</div>
 						</div>

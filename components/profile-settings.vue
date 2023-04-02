@@ -287,9 +287,9 @@ Zimbabwe`;
 
 <template>
 	<div class="">
-		<div role="tabpanel" class="sc-gsnTZi kJQFiu">
+		<div role="tabpanel" class="mt-4">
 			<div class="space-y-8">
-				<div class="" id="profile">
+				<div class="dark:text-white" id="profile">
 					<div class="">
 						<div class="mb-4 flex border-b border-slate-300 py-8">
 							<h4 class="font-semibold">Personal info</h4>
@@ -460,13 +460,14 @@ Zimbabwe`;
 				</div>
 				<div id="danger">
 					<div>
-						<div class="mb-4 flex border-b border-slate-300 py-8">
+						<div
+							class="mb-4 flex border-b border-slate-300 py-8 dark:text-white"
+						>
 							<h4 class="font-semibold">Danger zone</h4>
-							<div class="sc-TRNrF iPuFes"></div>
 						</div>
 
 						<div class="flex items-center justify-between">
-							<div class="flex flex-col">
+							<div class="flex flex-col dark:text-white">
 								Delete user account<small class="text-slate-600"
 									>Delete your private workspace and all workspaces where you
 									are the only member. This action cannot be reverted.</small
@@ -474,8 +475,8 @@ Zimbabwe`;
 							</div>
 
 							<div class="ml-2">
-								<button class="rounded-lg bg-red-100 p-1">
-									<TrashIcon class="h-5 w-5 text-red-600" />
+								<button class="rounded-lg bg-red-100 dark:bg-red-800 p-1">
+									<TrashIcon class="h-5 w-5 text-red-600 dark:text-red-200" />
 								</button>
 							</div>
 						</div>
@@ -507,3 +508,9 @@ Zimbabwe`;
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	small {
+		color: rgb(156, 171, 183);
+	}
+</style>

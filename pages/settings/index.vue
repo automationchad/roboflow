@@ -20,7 +20,7 @@
 													</h1>
 													<button
 														@click="signOut"
-														class="flex items-center rounded-lg border border-gray-200 px-4 py-1"
+														class="flex items-center rounded-lg border border-gray-200 dark:border-transparent dark:bg-slate-800 dark:text-white px-4 py-1"
 													>
 														<svg
 															class="mr-1 h-6 w-6"

@@ -1,32 +1,16 @@
 <template>
 	<div class="">
-		<div
-			class="mt-4 rounded-md bg-red-50 p-4"
-			v-if="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
-		>
-			<div class="flex">
-				<div class="flex-shrink-0">
-					<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
-				</div>
-				<div class="ml-3">
-					<h3 class="text-sm font-medium text-red-800">
-						You currently don't have access to change billing details
-					</h3>
-
-					<span class="mt-2 text-sm text-red-700">
-						Contact an owner to request these changes.
-					</span>
-				</div>
-			</div>
-		</div>
 		<div class="mt-4 space-y-6 lg:px-0">
 			<!-- Workflows -->
 			<div class="flex items-center justify-end">
-				<button class="rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white">
+				<a
+					:href="`/${User.Account.id}/tickets/${User.defaultTeamId}`"
+					class="rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white"
+				>
 					New Workflow
-				</button>
+				</a>
 			</div>
-			<div class="grid grid-cols-2 gap-8">
+			<div class="grid grid-cols-1 gap-8">
 				<section>
 					<div class="bg-white p-6 dark:bg-slate-800 sm:overflow-hidden">
 						<div class="-mx-6">
@@ -168,7 +152,7 @@
 						</div>
 					</div>
 				</section>
-				<section aria-labelledby="billing-history-heading">
+				<section aria-labelledby="billing-history-heading" v-if="false">
 					<div class="bg-white p-6 dark:bg-slate-800 sm:overflow-hidden">
 						<div class="">
 							<h2

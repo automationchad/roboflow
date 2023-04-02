@@ -5,7 +5,13 @@
 		<div class="lg:pl-72">
 			<main class="py-10">
 				<div class="px-4 sm:px-6 lg:px-8">
-					<workflow-list />
+					<workflow-list v-if="hosting && User.Account.trayWorkspaceId" />
+					<div
+						v-else
+						class="items-center text-center text-sm dark:text-slate-400"
+					>
+						You'll need to select a plan
+					</div>
 				</div>
 			</main>
 		</div>
@@ -65,6 +71,7 @@
 			`*,Account (
 	     id,
 		 billingEmail,
+		 trayWorkspaceId,
 		 stripeCustomerId,
 		 Subscription(*),
 		 Team (
@@ -76,6 +83,12 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	let hosting = {};
+	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+	if (!hosting) {
+		navigateTo(`/${User.Account.id}/dashboard`);
+	}
 
 	const userNavigation = [
 		{ name: 'Your profile', href: '/settings' },
