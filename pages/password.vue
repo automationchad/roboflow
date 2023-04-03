@@ -131,7 +131,7 @@
 		const { data, error } = await supabase.auth.resetPasswordForEmail(
 			email.value,
 			{
-				redirectTo: 'http://localhost:3000/password-reset',
+				redirectTo: 'https://app.motis.group/password-reset',
 			}
 		);
 		if (error) {
