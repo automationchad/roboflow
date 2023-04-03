@@ -31,7 +31,7 @@
 						<div id="chart" class="mt-8 h-full w-full">
 							<div
 								class="flex items-center py-24 text-sm font-normal text-slate-300"
-								v-if="state.data === []"
+								v-if="!state.data"
 							>
 								No workflows
 							</div>
@@ -182,8 +182,6 @@
 		data: null,
 		loading: true,
 	});
-
-	console.log(state);
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
