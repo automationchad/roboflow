@@ -15,7 +15,7 @@
 						</div>
 						<div class="ml-4 mt-2 flex-shrink-0">
 							<button
-								:disabled="upgrade_needed"
+								:disabled="upgrade_needed && User.systemRole !== 'super_admin'"
 								data-tooltip-target="tooltip-default"
 								@click="showSubmitModal = true"
 								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-4 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
@@ -23,10 +23,10 @@
 								<PlusCircleIcon class="mr-2 h-5 w-5" />
 								Add
 								<div
-									v-if="upgrade_needed"
+									v-if="upgrade_needed && User.systemRole !== 'super_admin'"
 									id="tooltip-default"
 									role="tooltip"
-									class="absolute bottom-0 left-1/2 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
+									class="absolute bottom-0 left-1/2 z-10 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
 								>
 									<span class="text-left text-slate-900 dark:text-white">
 										Upgrade your organization’s plan to add more requests.
@@ -59,6 +59,36 @@
 									>
 										Building
 									</h3>
+								</div>
+								<div class="flex items-center space-x-3">
+									<p class="text-xs" v-if="active_tickets.length > 0">
+										Showing {{ buildingPage * limit + 1 }} to
+										{{
+											active_tickets.length / (buildingPage + 1) <= limit
+												? active_tickets.length
+												: buildingPage * limit + limit
+										}}
+										of
+										{{ active_tickets.length }}
+									</p>
+									<div class="space-x-2">
+										<button
+											:disabled="buildingPage <= 0"
+											class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+											@click="buildingPage--"
+										>
+											Previous page
+										</button>
+										<button
+											:disabled="
+												active_tickets.length / (buildingPage + 1) <= limit
+											"
+											class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+											@click="buildingPage++"
+										>
+											Next page
+										</button>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -190,17 +220,15 @@
 							</div>
 						</div>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-							<button
-								@click="showSubmitModal = true"
+							<div
 								v-if="backlog_tickets.length <= 0"
-								type="button"
-								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
 								<span
-									class="my-2 block text-sm font-semibold text-gray-900 dark:text-slate-400"
+									class="my-2 block text-sm text-slate-900 dark:text-slate-400"
 									>No backlogged requests</span
 								>
-							</button>
+							</div>
 							<a
 								:href="`/${route.params.team}/tickets/${ticket.id}`"
 								v-for="ticket in backlog_tickets.slice(
@@ -216,7 +244,9 @@
 											<div
 												class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
 											>
-												<p class="truncate text-sm font-medium text-gray-900 dark:text-white">
+												<p
+													class="truncate text-sm font-medium text-gray-900 dark:text-white"
+												>
 													{{ ticket.name }}
 												</p>
 												<div
@@ -343,7 +373,9 @@
 											<div
 												class="col-span-2 flex items-center space-x-4 truncate"
 											>
-												<p class="truncate text-sm font-medium text-gray-900 dark:text-white">
+												<p
+													class="truncate text-sm font-medium text-gray-900 dark:text-white"
+												>
 													{{ ticket.name }}
 												</p>
 												<div
@@ -439,6 +471,7 @@
 	const showSubmitModal = ref(false);
 	const showTicketModal = ref(false);
 	const showOtpModal = ref(false);
+	const buildingPage = ref(0);
 	const backLogPage = ref(0);
 	const completedPage = ref(0);
 	const limit = 3;
@@ -446,7 +479,7 @@
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
-			`id,
+			`id,systemRole,
 		Account (
 	     id,
 		 trayWorkspaceId,
@@ -461,11 +494,12 @@
 		.limit(1)
 		.single();
 
-	const tickets = User.Account.Ticket.filter(
-		(o) => o.teamId == route.params.team
-	);
+	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
 
-	console.log(User);
+	const tickets =
+		User.systemRole === 'super_admin'
+			? Ticket.sort((a, b) => b['priority'] - a['priority'])
+			: User.Account.Ticket.filter((o) => o.teamId == route.params.team);
 
 	const active_tickets = tickets.filter((o) => o.status === 'active');
 	const backlog_tickets = tickets.filter((o) => o.status === 'backlog');

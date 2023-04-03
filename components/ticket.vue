@@ -17,10 +17,11 @@
 										<div class="col-span-7">
 											<footer class="mb-2 flex w-full items-center">
 												<div
-													class="mr-2 flex h-12 w-12 items-center border border-slate-700 justify-center rounded-full bg-slate-800"
+													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-800"
 												>
 													<div class="text-white">
-														{{ Ticket.User.firstName[0] }}{{ Ticket.User.lastName[0] }}
+														{{ Ticket.User.firstName[0]
+														}}{{ Ticket.User.lastName[0] }}
 													</div>
 												</div>
 												<div class="">
@@ -1005,7 +1006,7 @@
 			.from('Ticket')
 			.update({ status: ticket_status })
 			.eq('id', route.params.id);
-		navigateTo(`/tickets/${route.params.team}`);
+		navigateTo(`/${route.params.team}/tickets`);
 	};
 
 	const calculateDistance = (date) => {

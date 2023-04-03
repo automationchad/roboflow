@@ -36,15 +36,7 @@
                               `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
                             -->
 												</tr>
-												<tr
-													class="px-6"
-													v-if="
-														User.Account.Ticket.filter((obj) => {
-															const name = obj.name.toLowerCase();
-															return name.includes(search_term.toLowerCase());
-														}).length === 0
-													"
-												>
+												<tr class="px-6" v-if="tickets.length === 0">
 													<th
 														colspan="4"
 														class="py-24 text-sm font-normal text-slate-300"
@@ -57,18 +49,13 @@
 											<tbody
 												class="divide-y divide-slate-200 bg-slate-50 dark:bg-transparent"
 											>
-												<tr
-													v-for="ticket in User.Account.Ticket.filter((obj) => {
-														const name = obj.name.toLowerCase();
-														return name.includes(search_term.toLowerCase());
-													})"
-													:key="ticket.id"
-												>
+												<tr v-for="ticket in tickets" :key="ticket.id">
 													<td
 														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
 													>
 														<span
 															><a
+																class="hover:underline"
 																:href="`/${User.Account.id}/tickets/${ticket.id}`"
 																>{{ ticket.name }}</a
 															></span
@@ -90,15 +77,20 @@
 														class="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500 dark:text-slate-200"
 													>
 														<span
-															class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800"
+															v-if="ticket.type === 'bug'"
+															class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium capitalize text-purple-900 ring-1 ring-purple-300"
 														>
-															<svg
-																class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-																fill="currentColor"
-																viewBox="0 0 8 8"
-															>
-																<circle cx="4" cy="4" r="3" />
-															</svg>
+															<BugAntIcon
+																class="mr-1 h-4 w-4 text-purple-500"
+															/>
+
+															{{ ticket.type }}
+														</span>
+														<span
+															v-else
+															class="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium capitalize text-sky-900 ring-1 ring-sky-300"
+														>
+															<SparklesIcon class="mr-1 h-4 w-4 text-sky-500" />
 															{{ ticket.type }}
 														</span>
 													</td>
@@ -142,6 +134,7 @@
 	import {
 		Bars3Icon,
 		BellIcon,
+		BugAntIcon,
 		ExclamationTriangleIcon,
 		CogIcon,
 		CreditCardIcon,
@@ -173,6 +166,7 @@
 	};
 
 	const search_term = ref('');
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -194,4 +188,11 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
+
+	let tickets =
+		User.systemRole === 'super_admin'
+			? Ticket.sort((a, b) => b['priority'] - a['priority'])
+			: User.Account.Ticket;
 </script>

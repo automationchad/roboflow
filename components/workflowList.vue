@@ -2,19 +2,19 @@
 	<div class="">
 		<div class="space-y-6 lg:px-0">
 			<!-- Workflows -->
-			
+
 			<div class="grid grid-cols-1 gap-8">
 				<section>
 					<div class="p-6 dark:bg-slate-800 sm:overflow-hidden">
 						<div class="flex flex-col">
 							<div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 								<div class="inline-block min-w-full py-2 align-middle">
-									<div class="overflow-hidden">
-										<table
-											class="min-w-full divide-y divide-gray-200 dark:divide-slate-600"
-										>
-											<thead class="bg-gray-50 dark:bg-transparent">
-												<tr class="border-b border-slate-600">
+									<div class="max-h-[300px] overflow-y-auto">
+										<table class="min-w-full table-auto divide-y">
+											<thead
+												class="sticky top-0 border-b border-slate-600 bg-gray-50 dark:bg-transparent"
+											>
+												<tr class="">
 													<th
 														scope="col"
 														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
@@ -25,14 +25,14 @@
 														scope="col"
 														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
 													>
-														Updated
+														Desc
 													</th>
-													<th
+													<!-- <th
 														scope="col"
 														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
 													>
 														Tasks
-													</th>
+													</th> -->
 
 													<!--
                               `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
@@ -57,35 +57,22 @@
 											</thead>
 
 											<tbody
-												class="divide-y divide-gray-200 bg-white dark:bg-transparent"
+												class="divide-y divide-gray-200  dark:bg-transparent"
 											>
 												<tr
-													v-for="workflow in workflows
-														.slice(0, 3)
-														.filter((obj) => {
-															const name = obj.name.toLowerCase();
-															return name.includes(search_term.toLowerCase());
-														})"
+													v-for="workflow in workflows.filter((obj) => {
+														const name = obj.name.toLowerCase();
+														return name.includes(search_term.toLowerCase());
+													})"
 													:key="workflow.id"
 												>
 													<td
 														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="0 0 140 140"
-															class="mr-1 h-4 w-4 flex-none text-slate-400"
-														>
-															<g id="Artwork_2">
-																<path
-																	fill="currentColor"
-																	d="M97.57,.02c-21.35,.62-38.8,19.3-38.8,40.66v6.32h20v-6.76c0-10.45,7.91-19.48,18.34-20.19,12.7-.87,23.08,10.57,20.71,23.72-1.72,9.49-10.24,16.23-19.88,16.23H40.24c-18.2,0-36.34,14.54-39.56,32.46-4.57,25.41,14.53,47.54,38.71,47.54h7.38v-20h-7.04c-10.41,0-19.43-7.77-20.38-18.13-1.08-11.86,8.27-21.87,19.91-21.87h19.5v60h20v-60h19.32c21.37,0,40.04-17.45,40.66-38.8C139.42,18.16,120.61-.66,97.57,.02Z"
-																/>
-															</g>
-														</svg>
-														<span>{{ workflow.name }}</span>
+														
+														<span class="truncate text-ellipsis max-w-[200px]">{{ workflow.id }}</span>
 													</td>
-													<td
+													<!-- <td
 														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
 													>
 														{{
@@ -96,130 +83,11 @@
 															' at ' +
 															format(new Date(workflow.lastModified), 'hh:mm')
 														}}
-													</td>
+													</td> -->
 													<td
 														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
 													>
-														<span
-															class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800"
-														>
-															<svg
-																class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-																fill="currentColor"
-																viewBox="0 0 8 8"
-															>
-																<circle cx="4" cy="4" r="3" />
-															</svg>
-															{{ abbreviatedNumber(10000) }}
-														</span>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
-				<section aria-labelledby="billing-history-heading" v-if="false">
-					<div class="bg-white p-6 dark:bg-slate-800 sm:overflow-hidden">
-						<div class="">
-							<h2
-								id="billing-history-heading"
-								class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
-							>
-								Invoices
-							</h2>
-						</div>
-						<div class="mt-6 flex flex-col">
-							<div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-								<div class="inline-block min-w-full py-2 align-middle">
-									<div class="overflow-hidden">
-										<table
-											class="min-w-full divide-y divide-gray-200 dark:divide-slate-600"
-										>
-											<thead class="bg-gray-50 dark:bg-transparent">
-												<tr class="border-b border-slate-600">
-													<th
-														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
-													>
-														Workflow
-													</th>
-													<th
-														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
-													>
-														Updated
-													</th>
-													<th
-														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
-													>
-														Tasks
-													</th>
-
-													<!--
-                              `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
-                            -->
-												</tr>
-												<tr class="px-6" v-if="workflows.length === 0">
-													<th
-														colspan="4"
-														class="py-24 text-sm font-normal text-slate-300"
-													>
-														No workflows
-													</th>
-												</tr>
-											</thead>
-
-											<tbody
-												class="divide-y divide-gray-200 bg-white dark:bg-transparent"
-											>
-												<tr v-for="workflow in workflows" :key="workflow.id">
-													<td
-														class="whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
-													>
-														<span>{{ workflow.name }}</span>
-													</td>
-													<td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
-													>
-														{{
-															format(
-																new Date(workflow.lastModified),
-																'MMM dd, yyyy'
-															) +
-															' at ' +
-															format(new Date(workflow.lastModified), 'hh:mm')
-														}}
-													</td>
-													<td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
-													>
-														<span
-															class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800"
-														>
-															<svg
-																class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-																fill="currentColor"
-																viewBox="0 0 8 8"
-															>
-																<circle cx="4" cy="4" r="3" />
-															</svg>
-															{{ abbreviatedNumber(10000) }}
-														</span>
-													</td>
-													<td
-														class="whitespace-nowrap px-6 py-4 text-sm font-medium"
-													>
-														<a
-															:href="workflow.hosted_invoice_url"
-															target="_blank"
-															class="text-indigo-600 hover:text-indigo-900"
-															>Docs</a
-														>
+														{{ workflow.name }}
 													</td>
 												</tr>
 											</tbody>
@@ -316,11 +184,13 @@
 		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
 	);
 
-	const { data } = await $fetch(
+	const { elements: data } = await $fetch(
 		`/api/workflows/${User.Account.trayWorkspaceId}`
 	);
+
 	let workflows = [];
-	if (data.viewer) {
-		workflows = data?.viewer?.workspaceWorkflows?.edges?.map((o) => o.node);
+	if (data) {
+		workflows = data;
 	}
+	console.log(data);
 </script>

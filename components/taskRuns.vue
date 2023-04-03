@@ -3,8 +3,8 @@
 		<main class="">
 			<div class="">
 				<div class="px-6">
-					<div v-if="state.loading" class="flex items-center justify-center">
-						<div class="flex items-center py-24">
+					<div v-if="state.loading" class="flex items-center justify-center py-36">
+						<div class="flex items-center">
 							<svg
 								class="-ml-1 mr-3 h-5 w-5 animate-spin text-black"
 								xmlns="http://www.w3.org/2000/svg"
