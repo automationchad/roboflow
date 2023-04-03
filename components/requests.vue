@@ -15,7 +15,7 @@
 						</div>
 						<div class="ml-4 mt-2 flex-shrink-0">
 							<button
-								:disabled="upgrade_needed && User.systemRole !== 'super_admin'"
+								:disabled="upgrade_needed"
 								data-tooltip-target="tooltip-default"
 								@click="showSubmitModal = true"
 								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-4 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
@@ -23,7 +23,7 @@
 								<PlusCircleIcon class="mr-2 h-5 w-5" />
 								Add
 								<div
-									v-if="upgrade_needed && User.systemRole !== 'super_admin'"
+									v-if="upgrade_needed"
 									id="tooltip-default"
 									role="tooltip"
 									class="absolute bottom-0 left-1/2 z-10 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
@@ -518,7 +518,9 @@
 	).length;
 	const entitlement = entitlements.find((v) => v.plan === retainer.tier);
 	const upgrade_needed =
-		totalActive >= entitlement.count || retainer.status !== 'active';
+		totalActive >= entitlement.count &&
+		retainer.status === 'active' &&
+		User.systemRole !== 'super_admin';
 </script>
 
 <script>

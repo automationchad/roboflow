@@ -1,8 +1,11 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server';
 import { format } from 'date-fns';
 
-const tray_key =
-	'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
+const test = false;
+
+const tray_key = test
+	? 'bf2d37099d0b4d59bdf52ee88f05faef222946f102064753abc50be648775156'
+	: 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
 
 export default defineEventHandler(async (event) => {
 	const user = await serverSupabaseUser(event);
@@ -31,12 +34,12 @@ export default defineEventHandler(async (event) => {
 	var d = new Date(new Date().getFullYear(), 0, 1);
 
 	let filters = {};
-	if (User.systemRole === 'super_admin') {
-	} else {
-		filters = {
-			workspaces: [User.Account.trayWorkspaceId],
-		};
-	}
+	// if (User.systemRole === 'super_admin') {
+	// } else {
+	// 	filters = {
+	// 		workspaces: [User.Account.trayWorkspaceId],
+	// 	};
+	// }
 
 	const response = await $fetch(
 		'https://api.tray.io/insights/v1/executions/timeseries',

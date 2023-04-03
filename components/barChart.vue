@@ -35,7 +35,7 @@
 
 	export default {
 		name: 'BarChart',
-		props: ['data'],
+		props: ['data', 'period'],
 		components: { Line },
 		data() {
 			return {

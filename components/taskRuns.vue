@@ -3,7 +3,10 @@
 		<main class="">
 			<div class="">
 				<div class="px-6">
-					<div v-if="state.loading" class="flex items-center justify-center py-36">
+					<div
+						v-if="state.loading"
+						class="flex items-center justify-center py-36"
+					>
 						<div class="flex items-center">
 							<svg
 								class="-ml-1 mr-3 h-5 w-5 animate-spin text-black"
@@ -143,7 +146,9 @@
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
-	
+	const props = defineProps({
+		period: String,
+	});
 
 	const trayCost = (tasks) => {
 		if (tasks <= 1000000) return tasks * (2.04 / 1000);
@@ -209,8 +214,8 @@
 		state.loading = false;
 	});
 
-	const task_data = state.data;
-	const loading = state.loading;
+	const task_data = ref(state.data);
+	const loading = ref(state.loading);
 </script>
 
 <script>
@@ -250,22 +255,4 @@
 
 	// kpis = kpis.value.data.kpis;
 	// all_kpis = all_kpis.value.data.kpis;
-
-	export default {
-		methods: {
-			abbreviatedNumber(number) {
-				const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
-				const tier = (Math.log10(Math.abs(number)) / 3) | 0;
-				if (tier === 0) {
-					return number;
-				}
-				const suffix = SI_SYMBOL[tier];
-				const scale = 10 ** (tier * 3);
-				const scaled = number / scale;
-				const length = scaled.toFixed(1).toString();
-				const precision = length > 3 ? 0 : 1;
-				return scaled.toFixed(precision) + suffix;
-			},
-		},
-	};
 </script>

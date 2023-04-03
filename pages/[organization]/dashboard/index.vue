@@ -27,8 +27,24 @@
 					<div
 						class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
-						<div class="px-4 text-base font-semibold">Tasks</div>
+						<div class="flex items-center justify-between pr-8">
+							<div class="px-4 text-base font-semibold">Tasks</div>
+							<div>
+								<select
+									v-model="period"
+									id="location"
+									name="location"
+									class="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+								>
+									<option value="7">Last 7 days</option>
+									<option value="30">Last 30 days</option>
+									<option value="90">All time</option>
+								</select>
+							</div>
+						</div>
+
 						<task-runs
+							:period="period"
 							v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
 						/>
 						<div v-else class="py-24 text-center text-slate-700">
@@ -119,6 +135,8 @@
 	});
 
 	const user = useSupabaseUser();
+
+	const period = ref(30);
 
 	const supabase = useSupabaseClient();
 

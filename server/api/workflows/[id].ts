@@ -3,13 +3,16 @@ export default defineEventHandler(async (event) => {
 	var date = new Date(Date.now());
 	var firstDay = new Date(date.getFullYear(), 1, 1);
 	var d = new Date(new Date().getFullYear(), 0, 1);
-	const filters = true ? { workspaces: [event.context.params.id] } : {};
+	const test = false;
+	const tray_key = test
+		? 'bf2d37099d0b4d59bdf52ee88f05faef222946f102064753abc50be648775156'
+		: 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
+	const filters = test ? {} : { workspaces: [event.context.params.id] };
 	const data = await $fetch('https://api.tray.io/insights/v1/list/workflows', {
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization:
-				'Bearer ee71577b6e594df68ab917b6b307c5cffc3bc015f2a34406a3d07b2a5ab0918b',
+			Authorization: `Bearer ${tray_key}`,
 		},
 		body: {
 			startPeriod: firstDay,
