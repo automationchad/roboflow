@@ -27,12 +27,12 @@
 					"
 					class="disabled:opacity-60"
 				>
-					<div class="sm:overflow-hidden sm:rounded-md">
-						<div class="pb-6">
+					<div class="sm:overflow-hidden sm:rounded-md ">
+						<div class="pb-6 ">
 							<div>
 								<h2
 									id="payment-details-heading"
-									class="text-lg font-medium leading-6 text-gray-900"
+									class="text-lg font-medium leading-6 text-gray-900 dark:text-white "
 								>
 									Billing information
 								</h2>
@@ -42,7 +42,7 @@
 								<div class="col-span-4 sm:col-span-2">
 									<label
 										for="email-address"
-										class="block text-sm font-medium leading-6 text-gray-900"
+										class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
 										>Billing email</label
 									>
 									<input
@@ -53,7 +53,7 @@
 										autocomplete="email"
 										class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 sm:text-sm sm:leading-6"
 									/>
-									<p class="mt-2 text-xs text-slate-600">
+									<p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
 										The invoices will be sent to this email
 									</p>
 								</div>
@@ -130,21 +130,13 @@
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
-			`*,Account (
-	     id,
-		 billingEmail,
-		 stripeCustomerId,
-		 trayWorkspaceId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
+			`systemRole,Account(id,billingEmail,stripeCustomerId,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	console.log(User);
 
 	const customer = await $fetch(
 		`/api/stripe/customer/${User.Account.stripeCustomerId}`

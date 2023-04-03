@@ -13,7 +13,9 @@
 										<div class="relative mx-auto">
 											<div class="pt-10 pb-16">
 												<div class="px-4 sm:px-6 lg:px-0">
-													<p class="text-white text-xs">{{ User.Account.name }}</p>
+													<p class="text-xs text-white">
+														{{ User.Account.name }}
+													</p>
 													<h1
 														class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
 													>
@@ -67,7 +69,6 @@
 															</div>
 														</TabList>
 														<TabPanels>
-		
 															<TabPanel><plans /></TabPanel>
 															<TabPanel><billing-info /></TabPanel>
 															<TabPanel><invoices /></TabPanel>
@@ -132,25 +133,9 @@
 
 	const supabase = useSupabaseClient();
 
-
-
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,
-		Account (
-	     id,
-		 name,
-		 Team (
-			id,
-			name
-		 ),
-		 Ticket (
-			count
-		 )
-	   )
-	 `
-		)
+		.select('accountId,Account(name)')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
@@ -158,22 +143,22 @@
 	const tabs = [
 		{
 			name: 'Plans',
-			href: `/${User.Account.id}/settings/billing`,
+			href: `/${User.accountId}/settings/billing`,
 			current: true,
 		},
 		{
 			name: 'Billing info',
-			href: `/${User.Account.id}/settings/billing/billing-info`,
+			href: `/${User.accountId}/settings/billing/billing-info`,
 			current: false,
 		},
 		{
 			name: 'Invoices',
-			href: `/${User.Account.id}/settings/billing/invoices`,
+			href: `/${User.accountId}/settings/billing/invoices`,
 			current: false,
 		},
 		{
 			name: 'Cost management',
-			href: `/${User.Account.id}/settings/billing/cost-management`,
+			href: `/${User.accountId}/settings/billing/cost-management`,
 			current: false,
 		},
 	];

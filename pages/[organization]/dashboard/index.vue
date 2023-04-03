@@ -47,7 +47,10 @@
 							:period="period"
 							v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
 						/>
-						<div v-else class="py-24 text-center text-slate-700">
+						<div
+							v-else
+							class="py-24 text-center text-slate-700 dark:text-slate-300"
+						>
 							You'll need to
 							<a
 								:href="`/${User.Account.id}/settings/billing`"
@@ -62,7 +65,10 @@
 					>
 						<div class="px-4 text-base font-semibold">Tickets</div>
 						<task-list v-if="upgrade_needed" />
-						<div v-else class="py-24 text-center text-slate-700">
+						<div
+							v-else
+							class="py-24 text-center text-slate-700 dark:text-slate-300"
+						>
 							You'll need to
 							<a
 								:href="`/${User.Account.id}/settings/billing`"
@@ -79,7 +85,10 @@
 						<workflow-list
 							v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
 						/>
-						<div v-else class="py-24 text-center text-slate-700">
+						<div
+							v-else
+							class="py-24 text-center text-slate-700 dark:text-slate-300"
+						>
 							You'll need to
 							<a
 								:href="`/${User.Account.id}/settings/billing`"

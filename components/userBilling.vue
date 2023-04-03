@@ -495,20 +495,8 @@
 	const supabase = useSupabaseClient();
 
 	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 billingEmail,
-		 stripeCustomerId,
-		 trayWorkspaceId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
+		.from("User")
+		.select('*')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();

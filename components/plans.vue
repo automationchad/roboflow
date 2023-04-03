@@ -205,7 +205,7 @@
 														{ id: selectedPlan.id },
 														'retainer',
 														User.Account.stripeCustomerId,
-														User.Account.subscription
+														User.Account.Subscription
 												  )
 												: handleCheckout(
 														{},
@@ -276,23 +276,11 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 billingEmail,
-		 stripeCustomerId,
-		 trayWorkspaceId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
+		.select(`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-
+	console.log(User);
 	let retainer = {};
 	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
