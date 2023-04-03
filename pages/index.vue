@@ -1,7 +1,7 @@
 <template>
 	<div class="h-screen">
 		<div
-			class="flex flex-1 flex-col h-full justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+			class="flex h-full flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
 		>
 			<div class="mx-auto w-full max-w-sm lg:w-96" v-if="invitation">
 				<div>
@@ -254,7 +254,6 @@
 				</div>
 			</div>
 		</div>
-		
 	</div>
 </template>
 
@@ -318,7 +317,6 @@
 					.eq('id', user.value.id)
 					.limit(1)
 					.single();
-
 				navigateTo(`/${User.accountId}/dashboard`);
 			}
 		});
