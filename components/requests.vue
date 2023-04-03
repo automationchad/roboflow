@@ -449,6 +449,7 @@
 			`id,
 		Account (
 	     id,
+		 trayWorkspaceId,
 		 Ticket (
 			*
 		 ),

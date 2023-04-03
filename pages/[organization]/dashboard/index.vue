@@ -27,8 +27,10 @@
 					<div
 						class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
-						<div class="px-4 text-base font-semibold ">Tasks</div>
-						<task-runs v-if="!hosting_needed" />
+						<div class="px-4 text-base font-semibold">Tasks</div>
+						<task-runs
+							v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
+						/>
 						<div v-else class="py-24 text-center text-slate-700">
 							You'll need to
 							<a
@@ -58,7 +60,9 @@
 						class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
 						<div class="px-4 text-base font-semibold">Workflows</div>
-						<workflow-list v-if="!hosting_needed" />
+						<workflow-list
+							v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
+						/>
 						<div v-else class="py-24 text-center text-slate-700">
 							You'll need to
 							<a
@@ -118,10 +122,6 @@
 
 	const supabase = useSupabaseClient();
 
-	const signOut = async () => {
-		await supabase.auth.signOut();
-	};
-
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -141,12 +141,10 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
 	console.log(User);
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-	if (!hosting) {
-		navigateTo(`/${User.Account.id}/dashboard`);
-	}
 
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 

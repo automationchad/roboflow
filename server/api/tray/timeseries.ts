@@ -30,6 +30,14 @@ export default defineEventHandler(async (event) => {
 	var firstDay = new Date(date.getFullYear(), 1, 1);
 	var d = new Date(new Date().getFullYear(), 0, 1);
 
+	let filters = {};
+	if (User.systemRole === 'super_admin') {
+	} else {
+		filters = {
+			workspaces: [User.Account.trayWorkspaceId],
+		};
+	}
+
 	const response = await $fetch(
 		'https://api.tray.io/insights/v1/executions/timeseries',
 		{
@@ -40,9 +48,7 @@ export default defineEventHandler(async (event) => {
 			},
 			body: {
 				endPeriod: new Date(Date.now()),
-				filters: {
-					workspaces: [User.Account.trayWorkspaceId],
-				},
+				filters,
 				metric: 'TASK_RUNS',
 				startPeriod: firstDay,
 			},
