@@ -129,10 +129,6 @@
 
 	const supabase = useSupabaseClient();
 
-	const signOut = async () => {
-		await supabase.auth.signOut();
-	};
-
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(

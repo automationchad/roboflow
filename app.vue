@@ -1,22 +1,6 @@
-<script setup>
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
-	const { data: profile } = user.value
-		? await supabase
-				.from('profiles')
-				.select(
-					`username,first_name,last_name,phone_num,country_code,
-    			workspaces (
-      					id, tray_workspace_id, stripe_customer_id, billing_email, stripe_subscription_id, domain, active, type, all_access, templates)`
-				)
-				.eq('id', user.value.id)
-				.single()
-		: {};
-</script>
-
 <template>
 	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
-		<NuxtPage :profile="profile" />
+		<NuxtPage />
 		<LoginModal
 			v-show="showLoginModal"
 			@close-modal="showLoginModal = false"

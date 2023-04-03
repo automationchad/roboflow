@@ -185,15 +185,15 @@
 </template>
 
 <script setup>
+	definePageMeta({ middleware: ['auth'] });
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
+
 	const email = ref('');
 	const password = ref('');
 	const isSignUp = ref(false);
 	const is_error = ref(false);
 	const error_message = ref('');
-
-	definePageMeta({ middleware: ['auth'] });
 
 	const login = async () => {
 		const { user, error } = await supabase.auth.signInWithPassword({
@@ -215,24 +215,11 @@
 			if (user.value) {
 				let { data: User, error: userError } = await supabase
 					.from('User')
-					.select(
-						`*,
-		Account (
-	     id,
-		 Team (
-			id,
-			name
-		 ),
-		 Ticket (
-			count
-		 )
-	   )
-	 `
-					)
+					.select('accountId')
 					.eq('id', user.value.id)
 					.limit(1)
 					.single();
-				navigateTo(`/${User.Account.id}/dashboard`);
+				navigateTo(`/${User.accountId}/dashboard`);
 			}
 		});
 	});

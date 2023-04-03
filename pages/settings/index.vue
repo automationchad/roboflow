@@ -20,7 +20,7 @@
 													</h1>
 													<button
 														@click="signOut"
-														class="flex items-center rounded-lg border border-gray-200 dark:border-transparent dark:bg-slate-800 dark:text-white px-4 py-1"
+														class="flex items-center rounded-lg border border-gray-200 px-4 py-1 dark:border-transparent dark:bg-slate-800 dark:text-white"
 													>
 														<svg
 															class="mr-1 h-6 w-6"
@@ -158,6 +158,10 @@
 
 	definePageMeta({ middleware: ['auth'] });
 
+	const user = useSupabaseUser();
+
+	const supabase = useSupabaseClient();
+
 	onMounted(() => {
 		watchEffect(() => {
 			if (!user.value) {
@@ -166,14 +170,9 @@
 		});
 	});
 
-	const route = useRoute();
-
-	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
 	const signOut = async () => {
 		await supabase.auth.signOut();
+		console.log('Signed Out!');
 	};
 
 	let { data: User, error: userError } = await supabase
@@ -213,6 +212,4 @@
 		// 	current: false,
 		// },
 	];
-
-	const sidebarOpen = ref(false);
 </script>
