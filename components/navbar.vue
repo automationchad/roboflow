@@ -239,7 +239,7 @@
 									:key="team.name"
 								>
 									<a
-										:href="`/${User.Account.id}/tickets/${team.id}`"
+										:href="`/${team.id}/tickets`"
 										:class="[
 											route.params.team == team.id
 												? ' dark:text-white'

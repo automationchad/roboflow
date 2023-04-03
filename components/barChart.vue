@@ -1,5 +1,5 @@
 <template>
-	<Line id="my-chart-id" :options="chartOptions" :data="chartData" />
+	<Line id="my-chart-id" :options="chartOptions" :data="chartData" class="w-full" />
 </template>
 
 <script>
@@ -55,7 +55,7 @@
 							borderWidth: 2,
 							borderCapStyle: 'round',
 							label: '',
-							pointRadius: 3,
+							pointRadius: 0,
 							data: this.data.map((o) => o.value),
 						},
 					],
@@ -82,6 +82,9 @@
 									return index % 1 === 0 ? this.getLabelForValue(val) : '';
 								},
 							},
+						},
+						y: {
+							grid: { display: false },
 						},
 					},
 				},

@@ -26,7 +26,7 @@
 									v-if="upgrade_needed"
 									id="tooltip-default"
 									role="tooltip"
-									class="absolute bottom-0 left-1/2 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 dark:border-slate-800 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:bg-gray-900 dark:text-white"
+									class="absolute bottom-0 left-1/2 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
 								>
 									<span class="text-left text-slate-900 dark:text-white">
 										Upgrade your organization’s plan to add more requests.
@@ -34,7 +34,7 @@
 
 									<a
 										:href="`/${User.Account.id}/settings/billing`"
-										class="mt-4 rounded-lg border border-slate-300 px-3 py-1 text-slate-900 dark:text-white dark:border-transparent dark:bg-slate-700"
+										class="mt-4 rounded-lg border border-slate-300 px-3 py-1 text-slate-900 dark:border-transparent dark:bg-slate-700 dark:text-white"
 										>Upgrade plan</a
 									>
 								</div>
@@ -73,7 +73,7 @@
 								>
 							</div>
 							<a
-								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${route.params.team}/tickets/${ticket.id}`"
 								v-for="ticket in active_tickets"
 								:key="ticket.id"
 								class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:border-gray-600 dark:bg-slate-800 dark:hover:border-gray-500"
@@ -90,7 +90,9 @@
 										<span class="absolute inset-0" aria-hidden="true" />
 										<div class="flex justify-between dark:border-gray-700">
 											<div class="flex items-center space-x-4">
-												<p class="truncate text-sm font-medium text-gray-900">
+												<p
+													class="truncate text-sm font-medium text-gray-900 dark:text-white"
+												>
 													{{ ticket.name }}
 												</p>
 												<div
@@ -194,12 +196,13 @@
 								type="button"
 								class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
-								<span class="my-2 block text-sm font-semibold text-gray-900"
-									>Hmmm...nothing to see here</span
+								<span
+									class="my-2 block text-sm font-semibold text-gray-900 dark:text-slate-400"
+									>No backlogged requests</span
 								>
 							</button>
 							<a
-								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${route.params.team}/tickets/${ticket.id}`"
 								v-for="ticket in backlog_tickets.slice(
 									backLogPage * limit,
 									backLogPage * limit + limit
@@ -213,7 +216,7 @@
 											<div
 												class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
 											>
-												<p class="truncate text-sm font-medium text-gray-900">
+												<p class="truncate text-sm font-medium text-gray-900 dark:text-white">
 													{{ ticket.name }}
 												</p>
 												<div
@@ -318,7 +321,7 @@
 								>
 							</div>
 							<a
-								:href="`/${User.Account.id}/tickets/${route.params.team}/${ticket.id}`"
+								:href="`/${route.params.team}/tickets/${ticket.id}`"
 								v-for="ticket in done_tickets.slice(
 									completedPage * limit,
 									completedPage * limit + limit
@@ -340,7 +343,7 @@
 											<div
 												class="col-span-2 flex items-center space-x-4 truncate"
 											>
-												<p class="truncate text-sm font-medium text-gray-900">
+												<p class="truncate text-sm font-medium text-gray-900 dark:text-white">
 													{{ ticket.name }}
 												</p>
 												<div

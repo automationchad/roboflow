@@ -415,6 +415,19 @@ Zimbabwe`;
 							<li class="flex items-center justify-between">
 								<div>
 									<div class="flex flex-col">
+										<small class="">Job title</small
+										>{{ User.Account.jobTitle ?? 'null' }}
+									</div>
+								</div>
+								<div class="ml-2">
+									<button class="p-2">
+										<PencilIcon class="h-5 w-5" />
+									</button>
+								</div>
+							</li>
+							<li class="flex items-center justify-between">
+								<div>
+									<div class="flex flex-col">
 										<small>Email</small>{{ User.email }}
 									</div>
 								</div>
@@ -475,7 +488,7 @@ Zimbabwe`;
 							</div>
 
 							<div class="ml-2">
-								<button class="rounded-lg bg-red-100 dark:bg-red-800 p-1">
+								<button class="rounded-lg bg-red-100 p-1 dark:bg-red-800">
 									<TrashIcon class="h-5 w-5 text-red-600 dark:text-red-200" />
 								</button>
 							</div>

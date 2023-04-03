@@ -6,20 +6,22 @@
 					<div
 						class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 xl:grid xl:max-w-5xl xl:grid-cols-3"
 					>
-						<div class="xl:col-span-2 xl:border-r xl:border-gray-200 xl:pr-8">
+						<div
+							class="dark:border-slate-800 xl:col-span-2 xl:border-r xl:border-gray-200 xl:pr-8"
+						>
 							<div>
 								<div>
 									<div
-										class="grid grid-cols-7 justify-between md:space-x-4 xl:border-b xl:pb-6"
+										class="grid grid-cols-7 justify-between dark:border-slate-800 md:space-x-4 xl:border-b xl:pb-6"
 									>
 										<div class="col-span-7">
 											<footer class="mb-2 flex w-full items-center">
-												<div class="mr-1">
-													<img
-														class="mr-2 h-12 w-12 rounded-full"
-														src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-														alt="Michael Gough"
-													/>
+												<div
+													class="mr-2 flex h-12 w-12 items-center border border-slate-700 justify-center rounded-full bg-slate-800"
+												>
+													<div class="text-white">
+														{{ Ticket.User.firstName[0] }}{{ Ticket.User.lastName[0] }}
+													</div>
 												</div>
 												<div class="">
 													<div class="flex items-center">
@@ -41,13 +43,17 @@
 													>
 												</div>
 											</footer>
-											<h1 class="text-2xl font-bold text-gray-900">
+											<h1
+												class="text-2xl font-bold text-gray-900 dark:text-white"
+											>
 												{{ Ticket.name }}
 											</h1>
 											<p class="mt-2 text-sm text-gray-500">
-												#{{ Ticket.id }} opened by
+												Opened by
 												{{ ' ' }}
-												<a href="#" class="font-medium text-gray-900"
+												<a
+													href="#"
+													class="font-medium text-gray-900 dark:text-white"
 													>{{ Ticket.User.firstName }}
 													{{ Ticket.User.lastName }}</a
 												>
@@ -55,8 +61,8 @@
 												in
 												{{ ' ' }}
 												<a
-													:href="`/${User.Account.id}/tickets/${Ticket.Team.id}`"
-													class="font-medium text-gray-900"
+													:href="`/${route.params.team}/tickets`"
+													class="font-medium text-gray-900 dark:text-white"
 													>{{ Ticket.Team.name }}</a
 												>
 											</p>
@@ -106,7 +112,8 @@
 													class="h-5 w-5 text-gray-400"
 													aria-hidden="true"
 												/>
-												<span class="text-sm font-medium text-gray-900"
+												<span
+													class="text-sm font-medium text-gray-900 dark:text-white"
 													>{{ Ticket.Comment.length }} comments</span
 												>
 											</div>
@@ -115,7 +122,8 @@
 													class="h-5 w-5 text-gray-400"
 													aria-hidden="true"
 												/>
-												<span class="text-sm font-medium text-gray-900"
+												<span
+													class="text-sm font-medium text-gray-900 dark:text-white"
 													>Created on
 													<span>{{
 														format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
@@ -124,7 +132,7 @@
 											</div>
 										</div>
 										<div
-											class="mt-6 space-y-8 border-t border-b border-gray-200 py-6"
+											class="mt-6 space-y-8 border-t border-b border-gray-200 py-6 dark:border-slate-800"
 										>
 											<div>
 												<h2 class="text-sm font-medium text-gray-500">
@@ -140,7 +148,9 @@
 																	alt=""
 																/>
 															</div>
-															<div class="text-sm font-medium text-gray-900">
+															<div
+																class="text-sm font-medium text-gray-900 dark:text-white"
+															>
 																Eduardo Benz
 															</div>
 														</a>
@@ -204,7 +214,7 @@
 												<div class="min-w-0 flex-1">
 													<div class="relative">
 														<div
-															class="rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600"
+															class="rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
 														>
 															<label for="comment" class="sr-only"
 																>Edit description</label
@@ -214,7 +224,7 @@
 																@input="update"
 																name="comment"
 																id="comment"
-																class="h-content w-full max-w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:leading-6"
+																class="h-content w-full max-w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
 																placeholder="Add your comment..."
 															></textarea>
 
@@ -234,7 +244,7 @@
 																class="flex flex-shrink-0 items-center space-x-2"
 															>
 																<DisclosureButton
-																	class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+																	class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
 																>
 																	Cancel
 																</DisclosureButton>
@@ -251,13 +261,13 @@
 												</div>
 											</DisclosurePanel>
 											<div
-												class="prose my-4 max-w-none"
+												class="prose my-4 max-w-none dark:prose-invert"
 												v-html="convert(input)"
 											></div>
 											<div class="">
 												<DisclosureButton
 													v-if="!open && Ticket.createdBy === user.id"
-													class="flex items-center text-xs font-semibold text-gray-800"
+													class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 												>
 													<div
 														data-v-164b91a0=""
@@ -295,11 +305,11 @@
 							</div>
 							<section aria-labelledby="activity-title" class="mt-8 xl:mt-10">
 								<div>
-									<div class="divide-gray-200">
+									<div class="divide-gray-200 dark:divide-slate-800">
 										<div class="pb-4">
 											<h2
 												id="activity-title"
-												class="text-md font-medium text-gray-900"
+												class="text-md font-medium text-gray-900 dark:text-white"
 											>
 												{{ Ticket.Comment.length }} comment{{
 													Ticket.Comment.length > 1 ? 's' : ''
@@ -307,7 +317,7 @@
 											</h2>
 											<div class="mt-3">
 												<div
-													class="flex space-x-3 rounded-lg p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900"
+													class="flex space-x-3 rounded-lg p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:ring-slate-800"
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
@@ -332,7 +342,7 @@
 																	id="comment"
 																	name="comment"
 																	rows="3"
-																	class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-base sm:leading-6"
+																	class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-base sm:leading-6"
 																	placeholder="Leave a comment"
 																/>
 															</div>
@@ -358,13 +368,13 @@
 											<div class="flex" v-if="!loading">
 												<div
 													v-if="comments <= 0"
-													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
 												>
 													No comments yet
 												</div>
 
 												<section
-													class="w-full bg-white dark:bg-gray-900"
+													class="w-full bg-white dark:bg-transparent"
 													v-else
 												>
 													<div class="mx-auto">
@@ -373,7 +383,7 @@
 																activityItem, activityItemIdx
 															) in comments"
 															:key="activityItem.id"
-															class="mb-6 rounded-lg bg-white text-base dark:bg-gray-900"
+															class="mb-6 rounded-lg bg-white text-base dark:bg-transparent"
 														>
 															<footer
 																class="mb-2 flex items-center justify-between"

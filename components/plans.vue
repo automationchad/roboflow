@@ -169,7 +169,7 @@
 							>
 								<h2 class="font-semibold dark:text-white">Hosting</h2>
 							</div>
-							<div class="py-12 text-sm text-slate-400">
+							<div class="py-4 text-sm text-slate-400">
 								<!-- <div class="">No add on added</div> -->
 								<div
 									class="flex flex-col items-start gap-y-6 gap-x-8 border border-gray-900/10 bg-gray-50 p-8 dark:border-white/10 dark:bg-slate-800 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"

@@ -2,7 +2,14 @@
 	<div class="">
 		<div class="space-y-6 lg:px-0">
 			<!-- Workflows -->
-			
+			<!-- <div class="flex items-center justify-end">
+				<a
+					:href="`/${User.Account.id}/tickets/${User.defaultTeamId}`"
+					class="rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white"
+				>
+					New Workflow
+				</a>
+			</div> -->
 			<div class="grid grid-cols-1 gap-8">
 				<section>
 					<div class="p-6 dark:bg-slate-800 sm:overflow-hidden">
@@ -13,8 +20,8 @@
 										<table
 											class="min-w-full divide-y divide-gray-200 dark:divide-slate-600"
 										>
-											<thead class="bg-gray-50 dark:bg-transparent">
-												<tr class="border-b border-slate-600">
+											<thead class="bg-slate-50 dark:bg-transparent">
+												<tr class="border-b border-slate-400">
 													<th
 														scope="col"
 														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
@@ -31,7 +38,7 @@
 														scope="col"
 														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
 													>
-														Tasks
+														Type
 													</th>
 
 													<!--
@@ -51,54 +58,45 @@
 														colspan="4"
 														class="py-24 text-sm font-normal text-slate-300"
 													>
-														No workflows
+														No tickets
 													</th>
 												</tr>
 											</thead>
 
 											<tbody
-												class="divide-y divide-gray-200 bg-white dark:bg-transparent"
+												class="divide-y divide-slate-200 bg-slate-50 dark:bg-transparent"
 											>
 												<tr
-													v-for="workflow in workflows
-														.slice(0, 3)
-														.filter((obj) => {
-															const name = obj.name.toLowerCase();
-															return name.includes(search_term.toLowerCase());
-														})"
+													v-for="workflow in workflows.filter((obj) => {
+														const name = obj.name.toLowerCase();
+														return name.includes(search_term.toLowerCase());
+													})"
 													:key="workflow.id"
 												>
 													<td
 														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="0 0 140 140"
-															class="mr-1 h-4 w-4 flex-none text-slate-400"
+														<span
+															><a
+																:href="`/${User.Account.id}/tickets/${workflow.id}`"
+																>{{ workflow.name }}</a
+															></span
 														>
-															<g id="Artwork_2">
-																<path
-																	fill="currentColor"
-																	d="M97.57,.02c-21.35,.62-38.8,19.3-38.8,40.66v6.32h20v-6.76c0-10.45,7.91-19.48,18.34-20.19,12.7-.87,23.08,10.57,20.71,23.72-1.72,9.49-10.24,16.23-19.88,16.23H40.24c-18.2,0-36.34,14.54-39.56,32.46-4.57,25.41,14.53,47.54,38.71,47.54h7.38v-20h-7.04c-10.41,0-19.43-7.77-20.38-18.13-1.08-11.86,8.27-21.87,19.91-21.87h19.5v60h20v-60h19.32c21.37,0,40.04-17.45,40.66-38.8C139.42,18.16,120.61-.66,97.57,.02Z"
-																/>
-															</g>
-														</svg>
-														<span>{{ workflow.name }}</span>
 													</td>
 													<td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500 dark:text-slate-200"
 													>
 														{{
 															format(
-																new Date(workflow.lastModified),
+																new Date(workflow.updatedOn),
 																'MMM dd, yyyy'
 															) +
 															' at ' +
-															format(new Date(workflow.lastModified), 'hh:mm')
+															format(new Date(workflow.updatedOn), 'hh:mm')
 														}}
 													</td>
 													<td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500 dark:text-slate-200"
 													>
 														<span
 															class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800"
@@ -110,7 +108,7 @@
 															>
 																<circle cx="4" cy="4" r="3" />
 															</svg>
-															{{ abbreviatedNumber(10000) }}
+															{{ workflow.type }}
 														</span>
 													</td>
 												</tr>
@@ -296,6 +294,9 @@
 		.select(
 			`*,Account (
 		     id,
+			 Ticket (
+			*
+		 ),
 			 billingEmail,
 			 stripeCustomerId,
 			 trayWorkspaceId,
@@ -312,15 +313,11 @@
 
 	const search_term = ref('');
 
-	const { data: payments } = await $fetch(
-		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
-	);
-
 	const { data } = await $fetch(
 		`/api/workflows/${User.Account.trayWorkspaceId}`
 	);
 	let workflows = [];
 	if (data.viewer) {
-		workflows = data?.viewer?.workspaceWorkflows?.edges?.map((o) => o.node);
+		workflows = User.Account.Ticket;
 	}
 </script>
