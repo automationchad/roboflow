@@ -1,8 +1,17 @@
 import Stripe from 'stripe';
 const stripe = Stripe(process.env.STRIPE_KEY);
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server';
 
 export default defineEventHandler(async (event) => {
 	const body = await readBody(event);
+	const user = await serverSupabaseUser(event);
+	const supabase = await serverSupabaseClient(event);
+	const { data: User, error: userError } = await supabase
+		.from('User')
+		.select(`id,Account (id)`)
+		.eq('id', user.id)
+		.limit(1)
+		.single();
 	const tray_platform_base_stripe = 'prod_NacuwXzBInmgCK';
 	const tray_platform_usage_stripe = 'prod_NabhFNPo6uszbl';
 
@@ -10,7 +19,7 @@ export default defineEventHandler(async (event) => {
 	const test = false;
 	const base_url = test
 		? 'http://localhost:3000'
-		: 'https://app.motis.group/settings';
+		: `https://app.motis.group/${User.Account.id}/settings/billing`;
 
 	let subscription = false;
 	let promo = false;
@@ -65,7 +74,7 @@ export default defineEventHandler(async (event) => {
 			? await stripe.checkout.sessions.create(details)
 			: await stripe.billingPortal.sessions.create({
 					customer: body.customer,
-					
+
 					return_url: `${base_url}`,
 			  });
 
