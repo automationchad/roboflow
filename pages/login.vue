@@ -222,7 +222,6 @@
 	onMounted(async () => {
 		watchEffect(async () => {
 			if (user.value) {
-				loading.value = true;
 				let { data: User, error: userError } = await supabase
 					.from('User')
 					.select('accountId')
