@@ -41,10 +41,10 @@
 												</tr>
 											</thead>
 											<tbody v-if="state.loading">
-												<tr v-if="state.loading" class="px-6">
+												<tr class="px-6">
 													<th
 														colspan="4"
-														class="py-36 text-center text-sm font-normal text-slate-300"
+														class="py-36 text-center text-sm font-normal"
 													>
 														<div class="flex justify-center">
 															<svg
