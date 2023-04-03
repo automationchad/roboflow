@@ -218,7 +218,7 @@
 	} from '@headlessui/vue';
 	import { XMarkIcon } from '@heroicons/vue/20/solid';
 	import { CheckIcon } from '@heroicons/vue/24/outline';
-	const emit = defineEmits(['close-modal', 'show-otp-modal']);
+	const emit = defineEmits(['close-modal', 'ticket-submit']);
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 	const open = ref(true);
@@ -308,9 +308,9 @@
 		// 		})
 		// 		.catch((err) => console.error(err));
 		// }
+		emit('ticket-submit');
 		emit('close-modal');
-		emit('submit-reload');
-		location.reload();
+		
 	};
 </script>
 
