@@ -29,7 +29,13 @@
 					</div>
 					<div v-else class="">
 						<div id="chart" class="mt-8 h-full w-full">
-							<BarChart :data="state.data" />
+							<div
+								class="flex items-center py-24 text-sm font-normal text-slate-300"
+								v-if="state.data === []"
+							>
+								No workflows
+							</div>
+							<BarChart v-else :data="state.data" />
 						</div>
 						<!-- <div
 							class="mt-4 mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
