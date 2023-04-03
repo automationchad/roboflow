@@ -212,6 +212,7 @@
 			password: password.value,
 		});
 		if (error != null) {
+			loading.value = false;
 			is_error.value = true;
 			error_message.value = error;
 		}
