@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
 				return acc;
 			}, {})
 	).map((o) => {
-		return { date: format(new Date(o.date), 'MMM dd'), value: o.value };
+		return { date: format(new Date(o.date), 'dd MMM'), value: o.value };
 	});
 
 	return data;

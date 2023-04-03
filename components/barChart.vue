@@ -1,5 +1,10 @@
 <template>
-	<Line id="my-chart-id" :options="chartOptions" :data="chartData" class="w-full" />
+	<Line
+		id="my-chart-id"
+		:options="chartOptions"
+		:data="chartData"
+		class="w-full"
+	/>
 </template>
 
 <script>
@@ -67,6 +72,8 @@
 							labels: {
 								// This more specific font property overrides the global property
 								font: {
+									family:
+										"system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
 									size: 14,
 								},
 							},
@@ -76,15 +83,14 @@
 						x: {
 							grid: { display: false },
 							ticks: {
+								color: 'black',
+								maxTicksLimit: 5,
 								// For a category axis, the val is the index so the lookup via getLabelForValue is needed
-								callback: function (val, index) {
-									// Hide every 2nd tick label
-									return index % 1 === 0 ? this.getLabelForValue(val) : '';
-								},
 							},
 						},
 						y: {
 							grid: { display: false },
+							ticks: { color: 'black' },
 						},
 					},
 				},
