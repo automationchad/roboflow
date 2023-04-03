@@ -159,9 +159,6 @@
 				<nav class="flex flex-1 flex-col">
 					<ul role="list" class="flex flex-1 flex-col gap-y-7">
 						<a
-							:href="`/${User.Account.id}/tickets/${
-								moveOrgToFront(teams)[0].id
-							}`"
 							:class="[
 								'group -mx-6 flex items-center justify-between py-4 px-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
 							]"
