@@ -3,30 +3,66 @@
 		<main class="py-10">
 			<div class="">
 				<div class="p-6 dark:bg-slate-900">
-					<div
-						class="flex items-center border-b border-slate-300 pb-4 dark:border-slate-700"
-					>
-						<div class="flex-auto">
-							<h1
-								class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-							>
-								Members
-							</h1>
+					<Disclosure
+						as="div"
+						class="border-b border-slate-300 pb-4 dark:border-slate-700"
+						v-slot="{ open }"
+						><div class="flex items-center">
+							<div class="flex-auto">
+								<h1
+									class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+								>
+									Members
+								</h1>
+							</div>
+							<div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+								<DisclosureButton
+									v-if="!open"
+									type="button"
+									class="flex items-center rounded-md border border-slate-300 py-2 px-4 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
+								>
+									<PlusCircleIcon class="mr-2 h-5 w-5" /> Add
+								</DisclosureButton>
+								<DisclosureButton
+									v-else
+									class="flex items-center rounded-md border border-slate-300 py-2 px-2 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
+									><XMarkIcon class="h-5 w-5"
+								/></DisclosureButton>
+							</div>
 						</div>
-						<div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-							<button
-								type="button"
-								class="flex items-center rounded-md border border-slate-300 dark:border-transparent py-2 px-4 text-center text-sm font-normal shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-slate-800 dark:text-white"
-							>
-								<PlusCircleIcon class="mr-2 h-5 w-5" />
-								Add
-							</button>
-						</div>
-					</div>
+						<DisclosurePanel
+							class="flex flex-grow items-center justify-between pt-4 pb-2 text-sm text-gray-500"
+						>
+							<div class="w-full">
+								<label for="email" class="block text-sm leading-6 text-gray-900"
+									>Email</label
+								>
+								<div class="mt-2 flex justify-between">
+									<input
+										v-model="inviteeEmail"
+										type="email"
+										name="email"
+										id="email"
+										class="mr-2 block w-full rounded-md border-0 bg-gray-50 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										placeholder="you@example.com"
+									/>
+									<DisclosureButton
+										@click="sendInvitation()"
+										class="rounded-md bg-indigo-600 p-2 text-white"
+									>
+										<CheckIcon class="h-5 w-5" />
+									</DisclosureButton>
+								</div>
+							</div>
+						</DisclosurePanel>
+					</Disclosure>
+
 					<div class="mt-8">
 						<ul class="space-y-4">
 							<li
-								v-for="person in moveUserToFront(User.Account.User)"
+								v-for="person in moveUserToFront(
+									User.Account.User.concat(Invitation)
+								)"
 								:key="person.email"
 								class="flex items-center justify-between"
 							>
@@ -38,19 +74,27 @@
 									/>
 								</div>
 								<div class="ml-4 flex-grow">
-									<div class="flex flex-col space-x-2 dark:text-white">
+									<div
+										class="flex flex-col space-x-2 dark:text-white"
+										v-if="!person.token"
+									>
 										{{ person.firstName }} {{ person.lastName }}
-										{{ person.id === user.id ? '(You)' : '' }}
-										<small class="text-gray-700 dark:text-slate-300">{{
+										{{ person.id === user.id ? '(You)' : ''
+										}}<small class="text-gray-700 dark:text-slate-300">{{
 											person.email
 										}}</small>
 									</div>
+									<div class="" v-else>{{ person.email }}</div>
 								</div>
 								<div class="flex flex-grow-0 space-x-4 pl-8">
-									<Listbox as="div" disabled class="w-[160px]">
+									<Listbox
+										as="div"
+										:disabled="person.id === user.id"
+										class="w-[160px]"
+									>
 										<div class="relative">
 											<ListboxButton
-												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 sm:text-sm sm:leading-6"
+												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 sm:text-sm sm:leading-6"
 											>
 												<span class="block truncate capitalize">{{
 													person.systemRole
@@ -77,7 +121,6 @@
 														as="template"
 														v-for="role in roles"
 														:key="role.id"
-														:value="role"
 														v-slot="{ active, selected }"
 													>
 														<li
@@ -90,14 +133,16 @@
 														>
 															<span
 																:class="[
-																	selected ? 'font-semibold' : 'font-normal',
+																	person.systemRole === role.id
+																		? 'font-semibold'
+																		: 'font-normal',
 																	'block truncate',
 																]"
-																>{{ person.name }}</span
+																>{{ role.name }}</span
 															>
 
 															<span
-																v-if="selected"
+																v-if="person.systemRole === role.id"
 																:class="[
 																	active ? 'text-white' : 'text-indigo-600',
 																	'absolute inset-y-0 right-0 flex items-center pr-4',
@@ -112,8 +157,8 @@
 										</div>
 									</Listbox>
 									<button
-										class="rounded-lg bg-slate-200 p-2 text-slate-600 disabled:cursor-not-allowed dark:bg-slate-700 dark:text-slate-400 dark:disabled:bg-slate-800"
-										:disabled="true"
+										class="rounded-lg p-2 text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-600 dark:bg-slate-700 dark:text-slate-400 dark:disabled:bg-slate-800"
+										:disabled="person.id === user.id"
 									>
 										<TrashIcon class="h-5 w-5" />
 									</button>
@@ -136,6 +181,9 @@
 		MenuButton,
 		MenuItem,
 		MenuItems,
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
 		TransitionChild,
 		TransitionRoot,
 		Listbox,
@@ -149,6 +197,7 @@
 		BellIcon,
 		CalendarIcon,
 		PlusCircleIcon,
+		CheckIcon,
 		ChartPieIcon,
 		Cog6ToothIcon,
 		DocumentDuplicateIcon,
@@ -183,6 +232,11 @@
 		.limit(1)
 		.single();
 
+	let { data: Invitation, error } = await supabase
+		.from('Invitation')
+		.select('*')
+		.eq('account', User.Account.id);
+
 	function moveUserToFront(arr) {
 		const orgIndex = arr.findIndex((obj) => obj.id === user.value.id);
 		if (orgIndex > -1) {
@@ -192,18 +246,26 @@
 		return arr;
 	}
 
-	// const { data: images } = await client.storage
-	// 	.from('images')
-	// 	.list(`blueprints/${event.context.params.id}`, {
-	// 		limit: 100,
-	// 		offset: 0,
-	// 		sortBy: { column: 'name', order: 'asc' },
-	// 	});
-	const roles = [
-		{ id: 1, name: 'Owner' },
-		{ id: 2, name: 'Arlene Mccoy' },
-	];
+	const inviteeEmail = ref('');
 
-	const selected = ref(roles[0]);
-	console.log(User);
+	const sendInvitation = async () => {
+		const { data: invitation, error } = await supabase
+			.from('Invitation')
+			.insert([{ email: inviteeEmail.value, account: User.accountId }])
+			.select('*');
+		if (error) {
+			alert(error);
+			console.error(error);
+			return;
+		}
+		const invitationLink = `https://example.com/signup?token=${invitation.token}`;
+		const emailBody = `You've been invited to join our Supabase account! Click this link to sign up: ${invitationLink}`;
+		// Send email using your preferred email service or library
+	};
+
+	const roles = [
+		{ id: 'owner', name: 'Owner' },
+		{ id: 'admin', name: 'Administrator' },
+		{ id: 'member', name: 'Member' },
+	];
 </script>

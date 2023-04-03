@@ -28,17 +28,6 @@
 														Desc
 													</th>
 												</tr>
-												<tr
-													class="px-6"
-													v-if="!state.loading && state.data.length === 0"
-												>
-													<th
-														colspan="4"
-														class="py-24 text-sm font-normal text-slate-300"
-													>
-														No workflows
-													</th>
-												</tr>
 											</thead>
 											<tbody v-if="state.loading">
 												<tr class="px-6">
@@ -76,6 +65,17 @@
 												v-else
 												class="divide-y divide-gray-200 dark:bg-transparent"
 											>
+												<tr
+													class="px-6"
+													v-if="!state.loading && state.data.length === 0"
+												>
+													<th
+														colspan="4"
+														class="py-24 text-sm font-normal text-slate-300"
+													>
+														No workflows
+													</th>
+												</tr>
 												<tr v-for="workflow in state.data" :key="workflow.id">
 													<td
 														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
@@ -179,19 +179,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,Account (
-		     id,
-			 billingEmail,
-			 stripeCustomerId,
-			 trayWorkspaceId,
-			 Subscription(*),
-			 Team (
-				id,
-				name
-			 )
-		   )`
-		)
+		.select('Account(trayWorkspaceId)')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();

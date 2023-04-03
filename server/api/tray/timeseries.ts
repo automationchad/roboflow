@@ -34,12 +34,12 @@ export default defineEventHandler(async (event) => {
 	var d = new Date(new Date().getFullYear(), 0, 1);
 
 	let filters = {};
-	// if (User.systemRole === 'super_admin') {
-	// } else {
-	// 	filters = {
-	// 		workspaces: [User.Account.trayWorkspaceId],
-	// 	};
-	// }
+	if (User.systemRole === 'super_admin') {
+	} else {
+		filters = {
+			workspaces: [User.Account.trayWorkspaceId],
+		};
+	}
 
 	const response = await $fetch(
 		'https://api.tray.io/insights/v1/executions/timeseries',
