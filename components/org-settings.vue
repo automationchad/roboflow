@@ -391,7 +391,6 @@
 		.select(
 			`*,Account (
 	     id,
-		 billingEmail,
 		 stripeCustomerId,
 		 trayWorkspaceId,
 		 Subscription(*),

@@ -169,7 +169,6 @@
 		.select(
 			`*,Account (
 	     id,
-		 billingEmail,
 		 trayWorkspaceId,
 		 stripeCustomerId,
 		 Subscription(*),

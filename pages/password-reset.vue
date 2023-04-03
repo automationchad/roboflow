@@ -19,24 +19,25 @@
 					>
 						Change Password
 					</h2>
-					<form class="mt-4 space-y-4 md:space-y-5 lg:mt-5" action="#">
-						<div>
-							<label
-								for="email"
-								class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-								>Your email</label
-							>
-							<input
-								disabled
-								type="email"
-								name="email"
-								:value="User.email"
-								id="email"
-								class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-indigo-600 focus:ring-indigo-600 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm"
-								placeholder="name@company.com"
-								required=""
-							/>
+					<div
+						class="rounded-md bg-red-50 p-4"
+						v-if="passwordError || is_error"
+					>
+						<div class="flex">
+							<div class="flex-shrink-0">
+								<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+							</div>
+							<div class="ml-3">
+								<h3 class="text-sm font-medium text-red-800">
+									{{ error_message || 'Passwords do not match!' }}
+								</h3>
+							</div>
 						</div>
+					</div>
+					<form
+						class="mt-4 space-y-4 md:space-y-5 lg:mt-5"
+						@submit.prevent="passwordReset()"
+					>
 						<div>
 							<label
 								for="password"
@@ -44,12 +45,13 @@
 								>New Password</label
 							>
 							<input
+								v-model="password1"
 								type="password"
 								name="password"
 								id="password"
 								placeholder="••••••••"
 								class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-indigo-600 focus:ring-indigo-600 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm"
-								required=""
+								required
 							/>
 						</div>
 						<div>
@@ -59,7 +61,8 @@
 								>Confirm password</label
 							>
 							<input
-								type="confirm-password"
+								v-model="password2"
+								type="password"
 								name="confirm-password"
 								id="confirm-password"
 								placeholder="••••••••"
@@ -67,34 +70,13 @@
 								required=""
 							/>
 						</div>
-						<div class="flex items-start">
-							<div class="flex h-5 items-center">
-								<input
-									id="newsletter"
-									aria-describedby="newsletter"
-									type="checkbox"
-									class="focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-indigo-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-indigo-600"
-									required=""
-								/>
-							</div>
-							<div class="ml-3 text-sm">
-								<label
-									for="newsletter"
-									class="font-light text-gray-500 dark:text-gray-300"
-									>I accept the
-									<a
-										class="font-medium text-indigo-600 hover:underline dark:text-indigo-500"
-										href="#"
-										>Terms and Conditions</a
-									></label
-								>
-							</div>
-						</div>
+
 						<button
+							:disabled="formInvalid"
 							type="submit"
 							class="w-full rounded-lg bg-indigo-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
 						>
-							Reset passwod
+							{{ loading ? 'Loading' : 'Reset password' }}
 						</button>
 					</form>
 				</div>
@@ -104,24 +86,47 @@
 </template>
 
 <script setup>
+	import { XCircleIcon } from '@heroicons/vue/20/solid';
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
+	const password1 = ref('');
+	const password2 = ref('');
+	const loading = ref(false);
+	const is_error = ref(false);
+	const error_message = ref('');
+	const is_success = ref(false);
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 name,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	const passwordError = computed(() => {
+		if (password2.value === '') return false;
+		else return password1.value !== password2.value;
+	});
+
+	const formInvalid = computed(() => {
+		return passwordError.value;
+	});
+
+	const passwordReset = async () => {
+		loading.value = true;
+		const { data, error } = await supabase.auth.updateUser({
+			password: password.value,
+		});
+		if (error) {
+			is_error.value = true;
+			error_message.value = error;
+			console.log(error);
+			is_success.value = false;
+			navigateTo('/password');
+		} else {
+			let { data: User, error: userError } = await supabase
+				.from('User')
+				.select('accountId')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
+			navigateTo(`/${User.accountId}/dashboard`);
+		}
+	};
+
+	// https://nsfipxnlucvgchlkqvqw.supabase.co/auth/v1/verify?token=212aafbc2290f39dccb8cd2741c4f0f797dd09547d71d3a99d80a866&type=recovery&redirect_to=http://localhost:3000/password-reset
 </script>

@@ -1,17 +1,9 @@
 <template>
-	<!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
-	<div class="flex h-screen">
+	<div class="h-screen">
 		<div
-			class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+			class="grid h-full grid-cols-1 items-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24"
 		>
-			<div class="mx-auto w-full max-w-sm lg:w-96">
+			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96">
 				<div>
 					<img
 						class="h-12 w-auto"
@@ -34,19 +26,26 @@
 					</p>
 				</div>
 
-				<div class="rounded-md bg-red-50 p-4" v-if="is_error">
+				<div class="mt-2 rounded-md bg-red-50 p-4" v-if="is_error">
 					<div class="flex">
 						<div class="flex-shrink-0">
 							<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
 						</div>
 						<div class="ml-3">
-							<h3 class="text-sm font-medium text-red-800">
-								There was an error
-							</h3>
-							<div class="mt-2 text-sm text-red-700">
-								<ul role="list" class="list-disc space-y-1 pl-5">
-									<li>{{ error_message }}</li>
-								</ul>
+							<div class="text-sm text-red-700">
+								{{ error_message }}
+							</div>
+						</div>
+						<div class="ml-auto pl-3">
+							<div class="-mx-1.5 -my-1.5">
+								<button
+									@click="is_error = false"
+									type="button"
+									class="inline-flex rounded-md bg-rose-50 p-1.5 text-rose-500 hover:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-600 focus:ring-offset-2 focus:ring-offset-rose-50"
+								>
+									<span class="sr-only">Dismiss</span>
+									<XMarkIcon class="h-5 w-5" aria-hidden="true" />
+								</button>
 							</div>
 						</div>
 					</div>
@@ -163,11 +162,12 @@
 
 							<div class="sm:col-span-2">
 								<button
+									:disabled="loading"
 									@keyup.enter="login()"
 									@click="login()"
 									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
-									{{ 'Log in' }}
+									{{ loading ? 'Loading' : 'Log in' }}
 								</button>
 							</div>
 						</div>
@@ -175,28 +175,35 @@
 				</div>
 			</div>
 		</div>
-		<div class="relative hidden w-0 flex-1 lg:block">
-			<img
-				class="absolute inset-0 h-full w-full object-cover"
-				src="https://images.unsplash.com/photo-1505904267569-f02eaeb45a4c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
-				alt=""
-			/>
-		</div>
 	</div>
 </template>
 
 <script setup>
 	definePageMeta({ middleware: ['auth'] });
+
+	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
+
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
+	if (user.value) {
+		let { data: User, error: userError } = await supabase
+			.from('User')
+			.select('accountId')
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+		navigateTo(`/${User.accountId}/dashboard`);
+	}
+
 	const email = ref('');
 	const password = ref('');
-	const isSignUp = ref(false);
 	const is_error = ref(false);
+	const loading = ref(false);
 	const error_message = ref('');
 
 	const login = async () => {
+		loading.value = true;
 		const { user, error } = await supabase.auth.signInWithPassword({
 			email: email.value,
 			password: password.value,
@@ -205,15 +212,14 @@
 			is_error.value = true;
 			error_message.value = error;
 		}
-		email.value = '';
-		password.value = '';
 		console.log('user', user);
 		console.log('error', error);
 	};
 
-	onMounted(() => {
+	onMounted(async () => {
 		watchEffect(async () => {
 			if (user.value) {
+				loading.value = true;
 				let { data: User, error: userError } = await supabase
 					.from('User')
 					.select('accountId')

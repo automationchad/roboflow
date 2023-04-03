@@ -48,7 +48,9 @@
 					</div>
 					<div class="" v-else>
 						<div class="" v-if="tickets.length === 0">
-							<p class="my-12 text-sm text-gray-500 dark:text-slate-300">
+							<p
+								class="my-12 text-center text-sm text-gray-500 dark:text-slate-300"
+							>
 								No requests.
 							</p>
 						</div>
@@ -511,9 +513,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			'id,systemRole,Account(id,trayWorkspaceId,Ticket(*),Subscription(*))'
-		)
+		.select('*,Account(id,trayWorkspaceId,Ticket(*),Subscription(*))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();

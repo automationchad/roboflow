@@ -45,7 +45,7 @@
 	<div class="relative isolate h-full bg-gray-900">
 		<Navbar
 			class=""
-			@open-modal="showLoginModal = true"
+			
 			:user="user"
 			:profile="profile"
 		/>

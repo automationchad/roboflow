@@ -27,12 +27,12 @@
 					"
 					class="disabled:opacity-60"
 				>
-					<div class="sm:overflow-hidden sm:rounded-md ">
-						<div class="pb-6 ">
+					<div class="sm:overflow-hidden sm:rounded-md">
+						<div class="pb-6">
 							<div>
 								<h2
 									id="payment-details-heading"
-									class="text-lg font-medium leading-6 text-gray-900 dark:text-white "
+									class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
 								>
 									Billing information
 								</h2>

@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
 		.select(
 			`*,Account (
 	     id,
-		 billingEmail,
 		 trayWorkspaceId,
 		 stripeCustomerId,
 		 Subscription(*),

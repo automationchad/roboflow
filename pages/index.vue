@@ -1,7 +1,7 @@
 <template>
-	<div class="flex h-screen">
+	<div class="h-screen">
 		<div
-			class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+			class="flex flex-1 flex-col h-full justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
 		>
 			<div class="mx-auto w-full max-w-sm lg:w-96" v-if="invitation">
 				<div>
@@ -110,6 +110,45 @@
 				</div>
 
 				<div class="mt-8">
+					<div class="rounded-md bg-green-50 p-4" v-if="is_success">
+						<div class="flex">
+							<div class="flex-shrink-0">
+								<CheckCircleIcon
+									class="h-5 w-5 text-green-400"
+									aria-hidden="true"
+								/>
+							</div>
+							<div class="ml-3">
+								<p class="text-sm text-green-600">
+									Success, check your email for verification link!
+								</p>
+							</div>
+							<div class="ml-auto pl-3">
+								<div class="-mx-1.5 -my-1.5">
+									<button
+										@click="is_success = false"
+										type="button"
+										class="inline-flex rounded-md bg-green-50 p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50"
+									>
+										<span class="sr-only">Dismiss</span>
+										<XMarkIcon class="h-5 w-5" aria-hidden="true" />
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="rounded-md bg-red-50 p-4" v-if="is_error">
+						<div class="flex">
+							<div class="flex-shrink-0">
+								<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+							</div>
+							<div class="ml-3">
+								<h3 class="text-sm font-medium text-red-800">
+									{{ error_message }}
+								</h3>
+							</div>
+						</div>
+					</div>
 					<div class="mt-6">
 						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
 							<div>
@@ -215,40 +254,47 @@
 				</div>
 			</div>
 		</div>
-		<div class="relative hidden w-0 flex-1 lg:block">
-			<img
-				class="absolute inset-0 h-full w-full object-cover"
-				src="https://images.unsplash.com/photo-1505904267569-f02eaeb45a4c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
-				alt=""
-			/>
-		</div>
+		
 	</div>
 </template>
 
 <script setup>
 	definePageMeta({ middleware: ['auth'] });
+
+	import {
+		CheckCircleIcon,
+		XMarkIcon,
+		XCircleIcon,
+	} from '@heroicons/vue/20/solid';
 	const route = useRoute();
-	console.log(route.query);
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
+
+	if (user.value) {
+		let { data: User, error: userError } = await supabase
+			.from('User')
+			.select('accountId')
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+		navigateTo(`/${User.accountId}/dashboard`);
+	}
+
 	const invitation = ref(null);
 	const email = ref('');
-	const password = ref('swimming123');
+	const password = ref('');
 	const company_name = ref('');
-	const first_name = ref('Juliet');
-	const last_name = ref('Smith');
+	const first_name = ref('');
+	const last_name = ref('');
 
-	const isSignUp = ref(true);
-	const error = ref(false);
+	const is_error = ref(false);
+	const is_success = ref(false);
 	const error_message = ref('');
 	const loading = ref(false);
 
-	onMounted(async () => {
-		const token = route.query.token;
-		if (!token) {
-			return;
-		}
+	const token = route.query.token;
+	if (token) {
 		const { data, error } = await supabase
 			.from('Invitation')
 			.select('*')
@@ -256,14 +302,12 @@
 			.single();
 		if (error) {
 			console.error(error);
-			return;
+		} else if (!data || data.status !== 'pending') {
+			navigateTo('/');
+		} else {
+			invitation.value = data;
 		}
-		if (!data || data.status !== 'pending') {
-			return;
-		}
-		invitation.value = data;
-		console.log(data);
-	});
+	}
 
 	onMounted(() => {
 		watchEffect(async () => {
@@ -305,7 +349,7 @@
 					first_name: first_name.value,
 					last_name: last_name.value,
 					company_name: company_name.value,
-					account_id: null,
+					account_id: '3e1d58dc-be98-4e46-af57-02ebfb36aa3d',
 					stripe_customer_id: customer.id,
 					stripe_subscription_id: subscription.id,
 					stripe_plan: subscription.plan,
@@ -313,12 +357,12 @@
 			},
 		});
 		if (error) {
-			error.value = true;
+			is_error.value = true;
 			error_message.value = error;
 			alert(error);
 		} else {
 			loading.value = false;
-			alert('Success, check your email for verification link');
+			is_success.value = true;
 		}
 		email.value = '';
 		password.value = '';

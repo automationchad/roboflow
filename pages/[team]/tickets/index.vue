@@ -50,18 +50,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 billingEmail,
-		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
+		.select('*,Account(id,stripeCustomerId,Subscription(*),Team(id,name))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();

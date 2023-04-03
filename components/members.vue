@@ -248,10 +248,28 @@
 
 	const inviteeEmail = ref('');
 
+	function addMemberModifier(email) {
+		const atIndex = email.indexOf('@');
+		if (atIndex === -1) {
+			// If the email doesn't contain an '@' symbol, it's not a valid email
+			return null;
+		}
+
+		const username = email.slice(0, atIndex);
+		const domain = email.slice(atIndex);
+
+		return username + '+member' + domain;
+	}
+
 	const sendInvitation = async () => {
 		const { data: invitation, error } = await supabase
 			.from('Invitation')
-			.insert([{ email: inviteeEmail.value, account: User.accountId }])
+			.insert([
+				{
+					email: addMemberModifier(inviteeEmail.value),
+					account: User.accountId,
+				},
+			])
 			.select('*');
 		if (error) {
 			alert(error);

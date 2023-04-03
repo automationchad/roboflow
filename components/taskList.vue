@@ -175,7 +175,6 @@
 			 Ticket (
 			*
 		 ),
-			 billingEmail,
 			 stripeCustomerId,
 			 trayWorkspaceId,
 			 Subscription(*),

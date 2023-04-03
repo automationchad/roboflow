@@ -62,7 +62,6 @@
 		.select(
 			`*,Account (
 	     id,
-		 billingEmail,
 		 stripeCustomerId,
 		 Subscription(*),
 		 Team (

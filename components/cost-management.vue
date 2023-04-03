@@ -29,7 +29,7 @@
 											? formatNumber(taskPrice(kpis['Task Runs']))
 											: formatNumber(0)
 									}}
-									<div v-if="User.systemRole !== 'super_admin'" class="">
+									<div v-if="User.systemRole === 'super_admin'" class="">
 										<!-- <p class="text-xs font-semibold text-rose-700">
 											({{ formatNumber(trayCost(kpis['Task Runs'])) }})
 										</p> -->

@@ -145,31 +145,18 @@
 
 	const user = useSupabaseUser();
 
-	const period = ref(30);
-
 	const supabase = useSupabaseClient();
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 billingEmail,
-		 Ticket(count),
-		 trayWorkspaceId,
-		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
+		.select('systemRole,Account(*,Subscription(*),Ticket(count))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
 
+		const period = ref(30);
 	console.log(User);
+
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
@@ -178,9 +165,7 @@
 	const upgrade_needed =
 		retainer.status !== 'active' || retainer.tier === 'free';
 
-	const hosting_needed = !User.Account.Subscription.find(
-		(o) => o.type === 'hosting'
-	);
+	const hosting_needed = !hosting;
 
 	const userNavigation = [
 		{ name: 'Your profile', href: '/settings' },
