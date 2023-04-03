@@ -12,7 +12,7 @@
 									<div class="max-h-[300px] overflow-y-auto">
 										<table class="min-w-full table-auto divide-y">
 											<thead
-												class="sticky top-0 border-b border-slate-600 bg-gray-50 dark:bg-transparent"
+												class="sticky top-0 border-b border-slate-600 bg-gray-50 dark:bg-slate-800"
 											>
 												<tr class="">
 													<th

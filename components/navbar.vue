@@ -96,7 +96,7 @@
 											<div
 												class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 											>
-												<div>Request teams</div>
+												<div>Workspace</div>
 												<button><PlusIcon class="h-5 w-5 text-white" /></button>
 											</div>
 											<ul role="list" class="-mx-2 mt-2 space-y-1">
@@ -228,7 +228,7 @@
 							<div
 								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 							>
-								<div>Request teams</div>
+								<div>Workspaces</div>
 							</div>
 							<ul role="list" class="-ml-2 mt-2 space-y-1">
 								<li

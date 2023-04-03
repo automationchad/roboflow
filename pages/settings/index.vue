@@ -177,20 +177,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,
-		Account (
-	     id,
-		 Team (
-			id,
-			name
-		 ),
-		 Ticket (
-			count
-		 )
-	   )
-	 `
-		)
+		.select('accountId')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
@@ -198,7 +185,7 @@
 	const tabs = [
 		{
 			name: 'Profile',
-			href: `/${User.Account.id}/settings`,
+			href: `/${User.accountId}/settings`,
 			current: true,
 		},
 		// {

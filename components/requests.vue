@@ -494,6 +494,8 @@
 		.limit(1)
 		.single();
 
+	console.log(User);
+
 	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
 
 	const tickets =
