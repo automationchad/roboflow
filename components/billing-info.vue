@@ -130,7 +130,7 @@
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
-			`systemRole,Account(id,billingEmail,stripeCustomerId,Subscription(*))`
+			`systemRole,Account(id,stripeCustomerId,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
