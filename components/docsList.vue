@@ -58,8 +58,12 @@
 																class="flex items-center hover:underline"
 																@click="getUrl(User.accountId, doc.name)"
 															>
-																{{ doc.name.split('.')[0]
-																}}<ArrowUpOnSquareIcon class="ml-1 h-4 w-4" /></button
+																<span class="">{{
+																	limitString(doc.name.split('.')[0])
+																}}</span
+																><ArrowUpOnSquareIcon
+																	class="ml-1 h-4 w-4"
+																/></button
 														></span>
 													</td>
 													<td
@@ -138,6 +142,15 @@
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
+
+	function limitString(s) {
+		const limit = 35;
+		if (s.length <= limit) {
+			return s;
+		} else {
+			return s.substring(0, limit) + '...';
+		}
+	}
 
 	const abbreviatedNumber = (number) => {
 		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
