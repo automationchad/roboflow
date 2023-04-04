@@ -172,6 +172,7 @@
 		.select(
 			`*,Account (
 		     id,
+			 type,
 			 Ticket (
 			*
 		 ),
@@ -191,7 +192,7 @@
 	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
 
 	let tickets =
-		User.systemRole === 'super_admin'
+		User.Account.type === 'super_admin'
 			? Ticket.sort((a, b) => b['priority'] - a['priority'])
 			: User.Account.Ticket;
 </script>
