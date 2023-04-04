@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 		.single();
 
 	var date = new Date(Date.now());
-	var firstDay = new Date(date.getFullYear(), 1, 1);
+	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
 	var d = new Date(new Date().getFullYear(), 0, 1);
 
 	let filters = {};
