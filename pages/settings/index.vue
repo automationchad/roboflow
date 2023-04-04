@@ -100,6 +100,7 @@
 														</TabList>
 														<TabPanels>
 															<TabPanel><profile-settings /></TabPanel>
+															<TabPanel><invitations /></TabPanel>
 															<!-- <TabPanel><profile-preferences /></TabPanel>
 															<TabPanel><profile-credentials /></TabPanel> -->
 														</TabPanels>
@@ -185,6 +186,11 @@
 	const tabs = [
 		{
 			name: 'Profile',
+			href: `/${User.accountId}/settings`,
+			current: true,
+		},
+		{
+			name: 'Invitations',
 			href: `/${User.accountId}/settings`,
 			current: true,
 		},

@@ -58,7 +58,7 @@
 																		><a
 																			:class="[
 																				selected
-																					? 'border-purple-500'
+																					? 'border-indigo-500'
 																					: 'border-transparent',
 																				'cursor-pointer whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
 																			]"

@@ -15,14 +15,27 @@
 									Members
 								</h1>
 							</div>
-							<div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+							<div class="group relative mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+								<div
+									v-if="isAddingDisabled"
+									id="tooltip-default"
+									role="tooltip"
+									class="absolute bottom-0 left-1/2 z-10 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
+								>
+									<span class="text-left text-slate-900 dark:text-white">
+										As a "<span class="capitalize">{{ User.systemRole }}</span
+										>" you don't have permissions to send invites.
+									</span>
+								</div>
 								<DisclosureButton
+									:disabled="isAddingDisabled"
 									v-if="!open"
 									type="button"
 									class="flex items-center rounded-md border border-slate-300 py-2 px-4 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
 								>
 									<PlusCircleIcon class="mr-2 h-5 w-5" /> Add
 								</DisclosureButton>
+
 								<DisclosureButton
 									v-else
 									class="flex items-center rounded-md border border-slate-300 py-2 px-2 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
@@ -84,17 +97,24 @@
 											person.email
 										}}</small>
 									</div>
-									<div class="" v-else>{{ person.email }}</div>
+									<div class="dark:text-white" v-else>{{ person.email }}</div>
 								</div>
-								<div class="flex flex-grow-0 space-x-4 pl-8">
+								<div class="flex flex-grow-0 items-center space-x-4 pl-8">
+									<div class="flex items-center space-x-4" v-if="person.token">
+										<div class="text-slate-400">Invite pending</div>
+										<button @click="copyToClipboard(person.confirm_url)">
+											<LinkIcon class="h-5 w-5 text-slate-400" />
+										</button>
+									</div>
+
 									<Listbox
 										as="div"
-										:disabled="person.id === user.id"
+										:disabled="isEditRoleDisabled(person)"
 										class="w-[160px]"
 									>
 										<div class="relative">
 											<ListboxButton
-												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 sm:text-sm sm:leading-6"
+												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 dark:disabled:bg-slate-600 sm:text-sm sm:leading-6"
 											>
 												<span class="block truncate capitalize">{{
 													person.systemRole
@@ -158,7 +178,7 @@
 									</Listbox>
 									<button
 										class="rounded-lg p-2 text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-600 dark:bg-slate-700 dark:text-slate-400 dark:disabled:bg-slate-800"
-										:disabled="person.id === user.id"
+										:disabled="isDeleteDisabled(person)"
 									>
 										<TrashIcon class="h-5 w-5" />
 									</button>
@@ -210,6 +230,7 @@
 	} from '@heroicons/vue/24/outline';
 	import {
 		ChevronDownIcon,
+		LinkIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
@@ -232,7 +253,38 @@
 		.limit(1)
 		.single();
 
-	let { data: Invitation, error } = await supabase
+	let { data: Scopes, error: ScopesError } = await supabase
+		.from('Scopes')
+		.select('*')
+		.eq('systemRole', User.systemRole)
+		.single();
+
+	console.log(Scopes);
+
+	const isAddingDisabled = !Scopes.scopes.split(',').includes('users:create');
+
+	const isEditRoleDisabled = (user) => {
+		if (!Scopes.scopes.split(',').includes('users:edit')) return true;
+		else if (
+			User.Account.User.filter((o) => o.systemRole === 'owner').length === 1 &&
+			Scopes.scopes.split(',').includes('admin:edit') &&
+			user.systemRole === 'owner'
+		)
+			return true;
+		else return false;
+	};
+	const isDeleteDisabled = (user) => {
+		if (!Scopes.scopes.split(',').includes('users:delete')) return true;
+		else if (
+			User.Account.User.filter((o) => o.systemRole === 'owner').length === 1 &&
+			Scopes.scopes.split(',').includes('admin:delete') &&
+			user.systemRole === 'owner'
+		)
+			return true;
+		else return false;
+	};
+
+	let { data: Invitation, error: InvitationError } = await supabase
 		.from('Invitation')
 		.select('*')
 		.eq('account', User.Account.id);
@@ -247,6 +299,17 @@
 	}
 
 	const inviteeEmail = ref('');
+
+	const copyToClipboard = (text) => {
+		navigator.clipboard
+			.writeText(text) // write the text to the clipboard
+			.then(() => {
+				console.log('Text copied to clipboard'); // log a message indicating that the text was copied
+			})
+			.catch((err) => {
+				console.error('Error copying text to clipboard: ', err); // log an error message if there was an error copying the text
+			});
+	};
 
 	function addMemberModifier(email) {
 		const atIndex = email.indexOf('@');
@@ -266,13 +329,17 @@
 			.from('Invitation')
 			.insert([
 				{
-					email: addMemberModifier(inviteeEmail.value),
+					email: inviteeEmail.value,
+					systemRole: 'member',
+					createdBy: User.id,
+					expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
 					account: User.accountId,
+					workspaceId: User.defaultTeamId,
 				},
 			])
 			.select('*');
 		if (error) {
-			alert(error);
+			alert(error.details);
 			console.error(error);
 			return;
 		}
@@ -284,6 +351,7 @@
 	const roles = [
 		{ id: 'owner', name: 'Owner' },
 		{ id: 'admin', name: 'Administrator' },
-		{ id: 'member', name: 'Member' },
+		{ id: 'contributor', name: 'Contributor' },
+		{ id: 'viewer', name: 'Viewer' },
 	];
 </script>

@@ -3,92 +3,7 @@
 		<div
 			class="flex h-full flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
 		>
-			<div class="mx-auto w-full max-w-sm lg:w-96" v-if="invitation">
-				<div>
-					<img
-						class="h-12 w-auto"
-						src="~/assets/images/logo.png"
-						alt="Your Company"
-					/>
-					<h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">
-						Create your account
-					</h2>
-					<p class="mt-2 text-sm text-gray-600">
-						You've been invited to join our account!
-					</p>
-				</div>
-
-				<div class="mt-8">
-					<div class="mt-6">
-						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
-							<div>
-								<label
-									for="first-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
-									>First name</label
-								>
-								<div class="mt-2.5">
-									<input
-										v-model="first_name"
-										type="text"
-										name="first-name"
-										id="first-name"
-										autocomplete="given-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
-							<div>
-								<label
-									for="last-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
-									>Last name</label
-								>
-								<div class="mt-2.5">
-									<input
-										v-model="last_name"
-										type="text"
-										name="last-name"
-										id="last-name"
-										autocomplete="family-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
-
-							<div class="sm:col-span-2">
-								<label
-									for="password"
-									class="block text-sm font-medium leading-6 text-gray-900"
-									>Password</label
-								>
-								<div class="mt-2">
-									<input
-										v-model="password"
-										id="password"
-										name="password"
-										type="password"
-										autocomplete="current-password"
-										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									/>
-								</div>
-							</div>
-
-							<div class="sm:col-span-2">
-								<button
-									:disabled="loading"
-									@click="linkAccounts()"
-									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-								>
-									{{ loading ? 'Loading' : 'Join org' }}
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="mx-auto w-full max-w-sm lg:w-96" v-else>
+			<div class="mx-auto w-full max-w-sm lg:w-96">
 				<div>
 					<img
 						class="h-12 w-auto"
@@ -149,12 +64,12 @@
 							</div>
 						</div>
 					</div>
-					<div class="mt-6">
+					<div class="mt-6 text-gray-900 dark:text-white">
 						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
 							<div>
 								<label
 									for="first-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
+									class="block text-sm font-semibold leading-6"
 									>First name</label
 								>
 								<div class="mt-2.5">
@@ -164,14 +79,14 @@
 										name="first-name"
 										id="first-name"
 										autocomplete="given-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
 							<div>
 								<label
 									for="last-name"
-									class="block text-sm font-semibold leading-6 text-gray-900"
+									class="block text-sm font-semibold leading-6"
 									>Last name</label
 								>
 								<div class="mt-2.5">
@@ -181,14 +96,14 @@
 										name="last-name"
 										id="last-name"
 										autocomplete="family-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
 							<div class="sm:col-span-2">
 								<label
 									for="company"
-									class="block text-sm font-semibold leading-6 text-gray-900"
+									class="block text-sm font-semibold leading-6"
 									>Company</label
 								>
 								<div class="mt-2.5">
@@ -198,14 +113,12 @@
 										name="company"
 										id="company"
 										autocomplete="organization"
-										class="block w-full rounded-md border-0 py-2 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
 							<div class="sm:col-span-2">
-								<label
-									for="email"
-									class="block text-sm font-medium leading-6 text-gray-900"
+								<label for="email" class="block text-sm font-medium leading-6"
 									>Email address</label
 								>
 								<div class="mt-2">
@@ -216,7 +129,7 @@
 										type="email"
 										autocomplete="email"
 										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -224,7 +137,7 @@
 							<div class="sm:col-span-2">
 								<label
 									for="password"
-									class="block text-sm font-medium leading-6 text-gray-900"
+									class="block text-sm font-medium leading-6"
 									>Password</label
 								>
 								<div class="mt-2">
@@ -235,7 +148,7 @@
 										type="password"
 										autocomplete="current-password"
 										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -292,22 +205,6 @@
 	const error_message = ref('');
 	const loading = ref(false);
 
-	const token = route.query.token;
-	if (token) {
-		const { data, error } = await supabase
-			.from('Invitation')
-			.select('*')
-			.eq('token', token)
-			.single();
-		if (error) {
-			console.error(error);
-		} else if (!data || data.status !== 'pending') {
-			navigateTo('/');
-		} else {
-			invitation.value = data;
-		}
-	}
-
 	onMounted(() => {
 		watchEffect(async () => {
 			if (user.value) {
@@ -347,7 +244,6 @@
 					first_name: first_name.value,
 					last_name: last_name.value,
 					company_name: company_name.value,
-					account_id: '3e1d58dc-be98-4e46-af57-02ebfb36aa3d',
 					stripe_customer_id: customer.id,
 					stripe_subscription_id: subscription.id,
 					stripe_plan: subscription.plan,

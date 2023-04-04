@@ -51,7 +51,7 @@
 										name="email-address"
 										id="email-address"
 										autocomplete="email"
-										class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 sm:text-sm sm:leading-6"
+										class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 shadow-sm ring-1 ring-inset ring-gray-300 dark:text-white dark:ring-slate-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 sm:text-sm sm:leading-6 bg-slate-800"
 									/>
 									<p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
 										The invoices will be sent to this email
@@ -61,8 +61,8 @@
 						</div>
 						<div class="space-x-4 px-4 py-3 text-right sm:px-6">
 							<button
-								type="submit"
-								class="inline-flex justify-center rounded-md border border-slate-400 py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+								@click="billingEmail = customer.email"
+								class="inline-flex justify-center rounded-md border border-slate-400 py-2 px-3 text-sm font-semibold dark:text-slate-300 text-gray-900 shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
 								Cancel
 							</button>
@@ -73,7 +73,7 @@
 									})
 								"
 								:disabled="loading"
-								class="inline-flex justify-center rounded-md bg-gray-900 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+								class="inline-flex justify-center rounded-md bg-gray-900 dark:bg-slate-700 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
 							>
 								{{ loading ? 'Loading' : 'Submit' }}
 							</button>

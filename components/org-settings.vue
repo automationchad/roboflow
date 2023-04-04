@@ -1,21 +1,20 @@
 <template>
 	<div class="h-full">
 		<div
-			class="mt-4 rounded-md bg-red-50 p-4"
+			class="mt-4 rounded-md bg-yellow-50 p-4"
 			v-if="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
 		>
 			<div class="flex">
 				<div class="flex-shrink-0">
-					<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+					<ExclamationTriangleIcon
+						class="h-5 w-5 text-yellow-400"
+						aria-hidden="true"
+					/>
 				</div>
 				<div class="ml-3">
-					<h3 class="text-sm font-medium text-red-800">
-						You currently don't have access to change billing details
+					<h3 class="text-sm font-medium text-yellow-800">
+						You currently don't have access to change org settings
 					</h3>
-
-					<span class="mt-2 text-sm text-red-700">
-						Contact an owner to request these changes.
-					</span>
 				</div>
 			</div>
 		</div>
@@ -29,308 +28,110 @@
 					class="disabled:opacity-60"
 				>
 					<div class="sm:overflow-hidden">
-						<div role="tabpanel" class="sc-gsnTZi kJQFiu">
-							<div class="sc-gsnTZi mQgVe">
-								<div class="sc-gsnTZi fZyFmh">
-									<div class="sc-gsnTZi ffhScO">
-										<div class="sc-gsnTZi ffhScO">
-											<div class="sc-ckMVTt csGkIt">
-												<div display="flex" class="sc-gsnTZi eMxiQG">
-													<h4 class="sc-fbPSWO bOtoTi">Organization</h4>
-													<div class="sc-TRNrF iPuFes"></div>
-												</div>
-												<hr
-													orientation="horizontal"
-													role="separator"
-													class="sc-lbOyJj evDKwP"
-												/>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-bWXABl dfOvQI" type="text">
-														<div class="sc-eFWqGp jCuTic">
-															<small>Name</small>admin-templates
-														</div>
-													</div>
-													<div class="sc-bWXABl dfOvOR" type="icon">
-														<button
-															class="sc-jqUVSM eLperz sc-crXcEl hXPYDT ghost"
-														>
-															<div class="sc-iqcoie fYkzzL">
-																<div
-																	class="sc-jSMfEi iAfUcO animated"
-																	size="16"
-																	color="inherit"
-																></div>
-															</div>
-															<div class="sc-gsnTZi blWcoZ">
-																<span class="sc-hKMtZM fPKIPe icon"
-																	><svg
-																		width="100%"
-																		height="100%"
-																		viewBox="0 0 24 24"
-																		fill="currentColor"
-																		stroke="none"
-																	>
-																		<path
-																			fill-rule="evenodd"
-																			clip-rule="evenodd"
-																			d="M19 3.172a1.829 1.829 0 0 0-1.293.535L4.395 17.02l-.97 3.556 3.556-.97L20.293 6.293A1.829 1.829 0 0 0 19 3.172Zm-1.465-1.709a3.829 3.829 0 0 1 4.172 6.244l-13.5 13.5a1 1 0 0 1-.444.258l-5.5 1.5a1 1 0 0 1-1.228-1.228l1.5-5.5a1 1 0 0 1 .258-.444l13.5-13.5a3.83 3.83 0 0 1 1.242-.83Z"
-																			fill="currentColor"
-																		></path></svg
-																></span>
-															</div>
-														</button>
-													</div>
-												</li>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-bWXABl dfOvQI" type="text">
-														<div class="sc-eFWqGp jCuTic">
-															<small>Short name</small>motisgroup4t7p5
-														</div>
-													</div>
-													<div class="sc-bWXABl dfOvOR" type="icon">
-														<div class="sc-fEOsli cLJBNf">
-															<span class="sc-bjUoiL gdftMO"
-																><div
-																	display="flex"
-																	class="sc-gsnTZi sc-jhzXDd kmvIMm jbSHOB"
-																>
-																	<span class="sc-hKMtZM bYOdYE sc-hjQCSK jxYcT"
-																		><svg
-																			width="100%"
-																			height="100%"
-																			viewBox="0 0 24 24"
-																			fill="currentColor"
-																			stroke="none"
-																		>
-																			<path
-																				fill-rule="evenodd"
-																				clip-rule="evenodd"
-																				d="M9.172 4.172A4 4 0 0 1 16 7v3H8V7a4 4 0 0 1 1.172-2.828ZM6 10V7a6 6 0 1 1 12 0v3h1a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h1Zm11 2H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1h-2Z"
-																				fill="currentColor"
-																			></path></svg
-																	></span></div
-															></span>
-														</div>
-													</div>
-												</li>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-bWXABl dfOvQI" type="text">
-														<div class="sc-eFWqGp jCuTic">
-															<small>Organization ID</small
-															>2933d3e7-770c-4c2b-9f17-0253f8fbcf9f
-														</div>
-													</div>
-												</li>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-bWXABl dfOvQI" type="text">
-														<div class="sc-eFWqGp jCuTic">
-															<small>Picture URL</small>
-															<div class="sc-gsnTZi gCYSzp"></div>
-														</div>
-													</div>
-													<div class="sc-bWXABl dfOvOR" type="icon">
-														<button
-															class="sc-jqUVSM eLperz sc-crXcEl hXPYDT ghost"
-														>
-															<div class="sc-iqcoie fYkzzL">
-																<div
-																	class="sc-jSMfEi iAfUcO animated"
-																	size="16"
-																	color="inherit"
-																></div>
-															</div>
-															<div class="sc-gsnTZi blWcoZ">
-																<span class="sc-hKMtZM fPKIPe icon"
-																	><svg
-																		width="100%"
-																		height="100%"
-																		viewBox="0 0 24 24"
-																		fill="currentColor"
-																		stroke="none"
-																	>
-																		<path
-																			fill-rule="evenodd"
-																			clip-rule="evenodd"
-																			d="M19 3.172a1.829 1.829 0 0 0-1.293.535L4.395 17.02l-.97 3.556 3.556-.97L20.293 6.293A1.829 1.829 0 0 0 19 3.172Zm-1.465-1.709a3.829 3.829 0 0 1 4.172 6.244l-13.5 13.5a1 1 0 0 1-.444.258l-5.5 1.5a1 1 0 0 1-1.228-1.228l1.5-5.5a1 1 0 0 1 .258-.444l13.5-13.5a3.83 3.83 0 0 1 1.242-.83Z"
-																			fill="currentColor"
-																		></path></svg
-																></span>
-															</div>
-														</button>
-													</div>
-												</li>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-caXVBt kGlIKY">
-														<div>
-															<label class="sc-ivTmOn DPcjy"
-																><strong class="sc-bBrHrO iXwHRn"
-																	><span>Timezone</span></strong
-																>
-																<div class="sc-cxabCf cgnODW">
-																	<input
-																		type="text"
-																		aria-expanded="false"
-																		aria-haspopup="menu"
-																		id=":rlt:"
-																		class="sc-llJcti kmASOK"
-																		value="Local time (every user will see the date in their local time)"
-																	/>
-																	<div>
-																		<div></div>
-																		<div>
-																			<span class="sc-hKMtZM bYOdYE icon"
-																				><svg
-																					width="100%"
-																					height="100%"
-																					viewBox="0 0 24 24"
-																					fill="currentColor"
-																					stroke="none"
-																				>
-																					<path
-																						fill-rule="evenodd"
-																						clip-rule="evenodd"
-																						d="M5.293 8.293a1 1 0 0 1 1.414 0L12 13.586l5.293-5.293a1 1 0 1 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-6-6a1 1 0 0 1 0-1.414Z"
-																						fill="currentColor"
-																					></path></svg
-																			></span>
-																		</div>
-																	</div></div
-															></label>
-														</div>
-														<small class="sc-iIPllB bWbWDd"
-															>This timezone will show for all users in this
-															organization</small
-														>
-													</div>
-												</li>
-												<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-													<div class="sc-bWXABl dfOvQI" type="text">
-														<div class="sc-eFWqGp jCuTic">
-															<small>Clock</small>
-															<div direction="row" class="sc-cCsOjp htWnge">
-																<label class="sc-ciZhAO hloVtL"
-																	><input
-																		name="nice"
-																		type="radio"
-																		class="sc-jdAMXn ciXReX"
-																		value="12"
-																	/><strong>12-hour clock</strong></label
-																><label class="sc-ciZhAO hloVtL"
-																	><input
-																		name="nice"
-																		type="radio"
-																		class="sc-jdAMXn ciXReX"
-																		value="24"
-																		checked=""
-																	/><strong>24-hour clock</strong></label
-																>
-															</div>
-														</div>
-													</div>
-												</li>
-											</div>
+						<div role="tabpanel" class="mt-4">
+							<div class="space-y-8">
+								<div class="dark:text-white" id="profile">
+									<div class="">
+										<div class="mb-4 flex border-b border-slate-300 py-8">
+											<h4 class="font-semibold">Organization</h4>
 										</div>
-										<div class="sc-ckMVTt csGkIt">
-											<div display="flex" class="sc-gsnTZi eMxiQG">
-												<h4 class="sc-fbPSWO bOtoTi">Danger zone</h4>
-												<div class="sc-TRNrF iPuFes"></div>
-											</div>
-											<hr
-												orientation="horizontal"
-												role="separator"
-												class="sc-lbOyJj evDKwP"
-											/>
-											<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-												<div class="sc-bWXABl dfOvQI" type="text">
-													<div class="sc-eFWqGp jCuTic">
-														Delete organization<small
-															>Delete the organization and all data associated
-															with it. This action cannot be reverted.</small
-														>
+
+										<ul class="space-y-4">
+											<li class="flex items-center justify-between">
+												<div class="">
+													<div class="flex flex-col">
+														<small>Name</small>{{ User.Account.name }}
 													</div>
 												</div>
-												<div class="sc-bWXABl dfOvOR" type="icon">
-													<div class="sc-dmRaPn jlnHkP">
-														<div class="sc-kgflAQ bNslnw">
-															<button
-																disabled=""
-																class="sc-jqUVSM eLperz sc-crXcEl hXPYDT ghost"
-															>
-																<div class="sc-iqcoie fYkzzL">
-																	<div
-																		class="sc-jSMfEi iAfUcO animated"
-																		size="16"
-																		color="inherit"
-																	></div>
-																</div>
-																<div class="sc-gsnTZi blWcoZ">
-																	<span class="sc-hKMtZM fPKIPe icon"
-																		><svg
-																			width="100%"
-																			height="100%"
-																			viewBox="0 0 24 24"
-																			fill="currentColor"
-																			stroke="none"
-																		>
-																			<path
-																				fill-rule="evenodd"
-																				clip-rule="evenodd"
-																				d="M9.293 3.293A1 1 0 0 1 10 3h4a1 1 0 0 1 1 1v1H9V4a1 1 0 0 1 .293-.707ZM7 5V4a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1h4a1 1 0 1 1 0 2h-1v13a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7H3a1 1 0 0 1 0-2h4ZM6 7v13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7H6Zm4 3a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm5 7v-6a1 1 0 1 0-2 0v6a1 1 0 1 0 2 0Z"
-																				fill="currentColor"
-																			></path></svg
-																	></span>
-																</div>
-															</button>
-														</div>
-													</div>
+												<div class="ml-2">
+													<button class="p-2">
+														<PencilIcon class="h-5 w-5" />
+													</button>
 												</div>
 											</li>
-											<li class="sc-csvncw sc-gITdmR eKxcFR crHSes">
-												<div class="sc-bWXABl dfOvQI" type="text">
-													<div class="sc-eFWqGp jCuTic">
-														Leave organization<small
-															>Are you sure you want to leave this
-															organization?</small
-														>
+											<li class="flex items-center justify-between">
+												<div class="">
+													<div class="flex flex-col">
+														<small>Organization ID</small>{{ User.Account.id }}
 													</div>
 												</div>
-												<div class="sc-bWXABl dfOvOR" type="icon">
-													<div class="sc-dmRaPn jlnHkP">
-														<div class="sc-kgflAQ bNslnw">
-															<button
-																disabled=""
-																class="sc-jqUVSM eLperz sc-crXcEl hXPYDT ghost"
-															>
-																<div class="sc-iqcoie fYkzzL">
-																	<div
-																		class="sc-jSMfEi iAfUcO animated"
-																		size="16"
-																		color="inherit"
-																	></div>
-																</div>
-																<div class="sc-gsnTZi blWcoZ">
-																	<span class="sc-hKMtZM fPKIPe icon"
-																		><svg
-																			width="100%"
-																			height="100%"
-																			viewBox="0 0 24 24"
-																			fill="currentColor"
-																			stroke="none"
-																		>
-																			<path
-																				fill-rule="evenodd"
-																				clip-rule="evenodd"
-																				d="M5.5 7a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-5a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM5 14a5 5 0 0 0-5 5v2a1 1 0 1 0 2 0v-2a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v2a1 1 0 1 0 2 0v-2a5 5 0 0 0-5-5H5Zm12.293-6.707a1 1 0 0 1 1.414 0L20.5 9.086l1.793-1.793a1 1 0 1 1 1.414 1.414L21.914 10.5l1.793 1.793a1 1 0 0 1-1.414 1.414L20.5 11.914l-1.793 1.793a1 1 0 0 1-1.414-1.414l1.793-1.793-1.793-1.793a1 1 0 0 1 0-1.414Z"
-																				fill="currentColor"
-																			></path></svg
-																	></span>
-																</div>
-															</button>
-														</div>
-													</div>
+												<div class="ml-2">
+													<button class="p-2">
+														<PencilIcon class="h-5 w-5" />
+													</button>
 												</div>
 											</li>
+										</ul>
+									</div>
+								</div>
+								<div id="danger">
+									<div>
+										<div
+											class="mb-4 flex border-b border-slate-300 py-8 dark:text-white"
+										>
+											<h4 class="font-semibold">Danger zone</h4>
 										</div>
+
+										<div class="flex items-center justify-between">
+											<div class="flex flex-col dark:text-white">
+												Delete organization<small class="text-slate-600"
+													>Delete the organization and all data associated with
+													it. This action cannot be reverted.</small
+												>
+											</div>
+
+											<div class="ml-2">
+												<button
+													disabled
+													class="group rounded-lg bg-red-100 p-1 disabled:bg-slate-700 dark:bg-red-800"
+												>
+													<TrashIcon
+														class="h-5 w-5 text-red-600 group-disabled:text-slate-300 dark:text-red-200"
+													/>
+												</button>
+											</div>
+										</div>
+										<div class="mt-4 flex items-center justify-between">
+											<div class="flex flex-col dark:text-white">
+												Leave organization<small class="text-slate-600"
+													>Are you sure you want to leave this
+													organization?</small
+												>
+											</div>
+
+											<div class="ml-2">
+												<button
+													disabled
+													class="group rounded-lg bg-red-100 p-1 disabled:bg-slate-700 dark:bg-red-800"
+												>
+													<UserMinusIcon
+														class="h-5 w-5 text-red-600 group-disabled:text-slate-300 dark:text-red-200"
+													/>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="text-slate-500">
+									<div class="flex flex-col">
+										<small
+											>Motis Group<a
+												href="https://robocorp.com/terms-of-use"
+												target="_blank"
+												rel="noreferrer"
+												class="text-indigo-500"
+											>
+												terms of use</a
+											>
+											and<a
+												href="https://robocorp.com/privacy-policy"
+												target="_blank"
+												rel="noreferrer"
+												class="text-indigo-500"
+											>
+												privacy policy</a
+											></small
+										>
 									</div>
 								</div>
 							</div>
@@ -364,19 +165,21 @@
 	import {
 		MagnifyingGlassIcon,
 		QuestionMarkCircleIcon,
+		ExclamationTriangleIcon,
 		XCircleIcon,
 	} from '@heroicons/vue/20/solid';
 	import {
 		Bars3Icon,
 		BellIcon,
 		PencilIcon,
-		ExclamationTriangleIcon,
 		CogIcon,
 		CreditCardIcon,
 		SparklesIcon,
 		KeyIcon,
 		SquaresPlusIcon,
 		UserCircleIcon,
+		UserMinusIcon,
+		TrashIcon,
 		XMarkIcon,
 	} from '@heroicons/vue/24/outline';
 
@@ -388,18 +191,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 stripeCustomerId,
-		 trayWorkspaceId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
+		.select(`*,Account(*)`)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
