@@ -2,19 +2,10 @@
 	<div>
 		<main class="py-10">
 			<div class="">
-				<div class="p-6 dark:bg-slate-900">
-					<Disclosure
-						as="div"
-						class="border-b border-slate-300 pb-4 dark:border-slate-700"
-						v-slot="{ open }"
-						><div class="flex items-center">
-							<div class="flex-auto">
-								<h1
-									class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-								>
-									Members
-								</h1>
-							</div>
+				<div class="py-6 dark:bg-slate-900">
+					<div class="">
+						<div class="flex items-center">
+							
 							<div class="group relative mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
 								<div
 									v-if="isAddingDisabled"
@@ -27,55 +18,20 @@
 										>" you don't have permissions to send invites.
 									</span>
 								</div>
-								<DisclosureButton
-									:disabled="isAddingDisabled"
-									v-if="!open"
-									type="button"
-									class="flex items-center rounded-md border border-slate-300 py-2 px-4 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
-								>
-									<PlusCircleIcon class="mr-2 h-5 w-5" /> Add
-								</DisclosureButton>
-
-								<DisclosureButton
-									v-else
-									class="flex items-center rounded-md border border-slate-300 py-2 px-2 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
-									><XMarkIcon class="h-5 w-5"
-								/></DisclosureButton>
 							</div>
 						</div>
-						<DisclosurePanel
-							class="flex flex-grow items-center justify-between pt-4 pb-2 text-sm text-gray-500"
-						>
-							<div class="w-full">
-								<label for="email" class="block text-sm leading-6 text-gray-900"
-									>Email</label
-								>
-								<div class="mt-2 flex justify-between">
-									<input
-										v-model="inviteeEmail"
-										type="email"
-										name="email"
-										id="email"
-										class="mr-2 block w-full rounded-md border-0 bg-gray-50 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-										placeholder="you@example.com"
-									/>
-									<DisclosureButton
-										@click="sendInvitation()"
-										class="rounded-md bg-indigo-600 p-2 text-white"
-									>
-										<CheckIcon class="h-5 w-5" />
-									</DisclosureButton>
-								</div>
-							</div>
-						</DisclosurePanel>
-					</Disclosure>
+					</div>
 
 					<div class="mt-8">
 						<ul class="space-y-4">
 							<li
-								v-for="person in moveUserToFront(
-									User.Account.User.concat(Invitation)
-								)"
+								v-if="Invitation.length === 0"
+								class="text-center text-sm text-slate-400"
+							>
+								There are no pending invites
+							</li>
+							<li
+								v-for="person in Invitation"
 								:key="person.email"
 								class="flex items-center justify-between"
 							>
@@ -141,7 +97,7 @@
 														as="template"
 														v-for="role in roles"
 														:key="role.id"
-														v-slot="{ active }"
+														v-slot="{ active, selected }"
 													>
 														<li
 															:class="[

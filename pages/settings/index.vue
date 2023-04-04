@@ -88,7 +88,7 @@
 																		><a
 																			:class="[
 																				selected
-																					? 'border-purple-500'
+																					? 'border-indigo-500'
 																					: 'border-transparent',
 																				'cursor-pointer items-center whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
 																			]"
@@ -105,7 +105,7 @@
 														</TabList>
 														<TabPanels>
 															<TabPanel><profile-settings /></TabPanel>
-															<TabPanel><invitations /></TabPanel>
+															<TabPanel><org-invitations /></TabPanel>
 															<!-- <TabPanel><profile-preferences /></TabPanel>
 															<TabPanel><profile-credentials /></TabPanel> -->
 														</TabPanels>
