@@ -55,8 +55,6 @@
 		.limit(1)
 		.single();
 
-	console.log(User);
-
 	const activeSub =
 		User.Account.Subscription.find((o) => o.type === 'retainer').tier !==
 		'free';

@@ -156,7 +156,6 @@
 		.single();
 
 		const period = ref(30);
-	console.log(User);
 
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');

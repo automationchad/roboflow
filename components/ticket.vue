@@ -957,7 +957,6 @@
 		.limit(1)
 		.single();
 
-	console.log(Ticket);
 
 	const input = ref(Ticket.desc);
 

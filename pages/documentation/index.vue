@@ -153,8 +153,6 @@
 		.select('*,Account(*,User(*)),User(firstName,lastName)')
 		.eq('Account.User.id', user.value.id);
 
-	console.log(Documents);
-
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(

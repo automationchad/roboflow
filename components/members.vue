@@ -259,7 +259,7 @@
 		.eq('systemRole', User.systemRole)
 		.single();
 
-	console.log(Scopes);
+
 
 	const isAddingDisabled = !Scopes.scopes.split(',').includes('users:create');
 

@@ -5,7 +5,6 @@
 				<div class="py-6 dark:bg-slate-900">
 					<div class="">
 						<div class="flex items-center">
-							
 							<div class="group relative mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
 								<div
 									v-if="isAddingDisabled"
@@ -97,7 +96,7 @@
 														as="template"
 														v-for="role in roles"
 														:key="role.id"
-														v-slot="{ active, selected }"
+														v-slot="{ active }"
 													>
 														<li
 															:class="[
@@ -215,8 +214,6 @@
 		.eq('systemRole', User.systemRole)
 		.single();
 
-	console.log(Scopes);
-
 	const isAddingDisabled = !Scopes.scopes.split(',').includes('users:create');
 
 	const isEditRoleDisabled = (user) => {
@@ -244,6 +241,8 @@
 		.from('Invitation')
 		.select('*')
 		.eq('account', User.Account.id);
+
+	
 
 	function moveUserToFront(arr) {
 		const orgIndex = arr.findIndex((obj) => obj.id === user.value.id);

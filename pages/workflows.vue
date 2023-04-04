@@ -163,7 +163,7 @@
 		.limit(1)
 		.single();
 
-	console.log(User);
+
 
 	const activeSub = true;
 

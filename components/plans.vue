@@ -280,14 +280,12 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-	console.log(User);
+	
 	let retainer = {};
 	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-
-	console.log(hosting);
 
 	const handleCheckout = async (product, type, customer) => {
 		const { url } = await $fetch('/api/stripe/checkout', {

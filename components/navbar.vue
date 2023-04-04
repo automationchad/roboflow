@@ -369,7 +369,7 @@
 		.limit(1)
 		.single();
 
-	console.log(User);
+
 	let teams = User.Account.Team;
 	let teams_sorted = teams;
 

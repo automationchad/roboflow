@@ -74,7 +74,7 @@
 		.limit(1)
 		.single();
 
-	console.log(User);
+	
 
 	const handleCheckout = async (product, type, customer, subscription) => {
 		const { url } = await $fetch('/api/stripe/checkout', {

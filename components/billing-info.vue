@@ -136,7 +136,7 @@
 		.limit(1)
 		.single();
 
-	console.log(User);
+	
 
 	const customer = await $fetch(
 		`/api/stripe/customer/${User.Account.stripeCustomerId}`

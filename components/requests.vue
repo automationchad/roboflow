@@ -450,12 +450,7 @@
 				:list-id="backlogId"
 				:auth="auth"
 			/>
-			<TicketModal
-				:card="selected_card"
-				:comments="comments"
-				:open="showTicketModal"
-				@close-modal="showTicketModal = false"
-			/>
+			
 		</div>
 	</div>
 </template>

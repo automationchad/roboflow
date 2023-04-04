@@ -178,7 +178,6 @@
 
 	const signOut = async () => {
 		await supabase.auth.signOut();
-		console.log('Signed Out!');
 	};
 
 	let { data: User, error: userError } = await supabase
@@ -194,7 +193,7 @@
 		.eq('account', User.accountId)
 		.single();
 
-	console.log(Invitation);
+
 
 	const tabs = [
 		{

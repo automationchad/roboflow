@@ -173,7 +173,6 @@
 <script setup>
 	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 	const route = useRoute();
-	console.log(route.params);
 	const user = useSupabaseUser();
 	if (user.value) {
 		navigateTo('/invitation-not-found');
