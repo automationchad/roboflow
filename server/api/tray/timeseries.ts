@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
 		.select(
 			`*,Account (
 	     id,
+		 type,
 		 trayWorkspaceId,
 		 stripeCustomerId,
 		 Subscription(*),
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
 	var d = new Date(new Date().getFullYear(), 0, 1);
 
 	let filters = {};
-	if (User.systemRole === 'super_admin') {
+	if (User.Account.type === 'super_admin') {
 	} else {
 		filters = {
 			workspaces: [User.Account.trayWorkspaceId],
