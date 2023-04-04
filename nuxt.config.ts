@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import stripeWebhookHandler from './server/api/stripe-webhook';
+
 export default defineNuxtConfig({
 	app: {
 		head: {
@@ -26,6 +28,9 @@ export default defineNuxtConfig({
 		},
 	},
 	// plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
+	serverMiddleware: [
+		{ path: '/api/stripe/events', handler: stripeWebhookHandler },
+	],
 	postcss: {
 		plugins: {
 			tailwindcss: {},
