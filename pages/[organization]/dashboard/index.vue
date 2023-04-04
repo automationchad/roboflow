@@ -61,9 +61,15 @@
 						</div>
 					</div>
 					<div
-						class="row-span-2 items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+						class="row-span-1 items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
-						<div class="px-4 text-base font-semibold "><a class="flex items-center" :href="`/${User.defaultTeamId}/tickets`">Tickets<LinkIcon class="h-4 w-4 ml-2"/></a></div>
+						<div class="px-4 text-base font-semibold">
+							<a
+								class="flex items-center"
+								:href="`/${User.defaultTeamId}/tickets`"
+								>Tickets<LinkIcon class="ml-2 h-4 w-4"
+							/></a>
+						</div>
 						<task-list v-if="!upgrade_needed" />
 						<div
 							v-else
@@ -78,6 +84,7 @@
 							to see tickets
 						</div>
 					</div>
+
 					<div
 						class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
@@ -96,6 +103,24 @@
 								>upgrade your hosting</a
 							>
 							to see workflows
+						</div>
+					</div>
+					<div
+						class="row-span-1 items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+					>
+						<div class="px-4 text-base font-semibold">Docs</div>
+						<docs-list v-if="!upgrade_needed && documentation" />
+						<div
+							v-else
+							class="py-24 text-center text-slate-700 dark:text-slate-300"
+						>
+							You'll need to
+							<a
+								:href="`/${User.Account.id}/settings/billing`"
+								class="font-semibold text-indigo-500"
+								>select a plan</a
+							>
+							to see documentation
 						</div>
 					</div>
 				</div>
@@ -155,7 +180,7 @@
 		.limit(1)
 		.single();
 
-		const period = ref(30);
+	const period = ref(30);
 
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
@@ -164,6 +189,8 @@
 
 	const upgrade_needed =
 		retainer.status !== 'active' || retainer.tier === 'free';
+
+	const documentation = retainer.tier === 'enterprise';
 
 	const hosting_needed = !hosting;
 
