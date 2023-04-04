@@ -22,14 +22,19 @@
 									TASKS
 								</p>
 								<h3
-									class="my-8 flex items-center text-2xl font-semibold dark:text-white"
+									:class="[
+										super_admin ? 'text-rose-800' : '',
+										'my-8 flex items-center text-2xl font-semibold dark:text-white',
+									]"
 								>
 									{{
 										hosting
-											? formatNumber(taskPrice(kpis['Task Runs']))
+											? super_admin
+												? `(${formatNumber(trayCost(kpis['Task Runs']))})`
+												: formatNumber(taskPrice(kpis['Task Runs']))
 											: formatNumber(0)
 									}}
-									<div v-if="User.systemRole === 'super_admin'" class="">
+									<div v-if="User.Account.type === 'super_admin'" class="">
 										<!-- <p class="text-xs font-semibold text-rose-700">
 											({{ formatNumber(trayCost(kpis['Task Runs'])) }})
 										</p> -->
@@ -54,7 +59,11 @@
 								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									{{
 										formatNumber(
-											(hosting ? taskPrice(kpis['Task Runs']) : 0) + monthly_sum
+											(hosting
+												? super_admin
+													? trayCost(kpis['Task Runs'])
+													: taskPrice(kpis['Task Runs'])
+												: 0) + monthly_sum
 										)
 									}}
 								</h3>
@@ -226,9 +235,6 @@
 
 	const supabase = useSupabaseClient();
 
-	const task_entitlement = 100000;
-	const current_usage = 5000;
-
 	const state = reactive({
 		data: [],
 		loading: true,
@@ -236,10 +242,14 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select('*,Account(Subscription(*))')
+		.select('*,Account(type,Subscription(*))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	const super_admin = User.Account.type === 'super_admin';
+
+	const task_entitlement = super_admin ? 1000000000 : 100000;
 
 	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
@@ -341,7 +351,7 @@
 		const scale = 10 ** (tier * 3);
 		const scaled = number / scale;
 		const length = scaled.toFixed(1).toString();
-		const precision = length > 3 ? 0 : 1;
+		const precision = length > 3 ? 1 : 0;
 		return scaled.toFixed(precision) + suffix;
 	};
 

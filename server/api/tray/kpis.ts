@@ -12,17 +12,16 @@ export default defineEventHandler(async (event) => {
 	const supabase = await serverSupabaseClient(event);
 	const { data: User, error: userError } = await supabase
 		.from('User')
-		.select('systemRole,Account(trayWorkspaceId)')
+		.select('systemRole,Account(type,trayWorkspaceId)')
 		.eq('id', user.id)
 		.limit(1)
 		.single();
 
 	var date = new Date(Date.now());
 	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-	var d = new Date(new Date().getFullYear(), 0, 1);
 
 	let filters = {};
-	if (User.systemRole === 'super_admin') {
+	if (User.Account.type === 'super_admin') {
 	} else {
 		filters = {
 			workspaces: [User.Account.trayWorkspaceId],
