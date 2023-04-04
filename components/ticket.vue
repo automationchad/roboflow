@@ -322,11 +322,10 @@
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
-															<img
-																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white"
-																src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80"
+															<div
+																class="flex h-8 w-8 items-center justify-center text-xs rounded-full bg-gray-400 ring-1 ring-gray-500"
 																alt=""
-															/>
+															>{{ User.firstName[0] }}</div>
 														</div>
 													</div>
 													<div class="min-w-0 flex-1">
@@ -794,12 +793,12 @@
 												<div class="flex-shrink-0">
 													<img
 														class="h-5 w-5 rounded-full"
-														src="https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80"
+														src="~/assets/images/logo.png"
 														alt=""
 													/>
 												</div>
 												<div class="text-sm font-medium text-gray-900">
-													Eduardo Benz
+													Motis Group
 												</div>
 											</a>
 										</li>

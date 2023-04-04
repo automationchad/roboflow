@@ -63,8 +63,8 @@
 					<div
 						class="row-span-2 items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 					>
-						<div class="px-4 text-base font-semibold">Tickets</div>
-						<task-list v-if="upgrade_needed" />
+						<div class="px-4 text-base font-semibold "><a class="flex items-center" :href="`/${User.defaultTeamId}/tickets`">Tickets<LinkIcon class="h-4 w-4 ml-2"/></a></div>
+						<task-list v-if="!upgrade_needed" />
 						<div
 							v-else
 							class="py-24 text-center text-slate-700 dark:text-slate-300"
@@ -131,6 +131,7 @@
 	} from '@heroicons/vue/24/outline';
 	import {
 		ChevronDownIcon,
+		LinkIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
@@ -149,7 +150,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select('systemRole,Account(*,Subscription(*),Ticket(count))')
+		.select('systemRole,defaultTeamId,Account(*,Subscription(*),Ticket(count))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
