@@ -90,9 +90,14 @@
 																				selected
 																					? 'border-purple-500'
 																					: 'border-transparent',
-																				'cursor-pointer whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
+																				'cursor-pointer items-center whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
 																			]"
-																			>{{ tab.name }}</a
+																			>{{ tab.name
+																			}}<span
+																				v-if="tab.count !== undefined"
+																				class="ml-2 rounded-full bg-red-200 px-2 text-xs font-semibold text-red-800"
+																				>{{ tab.count }}</span
+																			></a
 																		></Tab
 																	>
 																</nav>
@@ -183,6 +188,14 @@
 		.limit(1)
 		.single();
 
+	let { data: Invitation, error: InvitationError } = await supabase
+		.from('Invitation')
+		.select('count')
+		.eq('account', User.accountId)
+		.single();
+
+	console.log(Invitation);
+
 	const tabs = [
 		{
 			name: 'Profile',
@@ -192,6 +205,7 @@
 		{
 			name: 'Invitations',
 			href: `/${User.accountId}/settings`,
+			count: Invitation.count,
 			current: true,
 		},
 		// {
