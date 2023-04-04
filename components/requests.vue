@@ -450,7 +450,6 @@
 				:list-id="backlogId"
 				:auth="auth"
 			/>
-			
 		</div>
 	</div>
 </template>
@@ -508,7 +507,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select('*,Account(id,trayWorkspaceId,Ticket(*),Subscription(*))')
+		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
@@ -516,7 +515,7 @@
 	const getTickets = async () => {
 		const { data: Ticket, error } = await supabase.from('Ticket').select('*');
 		const response =
-			User.systemRole === 'super_admin'
+			User.Account.type === 'super_admin'
 				? Ticket.sort((a, b) => b['priority'] - a['priority'])
 				: User.Account.Ticket.filter((o) => o.teamId == route.params.team);
 		tickets.value = response;
