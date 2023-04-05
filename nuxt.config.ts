@@ -21,7 +21,7 @@ export default defineNuxtConfig({
 		SUPABASE_URL: process.env.SUPABASE_URL,
 	},
 	css: ['~/assets/css/main.css'],
-	modules: ['@nuxtjs/supabase'],
+	modules: ['@nuxtjs/supabase', '@nuxt/image-edge'],
 	vite: {
 		optimizeDeps: {
 			exclude: ['date-fns'],
