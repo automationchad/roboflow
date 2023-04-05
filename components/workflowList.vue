@@ -35,7 +35,7 @@
 														colspan="4"
 														class="py-36 text-center text-sm font-normal"
 													>
-														<loading-icon/>
+														<loading-icon />
 													</th>
 												</tr>
 											</tbody>
@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-	import { reactive, onMounted, ref } from 'vue';
+	import { reactive, onMounted } from 'vue';
 	import {
 		Disclosure,
 		DisclosureButton,
@@ -117,8 +117,6 @@
 		MagnifyingGlassIcon,
 		QuestionMarkCircleIcon,
 		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
 		Bars3Icon,
 		BellIcon,
 		ExclamationTriangleIcon,
@@ -134,7 +132,6 @@
 	import { format } from 'date-fns';
 
 	const user = useSupabaseUser();
-
 	const supabase = useSupabaseClient();
 
 	const state = reactive({
@@ -142,32 +139,18 @@
 		loading: true,
 	});
 
-	const abbreviatedNumber = (number) => {
-		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
-		const tier = (Math.log10(Math.abs(number)) / 3) | 0;
-		if (tier === 0) {
-			return number;
-		}
-		const suffix = SI_SYMBOL[tier];
-		const scale = 10 ** (tier * 3);
-		const scaled = number / scale;
-		const length = scaled.toFixed(1).toString();
-		const precision = length > 3 ? 0 : 1;
-		return scaled.toFixed(precision) + suffix;
-	};
-
-	let { data: User, error: userError } = await supabase
+	const { data: User } = await supabase
 		.from('User')
-		.select('Account(trayWorkspaceId)')
+		.select('Account(type,trayWorkspaceId)')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-
-	const search_term = ref('');
+	const workspaceId =
+		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
 
 	async function fetchData() {
 		const { elements: data } = await $fetch(
-			`/api/workflows/${User.Account.trayWorkspaceId}`
+			`/api/tray/workflows/${workspaceId}`
 		);
 		return data;
 	}

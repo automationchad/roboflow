@@ -1,24 +1,6 @@
 <template>
 	<div class="h-full">
-		<div
-			class="mt-4 rounded-md bg-red-50 p-4"
-			v-if="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
-		>
-			<div class="flex">
-				<div class="flex-shrink-0">
-					<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
-				</div>
-				<div class="ml-3">
-					<h3 class="text-sm font-medium text-red-800">
-						You currently don't have access to change billing details
-					</h3>
-
-					<span class="mt-2 text-sm text-red-700">
-						Contact an owner to request these changes.
-					</span>
-				</div>
-			</div>
-		</div>
+		<warning-access :role="User.systemRole"/>
 		<div class="mt-4 space-y-6 lg:px-0">
 			<!-- Plan -->
 			<section aria-labelledby="plan-heading">
@@ -276,11 +258,13 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`)
+		.select(
+			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
+		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-	
+
 	let retainer = {};
 	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
@@ -378,22 +362,9 @@
 		},
 	];
 
-	const people = [
-		{
-			name: 'Jane Cooper',
-			title: 'Paradigm Representative',
-			role: 'Admin',
-			email: 'janecooper@example.com',
-			telephone: '+1-202-555-0170',
-			imageUrl:
-				'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60',
-		},
-		// More people...
-	];
 	const { data: payments } = await $fetch(
 		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
 	);
 
 	const selectedPlan = ref(plans[0]);
-	const annualBillingEnabled = ref(false);
 </script>

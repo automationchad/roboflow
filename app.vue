@@ -1,8 +1,12 @@
 <template>
 	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
-		<NuxtPage />
+		<NuxtLayout :name="user ? 'default' : 'initial'"><LazyNuxtPage /> </NuxtLayout>
 	</div>
 </template>
+
+<script setup>
+	const user = useSupabaseUser();
+</script>
 
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap');

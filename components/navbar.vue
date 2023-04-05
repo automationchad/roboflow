@@ -369,6 +369,11 @@
 		.limit(1)
 		.single();
 
+	onMounted(() => {
+		nextTick(() => {
+			document.querySelector('navbar').removeAttribute('defer');
+		});
+	});
 
 	let teams = User.Account.Team;
 	let teams_sorted = teams;

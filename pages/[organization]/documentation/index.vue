@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<tickets />
+		<BlogPosts :posts="docs" />
 	</div>
 </template>
 
@@ -33,21 +33,25 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+
 	definePageMeta({ middleware: ['auth'] });
+
+	const route = useRoute();
+
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select('*,Account(id,stripeCustomerId,Subscription(*),Team(id,name))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	const { data: docs } = await supabase.storage
+		.from('files')
+		.list(`client_files/${route.params.organization}`, {
+			offset: 0,
+			sortBy: { column: 'name', order: 'asc' },
+		});
 
-	const activeSub =
-		User.Account.Subscription.find((o) => o.type === 'retainer').tier !==
-		'free';
+	// const activeSub =
+	// 	User.Account.Subscription[0].status === 'active' &&
+	// 	User.Account.Subscription[0].plan.metadata.plan !== 'Free';
 
 	onMounted(() => {
 		watchEffect(() => {
