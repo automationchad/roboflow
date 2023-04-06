@@ -257,7 +257,7 @@
 													class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
 												>
 													<p
-														class="truncate text-sm font-medium text-gray-900 dark:text-white"
+														class="truncate text-sm font- text-gray-900 dark:text-white"
 													>
 														{{ ticket.name }}
 													</p>

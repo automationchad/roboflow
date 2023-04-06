@@ -9,6 +9,9 @@ module.exports = {
 		'./app.vue',
 	],
 	theme: {
+		fontFamily: {
+			mono: ['Dank Mono', 'sans-serif'],
+		},
 		extend: {},
 	},
 	plugins: [

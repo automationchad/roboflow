@@ -1,9 +1,9 @@
 <template>
-	<div class="h-screen">
+	<div class="h-screen" v-if="!user">
 		<div
 			class="grid h-full grid-cols-1 items-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24"
 		>
-			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96" v-if="!loading">
+			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96">
 				<div>
 					<img
 						class="h-12 w-auto"
@@ -173,9 +173,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
-			<div v-else class="col-span-1 mx-auto w-full max-w-sm lg:w-96">
-				<LoadingIcon />
 			</div>
 		</div>
 	</div>

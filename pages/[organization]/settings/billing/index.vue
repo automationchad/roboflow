@@ -66,7 +66,7 @@
 													</div>
 												</TabList>
 												<TabPanels>
-													<TabPanel><plans /></TabPanel>
+													<TabPanel><org-plans /></TabPanel>
 													<TabPanel><org-billing /></TabPanel>
 													<TabPanel><org-invoices /></TabPanel>
 													<TabPanel><org-costs /></TabPanel>

@@ -1,6 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-
 export default defineNuxtConfig({
 	app: {
 		head: {
@@ -16,6 +15,12 @@ export default defineNuxtConfig({
 			],
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
 		},
+	},
+	router: {
+		middleware: ['auth'],
+	},
+	error: {
+		layout: 'error',
 	},
 	publicRuntimeConfig: {
 		SUPABASE_URL: process.env.SUPABASE_URL,

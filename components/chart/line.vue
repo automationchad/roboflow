@@ -3,7 +3,7 @@
 		id="my-chart-id"
 		:options="chartOptions"
 		:data="chartData"
-		class="w-full"
+		class="w-full font-normal"
 	/>
 </template>
 
@@ -49,9 +49,11 @@
 								const canvas = ctx.chart.ctx;
 								const gradient = canvas.createLinearGradient(0, 0, 0, 160);
 
-								gradient.addColorStop(0, 'rgba(102,218,252,0.9)');
-								gradient.addColorStop(0.05, 'rgba(102,218,252,0.6)');
-								gradient.addColorStop(1, 'rgba(102,218,252,0)');
+								gradient.addColorStop(0, 'rgba(102,218,252,0.6)');
+
+								gradient.addColorStop(0.5, 'rgba(102,218,252,0.5)');
+
+								gradient.addColorStop(1, 'rgba(102,218,252,0.05)');
 
 								return gradient;
 							},
@@ -59,7 +61,7 @@
 							pointBackgroundColor: 'rgb(50,188,252)',
 							borderWidth: 2,
 							borderCapStyle: 'round',
-							label: '',
+							label: 'Executions',
 							pointRadius: 0,
 							data: this.data.map((o) => o.value),
 						},
@@ -72,9 +74,7 @@
 							labels: {
 								// This more specific font property overrides the global property
 								font: {
-									family:
-										"system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
-									size: 14,
+									size: 10,
 								},
 							},
 						},

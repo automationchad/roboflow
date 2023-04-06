@@ -1,16 +1,16 @@
 <template>
 	<div
-		class="grid h-screen min-h-full grid-cols-1 grid-rows-[1fr,auto,1fr] bg-white lg:grid-cols-[max(50%,36rem),1fr]"
+		class="grid h-screen min-h-full grid-cols-1 grid-rows-[1fr,auto,1fr] bg-white dark:bg-[#0A1125] lg:grid-cols-[max(50%,36rem),1fr]"
 	>
 		<header
 			class="mx-auto w-full max-w-7xl px-6 pt-6 sm:pt-10 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:px-8"
 		>
 			<a href="/">
-				<span class="sr-only">Your Company</span>
+				<span class="sr-only">Motis Group</span>
 				<img
 					class="h-10 w-auto sm:h-12"
 					src="@/assets/images/logo.png"
-					alt=""
+					alt="motis_logo"
 				/>
 			</a>
 		</header>
@@ -18,14 +18,20 @@
 			class="mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8"
 		>
 			<div class="max-w-lg">
-				<p class="text-base font-semibold leading-8 text-indigo-600">404</p>
+				<p class="text-base font-semibold leading-8 text-indigo-600 dark:text-indigo-400">
+					{{ error.statusCode }}
+				</p>
 				<h1
-					class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl"
+					class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white"
 				>
-					Page not found
+					{{ error.message.split(':')[0] }}
 				</h1>
-				<p class="mt-6 text-base leading-7 text-gray-600">
-					Sorry, we couldn’t find the page you’re looking for.
+				<p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
+					{{
+						error.statusCode === 404
+							? 'Sorry, we couldn’t find the page you’re looking for.'
+							: "There's been an issue on our end"
+					}}
 				</p>
 				<div class="mt-10">
 					<a href="/" class="text-sm font-semibold leading-7 text-indigo-600"
@@ -61,3 +67,9 @@
 		</footer>
 	</div>
 </template>
+
+<script setup>
+	const props = defineProps({
+		error: Object,
+	});
+</script>

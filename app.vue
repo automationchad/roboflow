@@ -1,22 +1,19 @@
 <template>
 	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
-		<NuxtLayout :name="user ? 'default' : 'initial'"><LazyNuxtPage /> </NuxtLayout>
+		<NuxtLayout><NuxtLoadingIndicator /><NuxtPage /> </NuxtLayout>
 	</div>
 </template>
 
-<script setup>
-	const user = useSupabaseUser();
-</script>
-
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap');
-
 	* {
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-			Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-			sans-serif;
+		font-family: circular, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-smooth: always;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
+
 	html {
 		scroll-behavior: smooth;
+		line-height: 1.5;
 	}
 </style>
