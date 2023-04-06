@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
+	pageTransition: { name: 'page', mode: 'out-in' },
 	app: {
 		head: {
 			title: 'Motis Group | Automation and Business Process Consulting App',
