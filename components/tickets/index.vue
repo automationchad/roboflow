@@ -174,7 +174,9 @@
 									class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 								>
 									<div class="ml-4 mt-2">
-										<h3 class="text-sm font-semibold leading-6 text-gray-900">
+										<h3
+											class="text-sm font-semibold leading-6 text-gray-900 dark:text-white"
+										>
 											Done
 										</h3>
 									</div>
@@ -192,7 +194,7 @@
 										<div class="space-x-2">
 											<button
 												:disabled="completedPage <= 0"
-												class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+												class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0 disabled:cursor-not-allowed disabled:bg-gray-100 dark:bg-slate-800 dark:disabled:bg-slate-900"
 												@click="completedPage--"
 											>
 												Previous page

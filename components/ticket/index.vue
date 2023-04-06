@@ -61,10 +61,10 @@
 												{{ ' ' }}
 												in
 												{{ ' ' }}
-												<a
-													:href="`/${route.params.team}/tickets`"
+												<NuxtLink
+													:to="`/${route.params.team}/tickets`"
 													class="font-medium text-gray-900 dark:text-white"
-													>{{ Ticket.Team.name }}</a
+													>{{ Ticket.Team.name }}</NuxtLink
 												>
 											</p>
 										</div>
