@@ -7,9 +7,9 @@
 						<div class="flex w-full">
 							<div class="sc-gsnTZi w-1/3">
 								<p
-									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
-									PLAN
+									Base
 								</p>
 								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									{{ formatNumber(monthly_sum) }}
@@ -17,13 +17,15 @@
 							</div>
 							<div class="sc-gsnTZi w-1/3">
 								<p
-									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
-									TASKS
+									Tasks
 								</p>
 								<h3
 									:class="[
-										super_admin ? 'text-rose-800 dark:text-rose-600' : 'dark:text-white text-gray-900',
+										super_admin
+											? 'text-rose-800 dark:text-rose-600'
+											: 'text-gray-900 dark:text-white',
 										'my-8 flex items-center text-2xl font-semibold ',
 									]"
 								>
@@ -52,9 +54,9 @@
 
 							<div class="sc-gsnTZi w-1/3">
 								<p
-									class="sc-kLLXSd text-base text-slate-600 dark:text-slate-200"
+									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
-									TOTAL COST
+									Total cost
 								</p>
 								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									{{
@@ -115,10 +117,14 @@
 										<div class="sc-hiMGwR dkaYIm">
 											<progress
 												id="file"
-												:value="(kpis['Task Runs']*1000 / task_entitlement) * 100"
+												:value="
+													((kpis['Task Runs']) / task_entitlement) * 100
+												"
 												max="100"
 											>
-												{{ (kpis['Task Runs']*1000 / task_entitlement) * 100 }}%
+												{{
+													((kpis['Task Runs']) / task_entitlement) * 100
+												}}%
 											</progress>
 										</div>
 									</div>
@@ -293,7 +299,7 @@
 
 	const super_admin = User.Account.type === 'super_admin';
 
-	const task_entitlement = super_admin ? 10000000 : 100000;
+	const task_entitlement = super_admin ? 100000 : 100000;
 
 	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 

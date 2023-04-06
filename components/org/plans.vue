@@ -24,7 +24,7 @@
 									<div
 										class="group relative h-full overflow-hidden ring-2 ring-inset ring-black/20"
 									>
-										<nuxt-img
+										<img
 											class="h-full w-full object-cover transition-opacity group-hover:opacity-95"
 											:src="plan.image"
 											:alt="plan.name"

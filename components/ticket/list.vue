@@ -15,19 +15,19 @@
 												<tr class="border-b border-slate-400">
 													<th
 														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
+														class="px-6 py-3 text-left text-sm font-medium  text-gray-900 dark:text-slate-400"
 													>
 														Name
 													</th>
 													<th
 														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
+														class="px-6 py-3 text-left text-sm font-medium  text-gray-900 dark:text-slate-400"
 													>
 														Updated
 													</th>
 													<th
 														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
+														class="px-6 py-3 text-left text-sm font-medium  text-gray-900 dark:text-slate-400"
 													>
 														Type
 													</th>
@@ -47,11 +47,11 @@
 											</thead>
 
 											<tbody
-												class="divide-y divide-slate-200 bg-slate-50 dark:bg-transparent"
+												class="divide-y divide-slate-200 dark:divide-slate-700 bg-slate-50 dark:bg-transparent"
 											>
 												<tr v-for="ticket in tickets" :key="ticket.id">
 													<td
-														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
+														class="flex items-center whitespace-nowrap px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
 													>
 														<span
 															><a
@@ -62,7 +62,7 @@
 														>
 													</td>
 													<td
-														class="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-2 text-left text-sm text-gray-500 dark:text-slate-200"
 													>
 														{{
 															format(
@@ -74,7 +74,7 @@
 														}}
 													</td>
 													<td
-														class="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-2 text-left text-sm text-gray-500 dark:text-slate-200"
 													>
 														<span
 															v-if="ticket.type === 'bug'"

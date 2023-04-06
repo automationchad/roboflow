@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+	import { XCircleIcon } from '@heroicons/vue/20/solid';
 	const props = defineProps({
 		role: String,
 	});

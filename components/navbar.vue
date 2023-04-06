@@ -181,7 +181,7 @@
 							</div>
 							<div class="flex items-center">
 								<span
-									v-if="!active && item.gated"
+									v-if="item.gated"
 									class="ml-auto w-9 min-w-max whitespace-nowrap"
 									><LockClosedIcon class="h-5 w-5 text-gray-200"
 								/></span>
@@ -191,7 +191,7 @@
 							<ul role="list" class="-mx-2 space-y-1">
 								<li v-for="item in navigation" :key="item.name">
 									<NuxtLink
-										:to="!active ? '/settings' : item.href"
+										:to="item.href"
 										:class="[
 											route.path === item.href
 												? ' text-gray-900 dark:text-white'
@@ -211,12 +211,12 @@
 										/>
 										{{ item.name
 										}}<span
-											v-if="item.count && active"
+											v-if="item.count"
 											class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
 											aria-hidden="true"
 											>{{ abbreviatedNumber(item.count) }}</span
 										><span
-											v-if="!active && item.gated"
+											v-if="item.gated"
 											class="ml-auto w-9 min-w-max whitespace-nowrap"
 											><LockClosedIcon class="h-5 w-5 text-gray-200"
 										/></span>
@@ -261,7 +261,7 @@
 										</div>
 										<div class="flex items-center">
 											<span
-												v-if="!active && item.gated"
+												v-if="item.gated"
 												class="ml-auto w-9 min-w-max whitespace-nowrap"
 												><LockClosedIcon class="h-5 w-5 text-gray-200"
 											/></span>
@@ -283,14 +283,11 @@
 
 						<li class="mt-auto space-y-2">
 							<div class="relative">
-								<button class=""><help /></button>
+								<help />
 							</div>
 
 							<div class="relative">
-								<NuxtLink
-									class="-m-1.5 flex items-center p-1.5"
-									:to="`/settings`"
-								>
+								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
 									<div
 										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs"
 										alt=""
@@ -401,8 +398,6 @@
 		return arr;
 	}
 
-	const active = true;
-
 	const route = useRoute();
 
 	const navigation = [
@@ -424,11 +419,6 @@
 			icon: Cog8ToothIcon,
 			current: route.path === `/${User.Account.id}/settings`,
 		},
-	];
-
-	const userNavigation = [
-		{ name: 'Your profile', href: '#' },
-		{ name: 'Sign out', href: '#' },
 	];
 
 	const sidebarOpen = ref(false);

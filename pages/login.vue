@@ -244,9 +244,11 @@
 </template>
 
 <script setup>
-	definePageMeta({ middleware: ['auth'] });
+	
 
 	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
+
+	definePageMeta({ middleware: ['auth'] });
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();

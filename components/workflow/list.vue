@@ -17,13 +17,13 @@
 												<tr class="">
 													<th
 														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
+														class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 													>
 														Name
 													</th>
 													<th
 														scope="col"
-														class="px-6 py-3 text-left text-sm font-normal uppercase text-gray-900 dark:text-slate-400"
+														class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 													>
 														Desc
 													</th>
@@ -42,7 +42,7 @@
 
 											<tbody
 												v-else
-												class="divide-y divide-gray-200 dark:bg-transparent"
+												class="divide-y divide-gray-200 dark:divide-slate-700 dark:bg-transparent"
 											>
 												<tr
 													class="px-6"
@@ -57,7 +57,7 @@
 												</tr>
 												<tr v-for="workflow in state.data" :key="workflow.id">
 													<td
-														class="flex items-center whitespace-nowrap px-6 py-4 text-sm font-normal text-gray-900 dark:text-white"
+														class="flex items-center whitespace-nowrap px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
 													>
 														<span
 															class="max-w-[200px] truncate text-ellipsis"
@@ -65,7 +65,7 @@
 														>
 													</td>
 													<!-- <td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-2 text-sm text-gray-500 dark:text-slate-200"
 													>
 														{{
 															format(
@@ -77,7 +77,7 @@
 														}}
 													</td> -->
 													<td
-														class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-slate-200"
+														class="whitespace-nowrap px-6 py-2 text-sm text-gray-500 dark:text-slate-200"
 													>
 														{{ workflow.name }}
 													</td>

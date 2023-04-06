@@ -1,8 +1,8 @@
 <template>
 	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
-		<NuxtLayout :name="'default2'"
-			><NuxtLoadingIndicator :throttle="5" :height="1"
-		/><NuxtPage/></NuxtLayout>
+		<NuxtLayout
+			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
+		/></NuxtLayout>
 	</div>
 </template>
 
