@@ -172,7 +172,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="mt-8"><loading-icon /></div>
+			<div v-else class="mt-8"><loading-spinner /></div>
 		</div>
 	</div>
 </template>
@@ -277,8 +277,6 @@
 		}, 0) / 100
 	);
 
-	
-
 	const trayCost = (tasks) => {
 		if (tasks <= 1000000) return tasks * (2.04 / 1000);
 		if (tasks > 1000000 && tasks <= 3000000)
@@ -306,8 +304,6 @@
 			);
 		else return tasks * 0.005;
 	};
-
-	
 
 	const formatNumber = (num) => {
 		let formattedNum = Math.abs(num)

@@ -269,18 +269,28 @@
 									</a>
 								</li>
 								<button
-									disabled
-									class="flex items-center py-3 px-1 text-sm text-gray-500 disabled:text-gray-300"
+									:disabled="upgrade_needed"
+									class="group relative flex items-center py-3 px-1 text-sm text-gray-500 disabled:text-gray-300"
 								>
 									<PlusIcon class="mr-2 h-4 w-4" />New Workspace
+									<upgrade-access
+										:object="'workspaces'"
+										v-if="upgrade_needed"
+									/>
 								</button>
 							</ul>
 						</li>
 
 						<li class="mt-auto space-y-2">
 							<div class="relative">
-								<a class="-m-1.5 flex items-center p-1.5" href="/settings">
-									<span class="sr-only">Open user menu</span>
+								<a class=""><help /></a>
+							</div>
+
+							<div class="relative">
+								<a
+									class="-m-1.5 flex items-center p-1.5"
+									:href="`/settings`"
+								>
 									<div
 										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs"
 										src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -356,6 +366,7 @@
 		Account (
 	     id,
 		 name,
+		 Subscription(*),
 		 Team (
 			id,
 			name
@@ -370,34 +381,17 @@
 		.limit(1)
 		.single();
 
-	onMounted(() => {
-		nextTick(() => {
-			document.querySelector('navbar').removeAttribute('defer');
-		});
-	});
-
 	let teams = User.Account.Team;
 	let teams_sorted = teams;
-
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+	const upgrade_needed =
+		retainer.tier !== 'enterprise' ||
+		(retainer.status !== 'active' && User.systemRole !== 'super_admin');
 	const index = teams_sorted.indexOf((o) => User.defaultTeamId == o.id);
 
 	const item = teams_sorted.splice(index, 1)[0];
 
 	teams_sorted.unshift(item);
-
-	const abbreviatedNumber = (number) => {
-		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
-		const tier = (Math.log10(Math.abs(number)) / 3) | 0;
-		if (tier === 0) {
-			return number;
-		}
-		const suffix = SI_SYMBOL[tier];
-		const scale = 10 ** (tier * 3);
-		const scaled = number / scale;
-		const length = scaled.toFixed(1).toString();
-		const precision = length > 3 ? 0 : 1;
-		return scaled.toFixed(precision) + suffix;
-	};
 
 	function moveOrgToFront(arr) {
 		const orgIndex = arr.findIndex((obj) => obj.name === 'Organization');
@@ -415,19 +409,19 @@
 	const navigation = [
 		{
 			name: 'Dashboard',
-			href: `/${User.Account.id}/dashboard`,
+			href: `/dashboard`,
 			icon: ChartBarIcon,
 			current: route.path === `/${User.Account.id}/dashboard`,
 		},
 		{
 			name: 'Plan & Billing',
-			href: `/${User.Account.id}/settings/billing`,
+			href: `/settings/billing`,
 			icon: CreditCardIcon,
 			current: route.path === `/${User.Account.id}/settings/billing`,
 		},
 		{
 			name: 'Settings & Members',
-			href: `/${User.Account.id}/settings`,
+			href: `/settings`,
 			icon: Cog8ToothIcon,
 			current: route.path === `/${User.Account.id}/settings`,
 		},

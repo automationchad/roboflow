@@ -26,29 +26,14 @@
 							>
 								<PlusCircleIcon class="mr-2 h-5 w-5" />
 								Add
-								<div
-									v-if="upgrade_needed"
-									id="tooltip-default"
-									role="tooltip"
-									class="absolute bottom-0 left-1/2 z-10 m-4 mx-auto flex w-[200px] -translate-x-1/2 translate-y-full flex-col rounded-lg border border-slate-300 bg-white px-4 py-4 text-xs font-normal text-slate-500 opacity-0 shadow-sm transition-opacity duration-300 group-hover:opacity-100 dark:border-slate-800 dark:bg-gray-900 dark:text-white"
-								>
-									<span class="text-left text-slate-900 dark:text-white">
-										Upgrade your organization’s plan to add more requests.
-									</span>
-
-									<a
-										:href="`/${User.Account.id}/settings/billing`"
-										class="mt-4 rounded-lg border border-slate-300 px-3 py-1 text-slate-900 dark:border-transparent dark:bg-slate-700 dark:text-white"
-										>Upgrade plan</a
-									>
-								</div>
+								<upgrade-access v-if="upgrade_needed" :object="'tickets'" />
 							</button>
 						</div>
 					</div>
 				</div>
 				<div class="">
 					<div v-if="loading" class="text-center">
-						<div class="mt-8"><loading-icon /></div>
+						<div class="mt-8"><loading-spinner /></div>
 					</div>
 					<div class="" v-else>
 						<div class="" v-if="tickets.length === 0">
@@ -257,7 +242,7 @@
 													class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
 												>
 													<p
-														class="truncate text-sm font- text-gray-900 dark:text-white"
+														class="font- truncate text-sm text-gray-900 dark:text-white"
 													>
 														{{ ticket.name }}
 													</p>

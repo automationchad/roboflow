@@ -30,7 +30,7 @@
 					{{
 						error.statusCode === 404
 							? 'Sorry, we couldn’t find the page you’re looking for.'
-							: "There's been an issue on our end"
+							: error
 					}}
 				</p>
 				<div class="mt-10">

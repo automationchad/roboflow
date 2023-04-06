@@ -7,7 +7,7 @@
 						v-if="state.loading"
 						class="flex items-center justify-center py-36"
 					>
-						<loading-icon />
+						<loading-spinner />
 					</div>
 					<div v-else class="">
 						<div id="chart" class="mt-8 h-full w-full">

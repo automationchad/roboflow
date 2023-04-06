@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div>
+		<div v-if="user">
 			<!-- Your content -->
 			<div>
 				<div class="">

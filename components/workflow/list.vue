@@ -35,7 +35,7 @@
 														colspan="4"
 														class="py-36 text-center text-sm font-normal"
 													>
-														<loading-icon />
+														<loading-spinner />
 													</th>
 												</tr>
 											</tbody>
