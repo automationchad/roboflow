@@ -101,8 +101,8 @@
 											</div>
 											<ul role="list" class="-mx-2 mt-2 space-y-1">
 												<li v-for="team in teams" :key="team.name">
-													<a
-														:href="'/tickets/' + team.id"
+													<NuxtLink
+														to="'/tickets/' + team.id"
 														:class="[
 															route.params.team == team.id
 																? 'bg-gray-800 text-white'
@@ -115,7 +115,7 @@
 															>{{ team.initial }}</span
 														>
 														<span class="truncate">{{ team.name }}</span>
-													</a>
+													</NuxtLink>
 												</li>
 											</ul>
 										</li>
@@ -190,10 +190,10 @@
 						<li>
 							<ul role="list" class="-mx-2 space-y-1">
 								<li v-for="item in navigation" :key="item.name">
-									<a
-										:href="!active ? '/settings' : item.href"
+									<NuxtLink
+										:to="!active ? '/settings' : item.href"
 										:class="[
-											item.current
+											route.path === item.href
 												? ' text-gray-900 dark:text-white'
 												: 'text-gray-700 hover:text-gray-900 dark:text-gray-400  dark:hover:text-white',
 											'group flex items-center gap-x-3 rounded-md p-1 text-sm font-normal leading-6 transition-colors',
@@ -202,7 +202,7 @@
 										<component
 											:is="item.icon"
 											:class="[
-												item.current
+												route.path === item.href
 													? 'text-gray-900 dark:text-indigo-500'
 													: 'text-gray-700',
 												'h-5 w-5 shrink-0',
@@ -220,7 +220,7 @@
 											class="ml-auto w-9 min-w-max whitespace-nowrap"
 											><LockClosedIcon class="h-5 w-5 text-gray-200"
 										/></span>
-									</a>
+									</NuxtLink>
 								</li>
 							</ul>
 						</li>
@@ -235,8 +235,8 @@
 									v-for="(team, idx) in moveOrgToFront(teams)"
 									:key="team.name"
 								>
-									<a
-										:href="`/${team.id}/tickets`"
+									<NuxtLink
+										:to="`/${team.id}/tickets`"
 										:class="[
 											route.params.team == team.id
 												? ' dark:text-white'
@@ -266,7 +266,7 @@
 												><LockClosedIcon class="h-5 w-5 text-gray-200"
 											/></span>
 										</div>
-									</a>
+									</NuxtLink>
 								</li>
 								<button
 									:disabled="upgrade_needed"
@@ -283,17 +283,16 @@
 
 						<li class="mt-auto space-y-2">
 							<div class="relative">
-								<a class=""><help /></a>
+								<button class=""><help /></button>
 							</div>
 
 							<div class="relative">
-								<a
+								<NuxtLink
 									class="-m-1.5 flex items-center p-1.5"
-									:href="`/settings`"
+									:to="`/settings`"
 								>
 									<div
 										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs"
-										src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
 										alt=""
 									>
 										{{ User.firstName[0] }}
@@ -306,7 +305,7 @@
 											>{{ User.firstName }} {{ User.lastName }}</span
 										>
 									</span>
-								</a>
+								</NuxtLink>
 							</div>
 						</li>
 					</ul>
@@ -409,19 +408,19 @@
 	const navigation = [
 		{
 			name: 'Dashboard',
-			href: `/dashboard`,
+			href: `/${User.Account.id}/dashboard`,
 			icon: ChartBarIcon,
 			current: route.path === `/${User.Account.id}/dashboard`,
 		},
 		{
 			name: 'Plan & Billing',
-			href: `/settings/billing`,
+			href: `/${User.Account.id}/settings/billing`,
 			icon: CreditCardIcon,
 			current: route.path === `/${User.Account.id}/settings/billing`,
 		},
 		{
 			name: 'Settings & Members',
-			href: `/settings`,
+			href: `/${User.Account.id}/settings`,
 			icon: Cog8ToothIcon,
 			current: route.path === `/${User.Account.id}/settings`,
 		},

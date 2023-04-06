@@ -23,8 +23,8 @@
 								</p>
 								<h3
 									:class="[
-										super_admin ? 'text-rose-800' : '',
-										'my-8 flex items-center text-2xl font-semibold dark:text-white',
+										super_admin ? 'text-rose-800 dark:text-rose-600' : 'dark:text-white text-gray-900',
+										'my-8 flex items-center text-2xl font-semibold ',
 									]"
 								>
 									{{
@@ -115,19 +115,21 @@
 										<div class="sc-hiMGwR dkaYIm">
 											<progress
 												id="file"
-												:value="(kpis['Task Runs'] / task_entitlement) * 100"
+												:value="(kpis['Task Runs']*1000 / task_entitlement) * 100"
 												max="100"
 											>
-												{{ (kpis['Task Runs'] / task_entitlement) * 100 }}%
+												{{ (kpis['Task Runs']*1000 / task_entitlement) * 100 }}%
 											</progress>
 										</div>
 									</div>
 									<div class="flex">
 										<p class="text-sm">
 											{{
-												(kpis['Task Runs'] * 0.7) / 60 > 60
-													? (kpis['Task Runs'] * 0.7) / 3600
-													: (kpis['Task Runs'] * 0.7) / 60
+												Math.round(
+													(kpis['Task Runs'] * 0.7) / 60 > 60
+														? (kpis['Task Runs'] * 0.7) / 3600
+														: (kpis['Task Runs'] * 0.7) / 60
+												)
 											}}
 											Self-hosted
 											{{
@@ -178,30 +180,60 @@
 </template>
 
 <style scoped>
-	progress[value] {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 100%;
-		height: 0.5rem;
+	@media (prefers-color-scheme: dark) {
+		progress[value] {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 100%;
+			height: 0.5rem;
+		}
+
+		progress[value]::-webkit-progress-bar {
+			background-color: hsl(220, 36%, 25%);
+			border-radius: 0.5rem;
+
+			overflow: hidden;
+		}
+
+		progress[value]::-webkit-progress-value {
+			background-image: -webkit-linear-gradient(
+					top,
+					rgba(255, 255, 255, 0.25),
+					rgba(0, 0, 0, 0.25)
+				),
+				-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+
+			border-radius: 0.5rem;
+			background-size: 35px 20px, 100% 100%, 100% 100%;
+		}
 	}
 
-	progress[value]::-webkit-progress-bar {
-		background-color: hsl(221, 100%, 96%);
-		border-radius: 0.5rem;
+	@media (prefers-color-scheme: light) {
+		progress[value] {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 100%;
+			height: 0.5rem;
+		}
 
-		overflow: hidden;
-	}
+		progress[value]::-webkit-progress-bar {
+			background-color: hsl(221, 100%, 96%);
+			border-radius: 0.5rem;
 
-	progress[value]::-webkit-progress-value {
-		background-image: -webkit-linear-gradient(
-				top,
-				rgba(255, 255, 255, 0.25),
-				rgba(0, 0, 0, 0.25)
-			),
-			-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+			overflow: hidden;
+		}
 
-		border-radius: 0.5rem;
-		background-size: 35px 20px, 100% 100%, 100% 100%;
+		progress[value]::-webkit-progress-value {
+			background-image: -webkit-linear-gradient(
+					top,
+					rgba(255, 255, 255, 0.25),
+					rgba(0, 0, 0, 0.25)
+				),
+				-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+
+			border-radius: 0.5rem;
+			background-size: 35px 20px, 100% 100%, 100% 100%;
+		}
 	}
 </style>
 

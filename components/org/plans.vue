@@ -1,7 +1,7 @@
 <template>
 	<div class="h-full">
-		<warning-access :role="User.systemRole"/>
-		<div class="mt-4 space-y-6 lg:px-0">
+		<warning-access :role="User.systemRole" />
+		<div class="mt-10 space-y-6 lg:px-0">
 			<!-- Plan -->
 			<section aria-labelledby="plan-heading">
 				<fieldset
@@ -12,26 +12,9 @@
 				>
 					<div class="sm:overflow-hidden">
 						<div class="space-y-6 bg-white dark:bg-slate-900">
-							<!-- <div class="space-x-3 dark:bg-gray-50 text-right dark:bg-transparent">
-								<button
-									@click="
-										handleCheckout(
-											{ id: selectedPlan.id },
-											'retainer',
-											User.Account.stripeCustomerId,
-											User.Account.subscription
-										)
-									"
-									class="inline-flex items-center justify-center rounded-md py-2 px-3 text-sm font-normal border border-slate-300 dark:text-white text-gray-900 shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 dark:bg-slate-700"
-								>
-									<PencilIcon class="mr-1 h-4 w-4" />
-									Change retainer
-								</button>
-							</div> -->
-
 							<ul
 								role="list"
-								class="my-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+								class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
 							>
 								<li
 									v-for="(plan, idx) in plans"
@@ -252,55 +235,13 @@
 
 	import { format } from 'date-fns';
 
-	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	let retainer = {};
-	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-
-	let hosting = {};
-	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-
-	const handleCheckout = async (product, type, customer) => {
-		const { url } = await $fetch('/api/stripe/checkout', {
-			method: 'post',
-			body: {
-				product,
-				type,
-				customer,
-				account: User.Account,
-			},
-		});
-		location.href = url;
-	};
-
-	const navigation = [
-		{ name: 'Dashboard', href: '#' },
-		{ name: 'Jobs', href: '#' },
-		{ name: 'Applicants', href: '#' },
-		{ name: 'Company', href: '#' },
-	];
-	const userNavigation = [
-		{ name: 'Your Profile', href: '#' },
-		{ name: 'Settings', href: '#' },
-		{ name: 'Sign out', href: '#' },
-	];
-
 	import free from '@/assets/images/plans/free.png';
 	import support from '~/assets/images/plans/support.png';
 	import growth from '~/assets/images/plans/growth.png';
 	import enterprise from '~/assets/images/plans/enterprise.png';
 
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
 	const plans = [
 		{
 			name: 'Free',
@@ -362,9 +303,31 @@
 		},
 	];
 
-	const { data: payments } = await $fetch(
-		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
-	);
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
 
-	const selectedPlan = ref(plans[0]);
+	let retainer = {};
+	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+
+	let hosting = {};
+	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+
+	const handleCheckout = async (product, type, customer) => {
+		const { url } = await $fetch('/api/stripe/checkout', {
+			method: 'post',
+			body: {
+				product,
+				type,
+				customer,
+				account: User.Account,
+			},
+		});
+		location.href = url;
+	};
 </script>

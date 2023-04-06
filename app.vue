@@ -1,6 +1,8 @@
 <template>
 	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
-		<NuxtLayout><NuxtLoadingIndicator /><NuxtPage /> </NuxtLayout>
+		<NuxtLayout
+			><NuxtLoadingIndicator class="text-indigo-500" :throttle="5" :height="1" /><NuxtPage />
+		</NuxtLayout>
 	</div>
 </template>
 
@@ -15,5 +17,14 @@
 	html {
 		scroll-behavior: smooth;
 		line-height: 1.5;
+	}
+
+	.page-enter-active,
+	.page-leave-active {
+		transition: all 0.1s ease-in;
+	}
+	.page-enter-from,
+	.page-leave-to {
+		opacity: 0;
 	}
 </style>

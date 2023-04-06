@@ -2,6 +2,7 @@
 
 export default defineNuxtConfig({
 	app: {
+		pageTransition: { name: 'page', mode: 'out-in' },
 		head: {
 			title: 'Motis Group | Automation and Business Process Consulting App',
 			charset: 'utf-8',
