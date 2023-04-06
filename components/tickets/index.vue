@@ -97,79 +97,12 @@
 										>No active requests</span
 									>
 								</div>
-								<a
-									:href="`/${route.params.team}/tickets/${ticket.id}`"
+
+								<tickets-pill
 									v-for="ticket in active_tickets"
 									:key="ticket.id"
-									class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:border-gray-600 dark:bg-slate-800 dark:hover:border-gray-500"
-								>
-									<!-- <div class="flex-shrink-0">
-									<img
-										class="h-10 w-10 rounded-full"
-										src="~/assets/images/logo.png"
-										alt=""
-									/>
-								</div> -->
-									<div class="min-w-0 flex-1">
-										<div class="focus:outline-none">
-											<span class="absolute inset-0" aria-hidden="true" />
-											<div class="flex justify-between dark:border-gray-700">
-												<div class="flex items-center space-x-4">
-													<p
-														class="truncate text-sm font-medium text-gray-900 dark:text-white"
-													>
-														{{ ticket.name }}
-													</p>
-													<div
-														v-if="ticket.type === 'new'"
-														class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-sky-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-sky-900"
-														>
-															New
-														</div>
-													</div>
-													<div
-														v-else
-														class="relative inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-purple-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-purple-900"
-														>
-															Bug
-														</div>
-													</div>
-												</div>
-												<div
-													class="flex items-center space-x-1 text-sm text-gray-400"
-												>
-													<ClockIcon class="h-4 w-4" />
-													<span>{{
-														'In ' +
-														formatDistance(new Date(ticket.dueDate), new Date())
-													}}</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</a>
+									:ticket="ticket"
+								/>
 							</div>
 							<div class="mt-8 py-5">
 								<div
@@ -226,77 +159,15 @@
 										>No backlogged requests</span
 									>
 								</div>
-								<a
-									:href="`/${route.params.team}/tickets/${ticket.id}`"
+
+								<tickets-pill
 									v-for="ticket in backlog_tickets.slice(
 										backLogPage * limit,
 										backLogPage * limit + limit
 									)"
 									:key="ticket.id"
-									class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400 dark:bg-slate-800"
-								>
-									<div class="min-w-0 flex-1">
-										<div class="focus:outline-none">
-											<div class="grid grid-cols-3 justify-between">
-												<div
-													class="col-span-2 flex items-center space-x-4 overflow-hidden truncate"
-												>
-													<p
-														class="font- truncate text-sm text-gray-900 dark:text-white"
-													>
-														{{ ticket.name }}
-													</p>
-													<div
-														v-if="ticket.type === 'new'"
-														class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-sky-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-sky-900"
-														>
-															New
-														</div>
-													</div>
-													<div
-														v-else
-														class="relative inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-purple-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-purple-900"
-														>
-															Bug
-														</div>
-													</div>
-													{{ ' ' }}
-												</div>
-												<div
-													class="col-span-1 flex items-center justify-end space-x-1 text-sm text-gray-400"
-												>
-													<CalendarIcon class="h-4 w-4" />
-													<span>{{
-														format(new Date(ticket.createdOn), 'MMM d, yyyy') ??
-														'null'
-													}}</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</a>
+									:ticket="ticket"
+								/>
 							</div>
 							<div class="mt-4 py-5">
 								<div
@@ -349,84 +220,15 @@
 										>No completed requests</span
 									>
 								</div>
-								<a
-									:href="`/${route.params.team}/tickets/${ticket.id}`"
+
+								<tickets-pill
 									v-for="ticket in done_tickets.slice(
 										completedPage * limit,
 										completedPage * limit + limit
 									)"
 									:key="ticket.id"
-									class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
-								>
-									<!-- <div class="flex-shrink-0">
-									<img
-										class="h-10 w-10 rounded-full"
-										src="~/assets/images/logo.png"
-										alt=""
-									/>
-								</div> -->
-									<div class="min-w-0 flex-1">
-										<div class="focus:outline-none">
-											<span class="absolute inset-0" aria-hidden="true" />
-											<div class="grid grid-cols-3 justify-between">
-												<div
-													class="col-span-2 flex items-center space-x-4 truncate"
-												>
-													<p
-														class="truncate text-sm font-medium text-gray-900 dark:text-white"
-													>
-														{{ ticket.name }}
-													</p>
-													<div
-														v-if="ticket.type === 'new'"
-														class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-sky-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-sky-900"
-														>
-															New
-														</div>
-													</div>
-													<div
-														v-else
-														class="relative inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
-													>
-														<div
-															class="absolute flex flex-shrink-0 items-center justify-center"
-														>
-															<span
-																class="h-1.5 w-1.5 rounded-full bg-purple-500"
-																aria-hidden="true"
-															/>
-														</div>
-														<div
-															class="ml-3 text-xs font-semibold text-purple-900"
-														>
-															Bug
-														</div>
-													</div>
-												</div>
-												<div
-													class="col-span-1 flex items-center justify-end space-x-1 text-sm text-gray-400"
-												>
-													<CheckCircleIcon class="h-4 w-4" />
-													<span>{{
-														format(new Date(ticket.updatedOn), 'MMM d, yyyy') ??
-														'null'
-													}}</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</a>
+									:ticket="ticket"
+								/>
 							</div>
 						</div>
 					</div>
