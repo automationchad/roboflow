@@ -15,7 +15,7 @@
 					>
 						Sign in to your account
 					</h2>
-					<p class="mt-2 text-sm text-gray-600">
+					<p class="mt-2 text-sm text-gray-600 dark:text-slate-400">
 						Or
 						{{ ' ' }}
 						<a
@@ -154,7 +154,7 @@
 								<div class="text-sm">
 									<a
 										href="/password"
-										class="font-medium text-indigo-600 hover:text-indigo-500"
+										class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
 										>Forgot your password?</a
 									>
 								</div>

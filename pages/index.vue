@@ -1,24 +1,26 @@
 <template>
-	<div >
+	<div class="h-screen" v-if="!user">
 		<div
-			class="flex h-full flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+			class="grid h-full grid-cols-1 items-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24"
 		>
-			<div class="mx-auto w-full max-w-sm lg:w-96">
+			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96">
 				<div>
 					<img
 						class="h-12 w-auto"
 						src="~/assets/images/logo.png"
 						alt="Your Company"
 					/>
-					<h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+					<h2
+						class="mt-6 text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
+					>
 						Create your account
 					</h2>
-					<p class="mt-2 text-sm text-gray-600">
+					<p class="mt-2 text-sm text-gray-600 dark:text-slate-300">
 						Or
 						{{ ' ' }}
 						<a
 							href="/login"
-							class="font-medium text-indigo-600 hover:text-indigo-500"
+							class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
 							>login to an existing account</a
 						>
 					</p>
@@ -159,6 +161,70 @@
 									@click="signUp()"
 									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
+									<svg
+										v-if="loading"
+										class="mr-1 h-5 w-5 animate-spin"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M12 4.75V6.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M17.1266 6.87347L16.0659 7.93413"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M19.25 12L17.75 12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M17.1266 17.1265L16.0659 16.0659"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12 17.75V19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M7.9342 16.0659L6.87354 17.1265"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M6.25 12L4.75 12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M7.9342 7.93413L6.87354 6.87347"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+									</svg>
 									{{ loading ? 'Loading' : 'Sign up' }}
 								</button>
 							</div>
