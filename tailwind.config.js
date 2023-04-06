@@ -10,7 +10,8 @@ module.exports = {
 	],
 	theme: {
 		fontFamily: {
-			mono: ['Dank Mono', 'sans-serif'],
+			sans: ['circular', 'sans-serif'],
+			mono: ['Dank Mono', 'monospace'],
 		},
 		extend: {},
 	},
