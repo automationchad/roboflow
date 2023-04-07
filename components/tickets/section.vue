@@ -14,15 +14,13 @@
 				<div class="m-0 flex items-center justify-center space-x-3 p-0">
 					<div class="m-0 p-0 text-xs dark:text-gray-300">
 						<span v-if="displayedTickets.length > 0">
-							Showing {{ (props.page) * limit + 1 }} to
-							{{ props.page * limit + limit * (props.page - 1) }}
-							of
-							{{ props.tickets.length }}
+							Page {{ props.page + 1 }} of
+							{{ Math.ceil(props.tickets.length / limit) }}
 						</span>
 						<span v-else>No records</span>
 					</div>
 					<div class="flex items-center space-x-2">
-						<ButtonPageback :disabled="props.page <= 1" @click="prevPage" />
+						<ButtonPageback :disabled="props.page < 1" @click="prevPage" />
 						<ButtonPageforward
 							:disabled="props.page === totalPages.value - 1"
 							@click="nextPage"
@@ -31,15 +29,22 @@
 				</div>
 			</div>
 		</div>
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-1">
+		<div class="grid grid-cols-3 gap-4 sm:grid-cols-3">
 			<div
 				v-if="displayedTickets.length <= 0"
 				class="relative col-span-3 block w-full rounded-lg border border-dashed border-gray-300 px-6 py-5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800"
 			>
 				<span
-					class="my-2 block text-sm font-normal text-gray-900 dark:text-slate-400"
+					v-if="!props.loading"
+					class="block text-sm font-normal text-gray-600 dark:text-slate-400"
 				>
-					No active requests
+					No <span class="lowercase">{{ title }}</span> requests
+				</span>
+				<span
+					v-else
+					class="flex items-center justify-center text-sm text-center font-normal text-gray-900 dark:text-slate-400"
+				>
+					<loading-spinner />
 				</span>
 			</div>
 			<tickets-pill
@@ -65,6 +70,10 @@
 		},
 		page: {
 			type: Number,
+			required: true,
+		},
+		loading: {
+			type: Boolean,
 			required: true,
 		},
 	});

@@ -11,16 +11,100 @@
 								class="flex items-center text-xl font-semibold leading-6 text-gray-900 dark:text-white"
 							>
 								Requests
-								<a
-									class="ml-2 text-slate-300"
-									href="/support/guides/ticket-submit"
-								>
-									<QuestionMarkCircleIcon class="h-5 w-5" />
-								</a>
-								<button @click="refreshData()">refresh</button>
 							</h3>
 						</div>
-						<div class="ml-4 mt-2 flex-shrink-0">
+						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
+							<button
+								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal hover:bg-gray-100"
+								@click="refreshData()"
+							>
+								<svg
+									v-if="!state.loading"
+									class="mr-1 h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+								</svg>
+								<svg
+									v-else
+									class="mr-1 h-5 w-5 animate-spin"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M12 4.75V6.25"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M17.1266 6.87347L16.0659 7.93413"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M19.25 12L17.75 12"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M17.1266 17.1265L16.0659 16.0659"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M12 17.75V19.25"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M7.9342 16.0659L6.87354 17.1265"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M6.25 12L4.75 12"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M7.9342 7.93413L6.87354 6.87347"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path></svg
+								>Refresh
+							</button>
 							<button
 								:disabled="upgrade_needed || state.loading"
 								data-tooltip-target="tooltip-default"
@@ -35,39 +119,30 @@
 					</div>
 				</div>
 				<div>
-					<div v-if="state.loading" class="text-center">
-						<div class="mt-8">
-							<loading-spinner />
-						</div>
-					</div>
-					<div v-else>
-						<div v-if="false">
-							<p
-								class="my-12 text-center text-sm text-gray-500 dark:text-slate-300"
-							>
-								No requests.
-							</p>
-						</div>
-						<div v-else>
+					<div>
+						<div>
 							<tickets-section
 								title="Building"
-								:tickets="active_tickets"
-								:page="state.buildingPage"
-								@update:page="state.buildingPage = $event"
+								:tickets="state.active_tickets"
+								:page="buildingPage"
+								:loading="state.loading"
+								@update:page="buildingPage = $event"
 							/>
 
 							<tickets-section
 								title="Backlog"
-								:tickets="backlog_tickets"
-								:page="state.backlogPage"
-								@update:page="state.backlogPage = $event"
+								:tickets="state.backlog_tickets"
+								:page="backlogPage"
+								:loading="state.loading"
+								@update:page="backlogPage = $event"
 							/>
 
 							<tickets-section
 								title="Done"
-								:tickets="done_tickets"
-								:page="state.completedPage"
-								@update:page="state.completedPage = $event"
+								:tickets="state.done_tickets"
+								:page="completedPage"
+								:loading="state.loading"
+								@update:page="completedPage = $event"
 							/>
 						</div>
 					</div>
@@ -112,35 +187,16 @@
 	];
 
 	// Pagination refs
-	// const buildingPage = ref(1);
-	// const backlogPage = ref(1);
-	// const completedPage = ref(1);
+	const buildingPage = ref(0);
+	const backlogPage = ref(0);
+	const completedPage = ref(0);
 
-	// Reactive state
 	const state = reactive({
 		tickets: [],
-		buildingPage: 1,
-		backlogPage: 1,
-		completedPage: 1,
-		loading: false,
-	});
-
-	const active_tickets = ref([]);
-	const backlog_tickets = ref([]);
-	const done_tickets = ref([]);
-
-	onMounted(() => {
-		watchEffect(() => {
-			active_tickets.value = state.tickets.filter(
-				(ticket) => ticket.status === 'active'
-			);
-			backlog_tickets.value = state.tickets.filter(
-				(ticket) => ticket.status === 'backlog'
-			);
-			done_tickets.value = state.tickets.filter(
-				(ticket) => ticket.status === 'done'
-			);
-		});
+		active_tickets: [],
+		backlog_tickets: [],
+		done_tickets: [],
+		loading: true,
 	});
 
 	// Fetch User data
@@ -160,6 +216,13 @@
 				? Ticket.sort((a, b) => b['priority'] - a['priority'])
 				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
 		state.tickets = response;
+		state.active_tickets = response.filter(
+			(ticket) => ticket.status === 'active'
+		);
+		state.backlog_tickets = response.filter(
+			(ticket) => ticket.status === 'backlog'
+		);
+		state.done_tickets = response.filter((ticket) => ticket.status === 'done');
 		state.loading = false;
 	}
 
