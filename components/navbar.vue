@@ -259,7 +259,7 @@
 											>
 											<span class="truncate font-medium">{{ team.name }}</span>
 										</div>
-										<div class="flex items-center">
+										<div class="flex items-center" v-if="team.Ticket">
 											<div
 												v-if="team.Ticket.filter(o => o.status !== 'done').length"
 												class="flex items-center text-xs font-normal"

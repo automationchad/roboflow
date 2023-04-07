@@ -435,9 +435,9 @@
 																		class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																	>
 																		<img
-																			v-if="activityItem.avatarUrl"
+																			v-if="activityItem.User.avatarPath"
 																			class="mr-2 h-5 w-5 rounded-full object-cover"
-																			:src="activityItem.avatarUrl"
+																			:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${activityItem.User.id}`"
 																			alt=""
 																		/>{{ activityItem.User.firstName }}
 																		{{ activityItem.User.lastName }}

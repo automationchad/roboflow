@@ -5,7 +5,12 @@
 		TrashIcon,
 	} from '@heroicons/vue/24/outline';
 
+	import { PlusIcon, UserCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
+
 	import {
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
 		Listbox,
 		ListboxButton,
 		ListboxLabel,
@@ -19,8 +24,7 @@
 		ChevronDownIcon,
 	} from '@heroicons/vue/20/solid';
 
-	const countries = await getCountries();
-	const selected = ref(countries.find((o) => o === 'United States'));
+	const countries = getCountries();
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
@@ -46,6 +50,12 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	const firstName = ref(User.firstName);
+	const lastName = ref(User.lastName);
+	const companyName = ref(User.companyName);
+	const jobTitle = ref(User.jobTitle);
+	const country = ref(User.country ?? 'United States');
 
 	const getAvatar = async () => {
 		if (User.avatarPath) {
@@ -106,7 +116,7 @@
 			alert(error.message);
 		} finally {
 			avatarSuccess.value = true;
-			
+
 			fileInput.value = '';
 		}
 	};
@@ -114,6 +124,20 @@
 		imageSrc.value = null;
 		fileInput.value = '';
 	};
+
+	async function updateUserField(fieldName, fieldValue) {
+		const { data, error } = await supabase
+			.from('User')
+			.update({ [fieldName]: fieldValue })
+			.eq('id', user.value.id);
+
+		if (error) {
+			console.error(error);
+			return null;
+		}
+		return data;
+		location.reload();
+	}
 </script>
 
 <template>
@@ -135,40 +159,104 @@
 									</div>
 								</div>
 							</li>
-							<li class="flex items-center justify-between">
-								<div class="">
+							<Disclosure
+								as="li"
+								v-slot="{ open }"
+								class="flex items-center justify-between"
+							>
+								<div class="" v-if="!open">
 									<div class="flex flex-col">
-										<small>First name</small>{{ User.firstName }}
+										<small>First name</small>{{ firstName }}
 									</div>
 								</div>
+								<DisclosurePanel
+									class="flex flex-grow items-center justify-between text-sm text-gray-500"
+								>
+									<div class="w-full">
+										<div class="flex justify-between">
+											<input
+												type="text"
+												name="first-name"
+												id="first-name"
+												class="mr-2 block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
+												v-model="firstName"
+											/>
+											<div class="flex items-center space-x-2">
+												<DisclosureButton
+													class="rounded-md border border-indigo-600 bg-white p-2 text-indigo-600"
+												>
+													<XMarkIcon class="h-5 w-5" />
+												</DisclosureButton>
+												<DisclosureButton
+													@click="updateUserField('firstName', firstName)"
+													class="rounded-md bg-indigo-600 p-2 text-white"
+												>
+													<CheckIcon class="h-5 w-5" />
+												</DisclosureButton>
+											</div>
+										</div>
+									</div>
+								</DisclosurePanel>
 								<div class="ml-2">
-									<button class="p-2">
+									<DisclosureButton class="p-2" v-if="!open">
 										<PencilIcon class="h-5 w-5" />
-									</button>
+									</DisclosureButton>
 								</div>
-							</li>
-							<li class="flex items-center justify-between">
-								<div class="">
+							</Disclosure>
+							<Disclosure
+								as="li"
+								v-slot="{ open }"
+								class="flex items-center justify-between"
+							>
+								<div class="" v-if="!open">
 									<div class="flex flex-col">
-										<small>Last name</small>{{ User.lastName }}
+										<small>Last name</small>{{ lastName }}
 									</div>
 								</div>
+								<DisclosurePanel
+									class="flex flex-grow items-center justify-between text-sm text-gray-500"
+								>
+									<div class="w-full">
+										<div class="flex justify-between">
+											<input
+												type="text"
+												name="last-name"
+												id="last-name"
+												class="mr-2 block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
+												v-model="lastName"
+											/>
+											<div class="flex items-center space-x-2">
+												<DisclosureButton
+													class="rounded-md border border-indigo-600 bg-white p-2 text-indigo-600"
+												>
+													<XMarkIcon class="h-5 w-5" />
+												</DisclosureButton>
+												<DisclosureButton
+													@click="updateUserField('lastName', lastName)"
+													class="rounded-md bg-indigo-600 p-2 text-white"
+												>
+													<CheckIcon class="h-5 w-5" />
+												</DisclosureButton>
+											</div>
+										</div>
+									</div>
+								</DisclosurePanel>
 								<div class="ml-2">
-									<button class="p-2">
+									<DisclosureButton class="p-2" v-if="!open">
 										<PencilIcon class="h-5 w-5" />
-									</button>
+									</DisclosureButton>
 								</div>
-							</li>
+							</Disclosure>
 							<li class="flex items-center justify-between">
 								<div class="w-full">
 									<div class="flex flex-col">
 										<small>Country</small>
-										<Listbox as="div" v-model="selected">
+										<Listbox as="div" v-model="country">
 											<div class="relative mt-2">
 												<ListboxButton
 													class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
 												>
-													<span class="block truncate">{{ selected }}</span>
+													<span class="block truncate">{{ country }}</span>
 													<span
 														class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
 													>
@@ -189,9 +277,10 @@
 													>
 														<ListboxOption
 															as="template"
-															v-for="country in countries"
-															:key="country"
-															:value="country"
+															v-for="option in countries"
+															:key="option"
+															:value="option"
+															@click="updateUserField('country', option)"
 															v-slot="{ active, selected }"
 														>
 															<li
@@ -207,7 +296,7 @@
 																		selected ? 'font-semibold' : 'font-normal',
 																		'block truncate',
 																	]"
-																	>{{ country }}</span
+																	>{{ option }}</span
 																>
 
 																<span
@@ -231,31 +320,94 @@
 									</div>
 								</div>
 							</li>
-							<li class="flex items-center justify-between">
-								<div>
+							<Disclosure
+								as="li"
+								v-slot="{ open }"
+								class="flex items-center justify-between"
+							>
+								<div class="" v-if="!open">
 									<div class="flex flex-col">
-										<small class="">Company name</small>{{ User.Account.name }}
+										<small>Company</small>{{ companyName }}
 									</div>
 								</div>
+								<DisclosurePanel
+									class="flex flex-grow items-center justify-between text-sm text-gray-500"
+								>
+									<div class="w-full">
+										<div class="flex justify-between">
+											<input
+												type="text"
+												name="last-name"
+												id="last-name"
+												class="mr-2 block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
+												v-model="companyName"
+											/>
+											<div class="flex items-center space-x-2">
+												<DisclosureButton
+													class="rounded-md border border-indigo-600 bg-white p-2 text-indigo-600"
+												>
+													<XMarkIcon class="h-5 w-5" />
+												</DisclosureButton>
+												<DisclosureButton
+													@click="updateUserField('companyName', companyName)"
+													class="rounded-md bg-indigo-600 p-2 text-white"
+												>
+													<CheckIcon class="h-5 w-5" />
+												</DisclosureButton>
+											</div>
+										</div>
+									</div>
+								</DisclosurePanel>
 								<div class="ml-2">
-									<button class="p-2">
+									<DisclosureButton class="p-2" v-if="!open">
 										<PencilIcon class="h-5 w-5" />
-									</button>
+									</DisclosureButton>
 								</div>
-							</li>
-							<li class="flex items-center justify-between">
-								<div>
+							</Disclosure>
+							<Disclosure
+								as="li"
+								v-slot="{ open }"
+								class="flex items-center justify-between"
+							>
+								<div class="" v-if="!open">
 									<div class="flex flex-col">
-										<small class="">Job title</small
-										>{{ User.Account.jobTitle ?? 'null' }}
+										<small>Job title</small>{{ jobTitle ?? 'null' }}
 									</div>
 								</div>
+								<DisclosurePanel
+									class="flex flex-grow items-center justify-between text-sm text-gray-500"
+								>
+									<div class="w-full">
+										<div class="flex justify-between">
+											<input
+												type="text"
+												name="last-name"
+												id="last-name"
+												class="mr-2 block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
+												v-model="jobTitle"
+											/>
+											<div class="flex items-center space-x-2">
+												<DisclosureButton
+													class="rounded-md border border-indigo-600 bg-white p-2 text-indigo-600"
+												>
+													<XMarkIcon class="h-5 w-5" />
+												</DisclosureButton>
+												<DisclosureButton
+													@click="updateUserField('jobTitle', jobTitle)"
+													class="rounded-md bg-indigo-600 p-2 text-white"
+												>
+													<CheckIcon class="h-5 w-5" />
+												</DisclosureButton>
+											</div>
+										</div>
+									</div>
+								</DisclosurePanel>
 								<div class="ml-2">
-									<button class="p-2">
+									<DisclosureButton class="p-2" v-if="!open">
 										<PencilIcon class="h-5 w-5" />
-									</button>
+									</DisclosureButton>
 								</div>
-							</li>
+							</Disclosure>
 							<li class="flex items-center justify-between">
 								<div>
 									<div class="flex flex-col">
@@ -270,23 +422,29 @@
 										<div
 											class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all text-xs"
 										>
-											<div class="relative">
+											<div class="relative h-12 w-12">
 												<UserCircleIcon
-													v-if="!avatarUrl"
+													v-if="!imageSrc && !avatarUrl"
 													class="relative h-12 w-12 text-gray-300"
 													aria-hidden="true"
 												/>
 
 												<img
 													v-else
-													class="relative h-12 w-12 object-cover rounded-full text-gray-300"
+													class="relative h-12 w-12 rounded-full object-cover text-gray-300"
 													:src="imageSrc || avatarUrl"
-												/><input
+												/>
+												<div
+													class="absolute inset-0 flex items-center justify-center opacity-60 hover:opacity-100"
+												>
+													<PlusIcon class="h-6 w-6 cursor-pointer text-white" />
+												</div>
+												<input
 													type="file"
 													accept="image/*"
 													ref="fileInput"
 													@change="uploadImage"
-													class="absolute top-0 left-0 z-10 h-full w-full cursor-pointer bg-red-500 opacity-0 group-hover:cursor-pointer"
+													class="absolute left-0 top-0 z-10 h-full w-full cursor-pointer opacity-0 group-hover:cursor-pointer"
 												/>
 											</div>
 
@@ -306,11 +464,6 @@
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="ml-2">
-									<button class="p-2">
-										<PencilIcon class="h-5 w-5" />
-									</button>
 								</div>
 							</li>
 							<li class="flex items-center justify-between">
