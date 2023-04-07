@@ -39,7 +39,7 @@
 								leave-to="opacity-0"
 							>
 								<div
-									class="absolute top-0 left-full flex w-16 justify-center pt-5"
+									class="absolute left-full top-0 flex w-16 justify-center pt-5"
 								>
 									<button
 										type="button"
@@ -84,7 +84,7 @@
 														{{ item.name
 														}}<span
 															v-if="item.count"
-															class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
+															class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
 															aria-hidden="true"
 															>{{ abbreviatedNumber(item.count) }}</span
 														>
@@ -160,7 +160,7 @@
 					<ul role="list" class="flex flex-1 flex-col gap-y-7">
 						<a
 							:class="[
-								'group -mx-6 flex items-center justify-between py-4 px-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
+								'group -mx-6 flex items-center justify-between px-4 py-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
 							]"
 						>
 							<div :class="['flex gap-x-3']">
@@ -181,7 +181,7 @@
 							</div>
 							<div class="flex items-center">
 								<span
-									v-if="item.gated"
+									v-if="item?.gated"
 									class="ml-auto w-9 min-w-max whitespace-nowrap"
 									><LockClosedIcon class="h-5 w-5 text-gray-200"
 								/></span>
@@ -212,11 +212,11 @@
 										{{ item.name
 										}}<span
 											v-if="item.count"
-											class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 py-0.5 px-2.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
+											class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
 											aria-hidden="true"
 											>{{ abbreviatedNumber(item.count) }}</span
 										><span
-											v-if="item.gated"
+											v-if="item?.gated"
 											class="ml-auto w-9 min-w-max whitespace-nowrap"
 											><LockClosedIcon class="h-5 w-5 text-gray-200"
 										/></span>
@@ -257,11 +257,20 @@
 												]"
 												>{{ team.name[0] }}</span
 											>
-											<span class="truncate">{{ team.name }}</span>
+											<span class="truncate font-medium">{{ team.name }}</span>
 										</div>
 										<div class="flex items-center">
+											<div
+												v-if="team.Ticket.filter(o => o.status !== 'done').length"
+												class="flex items-center text-xs font-normal"
+											>
+												<span
+													class="inline-flex h-min w-min items-center rounded-full bg-rose-700 px-2 text-xs font-medium text-white"
+													>{{ team.Ticket.filter(o => o.status !== 'done').length }}</span
+												>
+											</div>
 											<span
-												v-if="item.gated"
+												v-if="false"
 												class="ml-auto w-9 min-w-max whitespace-nowrap"
 												><LockClosedIcon class="h-5 w-5 text-gray-200"
 											/></span>
@@ -270,7 +279,7 @@
 								</li>
 								<button
 									:disabled="upgrade_needed"
-									class="group relative flex items-center py-3 px-1 text-sm text-gray-500 disabled:text-gray-300"
+									class="group relative flex items-center px-1 py-3 text-sm text-gray-500 disabled:text-gray-300"
 								>
 									<PlusIcon class="mr-2 h-4 w-4" />New Workspace
 									<upgrade-access
@@ -288,8 +297,9 @@
 
 							<div class="relative">
 								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
-									<img v-if="User.avatarPath"
-										class="flex h-8 w-8 items-center object-cover justify-center rounded-full border border-gray-200 bg-gray-50 text-xs dark:border-slate-700"
+									<img
+										v-if="User.avatarPath"
+										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 object-cover text-xs dark:border-slate-700"
 										alt=""
 										:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`"
 									/>
@@ -359,38 +369,50 @@
 		.from('User')
 		.select(
 			`*,
-		Account (
-	     id,
-		 name,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 ),
-		 Ticket (
-			count
-		 )
-	   )
-	 `
+			Account (
+		     id,
+			 name,
+			 type,
+			 Subscription(*),
+			 Team (
+				id,
+				name
+			 ),
+			 Ticket (
+				count
+			 )
+		   )
+		 `
 		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
 
-	let teams = User.Account.Team;
-	let teams_sorted = teams;
+	let { data: Account, error: accountError } = await supabase
+		.from('Account')
+		.select('*,Ticket(status)');
+
+	let teams = [];
+	if (User.Account.type === 'super_admin') {
+		teams = Account;
+		console.log(teams);
+	} else {
+		teams = User.Account.Team;
+		const index = teams.indexOf((o) => User.defaultTeamId === o.id);
+		const item = teams.splice(index, 1)[0];
+		teams.unshift(item);
+	}
+
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 	const upgrade_needed =
 		retainer.tier !== 'enterprise' ||
 		(retainer.status !== 'active' && User.systemRole !== 'super_admin');
-	const index = teams_sorted.indexOf((o) => User.defaultTeamId == o.id);
-
-	const item = teams_sorted.splice(index, 1)[0];
-
-	teams_sorted.unshift(item);
 
 	function moveOrgToFront(arr) {
-		const orgIndex = arr.findIndex((obj) => obj.name === 'Organization');
+		const orgIndex =
+			User.Account.type === 'super_admin'
+				? arr.findIndex((obj) => obj.id === User.Account.id)
+				: arr.findIndex((obj) => obj.name === 'Organization');
 		if (orgIndex > -1) {
 			const orgObj = arr.splice(orgIndex, 1)[0];
 			arr.unshift(orgObj);
@@ -410,7 +432,6 @@
 	};
 
 	const avatarUrl = await getAvatar();
-	console.log(avatarUrl);
 
 	const route = useRoute();
 
