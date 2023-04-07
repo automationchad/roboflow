@@ -57,7 +57,7 @@
 				</div>
 			</div>
 			<div
-				class="row-span-2 items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+				class="items-center row-span-2 bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
 			>
 				<div class="px-4 text-base font-semibold">
 					<a class="flex items-center" :href="`/${User.defaultTeamId}/tickets`"
