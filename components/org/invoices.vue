@@ -6,15 +6,8 @@
 			<!-- Billing history -->
 			<section aria-labelledby="billing-history-heading" v-else>
 				<div class="sm:overflow-hidden">
-					<div class="">
-						<h2
-							id="billing-history-heading"
-							class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
-						>
-							Invoices
-						</h2>
-					</div>
-					<div class="mt-6 flex flex-col bg-white dark:bg-slate-800">
+					
+					<div class="flex flex-col bg-white dark:bg-slate-800">
 						<div class="overflow-x-auto">
 							<div class="inline-block min-w-full pt-2 align-middle">
 								<div class="overflow-hidden">

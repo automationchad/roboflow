@@ -13,16 +13,16 @@
 				>
 					<div class="sm:overflow-hidden sm:rounded-md">
 						<div class="pb-6">
-							<div>
+							<!-- <div>
 								<h2
 									id="payment-details-heading"
 									class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
 								>
 									Billing information
 								</h2>
-							</div>
+							</div> -->
 
-							<div class="mt-6 grid grid-cols-4 gap-6">
+							<div class="grid grid-cols-4 gap-6">
 								<div class="col-span-4 sm:col-span-2">
 									<label
 										for="email-address"

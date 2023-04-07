@@ -1,5 +1,7 @@
 <template>
-	<div class="flex items-center text-sm text-black dark:text-white leading-6">
+	<div
+		class="flex items-center text-sm font-normal text-slate-600"
+	>
 		<svg
 			class="mr-1 h-5 w-5 animate-spin"
 			viewBox="0 0 24 24"

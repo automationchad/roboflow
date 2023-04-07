@@ -59,7 +59,7 @@
 								<form
 									class="space-y-6 p-10"
 									@submit.prevent="
-										handleSubmit({ name, brief, type, link, auth, listId })
+										handleSubmit({ name, brief, type, link })
 									"
 								>
 									<div>
@@ -293,29 +293,12 @@
 			},
 		]);
 
-		// if (link !== '') {
-		// 	await $fetch(
-		// 		`https://api.trello.com/1/cards/${card.id}/attachments?url=${body.link}&name=videolink&${body.auth}`,
-		// 		{
-		// 			method: 'POST',
-		// 			headers: {
-		// 				Accept: 'application/json',
-		// 			},
-		// 		}
-		// 	)
-		// 		.then((response) => {
-		// 			return response;
-		// 		})
-		// 		.catch((err) => console.error(err));
-		// }
 		emit('ticket-submit');
 		emit('close-modal');
-		
-	};
-</script>
-
-<script>
-	export default {
-		props: ['listId', 'auth'],
+		name.value = '';
+		brief.value = '';
+		link.value = '';
+		type.value = '';
+		loading.value = false;
 	};
 </script>

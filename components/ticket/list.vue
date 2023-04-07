@@ -56,7 +56,7 @@
 														<span
 															><a
 																class="hover:underline"
-																:href="`/${User.Account.id}/tickets/${ticket.id}`"
+																:href="`/${User.defaultTeamId}/tickets/${ticket.id}`"
 																>{{ ticket.name }}</a
 															></span
 														>
@@ -151,19 +151,6 @@
 
 	const supabase = useSupabaseClient();
 
-	const abbreviatedNumber = (number) => {
-		const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
-		const tier = (Math.log10(Math.abs(number)) / 3) | 0;
-		if (tier === 0) {
-			return number;
-		}
-		const suffix = SI_SYMBOL[tier];
-		const scale = 10 ** (tier * 3);
-		const scaled = number / scale;
-		const length = scaled.toFixed(1).toString();
-		const precision = length > 3 ? 0 : 1;
-		return scaled.toFixed(precision) + suffix;
-	};
 
 	const search_term = ref('');
 

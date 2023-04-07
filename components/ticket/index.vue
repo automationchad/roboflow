@@ -7,7 +7,7 @@
 						class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 xl:grid xl:max-w-5xl xl:grid-cols-3"
 					>
 						<div
-							class="dark:border-slate-800 xl:col-span-2 xl:border-r xl:border-gray-200 xl:pr-8"
+							class="dark:border-slate-800 xl:col-span-2  xl:border-gray-200 xl:pr-8"
 						>
 							<div>
 								<div>
@@ -76,7 +76,7 @@
 											<button
 												@click="handleTicketClose(Ticket.status)"
 												type="button"
-												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 											>
 												<CheckCircleIcon
 													class="-ml-0.5 h-5 w-5 text-green-500"
@@ -108,16 +108,7 @@
 													>Open Ticket</span
 												>
 											</div>
-											<div class="flex items-center space-x-2">
-												<ChatBubbleLeftEllipsisIcon
-													class="h-5 w-5 text-gray-400"
-													aria-hidden="true"
-												/>
-												<span
-													class="text-sm font-medium text-gray-900 dark:text-white"
-													>{{ Ticket.Comment.length }} comments</span
-												>
-											</div>
+											
 											<div class="flex items-center space-x-2">
 												<CalendarIcon
 													class="h-5 w-5 text-gray-400"
@@ -323,9 +314,11 @@
 													<div class="flex-shrink-0">
 														<div class="relative">
 															<div
-																class="flex h-8 w-8 items-center justify-center text-xs rounded-full bg-gray-400 ring-1 ring-gray-500"
+																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 text-xs ring-1 ring-gray-500"
 																alt=""
-															>{{ User.firstName[0] }}</div>
+															>
+																{{ User.firstName[0] }}
+															</div>
 														</div>
 													</div>
 													<div class="min-w-0 flex-1">
@@ -715,7 +708,7 @@
 								<button
 									@click="handleTicketClose(Ticket.status)"
 									type="button"
-									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 								>
 									<CheckCircleIcon
 										class="-ml-0.5 h-5 w-5 text-green-500"
@@ -740,7 +733,7 @@
 											</button> -->
 							</div>
 							<h2 class="sr-only">Details</h2>
-							<div class="space-y-5">
+							<div class="space-y-3">
 								<div
 									class="flex items-center space-x-2"
 									v-if="Ticket.status !== 'done'"
@@ -749,34 +742,22 @@
 										class="h-5 w-5 text-green-500"
 										aria-hidden="true"
 									/>
-									<span class="text-sm font-medium text-green-700"
-										>Open Ticket</span
-									>
+									<span class="text-sm text-green-700">Open Ticket</span>
 								</div>
 								<div class="flex items-center space-x-2" v-else>
 									<LockClosedIcon
 										class="h-5 w-5 text-red-500"
 										aria-hidden="true"
 									/>
-									<span class="text-sm font-medium text-red-700"
-										>Closed Ticket</span
-									>
+									<span class="text-sm text-red-700">Closed Ticket</span>
 								</div>
-								<div class="flex items-center space-x-2">
-									<ChatBubbleLeftEllipsisIcon
-										class="h-5 w-5 text-gray-400"
-										aria-hidden="true"
-									/>
-									<span class="text-sm font-medium text-gray-900"
-										>{{ Ticket.Comment.length }} comments</span
-									>
-								</div>
+								
 								<div class="flex items-center space-x-2">
 									<CalendarIcon
 										class="h-5 w-5 text-gray-400"
 										aria-hidden="true"
 									/>
-									<span class="text-sm font-medium text-gray-900"
+									<span class="text-sm text-gray-900"
 										>Created on
 										<span>{{
 											format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
@@ -956,7 +937,6 @@
 		.eq('id', route.params.id)
 		.limit(1)
 		.single();
-
 
 	const input = ref(Ticket.desc);
 
