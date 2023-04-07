@@ -17,8 +17,8 @@
 										<div class="col-span-7">
 											<footer class="mb-4 flex w-full items-center" id="posted-by">
 												<img
-													v-if="ticketAvatar"
-													:src="ticketAvatar"
+													v-if="Ticket.User.avatarPath"
+													:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${Ticket.User.id}`"
 													class="mr-2 flex h-12 w-12 object-cover items-center justify-center rounded-full border border-slate-700"
 												/>
 
@@ -312,9 +312,9 @@
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
-															<img
+															<img v-if="User.avatarPath"
 																class="flex h-8 object-cover w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
-																:src="currentAvatar"
+																:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${user.id}`"
 																alt=""
 															/>
 														</div>
