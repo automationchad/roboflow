@@ -12,7 +12,7 @@
 									Base
 								</p>
 								<h3 class="my-8 text-2xl font-semibold dark:text-white">
-									{{ formatNumber(monthly_sum) }}
+									{{ formatAccounting(monthly_sum) }}
 								</h3>
 							</div>
 							<div class="sc-gsnTZi w-1/3">
@@ -32,17 +32,17 @@
 									{{
 										hosting
 											? super_admin
-												? `(${formatNumber(trayCost(kpis['Task Runs']))})`
-												: formatNumber(taskPrice(kpis['Task Runs']))
-											: formatNumber(0)
+												? `(${formatAccounting(trayCost(kpis['Task Runs']))})`
+												: formatAccounting(taskPrice(kpis['Task Runs']))
+											: formatAccounting(0)
 									}}
 									<div v-if="User.Account.type === 'super_admin'" class="">
 										<!-- <p class="text-xs font-semibold text-rose-700">
-											({{ formatNumber(trayCost(kpis['Task Runs'])) }})
+											({{ formatAccounting(trayCost(kpis['Task Runs'])) }})
 										</p> -->
 										<p class="ml-1 text-xs font-semibold text-lime-700">
 											{{
-												formatNumber(
+												formatAccounting(
 													taskPrice(kpis['Task Runs']) -
 														trayCost(kpis['Task Runs'])
 												)
@@ -60,7 +60,7 @@
 								</p>
 								<h3 class="my-8 text-2xl font-semibold dark:text-white">
 									{{
-										formatNumber(
+										formatAccounting(
 											(hosting
 												? super_admin
 													? trayCost(kpis['Task Runs'])

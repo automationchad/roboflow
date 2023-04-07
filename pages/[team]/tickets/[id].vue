@@ -33,10 +33,16 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
-	const userNavigation = [
-		{ name: 'Your profile', href: '#' },
-		{ name: 'Sign out', href: '#' },
-	];
+	
+	definePageMeta({ middleware: ['auth'] });
+
+	onMounted(() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo('/');
+			}
+		});
+	});
 
 	const user = useSupabaseUser();
 

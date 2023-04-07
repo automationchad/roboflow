@@ -13,276 +13,109 @@
 		ListboxOptions,
 	} from '@headlessui/vue';
 
-	import { CheckIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
+	import {
+		CheckIcon,
+		CheckCircleIcon,
+		ChevronDownIcon,
+	} from '@heroicons/vue/20/solid';
 
-	const country_str = `Afghanistan
-Åland Islands
-Albania
-Algeria
-American Samoa
-Andorra
-Angola
-Anguilla
-Antarctica
-Antigua and Barbuda
-Argentina
-Armenia
-Aruba
-Australia
-Austria
-Azerbaijan
-Bahamas
-Bahrain
-Bangladesh
-Barbados
-Belarus
-Belgium
-Belize
-Benin
-Bermuda
-Bhutan
-Bolivia
-Bosnia and Herzegovina
-Botswana
-Bouvet Island
-Brazil
-British Indian Ocean Territory
-Brunei Darussalam
-Bulgaria
-Burkina Faso
-Burundi
-Cambodia
-Cameroon
-Canada
-Cape Verde
-Cayman Islands
-Central African Republic
-Chad
-Chile
-China
-Christmas Island
-Cocos (Keeling) Islands
-Colombia
-Comoros
-Congo
-Congo, The Democratic Republic of The
-Cook Islands
-Costa Rica
-Cote D'ivoire
-Croatia
-Cuba
-Cyprus
-Czech Republic
-Denmark
-Djibouti
-Dominica
-Dominican Republic
-Ecuador
-Egypt
-El Salvador
-Equatorial Guinea
-Eritrea
-Estonia
-Ethiopia
-Falkland Islands (Malvinas)
-Faroe Islands
-Fiji
-Finland
-France
-French Guiana
-French Polynesia
-French Southern Territories
-Gabon
-Gambia
-Georgia
-Germany
-Ghana
-Gibraltar
-Greece
-Greenland
-Grenada
-Guadeloupe
-Guam
-Guatemala
-Guernsey
-Guinea
-Guinea-bissau
-Guyana
-Haiti
-Heard Island and Mcdonald Islands
-Holy See (Vatican City State)
-Honduras
-Hong Kong
-Hungary
-Iceland
-India
-Indonesia
-Iran, Islamic Republic of
-Iraq
-Ireland
-Isle of Man
-Israel
-Italy
-Jamaica
-Japan
-Jersey
-Jordan
-Kazakhstan
-Kenya
-Kiribati
-Korea, Democratic People's Republic of
-Korea, Republic of
-Kuwait
-Kyrgyzstan
-Lao People's Democratic Republic
-Latvia
-Lebanon
-Lesotho
-Liberia
-Libyan Arab Jamahiriya
-Liechtenstein
-Lithuania
-Luxembourg
-Macao
-Macedonia, The Former Yugoslav Republic of
-Madagascar
-Malawi
-Malaysia
-Maldives
-Mali
-Malta
-Marshall Islands
-Martinique
-Mauritania
-Mauritius
-Mayotte
-Mexico
-Micronesia, Federated States of
-Moldova, Republic of
-Monaco
-Mongolia
-Montenegro
-Montserrat
-Morocco
-Mozambique
-Myanmar
-Namibia
-Nauru
-Nepal
-Netherlands
-Netherlands Antilles
-New Caledonia
-New Zealand
-Nicaragua
-Niger
-Nigeria
-Niue
-Norfolk Island
-Northern Mariana Islands
-Norway
-Oman
-Pakistan
-Palau
-Palestinian Territory, Occupied
-Panama
-Papua New Guinea
-Paraguay
-Peru
-Philippines
-Pitcairn
-Poland
-Portugal
-Puerto Rico
-Qatar
-Reunion
-Romania
-Russian Federation
-Rwanda
-Saint Helena
-Saint Kitts and Nevis
-Saint Lucia
-Saint Pierre and Miquelon
-Saint Vincent and The Grenadines
-Samoa
-San Marino
-Sao Tome and Principe
-Saudi Arabia
-Senegal
-Serbia
-Seychelles
-Sierra Leone
-Singapore
-Slovakia
-Slovenia
-Solomon Islands
-Somalia
-South Africa
-South Georgia and The South Sandwich Islands
-Spain
-Sri Lanka
-Sudan
-Suriname
-Svalbard and Jan Mayen
-Swaziland
-Sweden
-Switzerland
-Syrian Arab Republic
-Taiwan (ROC)
-Tajikistan
-Tanzania, United Republic of
-Thailand
-Timor-leste
-Togo
-Tokelau
-Tonga
-Trinidad and Tobago
-Tunisia
-Turkey
-Turkmenistan
-Turks and Caicos Islands
-Tuvalu
-Uganda
-Ukraine
-United Arab Emirates
-United Kingdom
-United States
-United States Minor Outlying Islands
-Uruguay
-Uzbekistan
-Vanuatu
-Venezuela
-Viet Nam
-Virgin Islands, British
-Virgin Islands, U.S.
-Wallis and Futuna
-Western Sahara
-Yemen
-Zambia
-Zimbabwe`;
-
-	const countries = country_str.split('\n');
-
+	const countries = await getCountries();
 	const selected = ref(countries.find((o) => o === 'United States'));
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
 
+	const imageSrc = ref(null);
+	const fileInput = ref(null);
+	const selectedFile = ref(null);
+	const avatarSuccess = ref(false);
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
 			`*,Account (
-	     id,
-		 name,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
+		     id,
+			 name,
+			 Subscription(*),
+			 Team (
+				id,
+				name
+			 )
+		   )`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	const getAvatar = async () => {
+		if (User.avatarPath) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('avatars')
+				.getPublicUrl(`${User.avatarPath}`);
+			return publicUrl;
+		} else return null;
+	};
+
+	const avatarUrl = await getAvatar();
+
+	const uploadImage = async (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value = URL.createObjectURL(file);
+			selectedFile.value = file;
+			console.log(file);
+		}
+	};
+
+	const handleAvatarUpdate = async () => {
+		if (!selectedFile.value) {
+			console.error('No image selected');
+			return;
+		}
+		try {
+			const { error: deleteError } = await supabase.storage
+				.from('avatars')
+				.remove([User.avatarPath]);
+
+			if (deleteError) {
+				console.error('Error uploading image:', uploadError);
+				return;
+			}
+
+			const fileName = `${user.value.id}.${
+				selectedFile.value.type.split('/')[1]
+			}`;
+			const filePath = `${fileName}`;
+			const { error: uploadError } = await supabase.storage
+				.from('avatars')
+				.upload(filePath, selectedFile.value, { upsert: true });
+
+			if (uploadError) {
+				console.error('Error uploading image:', uploadError);
+				return;
+			}
+			const { error: userUpdateError } = await supabase
+				.from('User')
+				.update({ avatarPath: fileName })
+				.eq('id', user.value.id);
+			if (userUpdateError) {
+				console.error('Error updating user', uploadError);
+				return;
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			avatarSuccess.value = true;
+			imageSrc.value = null;
+			fileInput.value = '';
+		}
+	};
+	const removeImage = () => {
+		imageSrc.value = null;
+		fileInput.value = '';
+	};
 </script>
 
 <template>
@@ -435,9 +268,44 @@ Zimbabwe`;
 							<li class="flex items-center justify-between">
 								<div>
 									<div class="flex flex-col">
-										<small>User picture URL</small>
-										<div class="whitespace-wrap break-all text-xs">
-											https://lh3.googleusercontent.com/a-/ACB-R5TTqPhkUP-vcn7xt5m8mvEJT_VcGEgyESDLBtw3sujEXNMq_mTUPz4201MRcwHhlkXtuoCRoTSuZ9AZlo5JsYOoIpwfsKfwXXcZw4E9gf4ig_TMomyB-YgySd0yVAqQr4-D8Pty1bnr_6crM7OcBY6vGp9LMN8DB7pF0K7RgoiGoJ0_txrgF_UzqCHs34xqM-hRj4iPZBhCTFOFnbXIsaGfLMyfElVKBAluaY75C1tSP3NkxSbzSsWRIGRGXcz-poVxKQjR4_dwvCLi97DSKM1Yzw4Qt13aSLsSHPxXT49oa3gM7lBjX5ARYy0hUKlV7VyUAJKHjO-_be4vJBhMPW_Nt7I5b5BSqX3IEDfjSVdlQue_CU2t-plxLiPmfVl9wuB6vsroGsoOnOjK4HZCMkGOoHxE40rx0einTiVJHkqDRg2aWQhNXRv2-x8kGaFk9pTesQOPtUE04uPqsd-f_Dg-nXfMBVMV4LDschhSorO5NoBnSAIBiX4Ccz5o7rlC_gFIh5FizoO2c0u6gW90WlYkA3kOlgKhocF5IxBpAhCTnrl4juZPDsSSugT_xVEeXQoGn18aPhNtnGtgDWsFKOjwPfK0HQFrBPj2p8jaTwoUNBqvfmsjqLhTuh1ncYwToTs9r6QKkIhk2LlcLXe5S3Qcy225BLRVnemLOSARC60xe62RjFC4_YlpXznL10XhKVXdmnM5CjZsEzHXrl721pZy4g68ozcgTbMGgectfzNA7Sx3WnaThqsHXFaA0pB0AdbffdLRqCi8j909_uTvGMCDOuktY9DZuQLtbGv9kgvEpn0JxcI6ODtEXejTxjftRbHJRWtgIpqPgtmGusCNHrtzXhF7wRR66L0kshqP3i1KRjhI_uSAVv1NKWsnMCXMruinTjVSvN5KI5P_fkO1aGFv5E-68XZS8gy-6UAVHCLufrmCm0ieE1ioZEaZ=s96-c
+										<small>Avatar</small>
+										<div
+											class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all text-xs"
+										>
+											<div class="relative">
+												<UserCircleIcon
+													v-if="!avatarUrl"
+													class="relative h-12 w-12 text-gray-300"
+													aria-hidden="true"
+												/>
+
+												<img
+													v-else
+													class="relative h-12 w-12 rounded-full text-gray-300"
+													:src="imageSrc || avatarUrl"
+												/><input
+													type="file"
+													accept="image/*"
+													ref="fileInput"
+													@change="uploadImage"
+													class="absolute top-0 left-0 z-10 h-full w-full cursor-pointer bg-red-500 opacity-0 group-hover:cursor-pointer"
+												/>
+											</div>
+
+											<button
+												:disabled="!imageSrc"
+												@click="handleAvatarUpdate()"
+												type="button"
+												class="group relative rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:hover:bg-white"
+											>
+												Change
+											</button>
+											<div
+												v-if="avatarSuccess"
+												class="flex items-center text-green-500"
+											>
+												<CheckCircleIcon class="mr-1 h-4 w-4" />Success!
+											</div>
 										</div>
 									</div>
 								</div>

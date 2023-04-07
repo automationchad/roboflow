@@ -288,12 +288,12 @@
 
 							<div class="relative">
 								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
-									<div
-										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs"
+									<img v-if="User.avatarPath"
+										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs dark:border-slate-700"
 										alt=""
-									>
-										{{ User.firstName[0] }}
-									</div>
+										:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`"
+									/>
+
 									<span class="hidden lg:flex lg:items-center">
 										<span
 											style="font-weight: 100"
@@ -397,6 +397,20 @@
 		}
 		return arr;
 	}
+
+	const getAvatar = async () => {
+		if (User.avatarPath) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('avatars')
+				.getPublicUrl(`${User.avatarPath}`);
+			return publicUrl;
+		} else return null;
+	};
+
+	const avatarUrl = await getAvatar();
+	console.log(avatarUrl);
 
 	const route = useRoute();
 

@@ -33,10 +33,19 @@
 		ChevronDownIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+
 	definePageMeta({ middleware: ['auth'] });
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
+
+	onMounted(() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo('/');
+			}
+		});
+	});
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -49,13 +58,7 @@
 		User.Account.Subscription.find((o) => o.type === 'retainer').tier !==
 		'free';
 
-	onMounted(() => {
-		watchEffect(() => {
-			if (!user.value) {
-				navigateTo('/');
-			}
-		});
-	});
+	
 
 	const userNavigation = [
 		{ name: 'Your profile', href: '#' },

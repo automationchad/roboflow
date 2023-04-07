@@ -16,7 +16,14 @@
 									>
 										<div class="col-span-7">
 											<footer class="mb-2 flex w-full items-center">
+												<img
+													v-if="ticketAvatar"
+													:src="ticketAvatar"
+													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700"
+												/>
+
 												<div
+													v-else
 													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-800"
 												>
 													<div class="text-white">
@@ -24,6 +31,7 @@
 														}}{{ Ticket.User.lastName[0] }}
 													</div>
 												</div>
+
 												<div class="">
 													<div class="flex items-center">
 														<span
@@ -313,12 +321,11 @@
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
-															<div
-																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 text-xs ring-1 ring-gray-500"
+															<img
+																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
+																:src="currentAvatar"
 																alt=""
-															>
-																{{ User.firstName[0] }}
-															</div>
+															/>
 														</div>
 													</div>
 													<div class="min-w-0 flex-1">
@@ -425,9 +432,11 @@
 																activityItem, activityItemIdx
 															) in comments"
 															:key="activityItem.id"
+															id="parent-comment"
 															class="mb-6 rounded-lg bg-white text-base dark:bg-transparent"
 														>
 															<footer
+																v-if="!activityItem.deleted"
 																class="mb-2 flex items-center justify-between"
 															>
 																<div class="flex items-center">
@@ -435,8 +444,9 @@
 																		class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																	>
 																		<img
+																			v-if="activityItem.avatarUrl"
 																			class="mr-2 h-5 w-5 rounded-full"
-																			src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+																			:src="activityItem.avatarUrl"
 																			alt="Michael Gough"
 																		/>{{ activityItem.User.firstName }}
 																		{{ activityItem.User.lastName }}
@@ -556,12 +566,20 @@
 																</div>
 															</footer>
 															<span
-																class="prose prose-base pb-2 font-normal text-gray-900 dark:text-gray-200"
+																:class="[
+																	activityItem.deleted
+																		? 'dark:text-gray-400'
+																		: 'text-gray-900 dark:text-gray-200',
+																	'prose prose-base pb-2 font-normal ',
+																]"
 															>
 																{{ activityItem.text }}
 															</span>
 															<div
-																v-if="activityItem.attachment"
+																v-if="
+																	activityItem.attachment &&
+																	!activityItem.deleted
+																"
 																data-test="war_room_comment_text"
 																class="mt-1 flex overflow-hidden"
 															>
@@ -674,7 +692,7 @@
 															</div>
 
 															<div
-																class="ml-2 border-l-2 border-gray-300"
+																class="ml-2 border-l border-slate-300 dark:border-slate-700"
 																v-if="activityItem.Comment.length > 0"
 															>
 																<article
@@ -683,8 +701,9 @@
 																			new Date(b.createdOn) -
 																			new Date(a.createdOn)
 																	)"
+																	id="reply-messages"
 																	:key="reply.id"
-																	class="my-6 w-full rounded-lg bg-white pl-2 text-base dark:bg-gray-900 lg:pl-8"
+																	class="my-6 w-full rounded-lg pl-2 text-base lg:pl-8"
 																>
 																	<footer
 																		class="mb-2 flex items-center justify-between"
@@ -693,11 +712,15 @@
 																			<p
 																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																			>
-																				<img
+																				<img v-if="reply.User.avatarPath"
 																					class="mr-2 h-5 w-5 rounded-full"
-																					src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+																					:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${reply.User.avatarPath}`"
 																					alt="Jese Leos"
-																				/>{{ reply.User.firstName }}
+																				/>
+																				<div v-else class="mr-2 h-5 w-5 rounded-full bg-slate-300"></div>
+																				
+								
+																				{{ reply.User.firstName }}
 																				{{ reply.User.lastName
 																				}}<span
 																					v-if="
@@ -739,7 +762,12 @@
 																				</svg>
 																			</button>
 																			<button
-																				@click="handleDelete(reply.id)"
+																				@click="
+																					handleDelete(
+																						reply.id,
+																						activityItem.Comment
+																					)
+																				"
 																				class="text-slate-400 transition-colors hover:text-rose-400"
 																			>
 																				<svg
@@ -935,33 +963,9 @@
 											</div>
 											<div
 												v-else
-												class="relative block w-full rounded-lg border border-dashed border-gray-300 p-6 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+												class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 											>
-												<div class="flex items-center justify-center">
-													<svg
-														class="mr-3 h-5 w-5 animate-spin text-gray-500"
-														xmlns="http://www.w3.org/2000/svg"
-														fill="none"
-														viewBox="0 0 24 24"
-													>
-														<circle
-															class="opacity-25"
-															cx="12"
-															cy="12"
-															r="10"
-															stroke="currentColor"
-															stroke-width="4"
-														></circle>
-														<path
-															class="opacity-75"
-															fill="currentColor"
-															d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-														></path>
-													</svg>
-													<span class="text-sm text-gray-500"
-														>Loading comments...</span
-													>
-												</div>
+												<loading-spinner />
 											</div>
 											<!-- Comment Box  -->
 										</div>
@@ -1170,7 +1174,7 @@
 
 	const props = defineProps(['open', 'comments']);
 	const feedKey = ref(0);
-	const loading = ref(false);
+	const loading = ref(true);
 
 	const imageSrc = ref(null);
 	const fileInput = ref(null);
@@ -1209,20 +1213,59 @@
 		.limit(1)
 		.single();
 
+	const comments = ref([]);
+
+	const getAvatar = async (id) => {
+		const {
+			data: [avatar],
+			error,
+		} = await supabase.storage.from('avatars').list('', {
+			limit: 1,
+			offset: 0,
+			sortBy: { column: 'name', order: 'asc' },
+			search: id,
+		});
+		if (avatar) {
+			const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${avatar.name}`;
+			return url;
+		} else return null;
+	};
+
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id),Comment(*,User(firstName,lastName,systemRole,id))), User(*)'
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath),Comment(*,User(firstName,lastName,systemRole,id,avatarPath))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
 		.single();
 
+	const ticketAvatar = await getAvatar(Ticket.User.id);
+
+	const currentAvatar = await getAvatar(user.value.id);
+
 	const input = ref(Ticket.desc);
 
-	const comments = Ticket.Comment.filter((o) => !o.threadId).sort(
-		(a, b) => new Date(b.createdOn) - new Date(a.createdOn)
-	);
+	function fetchComments() {
+		const parents = Ticket.Comment.filter((o) => !o.threadId).sort(
+			(a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+		);
+		const updatedComments = parents.map((comment) => {
+			return {
+				...comment,
+				avatarUrl: comment.User.avatarPath
+					? `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`
+					: null,
+			};
+		});
+		comments.value = updatedComments;
+	}
+
+	onMounted(() => {
+		fetchComments();
+		console.log(comments.value);
+		loading.value = false;
+	});
 
 	const comment_text = ref('');
 	const reply_text = ref('');
@@ -1313,12 +1356,26 @@
 		navigateTo(`/${route.params.team}/tickets`);
 	};
 
-	const handleDelete = async (id) => {
-		const { data, error } = await supabase
-			.from('Comment')
-			.delete()
-			.eq('id', id);
-
+	const handleDelete = async (id, comments) => {
+		try {
+			if (comments) {
+				const { data, error: deleteError } = await supabase
+					.from('Comment')
+					.delete()
+					.eq('id', id);
+			} else {
+				const { data, error } = await supabase
+					.from('Comment')
+					.update({ text: 'This message was deleted.', deleted: true })
+					.eq('id', id);
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			comment_text.value = '';
+			loading.value = false;
+			location.reload();
+		}
 		location.reload();
 	};
 </script>

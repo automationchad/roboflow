@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex items-center text-sm font-normal text-slate-600"
+		class="flex items-center text-sm font-normal text-slate-600 dark:text-slate-300"
 	>
 		<svg
 			class="mr-1 h-5 w-5 animate-spin"
