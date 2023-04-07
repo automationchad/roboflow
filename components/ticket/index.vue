@@ -18,7 +18,7 @@
 											<footer class="mb-4 flex w-full items-center" id="posted-by">
 												<img
 													v-if="Ticket.User.avatarPath"
-													:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${Ticket.User.id}`"
+													:src="ticketAvatar"
 													class="mr-2 flex h-12 w-12 object-cover items-center justify-center rounded-full border border-slate-700"
 												/>
 
@@ -314,7 +314,7 @@
 														<div class="relative">
 															<img v-if="User.avatarPath"
 																class="flex h-8 object-cover w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
-																:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${user.id}`"
+																:src="currentAvatar"
 																alt=""
 															/>
 														</div>
@@ -1206,12 +1206,9 @@
 
 	const comments = ref([]);
 
-	const getAvatar = async (id) => {
-		
-		if (User.avatarPath) {
-			const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${id}`;
-			return url;
-		} else return null;
+	const getAvatar = (id) => {
+		const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${id}`;
+		return url;
 	};
 
 	let { data: Ticket, error } = await supabase
@@ -1223,9 +1220,9 @@
 		.limit(1)
 		.single();
 
-	const ticketAvatar = await getAvatar(Ticket.User.id);
+	const ticketAvatar = getAvatar(Ticket.User.id);
 
-	const currentAvatar = await getAvatar(user.value.id);
+	const currentAvatar = getAvatar(user.value.id);
 
 	const input = ref(Ticket.desc);
 
