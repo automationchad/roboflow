@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="bg-white">
+		<div class="">
 			<div class="">
 				<div class="">
 					<div class="">
@@ -24,7 +24,7 @@
 									@click="fetchDropdownItems"
 									:disabled="uploading"
 									placeholder="Choose org"
-									v-model="org"
+									v-model="org_id"
 									:class="[
 										uploading ? 'animate-pulse bg-gray-100' : '',
 										'mt-2 block w-full  rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6',
@@ -38,15 +38,17 @@
 
 							<div class="col-span-3">
 								<div
-									class="mt-8 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+									class="mt-8 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white/25"
 								>
 									<loading-spinner v-if="uploading" />
 									<success-text v-else-if="uploadSuccess" />
 									<div v-else class="text-center">
-										<div class="flex text-sm leading-6 text-gray-600">
+										<div
+											class="flex text-sm leading-6 text-gray-600 dark:text-slate-300"
+										>
 											<label
 												for="file"
-												class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 hover:text-indigo-500"
+												class="relative cursor-pointer rounded-md font-semibold text-indigo-600 hover:text-indigo-500"
 											>
 												<span>Upload a file</span>
 												<input
@@ -61,8 +63,10 @@
 
 											<p class="pl-1">or drag and drop</p>
 										</div>
-										<p class="text-xs leading-5 text-gray-600">
-											PNG, JPG, GIF up to 10MB
+										<p
+											class="text-xs leading-5 text-gray-600 dark:text-slate-500"
+										>
+											PDF, JPG, GIF up to 10MB
 										</p>
 										{{ fileName }}
 									</div>
@@ -81,15 +85,15 @@
 											<div class="inline-block min-w-full pt-2 align-middle">
 												<div class="overflow-hidden">
 													<div
-														class="mb-4 flex items-center justify-start space-x-3 text-sm"
+														class="mb-4 flex items-center justify-start space-x-3 px-2 text-sm dark:text-slate-300"
 													>
 														<button
-															class="inline-flex items-center rounded-md px-2 py-0.5 hover:bg-gray-100"
+															class="inline-flex items-center rounded-md px-2 py-0.5 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 															@click="handleRefresh()"
 														>
 															<svg
-																v-if="!refresh && !state.loading"
-																class="mr-1 h-5 w-5"
+																v-if="!state.loading"
+																class="mr-1 h-5 w-5 dark:text-slate-500"
 																viewBox="0 0 24 24"
 																fill="none"
 																xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +115,7 @@
 															</svg>
 															<svg
 																v-else
-																class="mr-1 h-5 w-5 animate-spin"
+																class="mr-1 h-5 w-5 animate-spin dark:text-slate-500"
 																viewBox="0 0 24 24"
 																fill="none"
 																xmlns="http://www.w3.org/2000/svg"
@@ -174,10 +178,10 @@
 																></path></svg
 															>Refresh</button
 														><button
-															class="inline-flex items-center rounded-md px-2 py-0.5 hover:bg-gray-100"
+															class="inline-flex items-center rounded-md px-2 py-0.5 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 														>
 															<svg
-																class="mr-1 h-5 w-5"
+																class="mr-1 h-5 w-5 dark:text-slate-500"
 																fill="none"
 																viewBox="0 0 24 24"
 															>
@@ -192,10 +196,10 @@
 															Filter
 														</button>
 														<button
-															class="inline-flex items-center rounded-md px-2 py-0.5 hover:bg-gray-100"
+															class="inline-flex items-center rounded-md px-2 py-0.5 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 														>
 															<svg
-																class="mr-1 h-5 w-5"
+																class="mr-1 h-5 w-5 dark:text-slate-500"
 																viewBox="0 0 24 24"
 																fill="none"
 																xmlns="http://www.w3.org/2000/svg"
@@ -245,31 +249,31 @@
 														</button>
 													</div>
 													<table
-														class="w-full divide-y divide-gray-200 dark:divide-slate-600 table-fixed"
+														class="w-full table-fixed divide-y divide-gray-200 dark:divide-slate-600"
 													>
 														<thead class="bg-gray-50 dark:bg-transparent">
 															<tr class="border-b border-slate-600">
 																<th
 																	scope="col"
-																	class="px-6 py-3 w-1/2 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+																	class="w-1/2 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 																>
 																	Name
 																</th>
 																<th
 																	scope="col"
-																	class="px-6 py-3 w-1/5 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+																	class="w-1/5 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 																>
 																	Created
 																</th>
 																<th
 																	scope="col"
-																	class="px-6 py-3 w-1/4 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+																	class="w-1/4 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 																>
 																	Filetype
 																</th>
 																<th
 																	scope="col"
-																	class="px-6 py-3 w-1/8 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+																	class="w-1/8 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 																></th>
 
 																<!--
@@ -282,8 +286,9 @@
 															class="divide-y divide-gray-200 bg-white dark:divide-slate-700 dark:bg-transparent"
 														>
 															<tr v-for="doc in state.docs" :key="doc.id">
-																<td scope="col"
-																	class="flex items-center whitespace-wrap px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
+																<td
+																	scope="col"
+																	class="whitespace-wrap flex items-center px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
 																>
 																	<button
 																		class="flex items-center"
@@ -554,6 +559,7 @@
 	};
 
 	const uploadFile = async (evt) => {
+		const maxSize = 1024 * 1024 * 10;
 		files.value = evt.target.files;
 		const org_id =
 			User.Account.type === 'super_admin'
@@ -567,6 +573,10 @@
 			}
 
 			const file = files.value[0];
+			if (file.size > maxSize) {
+				throw new Error('File too large.');
+				files.value = '';
+			}
 			const fileExt = file.name.split('.').pop();
 			const fileName = `${file.name}.${fileExt}`;
 			const filePath = `client_files/${org_id}/${fileName}`;
@@ -591,9 +601,9 @@
 	};
 
 	const handleRefresh = async () => {
-		refresh.value = true;
+		state.loading = true;
 		state.docs = await fetchData();
-		refresh.value = false;
+		state.loading = false;
 	};
 
 	const handleDownload = async (file_name, folder) => {

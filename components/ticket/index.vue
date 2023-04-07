@@ -7,7 +7,7 @@
 						class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 xl:grid xl:max-w-5xl xl:grid-cols-3"
 					>
 						<div
-							class="dark:border-slate-800 xl:col-span-2  xl:border-gray-200 xl:pr-8"
+							class="dark:border-slate-800 xl:col-span-2 xl:border-gray-200 xl:pr-8"
 						>
 							<div>
 								<div>
@@ -108,7 +108,7 @@
 													>Open Ticket</span
 												>
 											</div>
-											
+
 											<div class="flex items-center space-x-2">
 												<CalendarIcon
 													class="h-5 w-5 text-gray-400"
@@ -340,8 +340,57 @@
 																/>
 															</div>
 															<div
-																class="mt-6 flex items-center justify-end space-x-4"
+																class="mt-6 flex items-end justify-end space-x-4"
 															>
+																<div
+																	v-if="!imageSrc"
+																	class="relative ml-auto flex h-8 items-center justify-center text-slate-200"
+																>
+																	<svg
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg"
+																		class="h-5 w-5"
+																	>
+																		<path
+																			d="M16.667 8.75a.833.833 0 00-.834.833v5.834a.833.833 0 01-.833.833H3.334a.833.833 0 01-.834-.833V8.75a.833.833 0 01.833-.833H5a.833.833 0 00.833-.567l.45-1.367a.833.833 0 01.792-.566h4.592a.833.833 0 000-1.667H7.033a2.5 2.5 0 00-2.366 1.708l-.267.834H3.333a2.5 2.5 0 00-2.5 2.5v6.666a2.5 2.5 0 002.5 2.5H15a2.5 2.5 0 002.5-2.5V9.625a.835.835 0 00-.833-.875zm-7.5-.833a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm0 5a1.667 1.667 0 110-3.334 1.667 1.667 0 010 3.334zm9.167-9.167H17.5v-.833a.833.833 0 10-1.666 0v.833H15a.833.833 0 100 1.667h.834v.833a.833.833 0 101.666 0v-.833h.834a.833.833 0 000-1.667z"
+																			fill="currentColor"
+																		></path>
+																	</svg>
+																	<input
+																		type="file"
+																		accept="image/*"
+																		@change="uploadImage"
+																		ref="fileInput"
+																		data-test="image-input"
+																		class="absolute h-full w-full cursor-auto opacity-0"
+																	/>
+																</div>
+																<div v-else class="relative ml-auto h-full">
+																	<img
+																		:src="imageSrc"
+																		width="40"
+																		height="40"
+																		alt=""
+																		loading="eager"
+																		class="h-10 rounded object-cover"
+																	/>
+																	<div
+																		class="absolute left-0 top-0 h-10 w-10 rounded border border-slate-200 opacity-20"
+																	></div>
+																	<!---->
+																	<svg
+																		@click="removeImage"
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg"
+																		class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600"
+																	>
+																		<path
+																			d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+																			fill="currentColor"
+																		></path>
+																	</svg>
+																</div>
+
 																<button
 																	:disabled="comment_text === ''"
 																	type="submit"
@@ -401,20 +450,136 @@
 																		>
 																	</p>
 																</div>
-																<MessageMenu />
+
+																<div
+																	class="flex space-x-1"
+																	v-if="activityItem.createdBy === User.id"
+																>
+																	<button
+																		class="text-slate-400 transition-colors hover:text-indigo-400"
+																	>
+																		<svg
+																			class="h-5 w-5"
+																			fill="none"
+																			viewBox="0 0 24 24"
+																		>
+																			<path
+																				stroke="currentColor"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																				stroke-width="1.5"
+																				d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																			></path>
+																			<path
+																				stroke="currentColor"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																				stroke-width="1.5"
+																				d="M19.25 19.25H13.75"
+																			></path>
+																		</svg>
+																	</button>
+																	<button
+																		@click="handleDelete(activityItem.id)"
+																		class="text-slate-400 transition-colors hover:text-rose-400"
+																	>
+																		<svg
+																			class="h-5 w-5"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																		>
+																			<path
+																				d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M9.75 10.75V16.25"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M13.25 10.75V16.25"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M4.75 7.75H18.25"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																		</svg>
+																	</button>
+																</div>
+																<div class="flex space-x-1" v-else>
+																	<button
+																		class="text-slate-400 transition-colors hover:text-indigo-400"
+																	>
+																		<svg
+																			class="h-5 w-5"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																		>
+																			<path
+																				d="M4.75 5.75V19.25"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																		</svg>
+																	</button>
+																</div>
 															</footer>
-															<p
-																class="prose prose-base pb-2 font-normal text-gray-900 dark:text-gray-400"
+															<span
+																class="prose prose-base pb-2 font-normal text-gray-900 dark:text-gray-200"
 															>
 																{{ activityItem.text }}
-															</p>
-															<div class="">
+															</span>
+															<div
+																v-if="activityItem.attachment"
+																data-test="war_room_comment_text"
+																class="mt-1 flex overflow-hidden"
+															>
+																<img
+																	:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
+																	:alt="activityItem.attachment.split('/')[1]"
+																	loading="lazy"
+																	data-test="comment-image"
+																	class="max-h-96 max-w-full cursor-pointer rounded-lg"
+																/>
+															</div>
+															<div class="mt-2">
 																<Disclosure v-slot="{ open }">
 																	<div
 																		class="flex items-center justify-between"
 																	>
 																		<DisclosureButton
-																			class="flex items-center text-xs font-semibold text-gray-800"
+																			class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 																		>
 																			<div
 																				data-v-164b91a0=""
@@ -439,7 +604,7 @@
 																		</DisclosureButton>
 
 																		<p
-																			class="mr-2 text-xs text-gray-500 dark:text-gray-600"
+																			class="mr-2 text-xs text-gray-500 dark:text-gray-300"
 																		>
 																			{{
 																				format(
@@ -545,8 +710,109 @@
 																			</p>
 																		</div>
 
-																		<!-- Dropdown menu -->
-																		<MessageMenu />
+																		<div
+																			class="flex space-x-1"
+																			v-if="reply.createdBy === User.id"
+																		>
+																			<button
+																				class="text-slate-400 transition-colors hover:text-indigo-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					fill="none"
+																					viewBox="0 0 24 24"
+																				>
+																					<path
+																						stroke="currentColor"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																						stroke-width="1.5"
+																						d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																					></path>
+																					<path
+																						stroke="currentColor"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																						stroke-width="1.5"
+																						d="M19.25 19.25H13.75"
+																					></path>
+																				</svg>
+																			</button>
+																			<button
+																				@click="handleDelete(reply.id)"
+																				class="text-slate-400 transition-colors hover:text-rose-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					viewBox="0 0 24 24"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																				>
+																					<path
+																						d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M9.75 10.75V16.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M13.25 10.75V16.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M4.75 7.75H18.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																				</svg>
+																			</button>
+																		</div>
+																		<div class="flex space-x-1" v-else>
+																			<button
+																				class="text-slate-400 transition-colors hover:text-indigo-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					viewBox="0 0 24 24"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																				>
+																					<path
+																						d="M4.75 5.75V19.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																				</svg>
+																			</button>
+																		</div>
 																	</footer>
 																	<p
 																		class="text-base text-gray-900 dark:text-gray-400"
@@ -751,7 +1017,7 @@
 									/>
 									<span class="text-sm text-red-700">Closed Ticket</span>
 								</div>
-								
+
 								<div class="flex items-center space-x-2">
 									<CalendarIcon
 										class="h-5 w-5 text-gray-400"
@@ -905,11 +1171,25 @@
 	const props = defineProps(['open', 'comments']);
 	const feedKey = ref(0);
 	const loading = ref(false);
-	const test = false;
-	const user = test
-		? ref({ email: 'automation@motis.group' })
-		: useSupabaseUser();
 
+	const imageSrc = ref(null);
+	const fileInput = ref(null);
+	const selectedFile = ref(null);
+
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value = URL.createObjectURL(file);
+			selectedFile.value = file;
+		}
+	};
+
+	const removeImage = () => {
+		imageSrc.value = null;
+		fileInput.value = '';
+	};
+
+	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
 	let { data: User, error: userError } = await supabase
@@ -954,20 +1234,67 @@
 	};
 
 	const handleCommentAdd = async (thread_id) => {
-		const { data, error } = await supabase.from('Comment').insert([
-			{
-				text: thread_id ? reply_text.value : comment_text.value,
-				createdBy: user.value.id,
-				ticketId: Ticket.id,
-				threadId: thread_id,
-			},
-		]);
-		comment_text.value = '';
-		loading.value = true;
-		setTimeout(() => {
-			feedKey.value++;
+		const org_id =
+			User.Account.type === 'super_admin'
+				? org_id.value
+				: route.params.organization;
+		try {
+			loading.value = true;
+			if (selectedFile.value) {
+				const fileName = selectedFile.value.name;
+				const filePath = `attachments/${fileName}`;
+				const { error: uploadError } = await supabase.storage
+					.from('images')
+					.upload(filePath, selectedFile.value, { upsert: true });
+
+				if (uploadError) {
+					console.error('Error uploading image:', uploadError);
+					return;
+				}
+				const { data, error: insertError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+							attachment: filePath,
+						},
+					]);
+
+				if (insertError) {
+					console.error('Error inserting comment:', insertError);
+				} else {
+					console.log('Image uploaded and comment created successfully');
+					removeImage();
+				}
+			} else {
+				const { data, error: insertError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+						},
+					]);
+
+				if (insertError) {
+					console.error('Error inserting comment:', insertError);
+				} else {
+					console.log('Comment created successfully');
+					removeImage();
+				}
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			comment_text.value = '';
+			loading.value = false;
 			location.reload();
-		}, 1000);
+		}
 	};
 
 	const handleDescUpdate = async () => {
@@ -986,34 +1313,12 @@
 		navigateTo(`/${route.params.team}/tickets`);
 	};
 
-	const calculateDistance = (date) => {
-		var x = new Date(date);
-		var y = new Date();
-		let seconds = Math.abs(x.getTime() - y.getTime()) / 1000;
-		return seconds < 3600;
-	};
-	const regex = /\{[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\} ---/;
+	const handleDelete = async (id) => {
+		const { data, error } = await supabase
+			.from('Comment')
+			.delete()
+			.eq('id', id);
 
-	const calculateMessage = (text) => {};
-
-	const handleDeleteComment = async (card, comment) => {
-		const result = await $fetch(
-			`https://api.trello.com/1/cards/${card}/actions/${comment}/comments?${auth}`,
-			{
-				method: 'DELETE',
-			}
-		)
-			.then((response) => {
-				return response;
-			})
-
-			.catch((err) => console.error(err));
-
-		loading.value = true;
-		setTimeout(() => {
-			feedKey.value++;
-			location.reload();
-		}, 1000);
-		return result;
+		location.reload();
 	};
 </script>
