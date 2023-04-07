@@ -53,7 +53,7 @@
 				data: { publicUrl },
 			} = await supabase.storage
 				.from('avatars')
-				.getPublicUrl(`${User.avatarPath}`);
+				.getPublicUrl(`${user.value.id}`);
 			return publicUrl;
 		} else return null;
 	};
@@ -84,9 +84,7 @@
 				return;
 			}
 
-			const fileName = `${user.value.id}.${
-				selectedFile.value.type.split('/')[1]
-			}`;
+			const fileName = `${user.value.id}`;
 			const filePath = `${fileName}`;
 			const { error: uploadError } = await supabase.storage
 				.from('avatars')
@@ -108,7 +106,7 @@
 			alert(error.message);
 		} finally {
 			avatarSuccess.value = true;
-			imageSrc.value = null;
+			
 			fileInput.value = '';
 		}
 	};
@@ -281,7 +279,7 @@
 
 												<img
 													v-else
-													class="relative h-12 w-12 rounded-full text-gray-300"
+													class="relative h-12 w-12 object-cover rounded-full text-gray-300"
 													:src="imageSrc || avatarUrl"
 												/><input
 													type="file"

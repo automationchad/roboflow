@@ -12,14 +12,14 @@
 							<div>
 								<div>
 									<div
-										class="grid grid-cols-7 justify-between dark:border-slate-800 md:space-x-4 xl:border-b xl:pb-6"
+										class="grid grid-cols-7 justify-between md:space-x-4"
 									>
 										<div class="col-span-7">
-											<footer class="mb-2 flex w-full items-center">
+											<footer class="mb-4 flex w-full items-center" id="posted-by">
 												<img
 													v-if="ticketAvatar"
 													:src="ticketAvatar"
-													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700"
+													class="mr-2 flex h-12 w-12 object-cover items-center justify-center rounded-full border border-slate-700"
 												/>
 
 												<div
@@ -40,9 +40,9 @@
 															{{ Ticket.User.firstName }}
 															{{ Ticket.User.lastName }}
 														</span>
-														<span>&nbsp; • &nbsp;</span>
-														<span class="text-sm font-normal text-gray-600">
-															{{ Ticket.User.jobTitle }}
+														<span class="text-xs text-gray-400">&nbsp; &bull; &nbsp;</span>
+														<span class="inline-flex text-sm font-normal text-gray-600">
+															{{ Ticket.User.jobTitle ?? Ticket.User.systemRole }}
 														</span>
 													</div>
 													<span
@@ -57,24 +57,7 @@
 											>
 												{{ Ticket.name }}
 											</h1>
-											<p class="mt-2 text-sm text-gray-500">
-												Opened by
-												{{ ' ' }}
-												<a
-													href="#"
-													class="font-medium text-gray-900 dark:text-white"
-													>{{ Ticket.User.firstName }}
-													{{ Ticket.User.lastName }}</a
-												>
-												{{ ' ' }}
-												in
-												{{ ' ' }}
-												<NuxtLink
-													:to="`/${route.params.team}/tickets`"
-													class="font-medium text-gray-900 dark:text-white"
-													>{{ Ticket.Team.name }}</NuxtLink
-												>
-											</p>
+											
 										</div>
 									</div>
 									<aside class="mt-8 xl:hidden">
@@ -206,11 +189,11 @@
 											</div>
 										</div>
 									</aside>
-									<div class="py-3 xl:pt-6 xl:pb-0">
+									<div class="xl:pb-0">
 										<h2 class="sr-only">Description</h2>
 
 										<Disclosure v-slot="{ open }">
-											<DisclosurePanel class="flex items-start space-x-4">
+											<DisclosurePanel class="flex items-start space-x-4 mt-4">
 												<div class="min-w-0 flex-1">
 													<div class="relative">
 														<div
@@ -224,7 +207,7 @@
 																@input="update"
 																name="comment"
 																id="comment"
-																class="h-content w-full max-w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
+																class="h-content w-full text-sm max-w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
 																placeholder="Add your comment..."
 															></textarea>
 
@@ -301,6 +284,14 @@
 											</div>
 										</Disclosure>
 									</div>
+									<div class="mt-2 text-xs  py-3 xl:pt-6 xl:pb-0">
+												
+												<NuxtLink
+													:to="`/${route.params.team}/tickets`"
+													class="font-normal px-2 py-1 rounded-md text-indigo-600 bg-indigo-100 dark:text-white"
+													>{{ Ticket.Team.name }}</NuxtLink
+												>
+											</div>
 								</div>
 							</div>
 							<section aria-labelledby="activity-title" class="mt-8 xl:mt-10">
@@ -322,7 +313,7 @@
 													<div class="flex-shrink-0">
 														<div class="relative">
 															<img
-																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
+																class="flex h-8 object-cover w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
 																:src="currentAvatar"
 																alt=""
 															/>
@@ -445,9 +436,9 @@
 																	>
 																		<img
 																			v-if="activityItem.avatarUrl"
-																			class="mr-2 h-5 w-5 rounded-full"
+																			class="mr-2 h-5 w-5 rounded-full object-cover"
 																			:src="activityItem.avatarUrl"
-																			alt="Michael Gough"
+																			alt=""
 																		/>{{ activityItem.User.firstName }}
 																		{{ activityItem.User.lastName }}
 																		<span
@@ -713,8 +704,8 @@
 																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																			>
 																				<img v-if="reply.User.avatarPath"
-																					class="mr-2 h-5 w-5 rounded-full"
-																					:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${reply.User.avatarPath}`"
+																					class="mr-2 h-5 w-5 rounded-full object-cover"
+																					:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${reply.User.id}`"
 																					alt="Jese Leos"
 																				/>
 																				<div v-else class="mr-2 h-5 w-5 rounded-full bg-slate-300"></div>
@@ -1216,17 +1207,9 @@
 	const comments = ref([]);
 
 	const getAvatar = async (id) => {
-		const {
-			data: [avatar],
-			error,
-		} = await supabase.storage.from('avatars').list('', {
-			limit: 1,
-			offset: 0,
-			sortBy: { column: 'name', order: 'asc' },
-			search: id,
-		});
-		if (avatar) {
-			const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${avatar.name}`;
+		
+		if (User.avatarPath) {
+			const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${id}`;
 			return url;
 		} else return null;
 	};

@@ -289,7 +289,7 @@
 							<div class="relative">
 								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
 									<img v-if="User.avatarPath"
-										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs dark:border-slate-700"
+										class="flex h-8 w-8 items-center object-cover justify-center rounded-full border border-gray-200 bg-gray-50 text-xs dark:border-slate-700"
 										alt=""
 										:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`"
 									/>
