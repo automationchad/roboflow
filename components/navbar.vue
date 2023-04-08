@@ -434,6 +434,7 @@
 			limit: 100,
 			offset: 0,
 			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${user.value.id}`,
 		});
 		if (File) {
 			const {

@@ -244,7 +244,7 @@ export default function (num) {
 	Zambia
 	Zimbabwe`;
 
-	const countries = country_str.split('\n');
+	const countries = country_str.split('\n\t');
     
 	return countries;
 }

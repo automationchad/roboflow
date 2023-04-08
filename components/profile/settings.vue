@@ -61,26 +61,27 @@
 	const updatedPhoto = ref(false);
 
 	const getAvatar = async (avatar) => {
-		const { data: File, error: fileError } = await supabase.storage
-			.from('avatars')
-			.list(`${avatar}`, {
-				limit: 100,
-				offset: 0,
-				sortBy: { column: 'updated_at', order: 'desc' },
-			});
-		imageSrc.value = null;
-		if (File[0]) {
+		const {
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('avatars').list(`${avatar}`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${user.value.id}`,
+		});
+		if (File) {
 			const {
 				data: { publicUrl },
 			} = await supabase.storage
 				.from('avatars')
-				.getPublicUrl(`/${user.value.id}/${File[0].name}`);
-
+				.getPublicUrl(`${user.value.id}/${File.name}`);
 			return publicUrl;
 		} else return null;
 	};
 
 	avatarUrl.value = await getAvatar(user.value.id);
+	console.log(avatarUrl.value);
 
 	const uploadImage = async (event) => {
 		const file = event.target.files[0];
@@ -96,7 +97,7 @@
 			console.error('No image selected');
 			return;
 		}
-		console.log(selectedFile.value);
+
 		try {
 			updating_loading.value = true;
 			const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
@@ -112,6 +113,17 @@
 					offset: 0,
 					sortBy: { column: 'updated_at', order: 'desc' },
 				});
+
+			if (File.length > 0) {
+				const arr = File.map((o) => {
+					const userId = o.name.split('-').slice(0, -1).join('-');
+					return `${userId}/${o.name}`;
+				});
+				console.log(arr);
+				const { data, error } = await supabase.storage
+					.from('avatars')
+					.remove(arr);
+			}
 
 			const { error: uploadError } = await supabase.storage
 				.from('avatars')
@@ -134,19 +146,39 @@
 		} catch (error) {
 			alert(error.message);
 		} finally {
+			avatarUrl.value = await getAvatar(user.value.id);
 			updatedPhoto.value = false;
-			updating_loading.value = false;
 			avatarSuccess.value = true;
+			updating_loading.value = false;
 			fileInput.value = '';
-			setTimeout(async () => {
+			setTimeout(() => {
 				avatarSuccess.value = false;
-				avatarUrl.value = await getAvatar(user.value.id);
-			}, 2000);
+				imageSrc.value = null;
+			}, 1000);
 		}
 	};
-	const removeImage = () => {
-		updatedPhoto.value = false;
+	const removeImage = async () => {
 		imageSrc.value = null;
+		avatarUrl.value = null;
+		const { data: File, error: fileError } = await supabase.storage
+			.from('avatars')
+			.list(`${user.value.id}`, {
+				limit: 100,
+				offset: 0,
+				sortBy: { column: 'updated_at', order: 'desc' },
+			});
+
+		if (File.length > 0) {
+			const arr = File.map((o) => {
+				const userId = o.name.split('-').slice(0, -1).join('-');
+				return `${userId}/${o.name}`;
+			});
+
+			const { data, error } = await supabase.storage
+				.from('avatars')
+				.remove(arr);
+		}
+		updatedPhoto.value = false;
 		fileInput.value = '';
 	};
 
@@ -447,19 +479,19 @@
 										<div
 											class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all text-xs"
 										>
-											<div class="relative h-12 w-12">
+											<div class="relative h-14 w-14">
 												<div
 													v-if="!imageSrc && !avatarUrl"
-													class="relative h-12 w-12 rounded-full border border-slate-700"
+													class="relative h-14 w-14 rounded-full border border-slate-700"
 													aria-hidden="true"
 												></div>
 
 												<img
 													v-else
-													class="relative h-12 w-12 rounded-full object-cover text-gray-300"
+													class="relative h-14 w-14 rounded-full object-cover text-gray-300"
 													:src="imageSrc || avatarUrl"
 												/>
-												<div
+												<div v-if="!avatarUrl && !updating_loading && !imageSrc"
 													class="absolute inset-0 flex items-center justify-center opacity-60 hover:opacity-100"
 												>
 													<PlusIcon
@@ -467,12 +499,25 @@
 													/>
 												</div>
 												<input
+													v-if="!avatarUrl"
 													type="file"
 													accept="image/png, image/jpeg, image/webp, image/gif"
 													ref="fileInput"
 													@change="uploadImage"
 													class="absolute left-0 top-0 z-10 h-full w-full cursor-pointer opacity-0 group-hover:cursor-pointer"
 												/>
+												<svg
+													v-if="(avatarUrl && !updating_loading)"
+													@click="removeImage"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+													class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600"
+												>
+													<path
+														d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+														fill="currentColor"
+													></path>
+												</svg>
 											</div>
 											<div
 												class="flex items-center space-x-2"
@@ -495,27 +540,25 @@
 													:disabled="!updatedPhoto || updating_loading"
 													@click="handleAvatarUpdate()"
 													type="button"
-													class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800"
+													class="hover:bg-indigo- group relative rounded-md bg-indigo-600 px-1 py-1 text-sm font-normal text-white shadow-sm dark:bg-slate-800 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800"
 												>
 													<span v-if="!updating_loading"
 														><CheckIcon class="h-4 w-4"
 													/></span>
 												</button>
 											</div>
-											<div class="flex items-center space-x-2">
-												<div
-													v-if="updating_loading"
-													:disabled="updating_loading"
-													class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 dark:text-white"
-												>
-													<loading-spinner :show-text="false" />
-												</div>
-												<div
-													v-if="avatarSuccess"
-													class="group relative rounded-md px-1 py-1 text-sm font-normal text-green-500"
-												>
-													<success-spinner :show-text="false" />
-												</div>
+											<div
+												v-if="updating_loading && !avatarSuccess"
+												:disabled="updating_loading"
+												class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 dark:text-white"
+											>
+												<loading-spinner :show-text="false" />
+											</div>
+											<div
+												v-else-if="avatarSuccess"
+												class="group relative rounded-md px-1 py-1 text-sm font-normal text-green-500"
+											>
+												<success-spinner :show-text="false" />
 											</div>
 										</div>
 									</div>

@@ -44,6 +44,7 @@
 														<span class="inline-flex text-sm font-normal text-gray-600">
 															{{ Ticket.User.jobTitle ?? Ticket.User.systemRole }}
 														</span>
+														<span class="text-sm ml-1">{{ countryToEmoji(Ticket.User.country) }}</span>
 													</div>
 													<span
 														v-if="Ticket.User.systemRole === 'super_admin'"
@@ -440,7 +441,14 @@
 																			class="mr-2 h-5 w-5 rounded-full object-cover"
 																			:src="activityItem.avatarUrl"
 																			alt=""
-																		/>{{ activityItem.User.firstName }}
+																		/>
+																		<div
+																			v-else
+																			class="mr-2 h-5 w-5 text-xs flex border border-sky-600/20 items-center justify-center bg-sky-100 text-sky-500 rounded-full"
+																			
+																		><UserCircleIconMini class="h-5 w-5 m-0"/></div>
+																		
+																		{{ activityItem.User.firstName }}
 																		{{ activityItem.User.lastName }}
 																		<span
 																			v-if="
@@ -1202,11 +1210,13 @@
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath),Comment(*,User(firstName,lastName,systemRole,id,avatarPath))), User(*)'
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
 		.single();
+
+	console.log(Ticket);
 
 	const input = ref(Ticket.desc);
 	
@@ -1231,6 +1241,7 @@
 		limit: 100,
 		offset: 0,
 		sortBy: { column: 'updated_at', order: 'desc' },
+		search: `${avatar}`
 	});
 
 	if(File) {
