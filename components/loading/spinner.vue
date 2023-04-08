@@ -3,7 +3,7 @@
 		class="flex items-center text-sm font-normal text-slate-600 dark:text-slate-300"
 	>
 		<svg
-			class="mr-1 h-5 w-5 animate-spin"
+			class="h-5 w-5 animate-spin"
 			viewBox="0 0 24 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -64,6 +64,17 @@
 				stroke-linecap="round"
 				stroke-linejoin="round"
 			></path></svg
-		>Loading...
+		><span v-if="showText" class="ml-1">Loading...</span>
 	</div>
 </template>
+
+<script setup>
+
+const props = defineProps({
+	showText: {
+			type: Boolean,
+			required: true,
+		},
+})
+
+</script>

@@ -17,7 +17,7 @@
 										<div class="col-span-7">
 											<footer class="mb-4 flex w-full items-center" id="posted-by">
 												<img
-													v-if="Ticket.User.avatarPath"
+													v-if="ticketAvatar"
 													:src="ticketAvatar"
 													class="mr-2 flex h-12 w-12 object-cover items-center justify-center rounded-full border border-slate-700"
 												/>
@@ -47,8 +47,8 @@
 													</div>
 													<span
 														v-if="Ticket.User.systemRole === 'super_admin'"
-														class="badge py-0.25 rounded-md border border-gray-900/10 px-1 text-xs"
-														>MG Admin</span
+														class="badge py-0.25 rounded-md border dark:text-black/70 border-gray-900/10 px-1 text-xs"
+														>Admin</span
 													>
 												</div>
 											</footer>
@@ -312,11 +312,12 @@
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
-															<img v-if="User.avatarPath"
+															<img v-if="currentAvatar"
 																class="flex h-8 object-cover w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
 																:src="currentAvatar"
 																alt=""
 															/>
+															<div v-else class="flex h-8 object-cover w-8 items-center justify-center text-white rounded-full bg-slate-800 border-slate-700 border text-xs">{{ User.firstName[0] }}</div>
 														</div>
 													</div>
 													<div class="min-w-0 flex-1">
@@ -435,9 +436,9 @@
 																		class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																	>
 																		<img
-																			v-if="activityItem.User.avatarPath"
+																			v-if="activityItem.avatarUrl"
 																			class="mr-2 h-5 w-5 rounded-full object-cover"
-																			:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${activityItem.User.id}`"
+																			:src="activityItem.avatarUrl"
 																			alt=""
 																		/>{{ activityItem.User.firstName }}
 																		{{ activityItem.User.lastName }}
@@ -446,8 +447,8 @@
 																				activityItem.User.systemRole ===
 																				'super_admin'
 																			"
-																			class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs"
-																			>MG Admin</span
+																			class="badge py-0.25 ml-2 dark:text-black/70 rounded-md border border-gray-900/10 px-1 text-xs"
+																			>Admin</span
 																		>
 																	</p>
 																</div>
@@ -644,7 +645,7 @@
 																						v-model="reply_text"
 																						name="comment"
 																						id="comment"
-																						class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
+																						class="block w-full resize-none border-0 bg-transparent text-gray-900 dark:text-white placeholder:text-slate-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
 																						placeholder="Add your reply..."
 																					/>
 
@@ -702,12 +703,12 @@
 																		<div class="flex items-center">
 																			<p
 																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
-																			>
-																				<img v-if="reply.User.avatarPath"
+																			><div v-if="reply.avatarUrl"><img 
 																					class="mr-2 h-5 w-5 rounded-full object-cover"
-																					:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${reply.User.id}`"
+																					:src="reply.avatarUrl"
 																					alt="Jese Leos"
-																				/>
+																				/></div>
+																				
 																				<div v-else class="mr-2 h-5 w-5 rounded-full bg-slate-300"></div>
 																				
 								
@@ -718,8 +719,8 @@
 																						reply.User.systemRole ===
 																						'super_admin'
 																					"
-																					class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs"
-																					>MG Admin</span
+																					class="badge py-0.25 ml-2 rounded-md border dark:text-black/70 border-gray-900/10 px-1 text-xs"
+																					>Admin</span
 																				>
 																			</p>
 																		</div>
@@ -834,11 +835,11 @@
 																		</div>
 																	</footer>
 																	<p
-																		class="text-base text-gray-900 dark:text-gray-400"
+																		class="text-base text-gray-900 dark:text-slate-100"
 																	>
 																		{{ reply.text }}
 																	</p>
-																	<Disclosure v-slot="{ open }">
+																	<Disclosure>
 																		<div
 																			class="mt-2 flex items-center justify-between"
 																		>
@@ -954,7 +955,7 @@
 											</div>
 											<div
 												v-else
-												class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+												class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-300 dark:border-slate-700 p-6 text-center"
 											>
 												<loading-spinner />
 											</div>
@@ -1157,35 +1158,29 @@
 		UserCircleIcon as UserCircleIconMini,
 	} from '@heroicons/vue/20/solid';
 
-	import { format, formatDistanceStrict } from 'date-fns';
 	import showdown from 'showdown';
-	const converter = await new showdown.Converter();
+	import { format, formatDistanceStrict } from 'date-fns';
 
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
 	const route = useRoute();
-
 	const props = defineProps(['open', 'comments']);
-	const feedKey = ref(0);
+	
+	const converter = await new showdown.Converter();
 	const loading = ref(true);
+
+	const ticketAvatar = ref(null);
+
+	const currentAvatar = ref(null); 
+
+	const comments = ref([]);
+	const comment_text = ref('');
+	const reply_text = ref('');
+	
 
 	const imageSrc = ref(null);
 	const fileInput = ref(null);
 	const selectedFile = ref(null);
-
-	const uploadImage = (event) => {
-		const file = event.target.files[0];
-		if (file) {
-			imageSrc.value = URL.createObjectURL(file);
-			selectedFile.value = file;
-		}
-	};
-
-	const removeImage = () => {
-		imageSrc.value = null;
-		fileInput.value = '';
-	};
-
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -1204,13 +1199,6 @@
 		.limit(1)
 		.single();
 
-	const comments = ref([]);
-
-	const getAvatar = (id) => {
-		const url = `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${id}`;
-		return url;
-	};
-
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
@@ -1220,35 +1208,104 @@
 		.limit(1)
 		.single();
 
-	const ticketAvatar = getAvatar(Ticket.User.id);
-
-	const currentAvatar = getAvatar(user.value.id);
-
 	const input = ref(Ticket.desc);
+	
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value = URL.createObjectURL(file);
+			selectedFile.value = file;
+		}
+	};
 
-	function fetchComments() {
-		const parents = Ticket.Comment.filter((o) => !o.threadId).sort(
-			(a, b) => new Date(b.createdOn) - new Date(a.createdOn)
-		);
-		const updatedComments = parents.map((comment) => {
-			return {
-				...comment,
-				avatarUrl: comment.User.avatarPath
-					? `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`
-					: null,
-			};
-		});
-		comments.value = updatedComments;
-	}
+	const removeImage = () => {
+		imageSrc.value = null;
+		fileInput.value = '';
+	};
 
-	onMounted(() => {
-		fetchComments();
-		console.log(comments.value);
-		loading.value = false;
+	const getAvatarUrl = async (avatar) => {
+		const {
+		data: [File],
+		error: fileError,
+	} = await supabase.storage.from('avatars').list(`${avatar}`, {
+		limit: 100,
+		offset: 0,
+		sortBy: { column: 'updated_at', order: 'desc' },
 	});
 
-	const comment_text = ref('');
-	const reply_text = ref('');
+	if(File) {
+		const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('avatars')
+				.getPublicUrl(`/${avatar}/${File.name}`);
+		
+  return publicUrl;
+		} else return '';
+};
+
+const fetchComments = async (comments) => {
+
+    
+  const commentList = [];
+  const replyList = [];
+
+  for (const comment of comments) {
+    const commentObj = {
+      ...comment,
+      avatarUrl: '',
+      Comment: [] // Create an empty array to hold replies
+    };
+
+    // Check if this is a reply to another comment
+    if (comment.threadId) {
+      replyList.push(commentObj);
+    } else {
+      commentList.push(commentObj);
+    }
+  }
+
+  // Load avatar URLs asynchronously and update the comment data
+  const promises = [];
+  for (const comment of commentList) {
+    const promise = getAvatarUrl(comment.createdBy)
+      .then(avatarUrl => comment.avatarUrl = avatarUrl);
+    promises.push(promise);
+  }
+
+  for (const reply of replyList) {
+    const promise = getAvatarUrl(reply.createdBy)
+      .then(avatarUrl => reply.avatarUrl = avatarUrl);
+    promises.push(promise);
+  }
+
+  await Promise.all(promises);
+
+  // Loop through the replyList and add each reply to the appropriate comment
+  for (const reply of replyList) {
+    const parentComment = commentList.find(comment => comment.id === reply.threadId);
+    if (parentComment) {
+      parentComment.Comment.push(reply);
+    }
+  }
+
+  // Sort the commentList array in ascending order by createdOn date
+  commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+
+  return commentList;
+};
+
+ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
+		currentAvatar.value = await getAvatarUrl(user.value.id);
+
+		comments.value = await fetchComments(Ticket.Comment);
+		if(comments.value) {
+			loading.value = false;
+		}
+
+	
+
+	
 
 	const convert = (text) => {
 		let converter = new showdown.Converter();

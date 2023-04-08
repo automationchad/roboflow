@@ -261,12 +261,17 @@
 										</div>
 										<div class="flex items-center" v-if="team.Ticket">
 											<div
-												v-if="team.Ticket.filter(o => o.status !== 'done').length"
+												v-if="
+													team.Ticket.filter((o) => o.status !== 'done').length
+												"
 												class="flex items-center text-xs font-normal"
 											>
 												<span
 													class="inline-flex h-min w-min items-center rounded-full bg-rose-700 px-2 text-xs font-medium text-white"
-													>{{ team.Ticket.filter(o => o.status !== 'done').length }}</span
+													>{{
+														team.Ticket.filter((o) => o.status !== 'done')
+															.length
+													}}</span
 												>
 											</div>
 											<span
@@ -298,11 +303,11 @@
 							<div class="relative">
 								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
 									<img
-										v-if="User.avatarPath"
-										class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 object-cover text-xs dark:border-slate-700"
+										class="flex h-8 w-8 items-center justify-center rounded-full border object-cover text-xs dark:border-slate-700"
 										alt=""
-										:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${User.avatarPath}`"
+										:src="avatarUrl"
 									/>
+									<div></div>
 
 									<span class="hidden lg:flex lg:items-center">
 										<span
@@ -364,25 +369,26 @@
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
+	const avatarUrl = ref(null);
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
 			`*,
-			Account (
-		     id,
-			 name,
-			 type,
-			 Subscription(*),
-			 Team (
-				id,
-				name
-			 ),
-			 Ticket (
-				count
-			 )
-		   )
-		 `
+				Account (
+			     id,
+				 name,
+				 type,
+				 Subscription(*),
+				 Team (
+					id,
+					name
+				 ),
+				 Ticket (
+					count
+				 )
+			   )
+			 `
 		)
 		.eq('id', user.value.id)
 		.limit(1)
@@ -420,18 +426,27 @@
 		return arr;
 	}
 
-	const getAvatar = async () => {
-		if (User.avatarPath) {
+	const getAvatarUrl = async (avatar) => {
+		const {
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('avatars').list(`${avatar}/`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+		});
+		if (File) {
 			const {
 				data: { publicUrl },
 			} = await supabase.storage
 				.from('avatars')
-				.getPublicUrl(`${User.avatarPath}`);
+				.getPublicUrl(`/${user.value.id}/${File.name}`);
+
 			return publicUrl;
-		} else return null;
+		} else return null
 	};
 
-	const avatarUrl = await getAvatar();
+	avatarUrl.value = await getAvatarUrl(user.value.id);
 
 	const route = useRoute();
 

@@ -32,20 +32,21 @@
 	const imageSrc = ref(null);
 	const fileInput = ref(null);
 	const selectedFile = ref(null);
+	const updating_loading = ref(false);
 	const avatarSuccess = ref(false);
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
 			`*,Account (
-		     id,
-			 name,
-			 Subscription(*),
-			 Team (
-				id,
-				name
-			 )
-		   )`
+			     id,
+				 name,
+				 Subscription(*),
+				 Team (
+					id,
+					name
+				 )
+			   )`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
@@ -56,26 +57,37 @@
 	const companyName = ref(User.companyName);
 	const jobTitle = ref(User.jobTitle);
 	const country = ref(User.country ?? 'United States');
+	const avatarUrl = ref(null);
+	const updatedPhoto = ref(false);
 
-	const getAvatar = async () => {
-		if (User.avatarPath) {
+	const getAvatar = async (avatar) => {
+		const { data: File, error: fileError } = await supabase.storage
+			.from('avatars')
+			.list(`${avatar}`, {
+				limit: 100,
+				offset: 0,
+				sortBy: { column: 'updated_at', order: 'desc' },
+			});
+		imageSrc.value = null;
+		if (File[0]) {
 			const {
 				data: { publicUrl },
 			} = await supabase.storage
 				.from('avatars')
-				.getPublicUrl(`${user.value.id}`);
+				.getPublicUrl(`/${user.value.id}/${File[0].name}`);
+
 			return publicUrl;
 		} else return null;
 	};
 
-	const avatarUrl = await getAvatar();
+	avatarUrl.value = await getAvatar(user.value.id);
 
 	const uploadImage = async (event) => {
 		const file = event.target.files[0];
 		if (file) {
 			imageSrc.value = URL.createObjectURL(file);
 			selectedFile.value = file;
-			console.log(file);
+			updatedPhoto.value = true;
 		}
 	};
 
@@ -84,21 +96,26 @@
 			console.error('No image selected');
 			return;
 		}
+		console.log(selectedFile.value);
 		try {
-			const { error: deleteError } = await supabase.storage
+			updating_loading.value = true;
+			const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
+			const extension = selectedFile.value.name.match(regex);
+			const fileName = `${user.value.id}-${Date.now()}.${extension[1]}`;
+
+			const filePath = `/${user.value.id}/${fileName}`;
+
+			const { data: File, error: fileError } = await supabase.storage
 				.from('avatars')
-				.remove([User.avatarPath]);
+				.list(`${user.value.id}`, {
+					limit: 100,
+					offset: 0,
+					sortBy: { column: 'updated_at', order: 'desc' },
+				});
 
-			if (deleteError) {
-				console.error('Error uploading image:', uploadError);
-				return;
-			}
-
-			const fileName = `${user.value.id}`;
-			const filePath = `${fileName}`;
 			const { error: uploadError } = await supabase.storage
 				.from('avatars')
-				.upload(filePath, selectedFile.value, { upsert: true });
+				.upload(filePath, selectedFile.value);
 
 			if (uploadError) {
 				console.error('Error uploading image:', uploadError);
@@ -106,7 +123,9 @@
 			}
 			const { error: userUpdateError } = await supabase
 				.from('User')
-				.update({ avatarPath: fileName })
+				.update({
+					avatarPath: `https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/avatars/${user.value.id}/${fileName}`,
+				})
 				.eq('id', user.value.id);
 			if (userUpdateError) {
 				console.error('Error updating user', uploadError);
@@ -115,12 +134,18 @@
 		} catch (error) {
 			alert(error.message);
 		} finally {
+			updatedPhoto.value = false;
+			updating_loading.value = false;
 			avatarSuccess.value = true;
-
 			fileInput.value = '';
+			setTimeout(async () => {
+				avatarSuccess.value = false;
+				avatarUrl.value = await getAvatar(user.value.id);
+			}, 2000);
 		}
 	};
 	const removeImage = () => {
+		updatedPhoto.value = false;
 		imageSrc.value = null;
 		fileInput.value = '';
 	};
@@ -199,7 +224,7 @@
 								</DisclosurePanel>
 								<div class="ml-2">
 									<DisclosureButton class="p-2" v-if="!open">
-										<PencilIcon class="h-5 w-5" />
+										<PencilIcon class="h-4 w-4 dark:text-slate-400" />
 									</DisclosureButton>
 								</div>
 							</Disclosure>
@@ -243,7 +268,7 @@
 								</DisclosurePanel>
 								<div class="ml-2">
 									<DisclosureButton class="p-2" v-if="!open">
-										<PencilIcon class="h-5 w-5" />
+										<PencilIcon class="h-4 w-4 dark:text-slate-400" />
 									</DisclosureButton>
 								</div>
 							</Disclosure>
@@ -254,7 +279,7 @@
 										<Listbox as="div" v-model="country">
 											<div class="relative mt-2">
 												<ListboxButton
-													class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+													class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
 												>
 													<span class="block truncate">{{ country }}</span>
 													<span
@@ -360,7 +385,7 @@
 								</DisclosurePanel>
 								<div class="ml-2">
 									<DisclosureButton class="p-2" v-if="!open">
-										<PencilIcon class="h-5 w-5" />
+										<PencilIcon class="h-4 w-4 dark:text-slate-400" />
 									</DisclosureButton>
 								</div>
 							</Disclosure>
@@ -404,7 +429,7 @@
 								</DisclosurePanel>
 								<div class="ml-2">
 									<DisclosureButton class="p-2" v-if="!open">
-										<PencilIcon class="h-5 w-5" />
+										<PencilIcon class="h-4 w-4 dark:text-slate-400" />
 									</DisclosureButton>
 								</div>
 							</Disclosure>
@@ -423,11 +448,11 @@
 											class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all text-xs"
 										>
 											<div class="relative h-12 w-12">
-												<UserCircleIcon
+												<div
 													v-if="!imageSrc && !avatarUrl"
-													class="relative h-12 w-12 text-gray-300"
+													class="relative h-12 w-12 rounded-full border border-slate-700"
 													aria-hidden="true"
-												/>
+												></div>
 
 												<img
 													v-else
@@ -437,30 +462,60 @@
 												<div
 													class="absolute inset-0 flex items-center justify-center opacity-60 hover:opacity-100"
 												>
-													<PlusIcon class="h-6 w-6 cursor-pointer text-white" />
+													<PlusIcon
+														class="h-6 w-6 cursor-pointer text-gray-900 dark:text-white"
+													/>
 												</div>
 												<input
 													type="file"
-													accept="image/*"
+													accept="image/png, image/jpeg, image/webp, image/gif"
 													ref="fileInput"
 													@change="uploadImage"
 													class="absolute left-0 top-0 z-10 h-full w-full cursor-pointer opacity-0 group-hover:cursor-pointer"
 												/>
 											</div>
-
-											<button
-												:disabled="!imageSrc"
-												@click="handleAvatarUpdate()"
-												type="button"
-												class="group relative rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:hover:bg-white"
-											>
-												Change
-											</button>
 											<div
-												v-if="avatarSuccess"
-												class="flex items-center text-green-500"
+												class="flex items-center space-x-2"
+												v-if="!updating_loading"
 											>
-												<CheckCircleIcon class="mr-1 h-4 w-4" />Success!
+												<button
+													v-if="updatedPhoto"
+													:disabled="!updatedPhoto || updating_loading"
+													@click="removeImage()"
+													type="button"
+													class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800"
+												>
+													<span v-if="!updating_loading"
+														><XMarkIcon class="h-4 w-4"
+													/></span>
+												</button>
+
+												<button
+													v-if="updatedPhoto"
+													:disabled="!updatedPhoto || updating_loading"
+													@click="handleAvatarUpdate()"
+													type="button"
+													class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800"
+												>
+													<span v-if="!updating_loading"
+														><CheckIcon class="h-4 w-4"
+													/></span>
+												</button>
+											</div>
+											<div class="flex items-center space-x-2">
+												<div
+													v-if="updating_loading"
+													:disabled="updating_loading"
+													class="group relative rounded-md px-1 py-1 text-sm font-normal text-gray-900 dark:text-white"
+												>
+													<loading-spinner :show-text="false" />
+												</div>
+												<div
+													v-if="avatarSuccess"
+													class="group relative rounded-md px-1 py-1 text-sm font-normal text-green-500"
+												>
+													<success-spinner :show-text="false" />
+												</div>
 											</div>
 										</div>
 									</div>
