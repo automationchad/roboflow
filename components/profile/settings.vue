@@ -504,7 +504,7 @@
 													accept="image/png, image/jpeg, image/webp, image/gif"
 													ref="fileInput"
 													@change="uploadImage"
-													class="absolute left-0 top-0 z-10 h-full w-full cursor-pointer opacity-0 group-hover:cursor-pointer"
+													class="absolute left-0 top-0 h-full w-full file:cursor-pointer file:h-full file:w-full opacity-0 group-hover:cursor-pointer"
 												/>
 												<svg
 													v-if="(avatarUrl && !updating_loading)"

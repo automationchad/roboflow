@@ -11,15 +11,16 @@
 						>
 							<div>
 								<div>
-									<div
-										class="grid grid-cols-7 justify-between md:space-x-4"
-									>
+									<div class="grid grid-cols-7 justify-between md:space-x-4">
 										<div class="col-span-7">
-											<footer class="mb-4 flex w-full items-center" id="posted-by">
+											<footer
+												class="mb-4 flex w-full items-center"
+												id="posted-by"
+											>
 												<img
 													v-if="ticketAvatar"
 													:src="ticketAvatar"
-													class="mr-2 flex h-12 w-12 object-cover items-center justify-center rounded-full border border-slate-700"
+													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 object-cover"
 												/>
 
 												<div
@@ -40,15 +41,23 @@
 															{{ Ticket.User.firstName }}
 															{{ Ticket.User.lastName }}
 														</span>
-														<span class="text-xs text-gray-400">&nbsp; &bull; &nbsp;</span>
-														<span class="inline-flex text-sm font-normal text-gray-600">
-															{{ Ticket.User.jobTitle ?? Ticket.User.systemRole }}
+														<span class="text-xs text-gray-400"
+															>&nbsp; &bull; &nbsp;</span
+														>
+														<span
+															class="inline-flex text-sm font-normal text-gray-600"
+														>
+															{{
+																Ticket.User.jobTitle ?? Ticket.User.systemRole
+															}}
 														</span>
-														<span class="text-sm ml-1">{{ countryToEmoji(Ticket.User.country) }}</span>
+														<span class="ml-1 text-sm">{{
+															countryToEmoji(Ticket.User.country)
+														}}</span>
 													</div>
 													<span
 														v-if="Ticket.User.systemRole === 'super_admin'"
-														class="badge py-0.25 rounded-md border dark:text-black/70 border-gray-900/10 px-1 text-xs"
+														class="badge py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
 														>Admin</span
 													>
 												</div>
@@ -58,7 +67,6 @@
 											>
 												{{ Ticket.name }}
 											</h1>
-											
 										</div>
 									</div>
 									<aside class="mt-8 xl:hidden">
@@ -116,7 +124,7 @@
 											</div>
 										</div>
 										<div
-											class="mt-6 space-y-8 border-t border-b border-gray-200 py-6 dark:border-slate-800"
+											class="mt-6 space-y-8 border-b border-t border-gray-200 py-6 dark:border-slate-800"
 										>
 											<div>
 												<h2 class="text-sm font-medium text-gray-500">
@@ -194,7 +202,7 @@
 										<h2 class="sr-only">Description</h2>
 
 										<Disclosure v-slot="{ open }">
-											<DisclosurePanel class="flex items-start space-x-4 mt-4">
+											<DisclosurePanel class="mt-4 flex items-start space-x-4">
 												<div class="min-w-0 flex-1">
 													<div class="relative">
 														<div
@@ -208,7 +216,7 @@
 																@input="update"
 																name="comment"
 																id="comment"
-																class="h-content w-full text-sm max-w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
+																class="h-content w-full max-w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
 																placeholder="Add your comment..."
 															></textarea>
 
@@ -285,14 +293,13 @@
 											</div>
 										</Disclosure>
 									</div>
-									<div class="mt-2 text-xs  py-3 xl:pt-6 xl:pb-0">
-												
-												<NuxtLink
-													:to="`/${route.params.team}/tickets`"
-													class="font-normal px-2 py-1 rounded-md text-indigo-600 bg-indigo-100 dark:text-white"
-													>{{ Ticket.Team.name }}</NuxtLink
-												>
-											</div>
+									<div class="mt-2 py-3 text-xs xl:pb-0 xl:pt-6">
+										<NuxtLink
+											:to="`/${route.params.team}/tickets`"
+											class="rounded-md bg-indigo-100 px-2 py-1 font-normal text-indigo-600 dark:text-white"
+											>{{ Ticket.Team.name }}</NuxtLink
+										>
+									</div>
 								</div>
 							</div>
 							<section aria-labelledby="activity-title" class="mt-8 xl:mt-10">
@@ -303,8 +310,11 @@
 												id="activity-title"
 												class="text-md font-medium text-gray-900 dark:text-white"
 											>
-												{{ Ticket.Comment.length }} comment{{
-													Ticket.Comment.length > 1 ? 's' : ''
+												{{ comments.filter((o) => !o.deleted).length }}
+												comment{{
+													comments.filter((o) => !o.deleted).length > 1
+														? 's'
+														: ''
 												}}
 											</h2>
 											<div class="mt-3">
@@ -313,12 +323,18 @@
 												>
 													<div class="flex-shrink-0">
 														<div class="relative">
-															<img v-if="currentAvatar"
-																class="flex h-8 object-cover w-8 items-center justify-center rounded-full bg-gray-400 text-xs"
+															<img
+																v-if="currentAvatar"
+																class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 object-cover text-xs"
 																:src="currentAvatar"
 																alt=""
 															/>
-															<div v-else class="flex h-8 object-cover w-8 items-center justify-center text-white rounded-full bg-slate-800 border-slate-700 border text-xs">{{ User.firstName[0] }}</div>
+															<div
+																v-else
+																class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-800 object-cover text-xs text-white"
+															>
+																{{ User.firstName[0] }}
+															</div>
 														</div>
 													</div>
 													<div class="min-w-0 flex-1">
@@ -344,25 +360,27 @@
 															>
 																<div
 																	v-if="!imageSrc"
-																	class="relative ml-auto flex h-8 items-center justify-center text-slate-200"
+																	class="relative ml-auto flex h-8 w-8 cursor-pointer items-center justify-center text-slate-900 dark:text-slate-200"
 																>
-																	<svg
-																		fill="none"
-																		xmlns="http://www.w3.org/2000/svg"
-																		class="h-5 w-5"
-																	>
-																		<path
-																			d="M16.667 8.75a.833.833 0 00-.834.833v5.834a.833.833 0 01-.833.833H3.334a.833.833 0 01-.834-.833V8.75a.833.833 0 01.833-.833H5a.833.833 0 00.833-.567l.45-1.367a.833.833 0 01.792-.566h4.592a.833.833 0 000-1.667H7.033a2.5 2.5 0 00-2.366 1.708l-.267.834H3.333a2.5 2.5 0 00-2.5 2.5v6.666a2.5 2.5 0 002.5 2.5H15a2.5 2.5 0 002.5-2.5V9.625a.835.835 0 00-.833-.875zm-7.5-.833a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm0 5a1.667 1.667 0 110-3.334 1.667 1.667 0 010 3.334zm9.167-9.167H17.5v-.833a.833.833 0 10-1.666 0v.833H15a.833.833 0 100 1.667h.834v.833a.833.833 0 101.666 0v-.833h.834a.833.833 0 000-1.667z"
-																			fill="currentColor"
-																		></path>
-																	</svg>
+																	<span class="cursor-pointer"
+																		><svg
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																			class="h-5 w-5"
+																		>
+																			<path
+																				d="M16.667 8.75a.833.833 0 00-.834.833v5.834a.833.833 0 01-.833.833H3.334a.833.833 0 01-.834-.833V8.75a.833.833 0 01.833-.833H5a.833.833 0 00.833-.567l.45-1.367a.833.833 0 01.792-.566h4.592a.833.833 0 000-1.667H7.033a2.5 2.5 0 00-2.366 1.708l-.267.834H3.333a2.5 2.5 0 00-2.5 2.5v6.666a2.5 2.5 0 002.5 2.5H15a2.5 2.5 0 002.5-2.5V9.625a.835.835 0 00-.833-.875zm-7.5-.833a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm0 5a1.667 1.667 0 110-3.334 1.667 1.667 0 010 3.334zm9.167-9.167H17.5v-.833a.833.833 0 10-1.666 0v.833H15a.833.833 0 100 1.667h.834v.833a.833.833 0 101.666 0v-.833h.834a.833.833 0 000-1.667z"
+																				fill="currentColor"
+																			></path></svg
+																	></span>
+
 																	<input
 																		type="file"
 																		accept="image/*"
 																		@change="uploadImage"
 																		ref="fileInput"
 																		data-test="image-input"
-																		class="absolute h-full w-full cursor-auto opacity-0"
+																		class="absolute h-full w-full opacity-0 file:cursor-pointer"
 																	/>
 																</div>
 																<div v-else class="relative ml-auto h-full">
@@ -378,17 +396,23 @@
 																		class="absolute left-0 top-0 h-10 w-10 rounded border border-slate-200 opacity-20"
 																	></div>
 																	<!---->
-																	<svg
+																	<button
+																		v-if="!loading"
 																		@click="removeImage"
-																		fill="none"
-																		xmlns="http://www.w3.org/2000/svg"
 																		class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600"
+																		:disabled="loading"
 																	>
-																		<path
-																			d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
-																			fill="currentColor"
-																		></path>
-																	</svg>
+																		<svg
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																			class="h-4 w-4"
+																		>
+																			<path
+																				d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+																				fill="currentColor"
+																			></path>
+																		</svg>
+																	</button>
 																</div>
 
 																<button
@@ -409,7 +433,7 @@
 											<!-- Activity feed-->
 											<div class="flex" v-if="!loading">
 												<div
-													v-if="comments <= 0"
+													v-if="comments.length <= 0"
 													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
 												>
 													No comments yet
@@ -421,274 +445,303 @@
 												>
 													<div class="mx-auto">
 														<article
-															v-for="(
-																activityItem, activityItemIdx
-															) in comments"
+															v-for="activityItem in comments"
 															:key="activityItem.id"
 															id="parent-comment"
 															class="mb-6 rounded-lg bg-white text-base dark:bg-transparent"
 														>
-															<footer
-																v-if="!activityItem.deleted"
-																class="mb-2 flex items-center justify-between"
-															>
-																<div class="flex items-center">
-																	<p
-																		class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
-																	>
-																		<img
-																			v-if="activityItem.avatarUrl"
-																			class="mr-2 h-5 w-5 rounded-full object-cover"
-																			:src="activityItem.avatarUrl"
-																			alt=""
-																		/>
-																		<div
-																			v-else
-																			class="mr-2 h-5 w-5 text-xs flex border border-sky-600/20 items-center justify-center bg-sky-100 text-sky-500 rounded-full"
-																			
-																		><UserCircleIconMini class="h-5 w-5 m-0"/></div>
-																		
-																		{{ activityItem.User.firstName }}
-																		{{ activityItem.User.lastName }}
-																		<span
-																			v-if="
-																				activityItem.User.systemRole ===
-																				'super_admin'
-																			"
-																			class="badge py-0.25 ml-2 dark:text-black/70 rounded-md border border-gray-900/10 px-1 text-xs"
-																			>Admin</span
-																		>
-																	</p>
-																</div>
-
-																<div
-																	class="flex space-x-1"
-																	v-if="activityItem.createdBy === User.id"
-																>
-																	<button
-																		class="text-slate-400 transition-colors hover:text-indigo-400"
-																	>
-																		<svg
-																			class="h-5 w-5"
-																			fill="none"
-																			viewBox="0 0 24 24"
-																		>
-																			<path
-																				stroke="currentColor"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																				stroke-width="1.5"
-																				d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-																			></path>
-																			<path
-																				stroke="currentColor"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																				stroke-width="1.5"
-																				d="M19.25 19.25H13.75"
-																			></path>
-																		</svg>
-																	</button>
-																	<button
-																		@click="handleDelete(activityItem.id)"
-																		class="text-slate-400 transition-colors hover:text-rose-400"
-																	>
-																		<svg
-																			class="h-5 w-5"
-																			viewBox="0 0 24 24"
-																			fill="none"
-																			xmlns="http://www.w3.org/2000/svg"
-																		>
-																			<path
-																				d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M9.75 10.75V16.25"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M13.25 10.75V16.25"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M4.75 7.75H18.25"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																		</svg>
-																	</button>
-																</div>
-																<div class="flex space-x-1" v-else>
-																	<button
-																		class="text-slate-400 transition-colors hover:text-indigo-400"
-																	>
-																		<svg
-																			class="h-5 w-5"
-																			viewBox="0 0 24 24"
-																			fill="none"
-																			xmlns="http://www.w3.org/2000/svg"
-																		>
-																			<path
-																				d="M4.75 5.75V19.25"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																		</svg>
-																	</button>
-																</div>
-															</footer>
-															<span
-																:class="[
-																	activityItem.deleted
-																		? 'dark:text-gray-400'
-																		: 'text-gray-900 dark:text-gray-200',
-																	'prose prose-base pb-2 font-normal ',
-																]"
-															>
-																{{ activityItem.text }}
-															</span>
 															<div
+																class=""
 																v-if="
-																	activityItem.attachment &&
-																	!activityItem.deleted
+																	!activityItem.deleted ||
+																	activityItem.Comment.length > 0
 																"
-																data-test="war_room_comment_text"
-																class="mt-1 flex overflow-hidden"
 															>
-																<img
-																	:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
-																	:alt="activityItem.attachment.split('/')[1]"
-																	loading="lazy"
-																	data-test="comment-image"
-																	class="max-h-96 max-w-full cursor-pointer rounded-lg"
-																/>
-															</div>
-															<div class="mt-2">
-																<Disclosure v-slot="{ open }">
-																	<div
-																		class="flex items-center justify-between"
-																	>
-																		<DisclosureButton
-																			class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
+																<footer
+																	v-if="!activityItem.deleted"
+																	class="mb-2 flex items-center justify-between"
+																>
+																	<div class="flex items-center">
+																		<div
+																			class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																		>
+																			<img
+																				v-if="activityItem.avatarUrl"
+																				class="mr-2 h-5 w-5 rounded-full object-cover"
+																				:src="activityItem.avatarUrl"
+																				alt=""
+																			/>
 																			<div
-																				data-v-164b91a0=""
-																				data-test="open-reply-button"
-																				class="flex items-center"
+																				v-else
+																				class="mr-2 flex h-5 w-5 items-center justify-center rounded-full border border-sky-600/20 bg-sky-100 text-xs text-sky-500"
 																			>
-																				<svg
-																					data-v-164b91a0=""
-																					viewBox="0 0 16 16"
-																					fill="none"
-																					xmlns="http://www.w3.org/2000/svg"
-																					class="mr-1 h-4 w-4"
-																				>
-																					<path
-																						data-v-164b91a0=""
-																						d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
-																						fill="currentColor"
-																					></path>
-																				</svg>
-																				Reply
+																				<UserCircleIconMini
+																					class="m-0 h-5 w-5"
+																				/>
 																			</div>
-																		</DisclosureButton>
 
-																		<p
-																			class="mr-2 text-xs text-gray-500 dark:text-gray-300"
-																		>
-																			{{
-																				format(
-																					new Date(activityItem.createdOn),
-																					'MMM dd, hh:mm aa'
+																			{{ activityItem.User.firstName }}
+																			{{ activityItem.User.lastName }}
+																			<span
+																				v-if="
+																					activityItem.User.systemRole ===
+																					'super_admin'
+																				"
+																				class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
+																				>Admin</span
+																			>
+																			<span class="text-xs text-gray-400"
+																				>&nbsp; &bull; &nbsp;</span
+																			>
+																			<span
+																				class="inline-flex text-sm font-light text-gray-600"
+																			>
+																				{{ activityItem.User.jobTitle }}
+																			</span>
+																			<span class="ml-1 text-sm">{{
+																				countryToEmoji(
+																					activityItem.User.country
 																				)
-																			}}
-																		</p>
+																			}}</span>
+																		</div>
 																	</div>
 
-																	<DisclosurePanel
-																		class="mt-3 flex items-start space-x-4"
+																	<div
+																		class="flex space-x-1"
+																		v-if="activityItem.createdBy === User.id"
 																	>
-																		<div class="min-w-0 flex-1">
-																			<form
-																				@submit.prevent="
-																					handleCommentAdd(activityItem.id)
-																				"
-																				class="relative"
+																		<button
+																			class="text-slate-400 transition-colors hover:text-indigo-400"
+																		>
+																			<svg
+																				class="h-5 w-5"
+																				fill="none"
+																				viewBox="0 0 24 24"
+																			>
+																				<path
+																					stroke="currentColor"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																					stroke-width="1.5"
+																					d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																				></path>
+																				<path
+																					stroke="currentColor"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																					stroke-width="1.5"
+																					d="M19.25 19.25H13.75"
+																				></path>
+																			</svg>
+																		</button>
+																		<button
+																			@click="handleDelete(activityItem.id)"
+																			class="text-slate-400 transition-colors hover:text-rose-400"
+																		>
+																			<svg
+																				class="h-5 w-5"
+																				viewBox="0 0 24 24"
+																				fill="none"
+																				xmlns="http://www.w3.org/2000/svg"
+																			>
+																				<path
+																					d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M9.75 10.75V16.25"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M13.25 10.75V16.25"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M4.75 7.75H18.25"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																			</svg>
+																		</button>
+																	</div>
+																	<div class="flex space-x-1" v-else>
+																		<button
+																			class="text-slate-400 transition-colors hover:text-indigo-400"
+																		>
+																			<svg
+																				class="h-5 w-5"
+																				viewBox="0 0 24 24"
+																				fill="none"
+																				xmlns="http://www.w3.org/2000/svg"
+																			>
+																				<path
+																					d="M4.75 5.75V19.25"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																			</svg>
+																		</button>
+																	</div>
+																</footer>
+																<span
+																	:class="[
+																		activityItem.deleted
+																			? 'text-gray-400 dark:text-gray-400'
+																			: 'text-gray-900 dark:text-gray-200',
+																		'pb-2 font-normal ',
+																	]"
+																>
+																	{{ activityItem.text }}
+																</span>
+																<div
+																	v-if="
+																		activityItem.attachment &&
+																		!activityItem.deleted
+																	"
+																	data-test="war_room_comment_text"
+																	class="mt-1 flex overflow-hidden"
+																>
+																	<button @click="
+																			(commentImageId =
+																				activityItem.attachment),
+																				(showImageModal = true)
+																		"><img
+																		:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
+																		:alt="activityItem.attachment"
+																		data-test="comment-image"
+																		
+																		class="max-h-48 max-w-full cursor-pointer rounded-lg"
+																	/></button>
+																</div>
+																<div class="mt-2">
+																	<Disclosure v-slot="{ open }">
+																		<div
+																			class="flex items-center justify-between"
+																		>
+																			<DisclosureButton
+																				class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 																			>
 																				<div
-																					class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600"
+																					data-v-164b91a0=""
+																					data-test="open-reply-button"
+																					class="flex items-center"
 																				>
-																					<label for="comment" class="sr-only"
-																						>Add your reply</label
+																					<svg
+																						data-v-164b91a0=""
+																						viewBox="0 0 16 16"
+																						fill="none"
+																						xmlns="http://www.w3.org/2000/svg"
+																						class="mr-1 h-4 w-4"
 																					>
-																					<textarea
-																						v-model="reply_text"
-																						name="comment"
-																						id="comment"
-																						class="block w-full resize-none border-0 bg-transparent text-gray-900 dark:text-white placeholder:text-slate-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
-																						placeholder="Add your reply..."
-																					/>
-
-																					<!-- Spacer element to match the height of the toolbar -->
-																					<div class="py-2" aria-hidden="true">
-																						<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																						<div class="py-px">
-																							<div class="h-9" />
-																						</div>
-																					</div>
+																						<path
+																							data-v-164b91a0=""
+																							d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
+																							fill="currentColor"
+																						></path>
+																					</svg>
+																					Reply
 																				</div>
+																			</DisclosureButton>
 
-																				<div
-																					class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
+																			<p
+																				class="mr-2 text-xs text-gray-500 dark:text-gray-300"
+																			>
+																				{{
+																					format(
+																						new Date(activityItem.createdOn),
+																						'MMM dd, hh:mm aa'
+																					)
+																				}}
+																			</p>
+																		</div>
+
+																		<DisclosurePanel
+																			class="mt-3 flex items-start space-x-4"
+																		>
+																			<div class="min-w-0 flex-1">
+																				<form
+																					@submit.prevent="
+																						handleCommentAdd(activityItem.id)
+																					"
+																					class="relative"
 																				>
 																					<div
-																						class="flex flex-shrink-0 items-center space-x-2"
+																						class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600"
 																					>
-																						<DisclosureButton
-																							class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+																						<label for="comment" class="sr-only"
+																							>Add your reply</label
 																						>
-																							Cancel
-																						</DisclosureButton>
-																						<button
-																							type="submit"
-																							class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																						<textarea
+																							v-model="reply_text"
+																							name="comment"
+																							id="comment"
+																							class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																							placeholder="Add your reply..."
+																						/>
+
+																						<!-- Spacer element to match the height of the toolbar -->
+																						<div
+																							class="py-2"
+																							aria-hidden="true"
 																						>
-																							Post
-																						</button>
+																							<!-- Matches height of button in toolbar (1px border + 36px content height) -->
+																							<div class="py-px">
+																								<div class="h-9" />
+																							</div>
+																						</div>
 																					</div>
-																				</div>
-																			</form>
-																		</div>
-																	</DisclosurePanel>
-																</Disclosure>
+
+																					<div
+																						class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
+																					>
+																						<div
+																							class="flex flex-shrink-0 items-center space-x-2"
+																						>
+																							<DisclosureButton
+																								class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+																							>
+																								Cancel
+																							</DisclosureButton>
+																							<button
+																								type="submit"
+																								class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																							>
+																								Post
+																							</button>
+																						</div>
+																					</div>
+																				</form>
+																			</div>
+																		</DisclosurePanel>
+																	</Disclosure>
+																</div>
 															</div>
 
 															<div
@@ -709,17 +762,22 @@
 																		class="mb-2 flex items-center justify-between"
 																	>
 																		<div class="flex items-center">
-																			<p
+																			<div
 																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
-																			><div v-if="reply.avatarUrl"><img 
-																					class="mr-2 h-5 w-5 rounded-full object-cover"
-																					:src="reply.avatarUrl"
-																					alt="Jese Leos"
-																				/></div>
-																				
-																				<div v-else class="mr-2 h-5 w-5 rounded-full bg-slate-300"></div>
-																				
-								
+																			>
+																				<div v-if="reply.avatarUrl">
+																					<img
+																						class="mr-2 h-5 w-5 rounded-full object-cover"
+																						:src="reply.avatarUrl"
+																						alt="Jese Leos"
+																					/>
+																				</div>
+
+																				<div
+																					v-else
+																					class="mr-2 h-5 w-5 rounded-full bg-slate-300"
+																				></div>
+
 																				{{ reply.User.firstName }}
 																				{{ reply.User.lastName
 																				}}<span
@@ -727,10 +785,21 @@
 																						reply.User.systemRole ===
 																						'super_admin'
 																					"
-																					class="badge py-0.25 ml-2 rounded-md border dark:text-black/70 border-gray-900/10 px-1 text-xs"
+																					class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
 																					>Admin</span
 																				>
-																			</p>
+																				<span class="text-xs text-gray-400"
+																					>&nbsp; &bull; &nbsp;</span
+																				>
+																				<span
+																					class="inline-flex text-sm font-light text-gray-600"
+																				>
+																					{{ reply.User.jobTitle }}
+																				</span>
+																				<span class="ml-1 text-sm">{{
+																					countryToEmoji(reply.User.country)
+																				}}</span>
+																			</div>
 																		</div>
 
 																		<div
@@ -963,7 +1032,7 @@
 											</div>
 											<div
 												v-else
-												class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-300 dark:border-slate-700 p-6 text-center"
+												class="relative flex w-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-center dark:border-slate-700"
 											>
 												<loading-spinner />
 											</div>
@@ -974,7 +1043,7 @@
 							</section>
 						</div>
 						<aside class="hidden xl:block xl:pl-8">
-							<div class="mt-4 mb-8 flex items-center space-x-3 md:mt-0">
+							<div class="mb-8 mt-4 flex items-center space-x-3 md:mt-0">
 								<button
 									@click="handleTicketClose(Ticket.status)"
 									type="button"
@@ -1104,6 +1173,12 @@
 				</div>
 			</main>
 		</div>
+		<ImageModal
+			:isOpen="showImageModal"
+			:imageSrc="commentImageId"
+			:imageAlt="commentImageId"
+			:toggleModal="toggleModal"
+		/>
 	</div>
 </template>
 
@@ -1173,22 +1248,33 @@
 	const supabase = useSupabaseClient();
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
-	
+
 	const converter = await new showdown.Converter();
 	const loading = ref(true);
 
 	const ticketAvatar = ref(null);
 
-	const currentAvatar = ref(null); 
+	const currentAvatar = ref(null);
 
 	const comments = ref([]);
 	const comment_text = ref('');
 	const reply_text = ref('');
-	
 
 	const imageSrc = ref(null);
 	const fileInput = ref(null);
 	const selectedFile = ref(null);
+
+	const commentImageId = ref('');
+	const showImageModal = ref(false);
+
+	const showImage = (id) => {
+		commentImageId.value = id;
+		showImageModal.value = true;
+	}
+
+	const toggleModal = () => {
+      showImageModal.value = !showImageModal.value;
+    }
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -1210,7 +1296,7 @@
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country))), User(*)'
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
@@ -1219,7 +1305,7 @@
 	console.log(Ticket);
 
 	const input = ref(Ticket.desc);
-	
+
 	const uploadImage = (event) => {
 		const file = event.target.files[0];
 		if (file) {
@@ -1235,88 +1321,94 @@
 
 	const getAvatarUrl = async (avatar) => {
 		const {
-		data: [File],
-		error: fileError,
-	} = await supabase.storage.from('avatars').list(`${avatar}`, {
-		limit: 100,
-		offset: 0,
-		sortBy: { column: 'updated_at', order: 'desc' },
-		search: `${avatar}`
-	});
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('avatars').list(`${avatar}`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${avatar}`,
+		});
 
-	if(File) {
-		const {
+		if (File) {
+			const {
 				data: { publicUrl },
 			} = await supabase.storage
 				.from('avatars')
 				.getPublicUrl(`/${avatar}/${File.name}`);
-		
-  return publicUrl;
+
+			return publicUrl;
 		} else return '';
-};
+	};
 
-const fetchComments = async (comments) => {
+	const fetchComments = async () => {
+		let { data: Ticket, error } = await supabase
+			.from('Ticket')
+			.select(
+				'*,Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle))), User(*)'
+			)
+			.eq('id', route.params.id)
+			.limit(1)
+			.single();
+		const commentList = [];
+		const replyList = [];
 
-    
-  const commentList = [];
-  const replyList = [];
+		for (const comment of Ticket.Comment) {
+			const commentObj = {
+				...comment,
+				avatarUrl: '',
+				Comment: [], // Create an empty array to hold replies
+			};
 
-  for (const comment of comments) {
-    const commentObj = {
-      ...comment,
-      avatarUrl: '',
-      Comment: [] // Create an empty array to hold replies
-    };
-
-    // Check if this is a reply to another comment
-    if (comment.threadId) {
-      replyList.push(commentObj);
-    } else {
-      commentList.push(commentObj);
-    }
-  }
-
-  // Load avatar URLs asynchronously and update the comment data
-  const promises = [];
-  for (const comment of commentList) {
-    const promise = getAvatarUrl(comment.createdBy)
-      .then(avatarUrl => comment.avatarUrl = avatarUrl);
-    promises.push(promise);
-  }
-
-  for (const reply of replyList) {
-    const promise = getAvatarUrl(reply.createdBy)
-      .then(avatarUrl => reply.avatarUrl = avatarUrl);
-    promises.push(promise);
-  }
-
-  await Promise.all(promises);
-
-  // Loop through the replyList and add each reply to the appropriate comment
-  for (const reply of replyList) {
-    const parentComment = commentList.find(comment => comment.id === reply.threadId);
-    if (parentComment) {
-      parentComment.Comment.push(reply);
-    }
-  }
-
-  // Sort the commentList array in ascending order by createdOn date
-  commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-
-  return commentList;
-};
-
-ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
-		currentAvatar.value = await getAvatarUrl(user.value.id);
-
-		comments.value = await fetchComments(Ticket.Comment);
-		if(comments.value) {
-			loading.value = false;
+			// Check if this is a reply to another comment
+			if (comment.threadId) {
+				replyList.push(commentObj);
+			} else {
+				commentList.push(commentObj);
+			}
 		}
 
-	
+		// Load avatar URLs asynchronously and update the comment data
+		const promises = [];
+		for (const comment of commentList) {
+			const promise = getAvatarUrl(comment.createdBy).then(
+				(avatarUrl) => (comment.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+		}
 
-	
+		for (const reply of replyList) {
+			const promise = getAvatarUrl(reply.createdBy).then(
+				(avatarUrl) => (reply.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+		}
+
+		await Promise.all(promises);
+
+		// Loop through the replyList and add each reply to the appropriate comment
+		for (const reply of replyList) {
+			const parentComment = commentList.find(
+				(comment) => comment.id === reply.threadId
+			);
+			if (parentComment) {
+				parentComment.Comment.push(reply);
+			}
+		}
+
+		// Sort the commentList array in ascending order by createdOn date
+		commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+
+		return commentList;
+	};
+
+	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
+	currentAvatar.value = await getAvatarUrl(user.value.id);
+
+	comments.value = await fetchComments();
+	if (comments.value) {
+		loading.value = false;
+	}
 
 	const convert = (text) => {
 		let converter = new showdown.Converter();
@@ -1325,14 +1417,14 @@ ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 	};
 
 	const handleCommentAdd = async (thread_id) => {
+		loading.value = true;
 		const org_id =
 			User.Account.type === 'super_admin'
 				? org_id.value
 				: route.params.organization;
 		try {
-			loading.value = true;
 			if (selectedFile.value) {
-				const fileName = selectedFile.value.name;
+				const fileName = cleanString(selectedFile.value.name);
 				const filePath = `attachments/${fileName}`;
 				const { error: uploadError } = await supabase.storage
 					.from('images')
@@ -1383,8 +1475,8 @@ ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 			alert(error.message);
 		} finally {
 			comment_text.value = '';
+			comments.value = await fetchComments();
 			loading.value = false;
-			location.reload();
 		}
 	};
 
@@ -1404,9 +1496,10 @@ ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 		navigateTo(`/${route.params.team}/tickets`);
 	};
 
-	const handleDelete = async (id, comments) => {
+	const handleDelete = async (id, arr) => {
+		loading.value = true;
 		try {
-			if (comments) {
+			if (arr) {
 				const { data, error: deleteError } = await supabase
 					.from('Comment')
 					.delete()
@@ -1420,10 +1513,9 @@ ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 		} catch (error) {
 			alert(error.message);
 		} finally {
-			comment_text.value = '';
+			const data = await fetchComments();
+			comments.value = data;
 			loading.value = false;
-			location.reload();
 		}
-		location.reload();
 	};
 </script>

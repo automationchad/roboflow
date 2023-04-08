@@ -119,6 +119,26 @@
 						</button>
 					</MenuItem>
 				</div>
+				<div class="space-y-1 px-1 py-1">
+					<MenuItem v-slot="{ active }">
+						<button
+							:class="[
+								active
+									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
+									: 'text-slate-800 dark:text-slate-50',
+								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+							]"
+						>
+							<EnvelopeIcon
+								:active="active"
+								class="mr-2 h-5 w-5 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"
+								aria-hidden="true"
+							/>
+							Contact support
+						</button>
+					</MenuItem>
+					
+				</div>
 			</MenuItems>
 		</transition>
 	</Menu>
@@ -133,6 +153,8 @@
 		QuestionMarkCircleIcon,
 		ChatBubbleOvalLeftIcon,
 		DocumentTextIcon,
+		
 		BookOpenIcon,
 	} from '@heroicons/vue/24/outline';
+	import { EnvelopeIcon } from '@heroicons/vue/20/solid'
 </script>

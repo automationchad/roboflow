@@ -64,7 +64,7 @@
 					>
 						<CalendarIcon class="h-4 w-4" />
 						<span>{{
-							format(new Date(ticket.createdOn), 'MMM d, yyyy') ?? 'null'
+							format(new Date(ticket.dueDate), 'MMM d, yyyy') ?? 'null'
 						}}</span>
 					</div>
 				</div>

@@ -213,7 +213,7 @@
 		const { data: Ticket, error } = await supabase.from('Ticket').select('*');
 		const response =
 			User.Account.type === 'super_admin'
-				? Ticket.sort((a, b) => b['priority'] - a['priority']).filter(o => o.accountId === route.params.team)
+				? Ticket.sort((a, b) => b['dueDate'] - a['dueDate']).filter(o => o.accountId === route.params.team)
 				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
 		state.tickets = response;
 		state.active_tickets = response.filter(

@@ -254,7 +254,7 @@
 			limit: 'No requests',
 		},
 		{
-			name: 'Support',
+			name: 'Basic',
 			id: 'support',
 			desc: 'Great for running lightweight automations',
 			features: [
