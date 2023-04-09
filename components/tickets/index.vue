@@ -19,7 +19,7 @@
 								@click="refreshData()"
 							>
 								<svg
-									v-if="!state.loading"
+									v-if="!loading"
 									class="mr-1 h-5 w-5"
 									viewBox="0 0 24 24"
 									fill="none"
@@ -106,7 +106,7 @@
 								>Refresh
 							</button>
 							<button
-								:disabled="upgrade_needed || state.loading"
+								:disabled="upgrade_needed || loading"
 								data-tooltip-target="tooltip-default"
 								@click="showSubmitModal = true"
 								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-4 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
@@ -123,25 +123,25 @@
 						<div>
 							<tickets-section
 								title="Building"
-								:tickets="state.active_tickets"
+								:tickets="active_tickets"
 								:page="buildingPage"
-								:loading="state.loading"
+								:loading="loading"
 								@update:page="buildingPage = $event"
 							/>
 
 							<tickets-section
 								title="Backlog"
-								:tickets="state.backlog_tickets"
+								:tickets="backlog_tickets"
 								:page="backlogPage"
-								:loading="state.loading"
+								:loading="loading"
 								@update:page="backlogPage = $event"
 							/>
 
 							<tickets-section
 								title="Done"
-								:tickets="state.done_tickets"
+								:tickets="done_tickets"
 								:page="completedPage"
-								:loading="state.loading"
+								:loading="loading"
 								@update:page="completedPage = $event"
 							/>
 						</div>
@@ -191,13 +191,13 @@
 	const backlogPage = ref(0);
 	const completedPage = ref(0);
 
-	const state = reactive({
-		tickets: [],
-		active_tickets: [],
-		backlog_tickets: [],
-		done_tickets: [],
-		loading: true,
-	});
+	const tickets = ref([]);
+	const active_tickets = ref([]);
+	const backlog_tickets = ref([]);
+	const done_tickets = ref([]);
+	const loading = ref(true);
+
+	
 
 	// Fetch User data
 	let { data: User, error: userError } = await supabase
@@ -209,21 +209,27 @@
 
 	// Fetch tickets data
 	async function fetchData() {
-		state.loading = true;
+		loading.value = true;
 		const { data: Ticket, error } = await supabase.from('Ticket').select('*');
+		let { data: User, error: userError } = await supabase
+		.from('User')
+		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
 		const response =
 			User.Account.type === 'super_admin'
 				? Ticket.sort((a, b) => b['dueDate'] - a['dueDate']).filter(o => o.accountId === route.params.team)
 				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
-		state.tickets = response;
-		state.active_tickets = response.filter(
+		tickets.value = response;
+		active_tickets.value = response.filter(
 			(ticket) => ticket.status === 'active'
 		);
-		state.backlog_tickets = response.filter(
+		backlog_tickets.value = response.filter(
 			(ticket) => ticket.status === 'backlog'
 		);
-		state.done_tickets = response.filter((ticket) => ticket.status === 'done');
-		state.loading = false;
+		done_tickets.value = response.filter((ticket) => ticket.status === 'done');
+		loading.value = false;
 	}
 
 	// Refresh tickets data
