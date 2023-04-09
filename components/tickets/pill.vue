@@ -12,32 +12,14 @@
 							{{ ticket.name }}
 						</p>
 						<div
-							v-if="ticket.type === 'new'"
-							class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
+							:class="[
+								styles[ticket.type],
+								'relative inline-flex items-center rounded-full  px-2.5 py-0.5 ring-1 ring-inset',
+							]"
 						>
-							<div
-								class="absolute flex flex-shrink-0 items-center justify-center"
-							>
-								<span
-									class="h-1.5 w-1.5 rounded-full bg-sky-500"
-									aria-hidden="true"
-								/>
+							<div class="text-xs font-normal">
+								{{ ticket.type }}
 							</div>
-							<div class="ml-3 text-xs font-semibold text-sky-900">New</div>
-						</div>
-						<div
-							v-else
-							class="relative inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-800 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
-						>
-							<div
-								class="absolute flex flex-shrink-0 items-center justify-center"
-							>
-								<span
-									class="h-1.5 w-1.5 rounded-full bg-purple-500 dark:bg-purple-300"
-									aria-hidden="true"
-								/>
-							</div>
-							<div class="ml-3 text-xs font-semibold text-purple-900 dark:text-purple-100">Bug</div>
 						</div>
 					</div>
 					<div
@@ -64,7 +46,7 @@
 					>
 						<CalendarIcon class="h-4 w-4" />
 						<span>{{
-							format(new Date(ticket.dueDate), 'MMM d, yyyy') ?? 'null'
+							format(new Date(ticket.dueDate), 'MMM d') ?? 'null'
 						}}</span>
 					</div>
 				</div>
@@ -84,4 +66,10 @@
 	const props = defineProps({
 		ticket: Object,
 	});
+
+	const styles = {
+		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 hover:bg-red-50 text-red-900 dark:text-red-200',
+		billing: 'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 hover:bg-lime-50 text-lime-900 dark:text-lime-200',
+		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300 hover:bg-sky-50 text-sky-900 dark:text-sky-200',
+	};
 </script>

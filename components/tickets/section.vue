@@ -22,7 +22,7 @@
 					<div class="flex items-center space-x-2">
 						<ButtonPageback :disabled="props.page < 1" @click="prevPage" />
 						<ButtonPageforward
-							:disabled="(props.page === totalPages.value - 1) || props.tickets.length === 0"
+							:disabled="(props.page === totalPages - 1) || props.tickets.length === 0"
 							@click="nextPage"
 						/>
 					</div>
@@ -85,6 +85,8 @@
 	const totalPages = computed(() => {
 		return Math.ceil(props.tickets.length / limit.value);
 	});
+
+	console.log(totalPages);
 
 	const displayedTickets = computed(() => {
 		return props.tickets.slice(
