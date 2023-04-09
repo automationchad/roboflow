@@ -17,12 +17,12 @@
 							Page {{ props.page + 1 }} of
 							{{ Math.ceil(props.tickets.length / limit) }}
 						</span>
-						<span v-else>No records</span>
+						<!-- <span v-else>No records</span> -->
 					</div>
 					<div class="flex items-center space-x-2">
 						<ButtonPageback :disabled="props.page < 1" @click="prevPage" />
 						<ButtonPageforward
-							:disabled="props.page === totalPages.value - 1"
+							:disabled="(props.page === totalPages.value - 1) || props.tickets.length === 0"
 							@click="nextPage"
 						/>
 					</div>

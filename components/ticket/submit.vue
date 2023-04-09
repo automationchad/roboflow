@@ -514,7 +514,7 @@
 				dueDate: due_date.value,
 				accountId: accountId,
 				teamId: teamId,
-				desc: body.brief + (link.value ? `\n [Video link](${link.value})` : ''),
+				desc: body.brief,
 			},
 		]);
 
