@@ -73,7 +73,7 @@
 const props = defineProps({
 	showText: {
 			type: Boolean,
-			required: true,
+			required: false,
 		},
 })
 

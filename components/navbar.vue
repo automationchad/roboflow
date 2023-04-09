@@ -257,7 +257,7 @@
 												]"
 												>{{ team.name[0] }}</span
 											>
-											<span class="truncate font-medium">{{ team.name }}</span>
+											<span class="truncate font-normal">{{ team.name }}</span>
 										</div>
 										<div class="flex items-center" v-if="team.Ticket">
 											<div
@@ -282,7 +282,7 @@
 										</div>
 									</NuxtLink>
 								</li>
-								<button
+								<button v-if="User.Account.type !== 'super_admin'"
 									:disabled="upgrade_needed"
 									class="group relative flex items-center px-1 py-3 text-sm text-gray-500 disabled:text-gray-300"
 								>
