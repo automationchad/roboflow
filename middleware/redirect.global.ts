@@ -5,12 +5,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 	if (user.value) {
 		let { data: User, error: userError } = await supabase
 			.from('User')
-			.select('accountId')
+			.select('defaultTeamId,accountId')
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
 
-		const org_id = User.accountId;
+		const org_id = User?.accountId;
+		const team_id = User?.defaultTeamId;
 
 		if (to.path === '/documentation') {
 			return navigateTo(`/${org_id}/documentation`);
@@ -18,6 +19,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 			return navigateTo(`/${org_id}/dashboard`);
 		} else if (to.path === '/settings/billing') {
 			return navigateTo(`/${org_id}/settings/billing`);
+		} else if (to.path === '/tickets') {
+			return navigateTo(`/${team_id}/tickets`);
 		}
 	}
 });

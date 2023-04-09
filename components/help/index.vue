@@ -30,17 +30,17 @@
 			leave-to-class="transform scale-95 opacity-0"
 		>
 			<MenuItems
-				class="absolute bottom-16 mt-2 w-56 origin-bottom-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-800 dark:ring-white dark:ring-opacity-20"
+				class="absolute bottom-16 mt-2 w-56 origin-bottom-left py-1 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:divide-slate-700 overflow-hidden dark:bg-slate-800 dark:ring-white dark:ring-opacity-10"
 			>
-				<div class="space-y-1 px-1 py-1">
+				<div class="space-y-1">
 					<MenuItem v-slot="{ active }">
-						<a
-							href="/docs/quickstart-guide"
+						<NuxtLink
+							to="/docs/quickstart-guide"
 							:class="[
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center px-3 py-2 text-sm',
 							]"
 						>
 							<BookOpenIcon
@@ -49,16 +49,16 @@
 								aria-hidden="true"
 							/>
 							Quickstart guide
-						</a>
+						</NuxtLink>
 					</MenuItem>
 					<MenuItem v-slot="{ active }">
-						<a
-							href="/documentation"
+						<NuxtLink
+							to="/documentation"
 							:class="[
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center  px-3 py-2 text-sm',
 							]"
 						>
 							<DocumentTextIcon
@@ -67,7 +67,7 @@
 								aria-hidden="true"
 							/>
 							Documentation portal
-						</a>
+						</NuxtLink>
 					</MenuItem>
 					<MenuItem v-slot="{ active }">
 						<button
@@ -75,7 +75,7 @@
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center  px-3 py-2 text-sm',
 							]"
 						>
 							<DocumentTextIcon
@@ -87,14 +87,14 @@
 						</button>
 					</MenuItem>
 				</div>
-				<div class="space-y-1 px-1 py-1">
+				<div class="space-y-1">
 					<MenuItem v-slot="{ active }">
 						<button
 							:class="[
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center px-3 py-2 text-sm',
 							]"
 						>
 							<ChatBubbleOvalLeftIcon
@@ -111,7 +111,7 @@
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center px-3 py-2 text-sm',
 							]"
 						>
 							<slackmark class="mr-2 h-4 w-4" aria-hidden="true" />
@@ -119,14 +119,14 @@
 						</button>
 					</MenuItem>
 				</div>
-				<div class="space-y-1 px-1 py-1">
+				<div class="space-y-1">
 					<MenuItem v-slot="{ active }">
-						<button
+						<NuxtLink to="/tickets"
 							:class="[
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
 									: 'text-slate-800 dark:text-slate-50',
-								'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+								'group flex w-full items-center px-3 py-2 text-sm',
 							]"
 						>
 							<EnvelopeIcon
@@ -135,9 +135,8 @@
 								aria-hidden="true"
 							/>
 							Contact support
-						</button>
+						</NuxtLink>
 					</MenuItem>
-					
 				</div>
 			</MenuItems>
 		</transition>
@@ -153,8 +152,7 @@
 		QuestionMarkCircleIcon,
 		ChatBubbleOvalLeftIcon,
 		DocumentTextIcon,
-		
 		BookOpenIcon,
 	} from '@heroicons/vue/24/outline';
-	import { EnvelopeIcon } from '@heroicons/vue/20/solid'
+	import { EnvelopeIcon } from '@heroicons/vue/20/solid';
 </script>

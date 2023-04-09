@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<div class="px-10 dark:bg-black lg:px-8">
+		<div class="px-10  lg:px-8">
 			<div class=" text-base leading-7">
 				<p class="text-base font-semibold leading-7 text-indigo-600">How to</p>
 				<h1
