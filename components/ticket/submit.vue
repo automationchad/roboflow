@@ -1,3 +1,158 @@
+<script setup>
+	import { ref } from 'vue';
+	import { format, addDays } from 'date-fns';
+	import {
+		Dialog,
+		DialogPanel,
+		DialogTitle,
+		TransitionChild,
+		TransitionRoot,
+		Listbox,
+		ListboxButton,
+		ListboxLabel,
+		ListboxOption,
+		ListboxOptions,
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
+	} from '@headlessui/vue';
+	import {
+		XMarkIcon,
+		ChevronUpDownIcon,
+		ChevronUpIcon,
+		ExclamationCircleIcon,
+	} from '@heroicons/vue/20/solid';
+	import { CheckIcon } from '@heroicons/vue/24/outline';
+	const emit = defineEmits(['close-modal', 'ticket-submit']);
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+	const open = ref(true);
+	const name = ref('');
+	const brief = ref(null);
+	const link = ref('');
+	const type = ref('');
+	const due_date = ref('');
+	const ticketTypes = [
+		{
+			id: 'bug',
+			title: 'Modify an existing automation',
+			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
+		},
+		{
+			id: 'new',
+			title: 'Create a new automation project',
+			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
+		},
+		{
+			id: 'dashboard_bug',
+			title: 'Dashboard bug',
+			desc: 'Issues with Motis dashboard',
+		},
+		{
+			id: 'performance_issues',
+			title: 'Perfomance issues',
+			desc: 'Reporting of performance issues is only available on the Enterprise tier',
+		},
+		{
+			id: 'sales_inquiry',
+			title: 'Sales enquiry',
+			desc: 'Questions about pricing, paid plans and Enterprise plans.',
+		},
+		{
+			id: 'billing',
+			title: 'Billing',
+			desc: 'Issues with credit card charges | invoices | overcharging',
+		},
+		{
+			id: 'abuse',
+			title: 'Abuse report',
+			desc: 'Report abuse of a Motis project or Motis brand',
+		},
+	];
+	const selectedTicket = ref(ticketTypes[0]);
+	const loading = ref(false);
+	const error_occurred = ref(false);
+	const route = useRoute();
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,type,Subscription(*))`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	const accountId =
+		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
+	const teamId =
+		User.Account.type === 'super_admin'
+			? User.defaultTeamId
+			: route.params.team;
+
+	const { data: Account, error: accountError } = await supabase
+		.from('Account')
+		.select(`*,User(*)`)
+		.eq('type', 'super_admin')
+		.limit(1)
+		.single();
+
+	const handleSubmit = async (body) => {
+		loading.value = true;
+
+		const accountManagers = await Promise.all(
+			Account.User.filter((o) => {
+				const badges = o.badges;
+				return badges.filter((o) => o.id === 'mg_officer').length;
+			}).map(async (o) => {
+				const { data: Ticket, error: ticketError } = await supabase
+					.from('Ticket')
+					.select('count')
+					.eq('assignedTo', o.id)
+					.single();
+
+				return {
+					...o,
+					ticket_count: Ticket.count,
+				};
+			})
+		);
+
+		// First, sort the account managers by ticket count
+		accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+
+		// Then, find the account manager with the lowest ticket count
+		const accountManager = accountManagers[0];
+
+		const { data, error } = await supabase.from('Ticket').insert([
+			{
+				name: body.name,
+				type: selectedTicket.value.id,
+				status: 'backlog',
+				createdBy: user.value.id,
+				dueDate: due_date.value,
+				accountId: accountId,
+				assignedTo: accountManager.id,
+				teamId: teamId,
+				desc: body.brief,
+			},
+		]);
+
+		emit('ticket-submit');
+		emit('close-modal');
+		name.value = '';
+		brief.value = '';
+		link.value = '';
+		type.value = '';
+		loading.value = false;
+	};
+
+	// Fetch User data
+
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+</script>
+
 <template>
 	<div
 		class="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center"
@@ -18,7 +173,7 @@
 								Motis Support
 							</div>
 							<div
-								class="ml-3 inline-flex items-center rounded-md border border-slate-300 dark:bg-slate-700 bg-white px-2 py-1 text-xs shadow-sm dark:border-slate-600 dark:text-white"
+								class="ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white px-2 py-1 text-xs shadow-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 							>
 								<span class="relative mr-1.5 flex h-2 w-2">
 									<span
@@ -377,157 +532,3 @@
 		</div>
 	</div>
 </template>
-
-<script setup>
-	import { ref } from 'vue';
-	import { format, addDays } from 'date-fns';
-	import {
-		Dialog,
-		DialogPanel,
-		DialogTitle,
-		TransitionChild,
-		TransitionRoot,
-		Listbox,
-		ListboxButton,
-		ListboxLabel,
-		ListboxOption,
-		ListboxOptions,
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-	} from '@headlessui/vue';
-	import {
-		XMarkIcon,
-		ChevronUpDownIcon,
-		ChevronUpIcon,
-		ExclamationCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import { CheckIcon } from '@heroicons/vue/24/outline';
-	const emit = defineEmits(['close-modal', 'ticket-submit']);
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
-	const open = ref(true);
-	const name = ref('');
-	const brief = ref(null);
-	const link = ref('');
-	const type = ref('');
-	const due_date = ref('');
-	const ticketTypes = [
-		{
-			id: 'bug',
-			title: 'Modify an existing automation',
-			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
-		},
-		{
-			id: 'new',
-			title: 'Create a new automation project',
-			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
-		},
-		{
-			id: 'dashboard_bug',
-			title: 'Dashboard bug',
-			desc: 'Issues with Motis dashboard',
-		},
-		{
-			id: 'performance_issues',
-			title: 'Perfomance issues',
-			desc: 'Reporting of performance issues is only available on the Enterprise tier',
-		},
-		{
-			id: 'sales_inquiry',
-			title: 'Sales enquiry',
-			desc: 'Questions about pricing, paid plans and Enterprise plans.',
-		},
-		{
-			id: 'billing',
-			title: 'Billing',
-			desc: 'Issues with credit card charges | invoices | overcharging',
-		},
-		{
-			id: 'abuse',
-			title: 'Abuse report',
-			desc: 'Report abuse of a Motis project or Motis brand',
-		},
-	];
-	const selectedTicket = ref(ticketTypes[0]);
-	const loading = ref(false);
-	const error_occurred = ref(false);
-	const route = useRoute();
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,type,Subscription(*))`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	const accountId =
-		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
-	const teamId =
-		User.Account.type === 'super_admin'
-			? User.defaultTeamId
-			: route.params.team;
-
-	function addWorkDays(startDate, days) {
-		if (isNaN(days)) {
-			console.log('Value provided for "days" was not a number');
-			return;
-		}
-		if (!(startDate instanceof Date)) {
-			console.log('Value provided for "startDate" was not a Date object');
-			return;
-		}
-		// Get the day of the week as a number (0 = Sunday, 1 = Monday, .... 6 = Saturday)
-		var dow = startDate.getDay();
-		var daysToAdd = parseInt(days);
-		// If the current day is Sunday add one day
-		if (dow == 0) daysToAdd++;
-		// If the start date plus the additional days falls on or after the closest Saturday calculate weekends
-		if (dow + daysToAdd >= 6) {
-			//Subtract days in current working week from work days
-			var remainingWorkDays = daysToAdd - (5 - dow);
-			//Add current working week's weekend
-			daysToAdd += 2;
-			if (remainingWorkDays > 5) {
-				//Add two days for each working week by calculating how many weeks are included
-				daysToAdd += 2 * Math.floor(remainingWorkDays / 5);
-				//Exclude final weekend if remainingWorkDays resolves to an exact number of weeks
-				if (remainingWorkDays % 5 == 0) daysToAdd -= 2;
-			}
-		}
-		startDate.setDate(startDate.getDate() + daysToAdd);
-		return startDate;
-	}
-
-	const handleSubmit = async (body) => {
-		loading.value = true;
-
-		const { data, error } = await supabase.from('Ticket').insert([
-			{
-				name: body.name,
-				type: selectedTicket.value.id,
-				status: 'backlog',
-				createdBy: user.value.id,
-				dueDate: due_date.value,
-				accountId: accountId,
-				teamId: teamId,
-				desc: body.brief,
-			},
-		]);
-
-		emit('ticket-submit');
-		emit('close-modal');
-		name.value = '';
-		brief.value = '';
-		link.value = '';
-		type.value = '';
-		loading.value = false;
-	};
-
-	// Fetch User data
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-</script>

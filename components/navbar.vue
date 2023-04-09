@@ -401,7 +401,6 @@
 	let teams = [];
 	if (User.Account.type === 'super_admin') {
 		teams = Account;
-		console.log(teams);
 	} else {
 		teams = User.Account.Team;
 		const index = teams.indexOf((o) => User.defaultTeamId === o.id);

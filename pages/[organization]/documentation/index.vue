@@ -1,3 +1,188 @@
+<script setup>
+	import { reactive, onMounted, ref } from 'vue';
+	import {
+		Dialog,
+		DialogPanel,
+		Menu,
+		MenuButton,
+		MenuItem,
+		MenuItems,
+		TransitionChild,
+		TransitionRoot,
+	} from '@headlessui/vue';
+	import {
+		Bars3Icon,
+		BellIcon,
+		CalendarIcon,
+		ChartPieIcon,
+		Cog6ToothIcon,
+		DocumentDuplicateIcon,
+		DocumentArrowDownIcon,
+		QueueListIcon,
+		FolderIcon,
+		HomeIcon,
+		ArrowPathIcon,
+		UsersIcon,
+		XMarkIcon,
+	} from '@heroicons/vue/24/outline';
+	import {
+		ChevronDownIcon,
+		MagnifyingGlassIcon,
+	} from '@heroicons/vue/20/solid';
+
+	import { format } from 'date-fns';
+
+	definePageMeta({ middleware: ['auth'] });
+
+	const state = reactive({
+		docs: [],
+		loading: true,
+	});
+
+	const route = useRoute();
+
+	const user = useSupabaseUser();
+
+	const supabase = useSupabaseClient();
+
+	const orgs = ref([]);
+	const org_id = ref('');
+	const fileName = ref('');
+	const isFileSelected = ref(false);
+	const uploading = ref(false);
+	const refresh = ref(false);
+	const uploadSuccess = ref(false);
+	const files = ref();
+	const deleteLoading = ref(false);
+
+	const { data: User, error: UserError } = await supabase
+		.from('User')
+		.select('systemRole,Account(id,type)')
+		.eq('id', user.value.id)
+		.single();
+
+	const fetchDropdownItems = async () => {
+		// Check if the dropdown items have already been fetched
+		if (orgs.value.length > 0) {
+			return;
+		}
+
+		uploading.value = true;
+		const { data: Account, error } = await supabase
+			.from('Account')
+			.select('id,name');
+
+		orgs.value = Account;
+		uploading.value = false;
+	};
+
+	const fetchData = async () => {
+		const { data } = await supabase.storage
+			.from('files')
+			.list(`client_files/${route.params.organization}`, {
+				offset: 0,
+				sortBy: { column: 'name', order: 'asc' },
+			});
+		return data;
+	};
+
+	onMounted(async () => {
+		state.docs = await fetchData();
+		state.loading = false;
+	});
+
+	const handleFileChange = (event) => {
+		// Set the file name and update the submit button state
+		const file = event.target.files[0];
+		fileName.value = file.name;
+		isFileSelected.value = true;
+	};
+
+	const uploadFile = async (evt) => {
+		const maxSize = 1024 * 1024 * 10;
+		files.value = evt.target.files;
+		const org_id =
+			User.Account.type === 'super_admin'
+				? org_id.value
+				: route.params.organization;
+		try {
+			uploading.value = true;
+
+			if (!files.value || files.value.length === 0) {
+				throw new Error('You must select an image to upload.');
+			}
+
+			const file = files.value[0];
+			if (file.size > maxSize) {
+				throw new Error('File too large.');
+				files.value = '';
+			}
+			const fileExt = file.name.split('.').pop();
+			const fileName = `${file.name}.${fileExt}`;
+			const filePath = `client_files/${org_id}/${fileName}`;
+
+			let { error: uploadError } = await supabase.storage
+				.from('files')
+				.upload(filePath, file, { upsert: true });
+
+			if (uploadError) throw uploadError;
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			uploading.value = false;
+			uploadSuccess.value = true;
+			state.loading = true;
+			state.docs = await fetchData();
+			setTimeout(() => {
+				uploadSuccess.value = false;
+			}, 2000);
+			state.loading = false;
+		}
+	};
+
+	const handleRefresh = async () => {
+		state.loading = true;
+		state.docs = await fetchData();
+		state.loading = false;
+	};
+
+	const handleDownload = async (file_name, folder) => {
+		const {
+			data: { signedUrl },
+			error,
+		} = await supabase.storage
+			.from('files')
+			.createSignedUrl(`client_files/${folder}/${file_name}`, 60);
+		window.open(signedUrl, '_blank').focus();
+	};
+
+	const handleFileDelete = async (file_name, folder) => {
+		state.loading = true;
+		const { data, error } = await supabase.storage
+			.from('files')
+			.remove([`client_files/${folder}/${file_name}`]);
+		state.docs = await fetchData();
+		state.loading = false;
+	};
+
+	// const activeSub =
+	// 	User.Account.Subscription[0].status === 'active' &&
+	// 	User.Account.Subscription[0].plan.metadata.plan !== 'Free';
+
+	onMounted(() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo('/');
+			}
+		});
+	});
+
+	const userNavigation = [
+		{ name: 'Your profile', href: '#' },
+		{ name: 'Sign out', href: '#' },
+	];
+</script>
+
 <template>
 	<div>
 		<div class="">
@@ -456,189 +641,3 @@
 		</div>
 	</div>
 </template>
-
-<script setup>
-	import { reactive, onMounted, ref } from 'vue';
-	import {
-		Dialog,
-		DialogPanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		TransitionChild,
-		TransitionRoot,
-	} from '@headlessui/vue';
-	import {
-		Bars3Icon,
-		BellIcon,
-		CalendarIcon,
-		ChartPieIcon,
-		Cog6ToothIcon,
-		DocumentDuplicateIcon,
-		DocumentArrowDownIcon,
-		QueueListIcon,
-		FolderIcon,
-		HomeIcon,
-		ArrowPathIcon,
-		UsersIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
-	import {
-		ChevronDownIcon,
-		MagnifyingGlassIcon,
-	} from '@heroicons/vue/20/solid';
-
-	import { format } from 'date-fns';
-
-	definePageMeta({ middleware: ['auth'] });
-
-	const state = reactive({
-		docs: [],
-		loading: true,
-	});
-
-	const route = useRoute();
-
-	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
-	const orgs = ref([]);
-	const org_id = ref('');
-	const fileName = ref('');
-	const isFileSelected = ref(false);
-	const uploading = ref(false);
-	const refresh = ref(false);
-	const uploadSuccess = ref(false);
-	const files = ref();
-	const deleteLoading = ref(false);
-
-	const { data: User, error: UserError } = await supabase
-		.from('User')
-		.select('systemRole,Account(id,type)')
-		.eq('id', user.value.id)
-		.single();
-
-	const fetchDropdownItems = async () => {
-		// Check if the dropdown items have already been fetched
-		if (orgs.value.length > 0) {
-			return;
-		}
-
-		uploading.value = true;
-		const { data: Account, error } = await supabase
-			.from('Account')
-			.select('id,name');
-
-		orgs.value = Account;
-		uploading.value = false;
-		console.log(Account);
-	};
-
-	const fetchData = async () => {
-		const { data } = await supabase.storage
-			.from('files')
-			.list(`client_files/${route.params.organization}`, {
-				offset: 0,
-				sortBy: { column: 'name', order: 'asc' },
-			});
-		return data;
-	};
-
-	onMounted(async () => {
-		state.docs = await fetchData();
-		state.loading = false;
-	});
-
-	const handleFileChange = (event) => {
-		// Set the file name and update the submit button state
-		const file = event.target.files[0];
-		fileName.value = file.name;
-		isFileSelected.value = true;
-	};
-
-	const uploadFile = async (evt) => {
-		const maxSize = 1024 * 1024 * 10;
-		files.value = evt.target.files;
-		const org_id =
-			User.Account.type === 'super_admin'
-				? org_id.value
-				: route.params.organization;
-		try {
-			uploading.value = true;
-
-			if (!files.value || files.value.length === 0) {
-				throw new Error('You must select an image to upload.');
-			}
-
-			const file = files.value[0];
-			if (file.size > maxSize) {
-				throw new Error('File too large.');
-				files.value = '';
-			}
-			const fileExt = file.name.split('.').pop();
-			const fileName = `${file.name}.${fileExt}`;
-			const filePath = `client_files/${org_id}/${fileName}`;
-
-			let { error: uploadError } = await supabase.storage
-				.from('files')
-				.upload(filePath, file, { upsert: true });
-
-			if (uploadError) throw uploadError;
-		} catch (error) {
-			alert(error.message);
-		} finally {
-			uploading.value = false;
-			uploadSuccess.value = true;
-			state.loading = true;
-			state.docs = await fetchData();
-			setTimeout(() => {
-				uploadSuccess.value = false;
-			}, 2000);
-			state.loading = false;
-		}
-	};
-
-	const handleRefresh = async () => {
-		state.loading = true;
-		state.docs = await fetchData();
-		state.loading = false;
-	};
-
-	const handleDownload = async (file_name, folder) => {
-		const {
-			data: { signedUrl },
-			error,
-		} = await supabase.storage
-			.from('files')
-			.createSignedUrl(`client_files/${folder}/${file_name}`, 60);
-		window.open(signedUrl, '_blank').focus();
-	};
-
-	const handleFileDelete = async (file_name, folder) => {
-		state.loading = true;
-		const { data, error } = await supabase.storage
-			.from('files')
-			.remove([`client_files/${folder}/${file_name}`]);
-		state.docs = await fetchData();
-		state.loading = false;
-	};
-
-	// const activeSub =
-	// 	User.Account.Subscription[0].status === 'active' &&
-	// 	User.Account.Subscription[0].plan.metadata.plan !== 'Free';
-
-	onMounted(() => {
-		watchEffect(() => {
-			if (!user.value) {
-				navigateTo('/');
-			}
-		});
-	});
-
-	const userNavigation = [
-		{ name: 'Your profile', href: '#' },
-		{ name: 'Sign out', href: '#' },
-	];
-</script>

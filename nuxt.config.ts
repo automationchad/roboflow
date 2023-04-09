@@ -23,7 +23,7 @@ export default defineNuxtConfig({
 		SUPABASE_URL: process.env.SUPABASE_URL,
 	},
 	css: ['~/assets/css/main.css'],
-	modules: ['@nuxtjs/supabase', '@nuxt/image-edge'],
+	modules: ['@nuxtjs/supabase', '@nuxt/image-edge', '@nuxtjs/color-mode'],
 	// plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
 	postcss: {
 		plugins: {

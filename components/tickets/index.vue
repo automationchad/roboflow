@@ -1,3 +1,105 @@
+<script setup>
+	// Import Vue Composition API and date-fns functions
+	import { reactive, onMounted, ref, computed } from 'vue';
+	import { format, formatDistance } from 'date-fns';
+
+	// Import heroicons
+	import {
+		PlusIcon,
+		TicketIcon,
+		ClockIcon,
+		QuestionMarkCircleIcon,
+		CalendarIcon,
+		ShieldCheckIcon,
+		CheckCircleIcon,
+		PlusCircleIcon,
+		PaperClipIcon,
+	} from '@heroicons/vue/24/outline';
+
+	// Custom hooks and constants
+	const route = useRoute();
+	const supabase = useSupabaseClient();
+	const user = useSupabaseUser();
+	const entitlements = [
+		{ plan: 'free', count: 0 },
+		{ plan: 'support', count: 5 },
+		{ plan: 'growth', count: 25 },
+		{ plan: 'enterprise', count: 100 },
+	];
+
+	// Pagination refs
+	const buildingPage = ref(0);
+	const backlogPage = ref(0);
+	const completedPage = ref(0);
+
+	const tickets = ref([]);
+	const active_tickets = ref([]);
+	const backlog_tickets = ref([]);
+	const done_tickets = ref([]);
+	const loading = ref(true);
+
+	// Fetch User data
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	// Fetch tickets data
+	async function fetchData() {
+		loading.value = true;
+		const { data: Ticket, error } = await supabase.from('Ticket').select('*');
+		let { data: User, error: userError } = await supabase
+			.from('User')
+			.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+		const response =
+			User.Account.type === 'super_admin'
+				? Ticket.sort((a, b) => b['dueDate'] - a['dueDate']).filter(
+						(o) => o.accountId === route.params.team
+				  )
+				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
+		tickets.value = response;
+		active_tickets.value = response.filter(
+			(ticket) => ticket.status === 'active'
+		);
+		backlog_tickets.value = response.filter(
+			(ticket) => ticket.status === 'backlog'
+		);
+		done_tickets.value = response.filter((ticket) => ticket.status === 'done');
+		loading.value = false;
+	}
+
+	// Refresh tickets data
+	function refreshData() {
+		fetchData();
+	}
+
+	// Call fetchData on component mounted
+	onMounted(() => fetchData());
+
+	// Modal control ref
+	const showSubmitModal = ref(false);
+
+	// If your application needs an upgrade to add tickets,
+	// set `upgrade_needed` to true. Otherwise, set it to false.
+	const upgrade_needed = ref(false);
+
+	// Calculate the current user's entitlement and update `upgrade_needed`
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+	const totalActive = User.Account.Ticket.filter(
+		(o) => o.status === 'active'
+	).length;
+	const entitlement = entitlements.find((v) => v.plan === retainer.tier);
+	upgrade_needed.value =
+		totalActive >= entitlement.count &&
+		retainer.status === 'active' &&
+		User.systemRole !== 'super_admin';
+</script>
+
 <template>
 	<div>
 		<div>
@@ -15,7 +117,7 @@
 						</div>
 						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
 							<button
-								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal dark:text-white dark:hover:bg-slate-800 hover:bg-gray-100"
+								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal hover:bg-gray-100 dark:text-white dark:hover:bg-slate-800"
 								@click="refreshData()"
 							>
 								<svg
@@ -156,105 +258,3 @@
 		</div>
 	</div>
 </template>
-
-<script setup>
-	// Import Vue Composition API and date-fns functions
-	import { reactive, onMounted, ref, computed } from 'vue';
-	import { format, formatDistance } from 'date-fns';
-
-	// Import heroicons
-	import {
-		PlusIcon,
-		TicketIcon,
-		ClockIcon,
-		QuestionMarkCircleIcon,
-		CalendarIcon,
-		ShieldCheckIcon,
-		CheckCircleIcon,
-		PlusCircleIcon,
-		PaperClipIcon,
-	} from '@heroicons/vue/24/outline';
-
-	// Custom hooks and constants
-	const route = useRoute();
-	const supabase = useSupabaseClient();
-	const user = useSupabaseUser();
-	const entitlements = [
-		{ plan: 'free', count: 0 },
-		{ plan: 'support', count: 5 },
-		{ plan: 'growth', count: 25 },
-		{ plan: 'enterprise', count: 100 },
-	];
-
-	// Pagination refs
-	const buildingPage = ref(0);
-	const backlogPage = ref(0);
-	const completedPage = ref(0);
-
-	const tickets = ref([]);
-	const active_tickets = ref([]);
-	const backlog_tickets = ref([]);
-	const done_tickets = ref([]);
-	const loading = ref(true);
-
-	
-
-	// Fetch User data
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	// Fetch tickets data
-	async function fetchData() {
-		loading.value = true;
-		const { data: Ticket, error } = await supabase.from('Ticket').select('*');
-		let { data: User, error: userError } = await supabase
-		.from('User')
-		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-		const response =
-			User.Account.type === 'super_admin'
-				? Ticket.sort((a, b) => b['dueDate'] - a['dueDate']).filter(o => o.accountId === route.params.team)
-				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
-		tickets.value = response;
-		active_tickets.value = response.filter(
-			(ticket) => ticket.status === 'active'
-		);
-		backlog_tickets.value = response.filter(
-			(ticket) => ticket.status === 'backlog'
-		);
-		done_tickets.value = response.filter((ticket) => ticket.status === 'done');
-		loading.value = false;
-	}
-
-	// Refresh tickets data
-	function refreshData() {
-		fetchData();
-	}
-
-	// Call fetchData on component mounted
-	onMounted(() => fetchData());
-
-	// Modal control ref
-	const showSubmitModal = ref(false);
-
-	// If your application needs an upgrade to add tickets,
-	// set `upgrade_needed` to true. Otherwise, set it to false.
-	const upgrade_needed = ref(false);
-
-	// Calculate the current user's entitlement and update `upgrade_needed`
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status === 'active'
-	).length;
-	const entitlement = entitlements.find((v) => v.plan === retainer.tier);
-	upgrade_needed.value =
-		totalActive >= entitlement.count &&
-		retainer.status === 'active' &&
-		User.systemRole !== 'super_admin';
-</script>

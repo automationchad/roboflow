@@ -36,7 +36,7 @@
 			<tbody
 				class="max-h-[100px] divide-y divide-slate-200 overflow-y-scroll bg-slate-50 dark:divide-slate-700 dark:bg-transparent"
 			>
-				<tr v-for="ticket in tickets.slice(0,15)" :key="ticket.id">
+				<tr v-for="ticket in tickets.slice(0, 15)" :key="ticket.id">
 					<td
 						class="flex items-center px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
 					>
@@ -61,18 +61,11 @@
 						class="px-6 py-2 text-left text-sm text-gray-500 dark:text-slate-200"
 					>
 						<span
-							v-if="ticket.type === 'bug'"
-							class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium capitalize text-purple-900 ring-1 ring-purple-300"
+							:class="[
+								styles[ticket.type],
+								'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] leading-3 font-medium capitalize ring-1',
+							]"
 						>
-							<BugAntIcon class="mr-1 h-4 w-4 text-purple-500" />
-
-							{{ ticket.type }}
-						</span>
-						<span
-							v-else
-							class="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium capitalize text-sky-900 ring-1 ring-sky-300"
-						>
-							<SparklesIcon class="mr-1 h-4 w-4 text-sky-500" />
 							{{ ticket.type }}
 						</span>
 					</td>
@@ -155,4 +148,11 @@
 		User.Account.type === 'super_admin'
 			? Ticket.sort((a, b) => b['priority'] - a['priority'])
 			: User.Account.Ticket;
+
+	const styles = {
+		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		billing:
+			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
+		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
+	};
 </script>

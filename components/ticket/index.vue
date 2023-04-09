@@ -1,3 +1,345 @@
+<script setup>
+	import { ref } from 'vue';
+	import {
+		Dialog,
+		DialogPanel,
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
+		TransitionChild,
+		TransitionRoot,
+		Listbox,
+		ListboxButton,
+		ListboxLabel,
+		ListboxOption,
+		ListboxOptions,
+	} from '@headlessui/vue';
+	import {
+		ArchiveBoxIcon,
+		Bars3BottomLeftIcon,
+		Bars4Icon,
+		ClockIcon,
+		HomeIcon,
+		UserCircleIcon as UserCircleIconOutline,
+		FaceFrownIcon,
+		FaceSmileIcon,
+		FireIcon,
+		HandThumbUpIcon,
+		HeartIcon,
+		PaperClipIcon,
+		XMarkIcon,
+	} from '@heroicons/vue/24/outline';
+	import {
+		BellIcon,
+		CalendarIcon,
+		ChatBubbleLeftEllipsisIcon,
+		CheckCircleIcon,
+		LockOpenIcon,
+		TrashIcon,
+		LockClosedIcon,
+		MagnifyingGlassIcon,
+		PencilIcon,
+		TagIcon,
+		UserCircleIcon as UserCircleIconMini,
+	} from '@heroicons/vue/20/solid';
+
+	import showdown from 'showdown';
+	import { format, formatDistanceStrict } from 'date-fns';
+
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+	const route = useRoute();
+	const props = defineProps(['open', 'comments']);
+
+	const converter = await new showdown.Converter();
+	const loading = ref(true);
+
+	const ticketAvatar = ref(null);
+
+	const currentAvatar = ref(null);
+
+	const assignedToAvatar = ref(null);
+
+	const comments = ref([]);
+	const comment_text = ref('');
+	const reply_text = ref('');
+
+	const imageSrc = ref(null);
+	const fileInput = ref(null);
+	const selectedFile = ref(null);
+
+	const commentImageId = ref('');
+	const showImageModal = ref(false);
+
+	const showImage = (id) => {
+		commentImageId.value = id;
+		showImageModal.value = true;
+	};
+
+	const toggleModal = () => {
+		showImageModal.value = !showImageModal.value;
+	};
+
+	const styles = {
+		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		billing:
+			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
+		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
+	};
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 stripeCustomerId,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	
+
+	let { data: Ticket, error } = await supabase
+		.from('Ticket')
+		.select(
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
+		)
+		.eq('id', route.params.id)
+		.limit(1)
+		.single();
+
+	const input = ref(Ticket.desc);
+
+	const { data: AssignedTo, error: assignedError } = await supabase
+		.from('User')
+		.select('*')
+		.eq('id', Ticket.assignedTo)
+		.limit(1)
+		.single();
+
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value = URL.createObjectURL(file);
+			selectedFile.value = file;
+		}
+	};
+
+	const removeImage = () => {
+		imageSrc.value = null;
+		fileInput.value = '';
+	};
+
+	const getAvatarUrl = async (avatar) => {
+		const {
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('avatars').list(`${avatar}`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${avatar}`,
+		});
+
+		if (File) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('avatars')
+				.getPublicUrl(`/${avatar}/${File.name}`);
+
+			return publicUrl;
+		} else return '';
+	};
+
+	const fetchComments = async () => {
+		let { data: Ticket, error } = await supabase
+			.from('Ticket')
+			.select(
+				'*,Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
+			)
+			.eq('id', route.params.id)
+			.limit(1)
+			.single();
+		const comments = Ticket.Comment;
+		const commentList = [];
+		const replyList = [];
+
+		for (const comment of comments) {
+			const commentObj = {
+				...comment,
+				avatarUrl: '',
+				Comment: [], // Create an empty array to hold replies
+			};
+
+			// Check if this is a reply to another comment
+			if (comment.threadId) {
+				replyList.push(commentObj);
+			} else {
+				commentList.push(commentObj);
+			}
+		}
+
+		// Load avatar URLs asynchronously and update the comment data
+		const promises = [];
+		for (const comment of commentList) {
+			const promise = getAvatarUrl(comment.createdBy).then(
+				(avatarUrl) => (comment.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+		}
+
+		for (const reply of replyList) {
+			const promise = getAvatarUrl(reply.createdBy).then(
+				(avatarUrl) => (reply.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+		}
+
+		await Promise.all(promises);
+
+		// Loop through the replyList and add each reply to the appropriate comment
+		for (const reply of replyList) {
+			const parentComment = commentList.find(
+				(comment) => comment.id === reply.threadId
+			);
+			if (parentComment) {
+				parentComment.Comment.push(reply);
+			}
+		}
+
+		// Sort the commentList array in ascending order by createdOn date
+		commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+
+		return commentList;
+	};
+
+	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
+	currentAvatar.value = await getAvatarUrl(user.value.id);
+	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
+
+	comments.value = await fetchComments();
+	if (comments.value) {
+		loading.value = false;
+	}
+
+	const convert = (text) => {
+		let converter = new showdown.Converter();
+		const formatted = converter.makeHtml(text);
+		return formatted;
+	};
+
+	const handleCommentAdd = async (thread_id) => {
+		loading.value = true;
+		const org_id =
+			User.Account.type === 'super_admin'
+				? org_id.value
+				: route.params.organization;
+		try {
+			if (selectedFile.value) {
+				const fileName = cleanString(selectedFile.value.name);
+				const filePath = `attachments/${fileName}`;
+				const { error: uploadError } = await supabase.storage
+					.from('images')
+					.upload(filePath, selectedFile.value, { upsert: true });
+
+				if (uploadError) {
+					console.error('Error uploading image:', uploadError);
+					return;
+				}
+				const { data, error: insertError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+							attachment: filePath,
+						},
+					]);
+
+				if (insertError) {
+					console.error('Error inserting comment:', insertError);
+				} else {
+					console.log('Image uploaded and comment created successfully');
+					removeImage();
+				}
+			} else {
+				const { data, error: insertError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+						},
+					]);
+
+				if (insertError) {
+					console.error('Error inserting comment:', insertError);
+				} else {
+					console.log('Comment created successfully');
+					removeImage();
+				}
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			comment_text.value = '';
+			comments.value = await fetchComments();
+			loading.value = false;
+		}
+	};
+
+	const handleDescUpdate = async () => {
+		const { data, error } = await supabase
+			.from('Ticket')
+			.update({ desc: input.value })
+			.eq('id', route.params.id);
+	};
+
+	const handleTicketClose = async (status) => {
+		const ticket_status = status !== 'done' ? 'done' : 'backlog';
+		const { data, error } = await supabase
+			.from('Ticket')
+			.update({ status: ticket_status })
+			.eq('id', route.params.id);
+		navigateTo(`/${route.params.team}/tickets`);
+	};
+
+	const handleDelete = async (id, arr) => {
+		loading.value = true;
+		try {
+			if (arr) {
+				const { data, error: deleteError } = await supabase
+					.from('Comment')
+					.delete()
+					.eq('id', id);
+			} else {
+				const { data, error } = await supabase
+					.from('Comment')
+					.update({ text: 'This message was deleted.', deleted: true })
+					.eq('id', id);
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			const data = await fetchComments();
+			comments.value = data;
+			loading.value = false;
+		}
+	};
+</script>
+
 <template>
 	<div class="flex min-h-full">
 		<div class="flex w-0 flex-1 flex-col">
@@ -36,30 +378,32 @@
 												<div class="">
 													<div class="flex items-center">
 														<span
-															class="inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
+															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 														>
 															{{ Ticket.User.firstName }}
 															{{ Ticket.User.lastName }}
 														</span>
-														<span class="text-xs text-gray-400"
-															>&nbsp; &bull; &nbsp;</span
-														>
+
 														<span
-															class="inline-flex text-sm font-normal text-gray-600"
+															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
-															{{
-																Ticket.User.jobTitle ?? Ticket.User.systemRole
-															}}
+															{{ Ticket.User.jobTitle }}
 														</span>
 														<span class="ml-1 text-sm">{{
 															countryToEmoji(Ticket.User.country)
 														}}</span>
 													</div>
-													<span
-														v-if="Ticket.User.systemRole === 'super_admin'"
-														class="badge py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
-														>Admin</span
-													>
+													<div class="space-x-1">
+														<span
+															v-for="badge in Ticket.User.badges"
+															:key="badge.id"
+															:class="[
+																badge.id,
+																'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
+															]"
+															>{{ badge.text }}</span
+														>
+													</div>
 												</div>
 											</footer>
 											<h1
@@ -127,7 +471,9 @@
 											class="mt-6 space-y-8 border-b border-t border-gray-200 py-6 dark:border-slate-800"
 										>
 											<div>
-												<h2 class="text-sm font-medium text-gray-500">
+												<h2
+													class="text-sm font-normal text-gray-500 dark:text-white"
+												>
 													Assignees
 												</h2>
 												<ul role="list" class="mt-3 space-y-3">
@@ -135,15 +481,16 @@
 														<a href="#" class="flex items-center space-x-3">
 															<div class="flex-shrink-0">
 																<img
-																	class="h-5 w-5 rounded-full"
-																	src="https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80"
+																	class="h-5 w-5 rounded-full object-cover"
+																	:src="assignedToAvatar"
 																	alt=""
 																/>
 															</div>
 															<div
 																class="text-sm font-medium text-gray-900 dark:text-white"
 															>
-																Eduardo Benz
+																{{ AssignedTo.firstName }}
+																{{ AssignedTo.lastName }}
 															</div>
 														</a>
 													</li>
@@ -152,44 +499,12 @@
 											<div>
 												<h2 class="text-sm font-medium text-gray-500">Type</h2>
 												<ul role="list" class="mt-2 leading-8">
-													<li class="inline" v-if="Ticket.type === 'bug'">
+													<li class="inline">
 														<a
-															href="#"
-															class="relative inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
+															:class="[styles[Ticket.type],'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset']"
 														>
-															<div
-																class="absolute flex flex-shrink-0 items-center justify-center"
-															>
-																<span
-																	class="h-1.5 w-1.5 rounded-full bg-purple-500"
-																	aria-hidden="true"
-																/>
-															</div>
-															<div
-																class="ml-3 text-xs font-semibold text-purple-900"
-															>
-																Bug
-															</div>
-														</a>
-														{{ ' ' }}
-													</li>
-													<li class="inline" v-else>
-														<a
-															href="#"
-															class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
-														>
-															<div
-																class="absolute flex flex-shrink-0 items-center justify-center"
-															>
-																<span
-																	class="h-1.5 w-1.5 rounded-full bg-sky-500"
-																	aria-hidden="true"
-																/>
-															</div>
-															<div
-																class="ml-3 text-xs font-semibold text-sky-900"
-															>
-																New
+															<div class="text-xs font-semibold">
+																{{ Ticket.type }}
 															</div>
 														</a>
 														{{ ' ' }}
@@ -296,7 +611,7 @@
 									<div class="mt-2 py-3 text-xs xl:pb-0 xl:pt-6">
 										<NuxtLink
 											:to="`/${route.params.team}/tickets`"
-											class="rounded-md bg-indigo-100 px-2 py-1 font-normal text-indigo-600 dark:text-white"
+											class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
 											>{{ Ticket.Team.name }}</NuxtLink
 										>
 									</div>
@@ -482,19 +797,32 @@
 
 																			{{ activityItem.User.firstName }}
 																			{{ activityItem.User.lastName }}
+																			<div class="ml-2 mr-1 space-x-1">
+																				<span
+																					v-for="badge in activityItem.User.badges.slice(
+																						0,
+																						1
+																					)"
+																					:key="badge.id"
+																					:class="[
+																						badge.id,
+																						'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
+																					]"
+																					>{{ badge.text }}</span
+																				>
+																				<span
+																					v-if="
+																						activityItem.User.badges.length - 1
+																					"
+																					class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
+																					>+{{
+																						activityItem.User.badges.length - 1
+																					}}</span
+																				>
+																			</div>
+
 																			<span
-																				v-if="
-																					activityItem.User.systemRole ===
-																					'super_admin'
-																				"
-																				class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
-																				>Admin</span
-																			>
-																			<span class="text-xs text-gray-400"
-																				>&nbsp; &bull; &nbsp;</span
-																			>
-																			<span
-																				class="inline-flex text-sm font-light text-gray-600"
+																				class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 																			>
 																				{{ activityItem.User.jobTitle }}
 																			</span>
@@ -628,17 +956,20 @@
 																	data-test="war_room_comment_text"
 																	class="mt-1 flex overflow-hidden"
 																>
-																	<button @click="
+																	<button
+																		@click="
 																			(commentImageId =
 																				activityItem.attachment),
 																				(showImageModal = true)
-																		"><img
-																		:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
-																		:alt="activityItem.attachment"
-																		data-test="comment-image"
-																		
-																		class="max-h-48 max-w-full cursor-pointer rounded-lg"
-																	/></button>
+																		"
+																	>
+																		<img
+																			:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
+																			:alt="activityItem.attachment"
+																			data-test="comment-image"
+																			class="max-h-48 max-w-full cursor-pointer rounded-lg"
+																		/>
+																	</button>
 																</div>
 																<div class="mt-2">
 																	<Disclosure v-slot="{ open }">
@@ -671,7 +1002,7 @@
 																			</DisclosureButton>
 
 																			<p
-																				class="mr-2 text-xs text-gray-500 dark:text-gray-300"
+																				class="mr-2 text-xs text-gray-500 dark:text-slate-400"
 																			>
 																				{{
 																					format(
@@ -756,7 +1087,7 @@
 																	)"
 																	id="reply-messages"
 																	:key="reply.id"
-																	class="my-6 w-full rounded-lg pl-2 text-base lg:pl-8"
+																	class="my-6 w-full pl-2 text-base lg:pl-4"
 																>
 																	<footer
 																		class="mb-2 flex items-center justify-between"
@@ -779,20 +1110,30 @@
 																				></div>
 
 																				{{ reply.User.firstName }}
-																				{{ reply.User.lastName
-																				}}<span
-																					v-if="
-																						reply.User.systemRole ===
-																						'super_admin'
-																					"
-																					class="badge py-0.25 ml-2 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70"
-																					>Admin</span
-																				>
-																				<span class="text-xs text-gray-400"
-																					>&nbsp; &bull; &nbsp;</span
-																				>
+																				{{ reply.User.lastName }}
+																				<div class="ml-2 mr-1 space-x-1">
+																					<span
+																						v-for="badge in reply.User.badges.slice(
+																							0,
+																							1
+																						)"
+																						:key="badge.id"
+																						:class="[
+																							badge.id,
+																							'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
+																						]"
+																						>{{ badge.text }}</span
+																					>
+																					<span
+																						class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
+																						>+{{
+																							reply.User.badges.length - 1
+																						}}</span
+																					>
+																				</div>
+
 																				<span
-																					class="inline-flex text-sm font-light text-gray-600"
+																					class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 																				>
 																					{{ reply.User.jobTitle }}
 																				</span>
@@ -921,7 +1262,7 @@
 																			class="mt-2 flex items-center justify-between"
 																		>
 																			<DisclosureButton
-																				class="flex items-center text-xs font-semibold text-gray-800"
+																				class="flex items-center text-xs font-semibold text-gray-800 dark:text-slate-400"
 																			>
 																				<div
 																					data-v-164b91a0=""
@@ -953,7 +1294,7 @@
 																				</div>
 																			</DisclosureButton>
 																			<p
-																				class="mr-2 text-xs text-gray-500 dark:text-gray-600"
+																				class="mr-2 text-xs text-gray-500 dark:text-slate-400"
 																			>
 																				{{
 																					format(
@@ -1096,7 +1437,7 @@
 										class="h-5 w-5 text-gray-400"
 										aria-hidden="true"
 									/>
-									<span class="text-sm text-gray-900"
+									<span class="text-sm text-gray-900 dark:text-slate-300"
 										>Created on
 										<span>{{
 											format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
@@ -1106,61 +1447,39 @@
 							</div>
 							<div class="mt-6 space-y-8 border-t border-gray-200 py-6">
 								<div>
-									<h2 class="text-sm font-medium text-gray-500">Assignees</h2>
+									<h2
+										class="text-sm font-normal text-gray-500 dark:text-slate-400"
+									>
+										Assignees
+									</h2>
 									<ul role="list" class="mt-3 space-y-3">
 										<li class="flex justify-start">
 											<a href="#" class="flex items-center space-x-3">
 												<div class="flex-shrink-0">
 													<img
-														class="h-5 w-5 rounded-full"
-														src="~/assets/images/logo.png"
+														class="h-5 w-5 rounded-full object-cover"
+														:src="assignedToAvatar"
 														alt=""
 													/>
 												</div>
-												<div class="text-sm font-medium text-gray-900">
-													Motis Group
+												<div
+													class="text-sm font-medium text-gray-900 dark:text-slate-100"
+												>
+													{{ AssignedTo.firstName }} {{ AssignedTo.lastName }}
 												</div>
 											</a>
 										</li>
 									</ul>
 								</div>
 								<div>
-									<h2 class="text-sm font-medium text-gray-500">Type</h2>
+									<h2 class="text-sm font-normal text-gray-500 dark:text-slate-400">Type</h2>
 									<ul role="list" class="mt-2 leading-8">
-										<li class="inline" v-if="Ticket.type === 'bug'">
+										<li class="inline">
 											<a
-												href="#"
-												class="relative inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 ring-1 ring-inset ring-purple-300 hover:bg-purple-50"
+												:class="[styles[Ticket.type],'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset']"
 											>
-												<div
-													class="absolute flex flex-shrink-0 items-center justify-center"
-												>
-													<span
-														class="h-1.5 w-1.5 rounded-full bg-purple-500"
-														aria-hidden="true"
-													/>
-												</div>
-												<div class="ml-3 text-xs font-semibold text-purple-900">
-													Bug
-												</div>
-											</a>
-											{{ ' ' }}
-										</li>
-										<li class="inline" v-else>
-											<a
-												href="#"
-												class="relative inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 ring-1 ring-inset ring-sky-300 hover:bg-sky-50"
-											>
-												<div
-													class="absolute flex flex-shrink-0 items-center justify-center"
-												>
-													<span
-														class="h-1.5 w-1.5 rounded-full bg-sky-500"
-														aria-hidden="true"
-													/>
-												</div>
-												<div class="ml-3 text-xs font-semibold text-sky-900">
-													New
+												<div class="text-xs font-medium capitalize">
+													{{ Ticket.type }}
 												</div>
 											</a>
 											{{ ' ' }}
@@ -1183,7 +1502,7 @@
 </template>
 
 <style scoped>
-	.badge {
+	.mg_admin {
 		background: conic-gradient(
 			from 171.52deg at 50% 50%,
 			#f0f1f6 0deg,
@@ -1194,328 +1513,26 @@
 			#ecf1f4 1turn
 		);
 	}
+
+	.member {
+		background: linear-gradient(
+			0.311turn,
+			#cf9a8c,
+			#eabcb1 24.38%,
+			#f5c9c0 50%,
+			#eabcb1 77.15%,
+			#cf9a8c
+		);
+	}
+
+	.mg_officer {
+		background: linear-gradient(
+			0.311turn,
+			#e3bc5a,
+			#e9d8ab 25%,
+			#f4e9c4 50%,
+			#e9d8ab 75%,
+			#e3bc5a
+		);
+	}
 </style>
-
-<script setup>
-	import { ref } from 'vue';
-	import {
-		Dialog,
-		DialogPanel,
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		TransitionChild,
-		TransitionRoot,
-		Listbox,
-		ListboxButton,
-		ListboxLabel,
-		ListboxOption,
-		ListboxOptions,
-	} from '@headlessui/vue';
-	import {
-		ArchiveBoxIcon,
-		Bars3BottomLeftIcon,
-		Bars4Icon,
-		ClockIcon,
-		HomeIcon,
-		UserCircleIcon as UserCircleIconOutline,
-		FaceFrownIcon,
-		FaceSmileIcon,
-		FireIcon,
-		HandThumbUpIcon,
-		HeartIcon,
-		PaperClipIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
-	import {
-		BellIcon,
-		CalendarIcon,
-		ChatBubbleLeftEllipsisIcon,
-		CheckCircleIcon,
-		LockOpenIcon,
-		TrashIcon,
-		LockClosedIcon,
-		MagnifyingGlassIcon,
-		PencilIcon,
-		TagIcon,
-		UserCircleIcon as UserCircleIconMini,
-	} from '@heroicons/vue/20/solid';
-
-	import showdown from 'showdown';
-	import { format, formatDistanceStrict } from 'date-fns';
-
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
-	const route = useRoute();
-	const props = defineProps(['open', 'comments']);
-
-	const converter = await new showdown.Converter();
-	const loading = ref(true);
-
-	const ticketAvatar = ref(null);
-
-	const currentAvatar = ref(null);
-
-	const comments = ref([]);
-	const comment_text = ref('');
-	const reply_text = ref('');
-
-	const imageSrc = ref(null);
-	const fileInput = ref(null);
-	const selectedFile = ref(null);
-
-	const commentImageId = ref('');
-	const showImageModal = ref(false);
-
-	const showImage = (id) => {
-		commentImageId.value = id;
-		showImageModal.value = true;
-	}
-
-	const toggleModal = () => {
-      showImageModal.value = !showImageModal.value;
-    }
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	let { data: Ticket, error } = await supabase
-		.from('Ticket')
-		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle))), User(*)'
-		)
-		.eq('id', route.params.id)
-		.limit(1)
-		.single();
-
-	console.log(Ticket);
-
-	const input = ref(Ticket.desc);
-
-	const uploadImage = (event) => {
-		const file = event.target.files[0];
-		if (file) {
-			imageSrc.value = URL.createObjectURL(file);
-			selectedFile.value = file;
-		}
-	};
-
-	const removeImage = () => {
-		imageSrc.value = null;
-		fileInput.value = '';
-	};
-
-	const getAvatarUrl = async (avatar) => {
-		const {
-			data: [File],
-			error: fileError,
-		} = await supabase.storage.from('avatars').list(`${avatar}`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${avatar}`,
-		});
-
-		if (File) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from('avatars')
-				.getPublicUrl(`/${avatar}/${File.name}`);
-
-			return publicUrl;
-		} else return '';
-	};
-
-	const fetchComments = async () => {
-		let { data: Ticket, error } = await supabase
-			.from('Ticket')
-			.select(
-				'*,Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle))), User(*)'
-			)
-			.eq('id', route.params.id)
-			.limit(1)
-			.single();
-		const commentList = [];
-		const replyList = [];
-
-		for (const comment of Ticket.Comment) {
-			const commentObj = {
-				...comment,
-				avatarUrl: '',
-				Comment: [], // Create an empty array to hold replies
-			};
-
-			// Check if this is a reply to another comment
-			if (comment.threadId) {
-				replyList.push(commentObj);
-			} else {
-				commentList.push(commentObj);
-			}
-		}
-
-		// Load avatar URLs asynchronously and update the comment data
-		const promises = [];
-		for (const comment of commentList) {
-			const promise = getAvatarUrl(comment.createdBy).then(
-				(avatarUrl) => (comment.avatarUrl = avatarUrl)
-			);
-			promises.push(promise);
-		}
-
-		for (const reply of replyList) {
-			const promise = getAvatarUrl(reply.createdBy).then(
-				(avatarUrl) => (reply.avatarUrl = avatarUrl)
-			);
-			promises.push(promise);
-		}
-
-		await Promise.all(promises);
-
-		// Loop through the replyList and add each reply to the appropriate comment
-		for (const reply of replyList) {
-			const parentComment = commentList.find(
-				(comment) => comment.id === reply.threadId
-			);
-			if (parentComment) {
-				parentComment.Comment.push(reply);
-			}
-		}
-
-		// Sort the commentList array in ascending order by createdOn date
-		commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-
-		return commentList;
-	};
-
-	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
-	currentAvatar.value = await getAvatarUrl(user.value.id);
-
-	comments.value = await fetchComments();
-	if (comments.value) {
-		loading.value = false;
-	}
-
-	const convert = (text) => {
-		let converter = new showdown.Converter();
-		const formatted = converter.makeHtml(text);
-		return formatted;
-	};
-
-	const handleCommentAdd = async (thread_id) => {
-		loading.value = true;
-		const org_id =
-			User.Account.type === 'super_admin'
-				? org_id.value
-				: route.params.organization;
-		try {
-			if (selectedFile.value) {
-				const fileName = cleanString(selectedFile.value.name);
-				const filePath = `attachments/${fileName}`;
-				const { error: uploadError } = await supabase.storage
-					.from('images')
-					.upload(filePath, selectedFile.value, { upsert: true });
-
-				if (uploadError) {
-					console.error('Error uploading image:', uploadError);
-					return;
-				}
-				const { data, error: insertError } = await supabase
-					.from('Comment')
-					.insert([
-						{
-							text: thread_id ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: Ticket.id,
-							threadId: thread_id,
-							attachment: filePath,
-						},
-					]);
-
-				if (insertError) {
-					console.error('Error inserting comment:', insertError);
-				} else {
-					console.log('Image uploaded and comment created successfully');
-					removeImage();
-				}
-			} else {
-				const { data, error: insertError } = await supabase
-					.from('Comment')
-					.insert([
-						{
-							text: thread_id ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: Ticket.id,
-							threadId: thread_id,
-						},
-					]);
-
-				if (insertError) {
-					console.error('Error inserting comment:', insertError);
-				} else {
-					console.log('Comment created successfully');
-					removeImage();
-				}
-			}
-		} catch (error) {
-			alert(error.message);
-		} finally {
-			comment_text.value = '';
-			comments.value = await fetchComments();
-			loading.value = false;
-		}
-	};
-
-	const handleDescUpdate = async () => {
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ desc: input.value })
-			.eq('id', route.params.id);
-	};
-
-	const handleTicketClose = async (status) => {
-		const ticket_status = status !== 'done' ? 'done' : 'backlog';
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ status: ticket_status })
-			.eq('id', route.params.id);
-		navigateTo(`/${route.params.team}/tickets`);
-	};
-
-	const handleDelete = async (id, arr) => {
-		loading.value = true;
-		try {
-			if (arr) {
-				const { data, error: deleteError } = await supabase
-					.from('Comment')
-					.delete()
-					.eq('id', id);
-			} else {
-				const { data, error } = await supabase
-					.from('Comment')
-					.update({ text: 'This message was deleted.', deleted: true })
-					.eq('id', id);
-			}
-		} catch (error) {
-			alert(error.message);
-		} finally {
-			const data = await fetchComments();
-			comments.value = data;
-			loading.value = false;
-		}
-	};
-</script>

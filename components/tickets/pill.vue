@@ -1,6 +1,6 @@
 <template>
 	<NuxtLink
-		class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
+		class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 dark:border-slate-700 dark:bg-slate-800 transition-colors dark:hover:border-slate-600"
 		:to="`/${route.params.team}/tickets/${ticket.id}`"
 		><div class="min-w-0 flex-1">
 			<div class="rounded-xl focus:outline-none">
@@ -33,7 +33,7 @@
 					</div>
 					<div
 						v-else-if="ticket.status === 'active'"
-						class="flex items-center space-x-1 text-sm text-gray-400"
+						class="flex items-center space-x-1 text-sm text-slate-400"
 					>
 						<ClockIcon class="h-4 w-4" />
 						<span>{{
@@ -42,7 +42,7 @@
 					</div>
 					<div
 						v-else
-						class="col-span-1 flex items-center justify-end space-x-1 text-sm text-gray-400"
+						class="col-span-1 flex items-center justify-end space-x-1 text-sm text-slate-400"
 					>
 						<CalendarIcon class="h-4 w-4" />
 						<span>{{
@@ -68,8 +68,8 @@
 	});
 
 	const styles = {
-		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 hover:bg-red-50 text-red-900 dark:text-red-200',
-		billing: 'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 hover:bg-lime-50 text-lime-900 dark:text-lime-200',
-		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300 hover:bg-sky-50 text-sky-900 dark:text-sky-200',
+		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		billing: 'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
+		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
 	};
 </script>

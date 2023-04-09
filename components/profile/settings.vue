@@ -81,7 +81,6 @@
 	};
 
 	avatarUrl.value = await getAvatar(user.value.id);
-	console.log(avatarUrl.value);
 
 	const uploadImage = async (event) => {
 		const file = event.target.files[0];

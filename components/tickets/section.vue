@@ -86,8 +86,6 @@
 		return Math.ceil(props.tickets.length / limit.value);
 	});
 
-	console.log(totalPages);
-
 	const displayedTickets = computed(() => {
 		return props.tickets.slice(
 			props.page * limit.value,
