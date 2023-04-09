@@ -59,13 +59,11 @@
 @font-face {
 	font-family: 'Dank Mono';
 	src: url('../fonts/dank-mono/DankMonoRegular.otf') format('otf');
-	font-weight: normal;
 	font-style: monospace;
 }
 
 @font-face {
 	font-family: 'Dank Mono';
 	src: url('../fonts/dank-mono/DankMonoItalic.otf') format('otf');
-	font-weight: normal;
 	font-style: italic;
 }
