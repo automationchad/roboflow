@@ -4,21 +4,23 @@
 	>
 		<div
 			@click="$emit('close-modal'), (error_message = '')"
-			class="fixed inset-0 left-0 top-0 h-full w-full bg-gray-500/25 backdrop-blur-md transition-opacity duration-700 dark:bg-black/75"
+			class="fixed inset-0 left-0 top-0 h-full w-full bg-gray-500/25 backdrop-blur-md transition-opacity duration-700 dark:bg-black/25"
 		></div>
 		<div class="flex h-full w-full items-start justify-center overflow-y-auto">
 			<div
-				class="w-[800px] transform overflow-hidden rounded-lg bg-white pb-4 text-left shadow-xl transition-all dark:bg-slate-800 sm:my-8"
+				class="w-[800px] transform overflow-hidden rounded-lg bg-white pb-4 text-left shadow-xl transition-all dark:bg-slate-900 sm:my-8"
 			>
 				<div class="relative w-full flex-1 overflow-y-auto">
-					<div class="bg-slate-50 px-8 py-6 sm:px-10">
+					<div class="bg-slate-50 px-8 py-6 dark:bg-slate-800 sm:px-10">
 						<div class="flex items-center justify-between">
-							<div class="flex items-center text-lg leading-6 text-gray-900">
+							<div
+								class="flex items-center text-lg leading-6 text-gray-900 dark:text-white"
+							>
 								<img src="~/assets/images/logo.png" class="mr-3 h-6 w-6" />
 								Motis Support
 							</div>
 							<div
-								class="ml-3 inline-flex items-center rounded-md border border-slate-200 px-2 py-1 text-xs shadow-sm"
+								class="ml-3 inline-flex items-center rounded-md border border-slate-200 bg-slate-700 px-2 py-1 text-xs shadow-sm dark:border-slate-600 dark:text-white"
 							>
 								<span class="relative mr-1.5 flex h-2 w-2">
 									<span
@@ -45,14 +47,15 @@
 							>
 								<div class="sm:col-span-2">
 									<Listbox as="div" v-model="selectedTicket">
-										<ListboxLabel class="block text-sm leading-6 text-gray-600"
+										<ListboxLabel
+											class="block text-sm leading-6 text-gray-600 dark:text-slate-400"
 											>What area do you need help in?</ListboxLabel
 										>
 										<div class="relative mt-2">
 											<ListboxButton
-												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
+												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
 											>
-												<span class="inline-flex w-full truncate text-black">
+												<span class="inline-flex w-full truncate">
 													<span class="truncate">{{
 														selectedTicket.title
 													}}</span>
@@ -73,7 +76,7 @@
 												leave-to-class="opacity-0"
 											>
 												<ListboxOptions
-													class="absolute z-10 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+													class="absolute z-10 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-800 sm:text-sm"
 												>
 													<ListboxOption
 														as="template"
@@ -84,8 +87,10 @@
 													>
 														<li
 															:class="[
-																active ? 'bg-slate-50 ' : 'bg-white',
-																selected ? 'bg-slate-200' : '',
+																active ? 'bg-slate-50 dark:bg-slate-700' : '',
+																selected
+																	? 'bg-slate-200 dark:bg-slate-600'
+																	: '',
 																'relative cursor-default select-none py-2 pl-3 pr-9 transition-colors',
 															]"
 														>
@@ -93,15 +98,19 @@
 																<span
 																	:class="[
 																		selected
-																			? 'text-gray-600'
-																			: 'text-gray-400',
-																		active ? 'text-gray-800' : '',
+																			? 'text-gray-600 dark:text-slate-400'
+																			: 'text-gray-400 dark:text-slate-400',
+																		active
+																			? 'text-gray-800 dark:text-white'
+																			: '',
 																		'truncate',
 																	]"
 																	>{{ ticketType.title }}</span
 																><span
 																	:class="[
-																		active ? 'text-gray-600' : 'text-gray-500',
+																		active
+																			? 'text-gray-600 dark:text-slate-300'
+																			: 'text-gray-500 dark:text-slate-300',
 																		'truncate text-xs',
 																	]"
 																	>{{ ticketType.desc }}</span
@@ -114,22 +123,25 @@
 										</div>
 									</Listbox>
 									<p class="mt-1 text-sm text-slate-500">
-										You are on the Free tier
+										You are on the
+										<span class="capitalize">{{ retainer.tier }}</span> tier
 									</p>
 								</div>
 								<div class="sm:col-span-2">
 									<Disclosure
 										v-slot="{ open }"
 										as="div"
-										class="rounded-lg border border-gray-200 p-4"
+										class="rounded-lg border border-gray-200 p-4 dark:border-slate-700 dark:bg-slate-800"
 									>
 										<div class="flex w-full justify-between">
-											<div class="flex items-center text-sm">
+											<div
+												class="flex items-center text-sm dark:text-slate-100"
+											>
 												<ExclamationCircleIcon class="mr-4 h-5 w-5" />
 												Expected response times are based on your plan's tier
 											</div>
 											<DisclosureButton
-												class="flex rounded-lg text-left text-sm font-medium text-slate-400 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75"
+												class="flex rounded-lg text-left text-sm font-medium text-slate-400 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:text-slate-100"
 											>
 												<svg
 													v-if="!open"
@@ -212,24 +224,25 @@
 											leave-from-class="transform translate-y-0"
 											leave-to-class="transform -translate-y-4"
 											><DisclosurePanel
-												class="pt-4 text-sm text-gray-500 transition-all"
+												class="pt-4 text-sm text-gray-500 transition-all dark:text-slate-300"
 											>
-												Free tier support is available within the community and
+												Basic tier support is available within the community and
 												officially by the team on a best efforts basis, though
 												we cannot guarantee a response time. For a guaranteed
-												response time we recommend upgrading to the Pro tier.
+												response time we recommend upgrading to the Growth tier.
 												Enhanced SLAs for support are available on our
 												Enterprise Tier.
 												<div class="mt-4 flex space-x-2">
-													<button
+													<NuxtLink
+														to="/settings/billing"
 														class="rounded-md border border-indigo-400 bg-indigo-600 px-3 py-1.5 text-xs text-white transition-all hover:bg-indigo-500 hover:shadow-sm"
 													>
 														Upgrade plan
-													</button>
+													</NuxtLink>
 													<a
 														href="https://calendly.com/motis-group/intro"
 														target="_blank"
-														class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50"
+														class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-700"
 													>
 														<svg
 															class="mr-1 h-4 w-4"
@@ -270,7 +283,7 @@
 								<div class="sm:col-span-2">
 									<label
 										for="name"
-										class="block text-sm font-normal leading-6 text-gray-600"
+										class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"
 										>Subject</label
 									>
 									<div class="mt-2.5">
@@ -281,7 +294,7 @@
 											name="text"
 											id="name"
 											placeholder="A brief summary of the project / issue"
-											class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+											class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:placeholder:text-slate-400 sm:text-sm sm:leading-6"
 										/>
 									</div>
 								</div>
@@ -292,7 +305,7 @@
 									>
 										<label
 											for="message"
-											class="block text-sm leading-6 text-gray-600"
+											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
 											>Message</label
 										>5000 character limit
 									</div>
@@ -306,7 +319,7 @@
 											rows="4"
 											max="5000"
 											placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
-											class="block w-full rounded-md border-0 px-3.5 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+											class="block w-full rounded-md border-0 px-3.5 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:placeholder:text-slate-400 sm:text-sm sm:leading-6"
 										/>
 									</div>
 									<p
@@ -314,7 +327,7 @@
 											brief === ''
 												? 'mt-2 opacity-100 '
 												: '-mb-6 -translate-y-3 opacity-0',
-											'text-sm text-red-900 transition-all',
+											'text-sm text-red-900 transition-all dark:text-red-500',
 										]"
 									>
 										Please add a message about the issue that you're facing
@@ -323,7 +336,7 @@
 								<div class="sm:col-span-2">
 									<label
 										for="desired-date"
-										class="block text-sm leading-6 text-gray-600"
+										class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
 										>Desired deadline</label
 									>
 									<div class="relative mt-2 rounded-md shadow-sm">
@@ -333,7 +346,7 @@
 											name="desired-date"
 											id="desired-date"
 											:min="format(addDays(new Date(), 7), 'yyyy-MM-dd')"
-											class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+											class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 sm:text-sm sm:leading-6"
 										/>
 									</div>
 								</div>
@@ -344,7 +357,7 @@
 						<div class="flex justify-end space-x-3">
 							<button
 								type="button"
-								class="rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+								class="rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
 								@click="emit('close-modal')"
 							>
 								Cancel
@@ -444,11 +457,18 @@
 		.from('User')
 		.select(
 			`*,Account (
-	     id)`
+	     id,type,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
+
+	const accountId =
+		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
+	const teamId =
+		User.Account.type === 'super_admin'
+			? User.defaultTeamId
+			: route.params.team;
 
 	function addWorkDays(startDate, days) {
 		if (isNaN(days)) {
@@ -491,8 +511,8 @@
 				status: 'backlog',
 				createdBy: user.value.id,
 				dueDate: due_date.value,
-				accountId: User.Account.id,
-				teamId: route.params.team,
+				accountId: accountId,
+				teamId: teamId,
 				desc: body.brief + (link.value ? `\n [Video link](${link.value})` : ''),
 			},
 		]);
@@ -505,4 +525,8 @@
 		type.value = '';
 		loading.value = false;
 	};
+
+	// Fetch User data
+
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 </script>

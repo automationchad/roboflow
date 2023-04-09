@@ -15,7 +15,7 @@
 						</div>
 						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
 							<button
-								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal hover:bg-gray-100"
+								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal dark:text-white dark:hover:bg-slate-800 hover:bg-gray-100"
 								@click="refreshData()"
 							>
 								<svg
