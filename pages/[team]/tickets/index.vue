@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<Head>
+			<Title>Motis Group | Requests</Title>
+		</Head>
 		<tickets />
 	</div>
 </template>
@@ -35,6 +38,7 @@
 	} from '@heroicons/vue/20/solid';
 
 	definePageMeta({ middleware: ['auth'] });
+	const route = useRoute();
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
@@ -57,8 +61,6 @@
 	const activeSub =
 		User.Account.Subscription.find((o) => o.type === 'retainer').tier !==
 		'free';
-
-	
 
 	const userNavigation = [
 		{ name: 'Your profile', href: '#' },

@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<Head>
+            <Title>Motis Group | Profile Settings</Title>
+         </Head>
 		<div v-if="user">
 			<!-- Your content -->
 			<div>

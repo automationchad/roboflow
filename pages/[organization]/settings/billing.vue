@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<Head>
+            <Title>Motis Group | Plan & Billing</Title>
+         </Head>
 		<div>
 			<!-- Your content -->
 			<div>

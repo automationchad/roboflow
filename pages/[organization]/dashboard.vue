@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<Head>
+            <Title>Motis Group | Dashboard</Title>
+         </Head>
 		<div class="mb-8 grid grid-cols-2 gap-x-8">
 			<div class="grid grid-cols-3 gap-x-8">
 				<div class="bg-slate-50 p-8 dark:bg-slate-800">

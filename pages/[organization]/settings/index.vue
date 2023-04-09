@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<Head>
+            <Title>Motis Group | Org Settings</Title>
+         </Head>
 		<div>
 			<!-- Your content -->
 			<div>
