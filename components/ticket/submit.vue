@@ -95,7 +95,18 @@
 
 	const removeImage = (idx) => {
 		imageSrc.value.splice(idx, 1);
-		selectedFiles.splice(idx, 1);
+		selectedFiles.value.splice(idx, 1);
+		fileInput.value = '';
+	};
+
+	const cancelAll = () => {
+		name.value = '';
+		brief.value = null;
+		imageSrc.value = [];
+		selectedFiles.value = [];
+		link.value = '';
+		type.value = '';
+		loading.value = false;
 		fileInput.value = '';
 	};
 
@@ -209,7 +220,7 @@
 		emit('ticket-submit');
 		emit('close-modal');
 		name.value = '';
-		brief.value = '';
+		brief.value = null;
 		link.value = '';
 		type.value = '';
 		loading.value = false;
@@ -653,7 +664,7 @@
 
 												<input
 													type="file"
-													accept="image/*"
+													accept="image/jpeg, image/png, image/jpg"
 													@change="uploadImage"
 													ref="fileInput"
 													data-test="image-input"
@@ -670,7 +681,7 @@
 								<button
 									type="button"
 									class="rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
-									@click="emit('close-modal')"
+									@click="emit('close-modal'), cancelAll()"
 								>
 									Cancel
 								</button>
