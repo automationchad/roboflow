@@ -4,7 +4,7 @@
 		<div class="modal-background" @click="toggleModal"></div>
 		<img
 			class="modal-image h-96 w-auto"
-			:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${imageSrc}`"
+			:src="imageSrc"
 			:alt="imageAlt"
 		/>
 	</div>

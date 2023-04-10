@@ -160,6 +160,31 @@
 		fileInput.value = '';
 	};
 
+	const getTicketAttachments = async (id) => {
+		const { data: files, error: fileError } = await supabase.storage
+			.from('images')
+			.list(`attachments`, {
+				limit: 100,
+				offset: 0,
+				sortBy: { column: 'updated_at', order: 'desc' },
+				search: `${id}`,
+			});
+
+		let images = [];
+
+		for (const file of files) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('images')
+				.getPublicUrl(`attachments/${file.name}`);
+
+			images.push(publicUrl);
+		}
+
+		return images;
+	};
+
 	const getAvatarUrl = async (avatar) => {
 		const {
 			data: [File],
@@ -177,6 +202,29 @@
 			} = await supabase.storage
 				.from('avatars')
 				.getPublicUrl(`/${avatar}/${File.name}`);
+
+			return publicUrl;
+		} else return '';
+	};
+
+	const getCommentImageUrl = async (id) => {
+		const {
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('images').list(`comments`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${id}`,
+		});
+
+		console.log(File);
+		if (File) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('images')
+				.getPublicUrl(`/comments/${File.name}`);
 
 			return publicUrl;
 		} else return '';
@@ -200,6 +248,7 @@
 			let commentObj = {
 				...comment,
 				avatarUrl: '',
+				attachments: [], // Create an empty array to hold files
 				Comment: [], // Create an empty array to hold replies
 			};
 
@@ -214,15 +263,24 @@
 		// Load avatar URLs asynchronously and update the comment data
 		const promises = [];
 		for (const comment of commentList) {
-			const promise = getAvatarUrl(comment.createdBy).then(
+			let promise = getAvatarUrl(comment.createdBy).then(
 				(avatarUrl) => (comment.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+			promise = getCommentImageUrl(comment.id).then((imageUrl) =>
+				comment.attachments.push(imageUrl)
 			);
 			promises.push(promise);
 		}
 
 		for (const reply of replyList) {
-			const promise = getAvatarUrl(reply.createdBy).then(
+			let promise = getAvatarUrl(reply.createdBy).then(
 				(avatarUrl) => (reply.avatarUrl = avatarUrl)
+			);
+			promises.push(promise);
+			promises.push(promise);
+			promise = getCommentImageUrl(reply.id).then((imageUrl) =>
+				reply.attachments.push(imageUrl)
 			);
 			promises.push(promise);
 		}
@@ -250,13 +308,17 @@
 		return commentList;
 	};
 
+	const ticketAttachments = ref([]);
+
+	ticketAttachments.value = await getTicketAttachments(Ticket.id);
+	console.log(ticketAttachments.value);
+
 	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 	currentAvatar.value = await getAvatarUrl(user.value.id);
 	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
 
 	comments.value = await fetchComments();
 
-	console.log(comments.value);
 	if (comments.value) {
 		loading.value = false;
 	}
@@ -272,16 +334,6 @@
 
 		try {
 			if (selectedFile.value) {
-				const fileName = cleanString(selectedFile.value.name);
-				const filePath = `attachments/${fileName}`;
-				const { error: uploadError } = await supabase.storage
-					.from('images')
-					.upload(filePath, selectedFile.value, { upsert: true });
-
-				if (uploadError) {
-					console.error('Error uploading image:', uploadError);
-					return;
-				}
 				const { data, error: insertError } = await supabase
 					.from('Comment')
 					.insert([
@@ -290,10 +342,23 @@
 							createdBy: user.value.id,
 							ticketId: Ticket.id,
 							threadId: thread_id,
-							attachment: filePath,
+							attachment: true,
 						},
-					]);
+					])
+					.select();
 
+				const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
+				const extension = selectedFile.value.name.match(regex);
+				const fileName = `${data[0].id}.${extension[1]}`;
+				const filePath = `comments/${fileName}`;
+				const { error: uploadError } = await supabase.storage
+					.from('images')
+					.upload(filePath, selectedFile.value, { upsert: true });
+
+				if (uploadError) {
+					console.error('Error uploading image:', uploadError);
+					return;
+				}
 				if (insertError) {
 					console.error('Error inserting comment:', insertError);
 				} else {
@@ -561,12 +626,12 @@
 									<div class="xl:pb-0">
 										<h2 class="sr-only">Description</h2>
 
-										<Disclosure v-slot="{ open }">
-											<DisclosurePanel class="mt-4 flex items-start space-x-4">
+										<Disclosure v-slot="{ open }"  as="div">
+											<DisclosurePanel class="mt-4 flex items-start space-x-4 ">
 												<div class="min-w-0 flex-1">
 													<div class="relative">
 														<div
-															class="rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
+															class="rounded-lg shadow-sm ring-1 ring-inset p-2 ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800 "
 														>
 															<label for="comment" class="sr-only"
 																>Edit description</label
@@ -581,26 +646,25 @@
 															></textarea>
 
 															<!-- Spacer element to match the height of the toolbar -->
-															<div class="py-2" aria-hidden="true">
+															<div class="p-2" aria-hidden="true">
 																<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																<div class="py-px">
+																<div class="py-px p-4">
 																	<div class="h-9" />
 																</div>
 															</div>
 														</div>
 
 														<div
-															class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
+															class="absolute inset-x-0 bottom-0 flex justify-end p-2"
 														>
 															<div
 																class="flex flex-shrink-0 items-center space-x-2"
 															>
 																<DisclosureButton
-																	class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
+																	class="inline-flex items-center rounded-md border border-gray-300 p-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
 																>
 																	<svg
-																		width="24"
-																		height="24"
+																		class="h-6 w-6"
 																		fill="none"
 																		viewBox="0 0 24 24"
 																	>
@@ -623,55 +687,104 @@
 																<DisclosureButton
 																	type="button"
 																	@click="handleDescUpdate()"
-																	class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																	class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
 																>
-																	Save
+																	<svg
+																		class="h-6 w-6"
+																		viewBox="0 0 24 24"
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg"
+																	>
+																		<path
+																			d="M7.75 12.75L10 15.25L16.25 8.75"
+																			stroke="currentColor"
+																			stroke-width="1.5"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																		></path>
+																	</svg>
 																</DisclosureButton>
 															</div>
 														</div>
 													</div>
 												</div>
 											</DisclosurePanel>
-											<div
-												class="prose my-4 max-w-none dark:prose-invert"
-												v-html="convert(input)"
-											></div>
-											<div class="">
-												<DisclosureButton
-													v-if="!open && Ticket.createdBy === user.id"
-													class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
-												>
-													<div
-														data-v-164b91a0=""
-														data-test="open-reply-button"
-														class="flex items-center"
+											<div class="my-4 flex justify-between">
+												<div
+													class="prose dark:prose-invert mr-auto w-full"
+													v-html="convert(input)"
+												></div>
+												<div class="">
+													<DisclosureButton
+														v-if="!open && Ticket.createdBy === user.id"
+														class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 													>
-														<svg
-															class="mr-1 h-4 w-4"
-															fill="none"
-															viewBox="0 0 24 24"
+														<div
+															data-v-164b91a0=""
+															data-test="open-reply-button"
+															class="flex items-center"
 														>
-															<path
-																stroke="currentColor"
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-															></path>
-															<path
-																stroke="currentColor"
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M19.25 19.25H13.75"
-															></path>
-														</svg>
-
-														Edit
-													</div>
-												</DisclosureButton>
+															<svg
+																class="h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M19.25 19.25H13.75"
+																></path>
+															</svg>
+														</div>
+													</DisclosureButton>
+												</div>
 											</div>
 										</Disclosure>
+									</div>
+									<div class="mt-6" v-if="ticketAttachments.length > 0">
+										<div class="mb-2">
+											<svg
+												width="25"
+												height="24"
+												viewBox="0 0 25 24"
+												class="dark:text-slate-400"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M19.4496 11.9511L13.3335 17.8601C11.4156 19.7131 8.30597 19.7131 6.38804 17.8601C4.46306 16.0003 4.47116 12.9826 6.4061 11.1325L12.0503 5.70078C13.3626 4.43293 15.4902 4.43292 16.8025 5.70075C18.1196 6.97324 18.114 9.038 16.7901 10.3039L11.0824 15.7858C10.374 16.4702 9.22538 16.4702 8.51694 15.7858C7.80849 15.1013 7.80849 13.9916 8.51695 13.3071L13.2435 8.74069"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												></path>
+											</svg>
+										</div>
+
+										<div class="grid grid-cols-5 gap-x-4">
+											<button
+												v-for="image in ticketAttachments"
+												class=""
+												@click="
+													(commentImageId = image), (showImageModal = true)
+												"
+											>
+												<img
+													:src="image"
+													:alt="image"
+													class="h-full w-auto rounded-md object-cover"
+												/>
+											</button>
+										</div>
 									</div>
 									<div class="mt-2 py-3 text-xs xl:pb-0 xl:pt-6">
 										<NuxtLink
@@ -1016,11 +1129,10 @@
 																		activityItem.deleted
 																			? 'text-gray-400 dark:text-gray-400'
 																			: 'text-gray-900 dark:text-gray-200',
-																		'pb-2 font-normal prose dark:prose-invert',
+																		'prose pb-2 font-normal dark:prose-invert',
 																	]"
 																	v-html="convert(activityItem.text)"
-																>
-																</div>
+																></div>
 																<div
 																	v-if="
 																		activityItem.attachment &&
@@ -1037,8 +1149,9 @@
 																		"
 																	>
 																		<img
-																			:src="`https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/images/${activityItem.attachment}`"
-																			:alt="activityItem.attachment"
+																			v-for="image in activityItem.attachments"
+																			:src="image"
+																			:alt="activityItem.id"
 																			data-test="comment-image"
 																			class="max-h-48 max-w-full cursor-pointer rounded-lg"
 																		/>

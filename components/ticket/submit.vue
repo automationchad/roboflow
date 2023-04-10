@@ -74,6 +74,24 @@
 	const error_occurred = ref(false);
 	const route = useRoute();
 
+	const imageSrc = ref([]);
+	const fileInput = ref(null);
+	const selectedFiles = ref([]);
+
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value.push(URL.createObjectURL(file));
+			selectedFiles.value.push(file);
+		}
+	};
+
+	const removeImage = (idx) => {
+		imageSrc.value.splice(idx, 1);
+		selectedFiles.splice(idx, 1);
+		fileInput.value = '';
+	};
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -125,19 +143,39 @@
 		// Then, find the account manager with the lowest ticket count
 		const accountManager = accountManagers[0];
 
-		const { data, error } = await supabase.from('Ticket').insert([
-			{
-				name: body.name,
-				type: selectedTicket.value.id,
-				status: 'backlog',
-				createdBy: user.value.id,
-				dueDate: due_date.value,
-				accountId: accountId,
-				assignedTo: accountManager.id,
-				teamId: teamId,
-				desc: body.brief,
-			},
-		]);
+		const { data, error } = await supabase
+			.from('Ticket')
+			.insert([
+				{
+					name: body.name,
+					type: selectedTicket.value.id,
+					status: 'backlog',
+					createdBy: user.value.id,
+					dueDate: due_date.value,
+					accountId: accountId,
+					assignedTo: accountManager.id,
+					teamId: teamId,
+					desc: body.brief,
+				},
+			])
+			.select();
+
+		if (selectedFiles.value.length > 0) {
+			for (const file of selectedFiles.value) {
+				const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
+				const extension = file.name.match(regex);
+				const fileName = `${data[0].id}.${extension[1]}`;
+				const filePath = `attachments/${fileName}`;
+				const { error: uploadError } = await supabase.storage
+					.from('images')
+					.upload(filePath, file, { upsert: true });
+
+				if (uploadError) {
+					console.error('Error uploading image:', uploadError);
+					return;
+				}
+			}
+		}
 
 		emit('ticket-submit');
 		emit('close-modal');
@@ -503,6 +541,96 @@
 												:min="format(addDays(new Date(), 7), 'yyyy-MM-dd')"
 												class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 sm:text-sm sm:leading-6"
 											/>
+										</div>
+									</div>
+									<div class="sm:cols-span-2">
+										<label
+											for="desired-date"
+											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
+											>Attachments</label
+										>
+										<p class="text-xs dark:text-slate-500">
+											Upload up to 5 screenshots that might be relevant to the
+											issue that you're facing
+										</p>
+										<div class="mt-6 flex items-center justify-start space-x-4">
+											<div
+												class="relative h-full"
+												v-for="(image, idx) in imageSrc"
+											>
+												<img
+													:src="image"
+													alt=""
+													loading="eager"
+													class="h-12 w-12 rounded object-cover"
+												/>
+												<div
+													class="absolute left-0 top-0 h-12 w-12 rounded border border-slate-200 opacity-20"
+												></div>
+												<!---->
+												<div
+													v-if="!loading"
+													@click="removeImage(idx)"
+													class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-red-600 bg-red-700 text-slate-200 hover:bg-red-600"
+													:disabled="loading"
+												>
+													<svg
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+														class="h-4 w-4"
+													>
+														<path
+															d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+															fill="currentColor"
+														></path>
+													</svg>
+												</div>
+											</div>
+
+											<div
+												v-if="imageSrc.length < 5"
+												class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-md border border-slate-400 p-2 text-slate-900 transition-colors dark:border-slate-600 dark:text-slate-400 dark:hover:text-slate-100"
+											>
+												<span class="cursor-pointer"
+													><svg
+														class="h-6 w-6"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M17 14.75V19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19.25 17L14.75 17"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</span>
+
+												<input
+													type="file"
+													accept="image/*"
+													@change="uploadImage"
+													ref="fileInput"
+													data-test="image-input"
+													class="absolute h-full w-full opacity-0 file:cursor-pointer"
+												/>
+											</div>
 										</div>
 									</div>
 								</div>
