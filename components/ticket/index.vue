@@ -131,6 +131,10 @@
 		.limit(1)
 		.single();
 
+	if (!Ticket) {
+		navigateTo('/ticket-not-found');
+	}
+
 	const input = ref(Ticket.desc);
 
 	const { data: AssignedTo, error: assignedError } = await supabase
@@ -263,7 +267,7 @@
 
 	const handleCommentAdd = async (thread_id) => {
 		loading.value = true;
-		
+
 		try {
 			if (selectedFile.value) {
 				const fileName = cleanString(selectedFile.value.name);
