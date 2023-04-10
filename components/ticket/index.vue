@@ -44,7 +44,7 @@
 	} from '@heroicons/vue/20/solid';
 
 	import showdown from 'showdown';
-	import { format, formatDistanceStrict } from 'date-fns';
+	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
@@ -80,6 +80,23 @@
 		showImageModal.value = !showImageModal.value;
 	};
 
+	const ticketDate = (timestamp) => {
+		const createdDate = new Date(timestamp);
+		const today = new Date();
+
+		if (
+			createdDate.getDate() === today.getDate() &&
+			createdDate.getMonth() === today.getMonth() &&
+			createdDate.getFullYear() === today.getFullYear()
+		) {
+			// Created date is today
+			return format(createdDate, 'hh:mm aa');
+		} else {
+			// Created date is not today
+			return format(createdDate, 'MMM dd, hh:mm aa');
+		}
+	};
+
 	const styles = {
 		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
 		billing:
@@ -92,6 +109,7 @@
 		.select(
 			`*,Account (
 	     id,
+		 type,
 		 stripeCustomerId,
 		 Subscription(*),
 		 Team (
@@ -103,8 +121,6 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-
-	
 
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
@@ -134,6 +150,7 @@
 
 	const removeImage = () => {
 		imageSrc.value = null;
+		selectedFile.value = null;
 		fileInput.value = '';
 	};
 
@@ -168,12 +185,13 @@
 			.eq('id', route.params.id)
 			.limit(1)
 			.single();
-		const comments = Ticket.Comment;
-		const commentList = [];
-		const replyList = [];
+
+		let comments = Ticket.Comment;
+		let commentList = [];
+		let replyList = [];
 
 		for (const comment of comments) {
-			const commentObj = {
+			let commentObj = {
 				...comment,
 				avatarUrl: '',
 				Comment: [], // Create an empty array to hold replies
@@ -205,6 +223,9 @@
 
 		await Promise.all(promises);
 
+		// Sort the commentList array in descending order by createdOn date
+		commentList.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn));
+
 		// Loop through the replyList and add each reply to the appropriate comment
 		for (const reply of replyList) {
 			const parentComment = commentList.find(
@@ -213,10 +234,12 @@
 			if (parentComment) {
 				parentComment.Comment.push(reply);
 			}
+			parentComment.Comment.sort(
+				(a, b) => new Date(a.createdOn) - new Date(b.createdOn)
+			);
 		}
 
-		// Sort the commentList array in ascending order by createdOn date
-		commentList.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+		// Sort the replies within each parent comment in descending order by createdOn date
 
 		return commentList;
 	};
@@ -226,6 +249,8 @@
 	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
 
 	comments.value = await fetchComments();
+
+	console.log(comments.value);
 	if (comments.value) {
 		loading.value = false;
 	}
@@ -238,10 +263,7 @@
 
 	const handleCommentAdd = async (thread_id) => {
 		loading.value = true;
-		const org_id =
-			User.Account.type === 'super_admin'
-				? org_id.value
-				: route.params.organization;
+		
 		try {
 			if (selectedFile.value) {
 				const fileName = cleanString(selectedFile.value.name);
@@ -295,6 +317,7 @@
 			alert(error.message);
 		} finally {
 			comment_text.value = '';
+			reply_text.value = '';
 			comments.value = await fetchComments();
 			loading.value = false;
 		}
@@ -336,6 +359,19 @@
 			const data = await fetchComments();
 			comments.value = data;
 			loading.value = false;
+		}
+	};
+
+	const handleTicketDelete = async (id) => {
+		try {
+			const { data, error: deleteError } = await supabase
+				.from('Ticket')
+				.delete()
+				.eq('id', id);
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			navigateTo(`/tickets`);
 		}
 	};
 </script>
@@ -420,7 +456,7 @@
 											<button
 												@click="handleTicketClose(Ticket.status)"
 												type="button"
-												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800"
 											>
 												<CheckCircleIcon
 													class="-ml-0.5 h-5 w-5 text-green-500"
@@ -501,7 +537,10 @@
 												<ul role="list" class="mt-2 leading-8">
 													<li class="inline">
 														<a
-															:class="[styles[Ticket.type],'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset']"
+															:class="[
+																styles[Ticket.type],
+																'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset',
+															]"
 														>
 															<div class="text-xs font-semibold">
 																{{ Ticket.type }}
@@ -532,7 +571,7 @@
 																name="comment"
 																id="comment"
 																class="h-content w-full max-w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
-																placeholder="Add your comment..."
+																placeholder="Reply..."
 															></textarea>
 
 															<!-- Spacer element to match the height of the toolbar -->
@@ -553,7 +592,27 @@
 																<DisclosureButton
 																	class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
 																>
-																	Cancel
+																	<svg
+																		width="24"
+																		height="24"
+																		fill="none"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			stroke="currentColor"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																			stroke-width="1.5"
+																			d="M17.25 6.75L6.75 17.25"
+																		></path>
+																		<path
+																			stroke="currentColor"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																			stroke-width="1.5"
+																			d="M6.75 6.75L17.25 17.25"
+																		></path>
+																	</svg>
 																</DisclosureButton>
 																<DisclosureButton
 																	type="button"
@@ -667,7 +726,7 @@
 																	name="comment"
 																	rows="3"
 																	class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-base sm:leading-6"
-																	placeholder="Leave a comment"
+																	placeholder="Message ticket"
 																/>
 															</div>
 															<div
@@ -675,7 +734,7 @@
 															>
 																<div
 																	v-if="!imageSrc"
-																	class="relative ml-auto flex h-8 w-8 cursor-pointer items-center justify-center text-slate-900 dark:text-slate-200"
+																	class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
 																>
 																	<span class="cursor-pointer"
 																		><svg
@@ -733,9 +792,22 @@
 																<button
 																	:disabled="comment_text === ''"
 																	type="submit"
-																	class="inline-flex items-center justify-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+																	class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 p-2 text-sm font-semibold text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
 																>
-																	Comment
+																	<svg
+																		class="h-5 w-5"
+																		viewBox="0 0 24 24"
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg"
+																	>
+																		<path
+																			d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
+																			stroke="currentColor"
+																			stroke-width="1.5"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																		></path>
+																	</svg>
 																</button>
 															</div>
 														</form>
@@ -824,13 +896,8 @@
 																			<span
 																				class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 																			>
-																				{{ activityItem.User.jobTitle }}
+																				{{ ticketDate(activityItem.createdOn) }}
 																			</span>
-																			<span class="ml-1 text-sm">{{
-																				countryToEmoji(
-																					activityItem.User.country
-																				)
-																			}}</span>
 																		</div>
 																	</div>
 
@@ -971,108 +1038,6 @@
 																		/>
 																	</button>
 																</div>
-																<div class="mt-2">
-																	<Disclosure v-slot="{ open }">
-																		<div
-																			class="flex items-center justify-between"
-																		>
-																			<DisclosureButton
-																				class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
-																			>
-																				<div
-																					data-v-164b91a0=""
-																					data-test="open-reply-button"
-																					class="flex items-center"
-																				>
-																					<svg
-																						data-v-164b91a0=""
-																						viewBox="0 0 16 16"
-																						fill="none"
-																						xmlns="http://www.w3.org/2000/svg"
-																						class="mr-1 h-4 w-4"
-																					>
-																						<path
-																							data-v-164b91a0=""
-																							d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
-																							fill="currentColor"
-																						></path>
-																					</svg>
-																					Reply
-																				</div>
-																			</DisclosureButton>
-
-																			<p
-																				class="mr-2 text-xs text-gray-500 dark:text-slate-400"
-																			>
-																				{{
-																					format(
-																						new Date(activityItem.createdOn),
-																						'MMM dd, hh:mm aa'
-																					)
-																				}}
-																			</p>
-																		</div>
-
-																		<DisclosurePanel
-																			class="mt-3 flex items-start space-x-4"
-																		>
-																			<div class="min-w-0 flex-1">
-																				<form
-																					@submit.prevent="
-																						handleCommentAdd(activityItem.id)
-																					"
-																					class="relative"
-																				>
-																					<div
-																						class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600"
-																					>
-																						<label for="comment" class="sr-only"
-																							>Add your reply</label
-																						>
-																						<textarea
-																							v-model="reply_text"
-																							name="comment"
-																							id="comment"
-																							class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
-																							placeholder="Add your reply..."
-																						/>
-
-																						<!-- Spacer element to match the height of the toolbar -->
-																						<div
-																							class="py-2"
-																							aria-hidden="true"
-																						>
-																							<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																							<div class="py-px">
-																								<div class="h-9" />
-																							</div>
-																						</div>
-																					</div>
-
-																					<div
-																						class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
-																					>
-																						<div
-																							class="flex flex-shrink-0 items-center space-x-2"
-																						>
-																							<DisclosureButton
-																								class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-																							>
-																								Cancel
-																							</DisclosureButton>
-																							<button
-																								type="submit"
-																								class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
-																							>
-																								Post
-																							</button>
-																						</div>
-																					</div>
-																				</form>
-																			</div>
-																		</DisclosurePanel>
-																	</Disclosure>
-																</div>
 															</div>
 
 															<div
@@ -1080,11 +1045,7 @@
 																v-if="activityItem.Comment.length > 0"
 															>
 																<article
-																	v-for="reply in activityItem.Comment.sort(
-																		(a, b) =>
-																			new Date(b.createdOn) -
-																			new Date(a.createdOn)
-																	)"
+																	v-for="reply in activityItem.Comment"
 																	id="reply-messages"
 																	:key="reply.id"
 																	class="my-6 w-full pl-2 text-base lg:pl-4"
@@ -1135,11 +1096,14 @@
 																				<span
 																					class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 																				>
-																					{{ reply.User.jobTitle }}
+																					{{
+																						formatDistance(
+																							new Date(reply.createdOn),
+																							new Date(),
+																							{ addSuffix: true }
+																						)
+																					}}
 																				</span>
-																				<span class="ml-1 text-sm">{{
-																					countryToEmoji(reply.User.country)
-																				}}</span>
 																			</div>
 																		</div>
 
@@ -1257,115 +1221,144 @@
 																	>
 																		{{ reply.text }}
 																	</p>
-																	<Disclosure>
-																		<div
-																			class="mt-2 flex items-center justify-between"
+																</article>
+															</div>
+															<div
+																class="mt-2"
+																v-if="
+																	!activityItem.deleted ||
+																	activityItem.Comment.length > 0
+																"
+															>
+																<Disclosure v-slot="{ open }">
+																	<div
+																		class="flex items-center justify-between"
+																	>
+																		<DisclosureButton
+																			class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 																		>
-																			<DisclosureButton
-																				class="flex items-center text-xs font-semibold text-gray-800 dark:text-slate-400"
+																			<div
+																				data-v-164b91a0=""
+																				data-test="open-reply-button"
+																				class="flex items-center"
 																			>
-																				<div
+																				<svg
 																					data-v-164b91a0=""
-																					data-test="open-reply-button"
-																					class="flex items-center"
+																					viewBox="0 0 16 16"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																					class="mr-1 h-4 w-4"
 																				>
-																					<svg
-																						class="mr-1 h-4 w-4"
-																						fill="none"
-																						viewBox="0 0 24 24"
-																					>
-																						<path
-																							stroke="currentColor"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																							stroke-width="1.5"
-																							d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-																						></path>
-																						<path
-																							stroke="currentColor"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																							stroke-width="1.5"
-																							d="M19.25 19.25H13.75"
-																						></path>
-																					</svg>
+																					<path
+																						data-v-164b91a0=""
+																						d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
+																						fill="currentColor"
+																					></path>
+																				</svg>
+																				Reply
+																			</div>
+																		</DisclosureButton>
 
-																					Edit
-																				</div>
-																			</DisclosureButton>
-																			<p
+																		<!-- <p
 																				class="mr-2 text-xs text-gray-500 dark:text-slate-400"
 																			>
 																				{{
 																					format(
-																						new Date(reply.createdOn),
+																						new Date(activityItem.createdOn),
 																						'MMM dd, hh:mm aa'
 																					)
 																				}}
-																			</p>
-																		</div>
+																			</p> -->
+																	</div>
 
-																		<DisclosurePanel
-																			v-if="false"
-																			class="mt-2 flex items-start space-x-4"
-																		>
-																			<div class="min-w-0 flex-1">
-																				<form
-																					@submit.prevent="
-																						handleCommentAdd(activityItem.id)
-																					"
-																					class="relative"
+																	<DisclosurePanel
+																		class="mt-3 flex items-start space-x-4"
+																	>
+																		<div class="min-w-0 flex-1">
+																			<form
+																				@submit.prevent="
+																					handleCommentAdd(activityItem.id)
+																				"
+																				class="relative"
+																			>
+																				<div
+																					class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
+																				>
+																					<label for="comment" class="sr-only"
+																						>Reply...</label
+																					>
+																					<textarea
+																						v-model="reply_text"
+																						name="comment"
+																						id="comment"
+																						class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																						placeholder="Reply..."
+																					/>
+
+																					<!-- Spacer element to match the height of the toolbar -->
+																					<div class="py-2" aria-hidden="true">
+																						<!-- Matches height of button in toolbar (1px border + 36px content height) -->
+																						<div class="py-px">
+																							<div class="h-9" />
+																						</div>
+																					</div>
+																				</div>
+
+																				<div
+																					class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
 																				>
 																					<div
-																						class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600"
+																						class="flex flex-shrink-0 items-center space-x-2"
 																					>
-																						<label for="comment" class="sr-only"
-																							>Add your comment</label
+																						<DisclosureButton
+																							class="inline-flex items-center rounded-md border border-gray-300 p-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700"
 																						>
-																						<textarea
-																							v-model="comment_text"
-																							name="comment"
-																							id="comment"
-																							class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
-																							placeholder="Add your comment..."
-																						/>
-
-																						<!-- Spacer element to match the height of the toolbar -->
-																						<div
-																							class="py-2"
-																							aria-hidden="true"
-																						>
-																							<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																							<div class="py-px">
-																								<div class="h-9" />
-																							</div>
-																						</div>
-																					</div>
-
-																					<div
-																						class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
-																					>
-																						<div
-																							class="flex flex-shrink-0 items-center space-x-2"
-																						>
-																							<DisclosureButton
-																								class="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+																							<svg
+																								class="h-5 w-5"
+																								fill="none"
+																								viewBox="0 0 24 24"
 																							>
-																								Cancel
-																							</DisclosureButton>
-																							<button
-																								type="submit"
-																								class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																								<path
+																									stroke="currentColor"
+																									stroke-linecap="round"
+																									stroke-linejoin="round"
+																									stroke-width="1.5"
+																									d="M17.25 6.75L6.75 17.25"
+																								></path>
+																								<path
+																									stroke="currentColor"
+																									stroke-linecap="round"
+																									stroke-linejoin="round"
+																									stroke-width="1.5"
+																									d="M6.75 6.75L17.25 17.25"
+																								></path>
+																							</svg>
+																						</DisclosureButton>
+																						<button
+																							type="submit"
+																							class="inline-flex items-center rounded-md border border-indigo-500 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																						>
+																							<svg
+																								class="h-5 w-5"
+																								viewBox="0 0 24 24"
+																								fill="none"
+																								xmlns="http://www.w3.org/2000/svg"
 																							>
-																								Post
-																							</button>
-																						</div>
+																								<path
+																									d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
+																									stroke="currentColor"
+																									stroke-width="1.5"
+																									stroke-linecap="round"
+																									stroke-linejoin="round"
+																								></path>
+																							</svg>
+																						</button>
 																					</div>
-																				</form>
-																			</div>
-																		</DisclosurePanel>
-																	</Disclosure>
-																</article>
+																				</div>
+																			</form>
+																		</div>
+																	</DisclosurePanel>
+																</Disclosure>
 															</div>
 														</article>
 													</div>
@@ -1384,11 +1377,13 @@
 							</section>
 						</div>
 						<aside class="hidden xl:block xl:pl-8">
-							<div class="mb-8 mt-4 flex items-center space-x-3 md:mt-0">
+							<div
+								class="mb-8 mt-4 flex items-center justify-between space-x-3 md:mt-0"
+							>
 								<button
 									@click="handleTicketClose(Ticket.status)"
 									type="button"
-									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-white dark:hover:ring-slate-600"
 								>
 									<CheckCircleIcon
 										class="-ml-0.5 h-5 w-5 text-green-500"
@@ -1398,6 +1393,55 @@
 									{{
 										Ticket.status !== 'done' ? 'Close ticket' : 'Open ticket'
 									}}
+								</button>
+								<button
+									v-if="User.Account.type === 'super_admin'"
+									@click="handleTicketDelete(Ticket.id)"
+									type="button"
+									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white p-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50 dark:bg-red-800 dark:text-red-300 dark:ring-red-700 dark:hover:bg-red-800 dark:hover:text-red-100 dark:hover:ring-red-600"
+								>
+									<svg
+										class="h-5 w-5"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M9.75 10.75V16.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M13.25 10.75V16.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M4.75 7.75H18.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+									</svg>
 								</button>
 
 								<!-- <button
@@ -1445,7 +1489,9 @@
 									>
 								</div>
 							</div>
-							<div class="mt-6 space-y-8 border-t border-gray-200 py-6">
+							<div
+								class="mt-6 space-y-8 border-t border-gray-200 py-6 dark:border-slate-700"
+							>
 								<div>
 									<h2
 										class="text-sm font-normal text-gray-500 dark:text-slate-400"
@@ -1472,11 +1518,18 @@
 									</ul>
 								</div>
 								<div>
-									<h2 class="text-sm font-normal text-gray-500 dark:text-slate-400">Type</h2>
+									<h2
+										class="text-sm font-normal text-gray-500 dark:text-slate-400"
+									>
+										Type
+									</h2>
 									<ul role="list" class="mt-2 leading-8">
 										<li class="inline">
 											<a
-												:class="[styles[Ticket.type],'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset']"
+												:class="[
+													styles[Ticket.type],
+													'relative inline-flex items-center rounded-full px-2.5 py-1 ring-1 ring-inset',
+												]"
 											>
 												<div class="text-xs font-medium capitalize">
 													{{ Ticket.type }}

@@ -231,10 +231,7 @@
 								<div>Workspaces</div>
 							</div>
 							<ul role="list" class="-ml-2 mt-2 space-y-1">
-								<li
-									v-for="(team, idx) in moveOrgToFront(teams)"
-									:key="team.name"
-								>
+								<li v-for="(team, idx) in teams" :key="team.name">
 									<NuxtLink
 										:to="`/${team.id}/tickets`"
 										:class="[
@@ -282,7 +279,8 @@
 										</div>
 									</NuxtLink>
 								</li>
-								<button v-if="User.Account.type !== 'super_admin'"
+								<button
+									v-if="User.Account.type !== 'super_admin'"
 									:disabled="upgrade_needed"
 									class="group relative flex items-center px-1 py-3 text-sm text-gray-500 disabled:text-gray-300"
 								>
@@ -394,19 +392,7 @@
 		.limit(1)
 		.single();
 
-	let { data: Account, error: accountError } = await supabase
-		.from('Account')
-		.select('*,Ticket(status)');
-
-	let teams = [];
-	if (User.Account.type === 'super_admin') {
-		teams = Account;
-	} else {
-		teams = User.Account.Team;
-		const index = teams.indexOf((o) => User.defaultTeamId === o.id);
-		const item = teams.splice(index, 1)[0];
-		teams.unshift(item);
-	}
+	const teams = ref([]);
 
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 	const upgrade_needed =
@@ -424,6 +410,21 @@
 		}
 		return arr;
 	}
+
+	onMounted(async () => {
+		let { data: Account, error: accountError } = await supabase
+			.from('Account')
+			.select('*,Ticket(status)');
+		if (User.Account.type === 'super_admin') {
+			teams.value = Account;
+		} else {
+			teams.value = User.Account.Team;
+			const index = teams.indexOf((o) => User.defaultTeamId === o.id);
+			const item = teams.splice(index, 1)[0];
+			teams.value.unshift(item);
+		}
+		teams.value = moveOrgToFront(teams.value);
+	});
 
 	const getAvatarUrl = async (avatar) => {
 		const {
@@ -443,7 +444,7 @@
 				.getPublicUrl(`/${user.value.id}/${File.name}`);
 
 			return publicUrl;
-		} else return null
+		} else return null;
 	};
 
 	avatarUrl.value = await getAvatarUrl(user.value.id);
