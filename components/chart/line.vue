@@ -37,25 +37,23 @@
 
 	const colorMode = useColorMode();
 	const componentKey = ref(0);
-
 	const isDarkMode = ref(colorMode.value === 'dark');
 
 	onMounted(() => {
 		isDarkMode.value = colorMode.value === 'dark';
-	});
-
-	watch(
-		() => colorMode.value,
-		(preference) => {
-			if (preference === 'dark') {
-				componentKey.value += 1;
-				isDarkMode.value = true;
-			} else {
-				componentKey.value += 1;
-				isDarkMode.value = false;
+		watchEffect(
+			() => colorMode.value,
+			(preference) => {
+				if (preference === 'dark') {
+					componentKey.value += 1;
+					isDarkMode.value = true;
+				} else {
+					componentKey.value += 1;
+					isDarkMode.value = false;
+				}
 			}
-		}
-	);
+		);
+	});
 
 	const props = defineProps({
 		data: { type: Array, required: true },
