@@ -1619,13 +1619,14 @@
 									</h2>
 									<ul role="list" class="mt-3 space-y-3">
 										<li class="flex justify-start">
-											<a href="#" class="flex items-center space-x-3">
+											<a class="flex items-center space-x-3">
 												<div class="flex-shrink-0">
-													<img
+													<img v-if="assignedToAvatar"
 														class="h-5 w-5 rounded-full object-cover"
 														:src="assignedToAvatar"
 														alt=""
 													/>
+													<div v-else class="h-5 w-5 rounded-full bg-slate-700 border border-slate-600 text-slate-400 flex items-center justify-center text-xs text-center">{{ AssignedTo.firstName[0] }}</div>
 												</div>
 												<div
 													class="text-sm font-medium text-gray-900 dark:text-slate-100"

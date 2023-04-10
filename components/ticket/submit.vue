@@ -35,36 +35,43 @@
 	const ticketTypes = [
 		{
 			id: 'bug',
+			type: 'engineering',
 			title: 'Modify an existing automation',
 			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
 		},
 		{
 			id: 'new',
+			type: 'engineering',
 			title: 'Create a new automation project',
 			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 		},
 		{
 			id: 'dashboard_bug',
+			type: 'engineering',
 			title: 'Dashboard bug',
 			desc: 'Issues with Motis dashboard',
 		},
 		{
 			id: 'performance_issues',
+			type: 'engineering',
 			title: 'Perfomance issues',
 			desc: 'Reporting of performance issues is only available on the Enterprise tier',
 		},
 		{
 			id: 'sales_inquiry',
+			type: 'sales',
 			title: 'Sales enquiry',
 			desc: 'Questions about pricing, paid plans and Enterprise plans.',
 		},
 		{
 			id: 'billing',
+			type: 'sales',
 			title: 'Billing',
 			desc: 'Issues with credit card charges | invoices | overcharging',
 		},
 		{
 			id: 'abuse',
+			type: 'sales',
 			title: 'Abuse report',
 			desc: 'Report abuse of a Motis project or Motis brand',
 		},
@@ -118,30 +125,52 @@
 
 	const handleSubmit = async (body) => {
 		loading.value = true;
+		let accountManager = null;
+		if (selectedTicket.value.type === 'engineering') {
+			const accountManagers = await Promise.all(
+				Account.User.filter((o) => {
+					const badges = o.badges;
+					return badges.filter((o) => o.id === 'mg_officer').length;
+				}).map(async (o) => {
+					const { data: Ticket, error: ticketError } = await supabase
+						.from('Ticket')
+						.select('count')
+						.eq('assignedTo', o.id)
+						.single();
 
-		const accountManagers = await Promise.all(
-			Account.User.filter((o) => {
-				const badges = o.badges;
-				return badges.filter((o) => o.id === 'mg_officer').length;
-			}).map(async (o) => {
-				const { data: Ticket, error: ticketError } = await supabase
-					.from('Ticket')
-					.select('count')
-					.eq('assignedTo', o.id)
-					.single();
+					return {
+						...o,
+						ticket_count: Ticket.count,
+					};
+				})
+			);
 
-				return {
-					...o,
-					ticket_count: Ticket.count,
-				};
-			})
-		);
+			// First, sort the account managers by ticket count
+			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
 
-		// First, sort the account managers by ticket count
-		accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+			// Then, find the account manager with the lowest ticket count
+			accountManager = accountManagers[0];
+		} else if (selectedTicket.value.type === 'sales') {
+			const accountManagers = await Promise.all(
+				Account.User.filter((o) => {
+					const badges = o.badges;
+					return badges.filter((o) => o.id === 'mg_sales').length;
+				}).map(async (o) => {
+					const { data: Ticket, error: ticketError } = await supabase
+						.from('Ticket')
+						.select('count')
+						.eq('assignedTo', o.id)
+						.single();
 
-		// Then, find the account manager with the lowest ticket count
-		const accountManager = accountManagers[0];
+					return {
+						...o,
+						ticket_count: Ticket.count,
+					};
+				})
+			);
+			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+			accountManager = accountManagers[0];
+		}
 
 		const { data, error } = await supabase
 			.from('Ticket')

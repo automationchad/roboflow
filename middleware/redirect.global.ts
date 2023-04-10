@@ -5,13 +5,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 	if (user.value) {
 		let { data: User, error: userError } = await supabase
 			.from('User')
-			.select('defaultTeamId,accountId')
+			.select('defaultTeamId,accountId,Account(type)')
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
 
 		const org_id = User?.accountId;
-		const team_id = User?.defaultTeamId;
+		const team_id =
+			User?.Account.type === 'super_admin'
+				? User.accountId
+				: User?.defaultTeamId;
 
 		if (to.path === '/documentation') {
 			return navigateTo(`/${org_id}/documentation`);
