@@ -233,8 +233,8 @@
 			limit: 'No requests',
 		},
 		{
-			name: 'Support',
-			id: 'support',
+			name: 'Basic',
+			id: 'basic',
 			image: '~/assets/images/plans/support.png',
 			priceMonthly: 600,
 			priceYearly: 6000,

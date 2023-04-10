@@ -22,7 +22,7 @@
 	const user = useSupabaseUser();
 	const entitlements = [
 		{ plan: 'free', count: 0 },
-		{ plan: 'support', count: 5 },
+		{ plan: 'basic', count: 5 },
 		{ plan: 'growth', count: 25 },
 		{ plan: 'enterprise', count: 100 },
 	];

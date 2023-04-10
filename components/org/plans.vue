@@ -255,7 +255,7 @@
 		},
 		{
 			name: 'Basic',
-			id: 'support',
+			id: 'basic',
 			desc: 'Great for running lightweight automations',
 			features: [
 				'Up to 2 hours of development',
