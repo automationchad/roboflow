@@ -30,10 +30,10 @@
 											:alt="plan.name"
 										/>
 										<div
-											class="absolute top-0 left-0 h-full w-full bg-black opacity-50"
+											class="absolute left-0 top-0 h-full w-full bg-black opacity-50"
 										></div>
 										<div
-											class="absolute top-0 left-0 flex h-full w-full flex-col justify-between px-6 py-4"
+											class="absolute left-0 top-0 flex h-full w-full flex-col justify-between px-6 py-4"
 										>
 											<div
 												class="flex flex-col items-start justify-start self-start"
@@ -95,7 +95,7 @@
 													v-else
 													@click="
 														handleCheckout(
-															{ id: selectedPlan.id },
+															{ id: plan.id },
 															'retainer',
 															User.Account.stripeCustomerId,
 															User.Account.subscription
@@ -137,7 +137,7 @@
 							<div class="py-4 text-sm text-slate-400">
 								<!-- <div class="">No add on added</div> -->
 								<div
-									class="flex flex-col items-start gap-y-6 gap-x-8 border border-gray-900/10 bg-gray-50 p-8 dark:border-white/10 dark:bg-slate-800 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
+									class="flex flex-col items-start gap-x-8 gap-y-6 border border-gray-900/10 bg-gray-50 p-8 dark:border-white/10 dark:bg-slate-800 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
 								>
 									<div class="lg:min-w-0 lg:flex-1">
 										<div class="mt-1 flex items-center">
@@ -178,7 +178,7 @@
 														User.Account.stripeCustomerId
 												  )
 										"
-										class="inline-flex items-center rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm font-medium text-black shadow dark:bg-slate-100"
+										class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-black shadow dark:bg-slate-100"
 									>
 										<SparklesIcon class="mr-1 h-5 w-5" />{{
 											hosting ? 'Manage License' : 'Upgrade License'
@@ -318,11 +318,14 @@
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
+	const selectedPlan = ref(null);
+
 	const handleCheckout = async (product, type, customer) => {
+		selectedPlan.value = product.id;
 		const { url } = await $fetch('/api/stripe/checkout', {
 			method: 'post',
 			body: {
-				product,
+				product: { id: selectedPlan.value },
 				type,
 				customer,
 				account: User.Account,
