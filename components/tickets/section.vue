@@ -38,7 +38,7 @@
 					v-if="!props.loading"
 					class="block text-sm font-normal text-gray-600 dark:text-slate-400"
 				>
-					No <span class="lowercase">{{ title }}</span> requests
+					No requests
 				</span>
 				<span
 					v-else

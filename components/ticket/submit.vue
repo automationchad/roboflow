@@ -32,51 +32,7 @@
 	const link = ref('');
 	const type = ref('');
 	const due_date = ref('');
-	const ticketTypes = [
-		{
-			id: 'bug',
-			type: 'engineering',
-			title: 'Modify an existing automation',
-			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
-		},
-		{
-			id: 'new',
-			type: 'engineering',
-			title: 'Create a new automation project',
-			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
-		},
-		{
-			id: 'dashboard_bug',
-			type: 'engineering',
-			title: 'Dashboard bug',
-			desc: 'Issues with Motis dashboard',
-		},
-		{
-			id: 'performance_issues',
-			type: 'engineering',
-			title: 'Perfomance issues',
-			desc: 'Reporting of performance issues is only available on the Enterprise tier',
-		},
-		{
-			id: 'sales_inquiry',
-			type: 'sales',
-			title: 'Sales enquiry',
-			desc: 'Questions about pricing, paid plans and Enterprise plans.',
-		},
-		{
-			id: 'billing',
-			type: 'sales',
-			title: 'Billing',
-			desc: 'Issues with credit card charges | invoices | overcharging',
-		},
-		{
-			id: 'abuse',
-			type: 'sales',
-			title: 'Abuse report',
-			desc: 'Report abuse of a Motis project or Motis brand',
-		},
-	];
-	const selectedTicket = ref(ticketTypes[0]);
+
 	const loading = ref(false);
 	const error_occurred = ref(false);
 	const route = useRoute();
@@ -120,6 +76,69 @@
 		.limit(1)
 		.single();
 
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+
+	const ticketTypes = [
+		{
+			id: 'asap',
+			type: 'engineering',
+			title: 'ASAP 1:1',
+			desc: 'On-demand support. Join waiting room after checkout. Be sure to have a stable connection with Zoom access.',
+		},
+		{
+			id: 'scheduled',
+			type: 'engineering',
+			title: 'Scheduled 1:1',
+			desc: "Book a call up to 2 weeks in advance. If your requested time isn't available, we'll email you with alternate times.",
+		},
+		{
+			id: 'bug',
+			type: 'engineering',
+			title: 'Modify an existing automation',
+			min_plan: 'support',
+			gated: retainer.tier === 'free',
+			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
+		},
+		{
+			id: 'new',
+			type: 'engineering',
+			title: 'Create a new automation project',
+			min_plan: 'growth',
+			gated: retainer.tier !== 'growth' && retainer.tier !== 'enterprise',
+			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
+		},
+		{
+			id: 'dashboard_bug',
+			type: 'engineering',
+			title: 'Dashboard bug',
+			desc: 'Issues with Motis dashboard',
+		},
+		{
+			id: 'performance_issues',
+			type: 'engineering',
+			title: 'Perfomance issues',
+			desc: 'Reporting of performance issues is only available on the Enterprise tier',
+		},
+		{
+			id: 'sales_inquiry',
+			type: 'sales',
+			title: 'Sales enquiry',
+			desc: 'Questions about pricing, paid plans and Enterprise plans.',
+		},
+		{
+			id: 'billing',
+			type: 'sales',
+			title: 'Billing',
+			desc: 'Issues with credit card charges | invoices | overcharging',
+		},
+		{
+			id: 'abuse',
+			type: 'sales',
+			title: 'Abuse report',
+			desc: 'Report abuse of a Motis project or Motis brand',
+		},
+	];
+	const selectedTicket = ref(ticketTypes[0]);
 	const accountId =
 		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
 	const teamId =
@@ -227,8 +246,6 @@
 	};
 
 	// Fetch User data
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 </script>
 
 <template>
@@ -316,6 +333,7 @@
 															v-for="ticketType in ticketTypes"
 															:key="ticketType.id"
 															:value="ticketType"
+															:disabled="ticketType.gated"
 															v-slot="{ active, selected }"
 														>
 															<li
@@ -324,7 +342,7 @@
 																	selected
 																		? 'bg-slate-200 dark:bg-slate-600'
 																		: '',
-																	'relative cursor-default select-none py-2 pl-3 pr-9 transition-colors',
+																	'relative flex cursor-default select-none items-center justify-between py-2 pl-3 pr-9 transition-colors',
 																]"
 															>
 																<div class="flex flex-col">
@@ -338,7 +356,17 @@
 																				: '',
 																			'truncate',
 																		]"
-																		>{{ ticketType.title }}</span
+																		>{{ ticketType.title
+																		}}<NuxtLink
+																			to="/settings/billing"
+																			class="ml-1 rounded-md bg-sky-200 px-2 text-xs text-sky-600"
+																			v-if="ticketType.gated"
+																			>Available on
+																			<span class="capitalize">{{
+																				ticketType.min_plan
+																			}}</span>
+																			plan</NuxtLink
+																		></span
 																	><span
 																		:class="[
 																			active
@@ -348,6 +376,9 @@
 																		]"
 																		>{{ ticketType.desc }}</span
 																	>
+																</div>
+																<div v-if="selected" class="text-lime-400">
+																	<CheckIcon class="h-5 w-5" />
 																</div>
 															</li>
 														</ListboxOption>
@@ -360,7 +391,189 @@
 											<span class="capitalize">{{ retainer.tier }}</span> tier
 										</p>
 									</div>
-									<div class="sm:col-span-2">
+									<div
+										class="sm:col-span-2"
+										v-if="selectedTicket.id === 'asap'"
+									>
+										<Disclosure
+											v-slot="{ open }"
+											as="div"
+											class="rounded-lg border border-gray-200 p-4 dark:border-sky-700 dark:bg-sky-800"
+										>
+											<div class="flex w-full justify-between">
+												<div
+													class="flex items-center text-sm dark:text-green-100"
+												>
+													<svg
+														class="mr-4 h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M5.75 4.75H18.25M6.75 4.75H17.25V6C17.25 8.89949 14.8995 11.25 12 11.25C9.10051 11.25 6.75 8.8995 6.75 6V4.75Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M9 10H15"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M5.75 19.25H18.25M6.75 19.25H17.25V17.5C17.25 14.6005 14.8995 12.25 12 12.25C9.10051 12.25 6.75 14.6005 6.75 17.5V19.25Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+
+													Expected waiting time {{ 15 }} min
+												</div>
+												<!-- <DisclosureButton
+													class="flex rounded-lg text-left text-sm font-medium text-slate-400 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:text-slate-100"
+												>
+													<svg
+														v-if="!open"
+														class="h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M4.75 14.75V19.25H9.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19.25 9.25V4.75H14.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M5 19L10.25 13.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19 5L13.75 10.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path></svg
+													><svg
+														v-else
+														class="h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M10.25 18.25V13.75H5.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M13.75 5.75V10.25H18.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M4.75 19.25L10.25 13.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19.25 4.75L13.75 10.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</DisclosureButton> -->
+											</div>
+											<transition
+												enter-active-class="transition duration-200 ease-in-out"
+												enter-from-class="transform -translate-y-4"
+												enter-to-class="transform translate-y-0"
+												leave-active-class="transition duration-100 ease-in-out"
+												leave-from-class="transform translate-y-0"
+												leave-to-class="transform -translate-y-4"
+												><DisclosurePanel
+													class="pt-4 text-sm text-gray-500 transition-all dark:text-slate-300"
+												>
+													Basic tier support is available within the community
+													and officially by the team on a best efforts basis,
+													though we cannot guarantee a response time. For a
+													guaranteed response time we recommend upgrading to the
+													Growth tier. Enhanced SLAs for support are available
+													on our Enterprise Tier.
+													<div class="mt-4 flex space-x-2">
+														<NuxtLink
+															to="/settings/billing"
+															class="rounded-md border border-indigo-400 bg-indigo-600 px-3 py-1.5 text-xs text-white transition-all hover:bg-indigo-500 hover:shadow-sm"
+														>
+															Upgrade plan
+														</NuxtLink>
+														<a
+															href="https://calendly.com/motis-group/intro"
+															target="_blank"
+															class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-700"
+														>
+															<svg
+																class="mr-1 h-4 w-4"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M9.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H17.25C18.3546 19.25 19.25 18.3546 19.25 17.25V14.75"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M19.25 9.25V4.75H14.75"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M19 5L11.75 12.25"
+																></path>
+															</svg>
+															Enquire about Enterprise
+														</a>
+													</div>
+												</DisclosurePanel></transition
+											>
+										</Disclosure>
+									</div>
+									<div class="sm:col-span-2" v-else>
 										<Disclosure
 											v-slot="{ open }"
 											as="div"
@@ -512,7 +725,10 @@
 										</Disclosure>
 									</div>
 								</div>
-								<div class="col-span-2 space-y-6 px-10">
+								<div
+									class="col-span-2 space-y-6 px-10"
+									v-if="selectedTicket.id !== 'scheduled'"
+								>
 									<div class="sm:col-span-2">
 										<label
 											for="name"
@@ -674,23 +890,127 @@
 										</div>
 									</div>
 								</div>
+								<div class="col-span-2 space-y-6 px-10" v-else>
+									<div class="h-[700px] sm:col-span-2">
+										<label
+											for="name"
+											class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"
+											>Calendar</label
+										>
+										<ticket-calendly class="-ml-4" />
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="flex-shrink-0 px-10 py-5">
 							<div class="flex justify-end space-x-3">
 								<button
 									type="button"
-									class="rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
+									class="rounded-md bg-white p-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800"
 									@click="emit('close-modal'), cancelAll()"
 								>
-									Cancel
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24">
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M17.25 6.75L6.75 17.25"
+										></path>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M6.75 6.75L17.25 17.25"
+										></path>
+									</svg>
 								</button>
 								<button
+									v-if="selectedTicket.id !== 'scheduled'"
 									type="submit"
 									:disabled="loading"
 									class="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-normal text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
-									{{ loading ? 'Loading' : 'Create' }}
+									<svg
+										v-if="loading"
+										class="h-5 w-5 animate-spin"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M12 4.75V6.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M17.1266 6.87347L16.0659 7.93413"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M19.25 12L17.75 12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M17.1266 17.1265L16.0659 16.0659"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12 17.75V19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M7.9342 16.0659L6.87354 17.1265"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M6.25 12L4.75 12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M7.9342 7.93413L6.87354 6.87347"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path></svg
+									><svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24">
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M4.75 19.25L12 4.75L19.25 19.25L12 15.75L4.75 19.25Z"
+										></path>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M12 15.5V12.75"
+										></path>
+									</svg>
 								</button>
 							</div>
 						</div>

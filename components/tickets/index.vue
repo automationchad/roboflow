@@ -107,38 +107,18 @@
 			<div class="mx-auto grid max-w-7xl">
 				<div class="mb-8 border-b border-gray-200 py-5 dark:border-gray-800">
 					<div
-						class="-mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
+						class="-mt-2 flex flex-wrap items-center justify-end sm:flex-nowrap"
 					>
-						<div class="mt-2 flex items-center">
-							<!-- <button
-								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal hover:bg-gray-100 dark:text-white dark:hover:bg-slate-800"
-								@click="refreshData()"
+						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
+							<button
+								:disabled="loading"
+								data-tooltip-target="tooltip-default"
+								@click="showSubmitModal = true"
+								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
 							>
 								<svg
-									v-if="!loading"
-									class="mr-1 h-5 w-5"
-									viewBox="0 0 24 24"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75"
-										stroke="currentColor"
-										stroke-width="1.5"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									></path>
-									<path
-										d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75"
-										stroke="currentColor"
-										stroke-width="1.5"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									></path>
-								</svg>
-								<svg
-									v-else
-									class="mr-1 h-5 w-5 animate-spin"
+									v-if="loading"
+									class="mr-2 h-5 w-5 animate-spin"
 									viewBox="0 0 24 24"
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
@@ -198,35 +178,34 @@
 										stroke-width="1.5"
 										stroke-linecap="round"
 										stroke-linejoin="round"
-									></path></svg
-								>Refresh
-							</button> -->
-							<button
-								@click="showSessionModal = true"
-								class="inline-flex items-center rounded-md px-3 py-0.5 text-sm font-normal hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white transition-colors dark:hover:bg-slate-900"
-							>
-								<svg class="mr-1 h-5 w-5" fill="none" viewBox="0 0 24 24">
+									></path>
+								</svg>
+								<svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24">
 									<path
 										stroke="currentColor"
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="1.5"
-										d="M19.25 11.25V8.75C19.25 7.64543 18.3546 6.75 17.25 6.75H6.75C5.64543 6.75 4.75 7.64543 4.75 8.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H11.25M17 14.75V19.25M19.25 17H14.75M8 4.75V8.25M16 4.75V8.25M7.75 10.75H16.25"
+										d="M4.75 12C4.75 7.99594 7.99594 4.75 12 4.75V4.75C16.0041 4.75 19.25 7.99594 19.25 12V12C19.25 16.0041 16.0041 19.25 12 19.25V19.25C7.99594 19.25 4.75 16.0041 4.75 12V12Z"
+									></path>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										d="M12 8.75003V15.25"
+									></path>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										d="M15.25 12L8.75 12"
 									></path>
 								</svg>
-								Session
-							</button>
-						</div>
-						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
-							<button
-								:disabled="upgrade_needed || loading"
-								data-tooltip-target="tooltip-default"
-								@click="showSubmitModal = true"
-								class="group relative inline-flex items-center rounded-lg border border-slate-300 px-4 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-transparent dark:bg-slate-700 dark:text-white"
-							>
-								<PlusCircleIcon class="mr-2 h-5 w-5" />
+
 								Add
-								<upgrade-access v-if="upgrade_needed" :object="'tickets'" />
+								<!-- <upgrade-access v-if="upgrade_needed" :object="'tickets'" /> -->
 							</button>
 						</div>
 					</div>
@@ -235,7 +214,7 @@
 					<div>
 						<div>
 							<tickets-section
-								title="Building"
+								title="Active"
 								:tickets="active_tickets"
 								:page="buildingPage"
 								:loading="loading"
@@ -243,7 +222,7 @@
 							/>
 
 							<tickets-section
-								title="Backlog"
+								title="Waiting"
 								:tickets="backlog_tickets"
 								:page="backlogPage"
 								:loading="loading"
