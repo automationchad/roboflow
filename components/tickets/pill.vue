@@ -1,16 +1,33 @@
 <template>
 	<NuxtLink
 		class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm transition-colors hover:border-gray-400 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
-		:to="`/${route.params.team}/tickets/${ticket.id}`"
+		:to="ticket.type !== 'asap' ? `/${route.params.team}/tickets/${ticket.id}` : `${ticket.desc}`"
 		><div class="min-w-0 flex-1">
 			<div class="rounded-xl focus:outline-none">
-				<div class="grid grid-cols-3 justify-between">
-					<div class="col-span-2 flex items-center space-x-4 truncate">
-						<p
-							class="truncate text-sm font-medium text-gray-900 dark:text-white"
+				<div class="flex justify-between">
+					<div class="flex items-center space-x-4 truncate">
+						<div
+							class="flex items-center truncate text-sm font-medium text-gray-900 dark:text-white"
 						>
-							{{ ticket.name }}
-						</p>
+							<span
+								v-if="ticket.type === 'asap'"
+								class="relative ml-1 mr-1.5 flex h-2 w-2"
+							>
+								<span
+									class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+								></span>
+								<span
+									class="relative inline-flex h-2 w-2 rounded-full bg-red-500"
+								></span>
+							</span>
+							<a
+								v-if="ticket.type === 'asap'"
+								:href="ticket.desc"
+								class="hover:underline"
+								>{{ ticket.name }}</a
+							>
+							<span v-else>{{ ticket.name }}</span>
+						</div>
 						<div
 							:class="[
 								styles[ticket.type],
@@ -24,7 +41,7 @@
 					</div>
 					<div
 						v-if="ticket.status === 'done'"
-						class="col-span-1 flex items-center justify-end space-x-1 text-sm text-gray-400"
+						class="flex items-center justify-end space-x-1 text-xs text-gray-400"
 					>
 						<CheckCircleIcon class="h-4 w-4" />
 						<span>{{
@@ -32,8 +49,8 @@
 						}}</span>
 					</div>
 					<div
-						v-else-if="ticket.status === 'active'"
-						class="flex items-center space-x-1 text-sm text-slate-400"
+						v-else-if="ticket.status === 'active' && ticket.type !== 'asap'"
+						class="flex items-center space-x-1 text-xs text-slate-400"
 					>
 						<ClockIcon class="h-4 w-4" />
 						<span>{{
@@ -41,8 +58,31 @@
 						}}</span>
 					</div>
 					<div
+						v-else-if="ticket.type === 'asap'"
+						class="flex items-center space-x-1 text-xs text-slate-400"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="1.5"
+								d="M12.25 8.75V12l-1.5 1.25m8.5 1.5s-1.929 2.09-2.893 4.5l-1.607-1.929m-3.5 1.929-.25-.068A7.251 7.251 0 0 1 12 4.75 7.251 7.251 0 0 1 19.182 11l.033.254"
+							></path>
+						</svg>
+
+						<span>{{
+							'Now'
+						}}</span>
+					</div>
+					<div
 						v-else
-						class="col-span-1 flex items-center justify-end space-x-1 text-sm text-slate-400"
+						class="col-span-1 flex items-center justify-end space-x-1 text-xs text-slate-400"
 					>
 						<CalendarIcon class="h-4 w-4" />
 						<span>{{
