@@ -873,16 +873,12 @@
 																	class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
 																>
 																	<span class="cursor-pointer"
-																		><svg
-																			fill="none"
-																			xmlns="http://www.w3.org/2000/svg"
-																			class="h-5 w-5"
-																		>
-																			<path
-																				d="M16.667 8.75a.833.833 0 00-.834.833v5.834a.833.833 0 01-.833.833H3.334a.833.833 0 01-.834-.833V8.75a.833.833 0 01.833-.833H5a.833.833 0 00.833-.567l.45-1.367a.833.833 0 01.792-.566h4.592a.833.833 0 000-1.667H7.033a2.5 2.5 0 00-2.366 1.708l-.267.834H3.333a2.5 2.5 0 00-2.5 2.5v6.666a2.5 2.5 0 002.5 2.5H15a2.5 2.5 0 002.5-2.5V9.625a.835.835 0 00-.833-.875zm-7.5-.833a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm0 5a1.667 1.667 0 110-3.334 1.667 1.667 0 010 3.334zm9.167-9.167H17.5v-.833a.833.833 0 10-1.666 0v.833H15a.833.833 0 100 1.667h.834v.833a.833.833 0 101.666 0v-.833h.834a.833.833 0 000-1.667z"
-																				fill="currentColor"
-																			></path></svg
-																	></span>
+																		><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M17 14.75V19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M19.25 17L14.75 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
 
 																	<input
 																		type="file"
