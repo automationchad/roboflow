@@ -70,7 +70,7 @@
 		.from('User')
 		.select(
 			`*,Account (
-	     id,type,Subscription(*))`
+	     id,type,stripeCustomerId,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
@@ -153,9 +153,34 @@
 		.limit(1)
 		.single();
 
+	const handleCheckout = async (product, type, customer) => {
+		const { url } = await $fetch('/api/stripe/checkout', {
+			method: 'post',
+			body: {
+				product,
+				type,
+				customer,
+				account: User.Account,
+				description: `${name.value} - ${brief.value}`
+			},
+		});
+		return url;
+	};
+
 	const handleSubmit = async (body) => {
 		loading.value = true;
 		let accountManager = null;
+		if (selectedTicket.value.id === 'asap') {
+			location.href = await handleCheckout(
+				{ id: 'asap' },
+				'asap',
+				User.Account.stripeCustomerId
+			);
+			emit('ticket-submit');
+			emit('close-modal');
+			loading.value = false;
+			return;
+		}
 		if (selectedTicket.value.type === 'engineering') {
 			const accountManagers = await Promise.all(
 				Account.User.filter((o) => {
@@ -210,7 +235,7 @@
 					type: selectedTicket.value.id,
 					status: 'backlog',
 					createdBy: user.value.id,
-					dueDate: due_date.value,
+					dueDate: due_date.value ?? new Date(),
 					accountId: accountId,
 					assignedTo: accountManager.id,
 					teamId: teamId,
@@ -361,11 +386,11 @@
 																			to="/settings/billing"
 																			class="ml-1 rounded-md bg-sky-200 px-2 text-xs text-sky-600"
 																			v-if="ticketType.gated"
-																			>Available on
+																			>Upgrade to
 																			<span class="capitalize">{{
 																				ticketType.min_plan
 																			}}</span>
-																			plan</NuxtLink
+																			</NuxtLink
 																		></span
 																	><span
 																		:class="[
@@ -573,7 +598,7 @@
 											>
 										</Disclosure>
 									</div>
-									<div class="sm:col-span-2" v-else>
+									<div class="sm:col-span-2" v-else-if="selectedTicket.id !== 'scheduled'">
 										<Disclosure
 											v-slot="{ open }"
 											as="div"
@@ -782,7 +807,10 @@
 											Please add a message about the issue that you're facing
 										</p>
 									</div>
-									<div class="sm:col-span-2">
+									<div
+										class="sm:col-span-2"
+										v-if="selectedTicket.id !== 'asap'"
+									>
 										<label
 											for="desired-date"
 											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
@@ -799,7 +827,10 @@
 											/>
 										</div>
 									</div>
-									<div class="sm:cols-span-2">
+									<div
+										class="sm:cols-span-2"
+										v-if="selectedTicket.id !== 'asap'"
+									>
 										<label
 											for="desired-date"
 											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
@@ -930,7 +961,7 @@
 									v-if="selectedTicket.id !== 'scheduled'"
 									type="submit"
 									:disabled="loading"
-									class="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-normal text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									class="inline-flex justify-center rounded-md bg-indigo-600 p-2 text-sm font-normal text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									<svg
 										v-if="loading"
