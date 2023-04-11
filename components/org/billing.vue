@@ -37,16 +37,15 @@
 									>
 										{{ state.email }}
 									</div>
-									
 								</div>
 
 								<DisclosurePanel
 									class="flex flex-grow items-center justify-between text-sm text-gray-500"
 								>
 									<div class="w-full">
-										<div class="flex justify-between items-center">
+										<div class="flex items-center justify-between">
 											<div
-												class="block mr-2 w-full rounded-md border-0 px-3 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:bg-slate-800 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+												class="mr-2 block w-full rounded-md border-0 px-3 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:bg-slate-800 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
 											>
 												<input
 													v-model="state.email"
@@ -86,8 +85,8 @@
 								</div>
 							</Disclosure>
 							<p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
-										The invoices will be sent to this email
-									</p>
+								The invoices will be sent to this email
+							</p>
 						</div>
 					</div>
 				</fieldset>

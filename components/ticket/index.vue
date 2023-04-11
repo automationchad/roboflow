@@ -133,6 +133,12 @@
 		.limit(1)
 		.single();
 
+	const dueDate = computed(() => {
+		return formatDistance(new Date(Ticket.dueDate), new Date(), {
+			addPrefix: true,
+		});
+	});
+
 	if (!Ticket) {
 		navigateTo('/ticket-not-found');
 	}
@@ -494,11 +500,9 @@
 														<span
 															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
-															{{ Ticket.User.jobTitle }}
+															{{ ticketDate(Ticket.createdOn) }}
+															<!-- {{ Ticket.User.jobTitle }} -->
 														</span>
-														<span class="ml-1 text-sm">{{
-															countryToEmoji(Ticket.User.country)
-														}}</span>
 													</div>
 													<div class="space-x-1">
 														<span
@@ -573,6 +577,19 @@
 													}}</span></span
 												>
 											</div>
+											<div class="flex items-center space-x-2">
+												<CalendarIcon
+													class="h-5 w-5 text-gray-400"
+													aria-hidden="true"
+												/>
+												<span
+													class="text-sm font-medium text-gray-900 dark:text-white"
+													>Created on
+													<span>{{
+														format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
+													}}</span></span
+												>
+											</div>
 										</div>
 										<div
 											class="mt-6 space-y-8 border-b border-t border-gray-200 py-6 dark:border-slate-800"
@@ -626,12 +643,12 @@
 									<div class="xl:pb-0">
 										<h2 class="sr-only">Description</h2>
 
-										<Disclosure v-slot="{ open }"  as="div">
-											<DisclosurePanel class="mt-4 flex items-start space-x-4 ">
+										<Disclosure v-slot="{ open }" as="div">
+											<DisclosurePanel class="mt-4 flex items-start space-x-4">
 												<div class="min-w-0 flex-1">
 													<div class="relative">
 														<div
-															class="rounded-lg shadow-sm ring-1 ring-inset p-2 ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800 "
+															class="rounded-lg p-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
 														>
 															<label for="comment" class="sr-only"
 																>Edit description</label
@@ -648,7 +665,7 @@
 															<!-- Spacer element to match the height of the toolbar -->
 															<div class="p-2" aria-hidden="true">
 																<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																<div class="py-px p-4">
+																<div class="p-4 py-px">
 																	<div class="h-9" />
 																</div>
 															</div>
@@ -711,7 +728,7 @@
 											</DisclosurePanel>
 											<div class="my-4 flex justify-between">
 												<div
-													class="prose dark:prose-invert mr-auto w-full"
+													class="prose mr-auto w-full dark:prose-invert"
 													v-html="convert(input)"
 												></div>
 												<div class="">
@@ -1581,30 +1598,84 @@
 									class="flex items-center space-x-2"
 									v-if="Ticket.status !== 'done'"
 								>
-									<LockOpenIcon
-										class="h-5 w-5 text-green-500"
-										aria-hidden="true"
-									/>
+									<svg
+										class="h-6 w-6 text-green-500"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M5.75 11.75C5.75 11.1977 6.19772 10.75 6.75 10.75H17.25C17.8023 10.75 18.25 11.1977 18.25 11.75V17.25C18.25 18.3546 17.3546 19.25 16.25 19.25H7.75C6.64543 19.25 5.75 18.3546 5.75 17.25V11.75Z"
+										></path>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M7.75 10.5V9.84343C7.75 8.61493 7.70093 7.29883 8.42416 6.30578C8.99862 5.51699 10.0568 4.75 12 4.75C14 4.75 15.25 6.25 15.25 6.25"
+										></path>
+									</svg>
+
 									<span class="text-sm text-green-700">Open Ticket</span>
 								</div>
 								<div class="flex items-center space-x-2" v-else>
-									<LockClosedIcon
-										class="h-5 w-5 text-red-500"
-										aria-hidden="true"
-									/>
+									<svg
+										class="h-6 w-6 text-red-500"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M5.75 11.75C5.75 11.1977 6.19772 10.75 6.75 10.75H17.25C17.8023 10.75 18.25 11.1977 18.25 11.75V17.25C18.25 18.3546 17.3546 19.25 16.25 19.25H7.75C6.64543 19.25 5.75 18.3546 5.75 17.25V11.75Z"
+										></path>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M7.75 10.5V10.3427C7.75 8.78147 7.65607 7.04125 8.74646 5.9239C9.36829 5.2867 10.3745 4.75 12 4.75C13.6255 4.75 14.6317 5.2867 15.2535 5.9239C16.3439 7.04125 16.25 8.78147 16.25 10.3427V10.5"
+										></path>
+									</svg>
+
 									<span class="text-sm text-red-700">Closed Ticket</span>
 								</div>
 
-								<div class="flex items-center space-x-2">
+								<!-- <div class="flex items-center space-x-2">
 									<CalendarIcon
 										class="h-5 w-5 text-gray-400"
 										aria-hidden="true"
 									/>
 									<span class="text-sm text-gray-900 dark:text-slate-300"
-										>Created on
+										>Created
 										<span>{{
 											format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
 										}}</span></span
+									>
+								</div> -->
+								<div class="flex items-center space-x-2">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-6 w-6  text-gray-400"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M19.25 9.25v-.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v8.5a2 2 0 0 0 2 2h2.5m5.75-5.5V15l1.25 1.25M8 4.75v3.5m8-3.5v3.5m-1 11a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Z"
+										></path>
+									</svg>
+
+									<span class="text-sm text-gray-900 dark:text-slate-300"
+										>Due in <span>{{ dueDate }}</span></span
 									>
 								</div>
 							</div>
@@ -1621,12 +1692,18 @@
 										<li class="flex justify-start">
 											<a class="flex items-center space-x-3">
 												<div class="flex-shrink-0">
-													<img v-if="assignedToAvatar"
+													<img
+														v-if="assignedToAvatar"
 														class="h-5 w-5 rounded-full object-cover"
 														:src="assignedToAvatar"
 														alt=""
 													/>
-													<div v-else class="h-5 w-5 rounded-full bg-slate-700 border border-slate-600 text-slate-400 flex items-center justify-center text-xs text-center">{{ AssignedTo.firstName[0] }}</div>
+													<div
+														v-else
+														class="flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-center text-xs text-slate-400"
+													>
+														{{ AssignedTo.firstName[0] }}
+													</div>
 												</div>
 												<div
 													class="text-sm font-medium text-gray-900 dark:text-slate-100"
