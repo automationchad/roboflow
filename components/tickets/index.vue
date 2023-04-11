@@ -83,6 +83,7 @@
 
 	// Modal control ref
 	const showSubmitModal = ref(false);
+	const showSessionModal = ref(false);
 
 	// If your application needs an upgrade to add tickets,
 	// set `upgrade_needed` to true. Otherwise, set it to false.
@@ -106,17 +107,10 @@
 			<div class="mx-auto grid max-w-7xl">
 				<div class="mb-8 border-b border-gray-200 py-5 dark:border-gray-800">
 					<div
-						class="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
+						class="-mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 					>
-						<div class="ml-4 mt-2">
-							<h3
-								class="flex items-center text-xl font-semibold leading-6 text-gray-900 dark:text-white"
-							>
-								Requests
-							</h3>
-						</div>
-						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
-							<button
+						<div class="mt-2 flex items-center">
+							<!-- <button
 								class="inline-flex items-center rounded-md px-2 py-0.5 text-sm font-normal hover:bg-gray-100 dark:text-white dark:hover:bg-slate-800"
 								@click="refreshData()"
 							>
@@ -206,7 +200,24 @@
 										stroke-linejoin="round"
 									></path></svg
 								>Refresh
+							</button> -->
+							<button
+								@click="showSessionModal = true"
+								class="inline-flex items-center rounded-md px-3 py-0.5 text-sm font-normal hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white transition-colors dark:hover:bg-slate-900"
+							>
+								<svg class="mr-1 h-5 w-5" fill="none" viewBox="0 0 24 24">
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										d="M19.25 11.25V8.75C19.25 7.64543 18.3546 6.75 17.25 6.75H6.75C5.64543 6.75 4.75 7.64543 4.75 8.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H11.25M17 14.75V19.25M19.25 17H14.75M8 4.75V8.25M16 4.75V8.25M7.75 10.75H16.25"
+									></path>
+								</svg>
+								Session
 							</button>
+						</div>
+						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
 							<button
 								:disabled="upgrade_needed || loading"
 								data-tooltip-target="tooltip-default"
@@ -254,6 +265,11 @@
 				v-show="showSubmitModal"
 				@ticket-submit="refreshData()"
 				@close-modal="(showSubmitModal = false), refreshData()"
+			/>
+			<ticket-session
+				v-show="showSessionModal"
+				@ticket-submit="refreshData()"
+				@close-modal="(showSessionModal = false), refreshData()"
 			/>
 		</div>
 	</div>

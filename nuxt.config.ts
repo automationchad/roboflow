@@ -15,6 +15,12 @@ export default defineNuxtConfig({
 						'A boutique dev shop assisting fast growing companies with process automation and software interoperability.',
 				},
 			],
+			script: [
+				{
+					src: 'https://assets.calendly.com/assets/external/widget.js',
+					defer: true,
+				},
+			],
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
 		},
 	},
