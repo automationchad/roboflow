@@ -180,7 +180,7 @@
 										stroke-linejoin="round"
 									></path>
 								</svg>
-								<svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24">
+								<svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" v-else>
 									<path
 										stroke="currentColor"
 										stroke-linecap="round"
