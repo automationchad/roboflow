@@ -88,10 +88,14 @@
 													class="flex w-full items-center justify-between rounded-lg py-1 text-sm"
 													v-if="retainer.tier === plan.id"
 												>
-													<div class="mr-12 flex items-center">
+													<div class="flex items-center">
 														<div
-															class="flex items-center text-lime-400"
-															v-if="retainer.status === 'active'"
+															class="flex items-center rounded-md border border-lime-400 bg-lime-200 px-3 py-0.5 text-lime-700"
+															v-if="
+																retainer.status === 'active' &&
+																new Date(retainer.resumesAt) <=
+																	new Date(new Date().getTime())
+															"
 														>
 															<svg
 																class="mr-1 h-5 w-5"
@@ -113,10 +117,42 @@
 																	d="M9.75 12.75L10.1837 13.6744C10.5275 14.407 11.5536 14.4492 11.9564 13.7473L14.25 9.75"
 																></path>
 															</svg>
-															Selected
+															Active
 														</div>
 														<div
-															class="flex items-center text-yellow-400"
+															class="flex items-center rounded-md border border-sky-400 bg-sky-200 px-3 py-0.5 text-sky-700"
+															v-else-if="
+																retainer.status === 'active' &&
+																new Date(retainer.resumesAt) >
+																	new Date(new Date().getTime())
+															"
+														>
+															<svg
+																class="mr-1 h-5 w-5"
+																viewBox="0 0 24 24"
+																fill="none"
+																xmlns="http://www.w3.org/2000/svg"
+															>
+																<path
+																	d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path>
+																<path
+																	d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path>
+															</svg>
+
+															Resuming
+														</div>
+														<div
+															class="flex items-center rounded-md border border-yellow-400 bg-yellow-200 px-3 py-0.5 text-yellow-700"
 															v-else
 														>
 															<svg
@@ -143,9 +179,18 @@
 														</div>
 													</div>
 													<div class="flex items-center text-xs text-white">
-														<span class="mr-1.5"
-															>{{
-																Math.floor(retainer.days_left / (24 * 3600 * 1000))
+														<span
+															v-if="
+																retainer.status === 'paused' ||
+																new Date(retainer.resumesAt) >
+																	new Date(new Date().getTime())
+															"
+															class="mr-1.5"
+															>Credits:
+															{{
+																Math.floor(
+																	retainer.days_left / (24 * 3600 * 1000)
+																)
 															}}
 															days</span
 														>
@@ -155,7 +200,7 @@
 															@click="
 																handlePause(retainer.stripeSubscriptionId)
 															"
-															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-600 hover:text-white"
+															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 p-0.5 text-slate-200 transition-colors hover:border-slate-600 hover:text-white"
 														>
 															<svg
 																v-if="loading"
@@ -252,7 +297,7 @@
 																	retainer.days_left
 																)
 															"
-															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-600 hover:text-white"
+															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 p-0.5 text-slate-200 transition-colors hover:border-slate-600 hover:text-white"
 														>
 															<svg
 																v-if="loading"

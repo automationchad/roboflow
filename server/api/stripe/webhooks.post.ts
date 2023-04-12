@@ -81,6 +81,12 @@ export default defineEventHandler(async (event) => {
 						days_left: daysLeft,
 						pausedOn: new Date(),
 						status: 'paused',
+						type:
+							subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+						tier:
+							subscription.plan.nickname === 'hosting'
+								? null
+								: subscription.plan.nickname,
 					})
 					.eq('stripeSubscriptionId', subscription.id);
 
@@ -93,6 +99,12 @@ export default defineEventHandler(async (event) => {
 							subscription.pause_collection.resumes_at * 1000
 						),
 						status: 'active',
+						type:
+							subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+						tier:
+							subscription.plan.nickname === 'hosting'
+								? null
+								: subscription.plan.nickname,
 					})
 					.eq('stripeSubscriptionId', subscription.id);
 
