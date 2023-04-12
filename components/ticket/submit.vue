@@ -96,7 +96,7 @@
 			type: 'engineering',
 			title: 'Modify an existing automation',
 			min_plan: 'support',
-			gated: retainer.tier === 'free',
+			gated: retainer.tier === 'free' && retainer.status === 'paused',
 			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
 		},
 		{
@@ -104,7 +104,10 @@
 			type: 'engineering',
 			title: 'Create a new automation project',
 			min_plan: 'growth',
-			gated: retainer.tier !== 'growth' && retainer.tier !== 'enterprise',
+			gated:
+				retainer.tier !== 'growth' &&
+				retainer.tier !== 'enterprise' &&
+				retainer.status === 'paused',
 			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 		},
 		{
@@ -161,7 +164,7 @@
 				type,
 				customer,
 				account: User.Account,
-				description: `${name.value} - ${brief.value}`
+				description: `${name.value} - ${brief.value}`,
 			},
 		});
 		return url;
@@ -390,8 +393,7 @@
 																			<span class="capitalize">{{
 																				ticketType.min_plan
 																			}}</span>
-																			</NuxtLink
-																		></span
+																		</NuxtLink></span
 																	><span
 																		:class="[
 																			active
@@ -598,7 +600,10 @@
 											>
 										</Disclosure>
 									</div>
-									<div class="sm:col-span-2" v-else-if="selectedTicket.id !== 'scheduled'">
+									<div
+										class="sm:col-span-2"
+										v-else-if="selectedTicket.id !== 'scheduled'"
+									>
 										<Disclosure
 											v-slot="{ open }"
 											as="div"

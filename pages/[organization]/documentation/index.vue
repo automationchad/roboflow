@@ -57,9 +57,11 @@
 
 	const { data: User, error: UserError } = await supabase
 		.from('User')
-		.select('systemRole,Account(id,type)')
+		.select('systemRole,Account(id,type,Subscription(*))')
 		.eq('id', user.value.id)
 		.single();
+
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
 	const fetchDropdownItems = async () => {
 		// Check if the dropdown items have already been fetched
@@ -228,7 +230,12 @@
 									<loading-spinner v-if="uploading" />
 									<success-text v-else-if="uploadSuccess" />
 									<div v-else class="text-center">
+										<div class=""></div>
 										<div
+											v-if="
+												retainer.tier === 'enterprise' &&
+												retainer.status !== 'paused'
+											"
 											class="flex text-sm leading-6 text-gray-600 dark:text-slate-300"
 										>
 											<label
@@ -237,6 +244,10 @@
 											>
 												<span>Upload a file</span>
 												<input
+													:disabled="
+														retainer.tier !== 'enterprise' &&
+														retainer.status === 'paused'
+													"
 													id="file"
 													required
 													name="file"
@@ -248,11 +259,71 @@
 
 											<p class="pl-1">or drag and drop</p>
 										</div>
+										<div
+											v-else
+											class="flex text-sm leading-6 text-gray-600 dark:text-slate-300"
+										>
+											<p>
+												Documentation uploads are available on our Enterprise
+												Tier.
+											</p>
+										</div>
+
 										<p
+											v-if="
+												retainer.tier === 'enterprise' &&
+												retainer.status !== 'paused'
+											"
 											class="text-xs leading-5 text-gray-600 dark:text-slate-500"
 										>
 											PDF, JPG, GIF up to 10MB
 										</p>
+										<div
+											class="mt-4 flex items-center justify-center space-x-2"
+											v-else
+										>
+											<NuxtLink
+												to="/settings/billing"
+												class="rounded-md border border-indigo-400 bg-indigo-600 px-3 py-1.5 text-xs text-white transition-all hover:bg-indigo-500 hover:shadow-sm"
+											>
+												Upgrade plan
+											</NuxtLink>
+											<a
+												href="https://calendly.com/motis-group/intro"
+												target="_blank"
+												class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-700"
+											>
+												<svg
+													class="mr-1 h-4 w-4"
+													fill="none"
+													viewBox="0 0 24 24"
+												>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M9.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H17.25C18.3546 19.25 19.25 18.3546 19.25 17.25V14.75"
+													></path>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M19.25 9.25V4.75H14.75"
+													></path>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M19 5L11.75 12.25"
+													></path>
+												</svg>
+												Enquire about Enterprise
+											</a>
+										</div>
+
 										{{ fileName }}
 									</div>
 								</div>
