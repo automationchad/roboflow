@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
 					.eq('stripeSubscriptionId', subscription.id);
 			} else if (subscription.pause_collection.resumes_at === null) {
 				const daysLeft =
-					subscription.current_period_end - Math.floor(Date.now() / 1000);
+					subscription.current_period_end * 1000 - Math.floor(Date.now());
 				const { data: Subscription, error: subscriptionError } = await supabase
 					.from('Subscription')
 					.update({
