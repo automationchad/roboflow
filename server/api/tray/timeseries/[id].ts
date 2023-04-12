@@ -56,5 +56,7 @@ export default defineEventHandler(async (event) => {
 		value,
 	}));
 
+	data.pop();
+
 	return data;
 });
