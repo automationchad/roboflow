@@ -10,14 +10,18 @@ export default defineEventHandler(async (event) => {
 	const supabase = serverSupabaseClient(event);
 
 	// Function to handle pausing a subscription
-	async function pauseSubscription(subscription) {
+	async function pauseSubscription(subscription: {
+		current_period_end: number;
+		plan: { nickname: string };
+		id: string;
+	}) {
 		const daysLeft =
 			subscription.current_period_end * 1000 - Math.floor(Date.now());
 
 		const { data, error } = await supabase
 			.from('Subscription')
 			.update({
-				daysLeft,
+				daysLeft: daysLeft,
 				pausedOn: new Date(),
 				status: 'paused',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
@@ -32,7 +36,11 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// Function to handle unpausing a subscription
-	async function unpauseSubscription(subscription) {
+	async function unpauseSubscription(subscription: {
+		pause_collection: { resumes_at: number };
+		plan: { nickname: string };
+		id: string;
+	}) {
 		const { data, error } = await supabase
 			.from('Subscription')
 			.update({
@@ -50,7 +58,16 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// Function to handle updating a subscription
-	async function updateSubscription(subscription) {
+	async function updateSubscription(subscription: {
+		pause_collection: { resumes_at: number } | null;
+		status: string;
+		start_date: number;
+		ended_at: number | null;
+		plan: { nickname: string; amount: any };
+		cancel_at: any;
+		canceled_at: any;
+		id: unknown;
+	}) {
 		const wasPaused =
 			subscription.pause_collection !== null &&
 			subscription.status === 'active';
