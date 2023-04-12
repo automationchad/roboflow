@@ -91,13 +91,6 @@ export default defineEventHandler(async (event) => {
 				.eq('stripeSubscriptionId', subscription.id);
 
 			if (error) throw error;
-
-			if (
-				subscription.pause_collection !== null &&
-				subscription.pause_collection.resumes_at !== null
-			) {
-				await unpauseSubscription(subscription);
-			}
 		}
 	}
 

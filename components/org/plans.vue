@@ -189,7 +189,7 @@
 															>Credits:
 															{{
 																Math.floor(
-																	retainer.days_left / (24 * 3600 * 1000)
+																	retainer.daysLeft / (24 * 3600 * 1000)
 																)
 															}}
 															days</span
@@ -294,7 +294,7 @@
 															@click="
 																handleResume(
 																	retainer.stripeSubscriptionId,
-																	retainer.days_left
+																	retainer.daysLeft
 																)
 															"
 															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 p-0.5 text-slate-200 transition-colors hover:border-slate-600 hover:text-white"
