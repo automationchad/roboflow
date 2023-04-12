@@ -89,7 +89,9 @@ export default defineEventHandler(async (event) => {
 				const { data: Subscription, error: subscriptionError } = await supabase
 					.from('Subscription')
 					.update({
-						resumesAt: new Date(subscription.pause_collection.resumes_at),
+						resumesAt: new Date(
+							subscription.pause_collection.resumes_at * 1000
+						),
 						status: 'active',
 					})
 					.eq('stripeSubscriptionId', subscription.id);

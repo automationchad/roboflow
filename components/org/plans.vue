@@ -456,6 +456,7 @@
 				},
 			}
 		);
+		location.reload();
 		let { data: User, error: userError } = await supabase
 			.from('User')
 			.select(
@@ -464,6 +465,7 @@
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
+
 		retainer.value = User.Account.Subscription.find(
 			(o) => o.type === 'retainer'
 		);
@@ -480,6 +482,7 @@
 				},
 			}
 		);
+		location.reload();
 		let { data: User, error: userError } = await supabase
 			.from('User')
 			.select(
