@@ -425,7 +425,7 @@
 		.single();
 
 	let retainer = {};
-	retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
 
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
@@ -456,11 +456,21 @@
 				},
 			}
 		);
-		return paused;
+		let { data: User, error: userError } = await supabase
+			.from('User')
+			.select(
+				`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
+			)
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+		retainer.value = User.Account.Subscription.find(
+			(o) => o.type === 'retainer'
+		);
 	};
 
 	const handleResume = async (subscriptionId, days_left) => {
-		const { date: paused, error } = await $fetch(
+		const { date: resumed, error } = await $fetch(
 			'/api/stripe/subscription/resume',
 			{
 				method: 'post',
@@ -470,6 +480,16 @@
 				},
 			}
 		);
-		return paused;
+		let { data: User, error: userError } = await supabase
+			.from('User')
+			.select(
+				`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
+			)
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+		retainer.value = User.Account.Subscription.find(
+			(o) => o.type === 'retainer'
+		);
 	};
 </script>
