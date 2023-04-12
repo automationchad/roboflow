@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 		plan: { nickname: string; amount: any };
 		cancel_at: any;
 		canceled_at: any;
-		id: unknown;
+		id: string;
 	}) {
 		const wasPaused =
 			subscription.pause_collection !== null &&
