@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
 		id: string;
 	}) {
 		const wasPaused = subscription.pause_collection !== null;
-		const wasResumed = subscription.pause_collection?.resumes_at !== undefined;
+		const wasResumed = subscription.pause_collection?.resumes_at !== null;
 
 		if (wasPaused) {
 			await pauseSubscription(subscription);
