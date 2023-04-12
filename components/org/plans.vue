@@ -85,11 +85,93 @@
 											</div>
 											<div class="flex w-full items-center self-end">
 												<div
-													class="flex items-center rounded-lg py-1 text-sm text-lime-400"
+													class="flex w-full items-center justify-between rounded-lg py-1 text-sm"
 													v-if="retainer.tier === plan.id"
 												>
-													<CheckCircleIcon class="mr-2 h-5 w-5" />
-													Your selected plan
+													<div class="mr-12 flex items-center">
+														<div
+															class="flex items-center text-lime-400"
+															v-if="retainer.status === 'active'"
+														>
+															<svg
+																class="mr-1 h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M4.75 12C4.75 7.99594 7.99594 4.75 12 4.75V4.75C16.0041 4.75 19.25 7.99594 19.25 12V12C19.25 16.0041 16.0041 19.25 12 19.25V19.25C7.99594 19.25 4.75 16.0041 4.75 12V12Z"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M9.75 12.75L10.1837 13.6744C10.5275 14.407 11.5536 14.4492 11.9564 13.7473L14.25 9.75"
+																></path>
+															</svg>
+															Selected
+														</div>
+														<div
+															class="flex items-center text-yellow-400"
+															v-else
+														>
+															<svg
+																class="mr-1 h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M15.25 6.75V17.25"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M8.75 6.75V17.25"
+																></path>
+															</svg>
+															Paused
+														</div>
+													</div>
+													<div class="flex items-center text-xs text-white">
+														<span class="mr-1.5">10 days</span
+														><button
+															@click="
+																handlePause(retainer.stripeSubscriptionId)
+															"
+															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-600 hover:text-white"
+														>
+															<svg
+																class="h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M15.25 6.75V17.25"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M8.75 6.75V17.25"
+																></path>
+															</svg>
+														</button>
+													</div>
 												</div>
 												<button
 													v-else
@@ -332,5 +414,18 @@
 			},
 		});
 		location.href = url;
+	};
+
+	const handlePause = async (subscriptionId) => {
+		const { date: paused, error } = await $fetch(
+			'/api/stripe/subscription/pause',
+			{
+				method: 'post',
+				body: {
+					subscriptionId,
+				},
+			}
+		);
+		return paused;
 	};
 </script>

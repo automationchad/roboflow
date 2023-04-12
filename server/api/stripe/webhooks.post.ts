@@ -35,12 +35,12 @@ export default defineEventHandler(async (event) => {
 			// Update the days left in the subscription column in Supabase
 			const daysLeft =
 				subscription.current_period_end - Math.floor(Date.now() / 1000);
-			const { data, error } = await supabase
+			const { data: Subscription, error: subscriptionError } = await supabase
 				.from('Subscription')
 				.update({ days_left: daysLeft })
 				.eq('stripeSubscriptionId', subscription.id);
 
-			if (error) throw error;
+			if (subscriptionError) throw subscriptionError;
 			break;
 		case 'customer.subscription.resumed':
 			subscription = stripeEvent.data.object;
@@ -49,28 +49,39 @@ export default defineEventHandler(async (event) => {
 		case 'customer.subscription.updated':
 			subscription = stripeEvent.data.object;
 
-			const { data, error } = await supabase
-				.from('Subscription')
-				.update({
-					startDate: new Date(subscription.start_date * 1000),
-					endDate:
-						subscription.ended_at === null
-							? null
-							: new Date(subscription.ended_at * 1000),
-					deleted: subscription.ended_at !== null,
-					status: subscription.status,
-					deletedAt: subscription.ended_at,
-					type:
-						subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
-					tier:
-						subscription.plan.nickname === 'hosting'
-							? null
-							: subscription.plan.nickname,
-					amount: subscription.plan.amount,
-					cancelledAt: subscription.cancel_at,
-					cancelledOn: subscription.canceled_at,
-				})
-				.eq('stripeSubscriptionId', subscription.id);
+			if (subscription.pause_collection === null) {
+				const { data, error } = await supabase
+					.from('Subscription')
+					.update({
+						startDate: new Date(subscription.start_date * 1000),
+						endDate:
+							subscription.ended_at === null
+								? null
+								: new Date(subscription.ended_at * 1000),
+						deleted: subscription.ended_at !== null,
+						status: subscription.status,
+						deletedAt: subscription.ended_at,
+						type:
+							subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+						tier:
+							subscription.plan.nickname === 'hosting'
+								? null
+								: subscription.plan.nickname,
+						amount: subscription.plan.amount,
+						cancelledAt: subscription.cancel_at,
+						cancelledOn: subscription.canceled_at,
+					})
+					.eq('stripeSubscriptionId', subscription.id);
+			} else {
+				const daysLeft =
+					subscription.current_period_end - Math.floor(Date.now() / 1000);
+				const { data: Subscription, error: subscriptionError } = await supabase
+					.from('Subscription')
+					.update({ days_left: daysLeft, status: 'paused' })
+					.eq('stripeSubscriptionId', subscription.id);
+
+				if (subscriptionError) throw subscriptionError;
+			}
 
 			// Then define and call a function to handle the stripeEvent customer.subscription.updated
 			break;
