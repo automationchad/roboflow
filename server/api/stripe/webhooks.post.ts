@@ -4,101 +4,102 @@ import { serverSupabaseClient } from '#supabase/server';
 
 const stripe = Stripe(process.env.STRIPE_KEY);
 
-// Initialize the Supabase client
-const supabase = serverSupabaseClient(event);
+// Define the event handler function
+export default defineEventHandler(async (event) => {
+	const stripeEvent = await readBody(event);
+	const supabase = serverSupabaseClient(event);
 
-// Function to handle pausing a subscription
-async function pauseSubscription(subscription) {
-	const daysLeft =
-		subscription.current_period_end - Math.floor(Date.now() / 1000);
+	// Function to handle pausing a subscription
+	async function pauseSubscription(subscription) {
+		const daysLeft =
+			subscription.current_period_end - Math.floor(Date.now() / 1000);
 
-	const { data, error } = await supabase
-		.from('Subscription')
-		.update({
-			days_left: daysLeft,
-			paused_on: new Date(),
-			status: 'paused',
-			type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
-			tier:
-				subscription.plan.nickname === 'hosting'
-					? null
-					: subscription.plan.nickname,
-		})
-		.eq('stripeSubscriptionId', subscription.id);
-
-	if (error) throw error;
-}
-
-// Function to handle unpausing a subscription
-async function unpauseSubscription(subscription) {
-	const { data, error } = await supabase
-		.from('Subscription')
-		.update({
-			resumes_at: null,
-			status: 'active',
-			type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
-			tier:
-				subscription.plan.nickname === 'hosting'
-					? null
-					: subscription.plan.nickname,
-		})
-		.eq('stripeSubscriptionId', subscription.id);
-
-	if (error) throw error;
-}
-
-// Function to handle updating a subscription
-async function updateSubscription(subscription) {
-	const wasPaused =
-		subscription.pause_collection !== null && subscription.status === 'active';
-	const wasResumed =
-		subscription.pause_collection === null && subscription.status === 'paused';
-
-	if (wasPaused) {
-		await pauseSubscription(subscription);
-	} else if (wasResumed) {
-		await unpauseSubscription(subscription);
-	} else {
 		const { data, error } = await supabase
 			.from('Subscription')
 			.update({
-				start_date: new Date(subscription.start_date * 1000),
-				end_date:
-					subscription.ended_at === null
-						? null
-						: new Date(subscription.ended_at * 1000),
-				deleted: subscription.ended_at !== null,
-				status: subscription.status,
-				deleted_at: subscription.ended_at,
+				days_left: daysLeft,
+				paused_on: new Date(),
+				status: 'paused',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 				tier:
 					subscription.plan.nickname === 'hosting'
 						? null
 						: subscription.plan.nickname,
-				quantity: subscription.plan.amount,
-				cancelled_at: subscription.cancel_at,
-				cancelled_on: subscription.canceled_at,
-				resumes_at:
-					subscription.pause_collection !== null
-						? new Date(subscription.pause_collection.resumes_at * 1000)
-						: null,
 			})
 			.eq('stripeSubscriptionId', subscription.id);
 
 		if (error) throw error;
+	}
 
-		if (
+	// Function to handle unpausing a subscription
+	async function unpauseSubscription(subscription) {
+		const { data, error } = await supabase
+			.from('Subscription')
+			.update({
+				resumes_at: null,
+				status: 'active',
+				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+				tier:
+					subscription.plan.nickname === 'hosting'
+						? null
+						: subscription.plan.nickname,
+			})
+			.eq('stripeSubscriptionId', subscription.id);
+
+		if (error) throw error;
+	}
+
+	// Function to handle updating a subscription
+	async function updateSubscription(subscription) {
+		const wasPaused =
 			subscription.pause_collection !== null &&
-			subscription.pause_collection.resumes_at !== null
-		) {
+			subscription.status === 'active';
+		const wasResumed =
+			subscription.pause_collection === null &&
+			subscription.status === 'paused';
+
+		if (wasPaused) {
+			await pauseSubscription(subscription);
+		} else if (wasResumed) {
 			await unpauseSubscription(subscription);
+		} else {
+			const { data, error } = await supabase
+				.from('Subscription')
+				.update({
+					start_date: new Date(subscription.start_date * 1000),
+					end_date:
+						subscription.ended_at === null
+							? null
+							: new Date(subscription.ended_at * 1000),
+					deleted: subscription.ended_at !== null,
+					status: subscription.status,
+					deleted_at: subscription.ended_at,
+					type:
+						subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+					tier:
+						subscription.plan.nickname === 'hosting'
+							? null
+							: subscription.plan.nickname,
+					quantity: subscription.plan.amount,
+					cancelled_at: subscription.cancel_at,
+					cancelled_on: subscription.canceled_at,
+					resumes_at:
+						subscription.pause_collection !== null
+							? new Date(subscription.pause_collection.resumes_at * 1000)
+							: null,
+				})
+				.eq('stripeSubscriptionId', subscription.id);
+
+			if (error) throw error;
+
+			if (
+				subscription.pause_collection !== null &&
+				subscription.pause_collection.resumes_at !== null
+			) {
+				await unpauseSubscription(subscription);
+			}
 		}
 	}
-}
-
-// Define the event handler function
-export default defineEventHandler(async (event) => {
-	const stripeEvent = await readBody(event);
 
 	switch (stripeEvent.type) {
 		case 'customer.subscription.created':
