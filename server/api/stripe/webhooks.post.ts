@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 			const daysLeft =
 				subscription.current_period_end - Math.floor(Date.now() / 1000);
 			const { data, error } = await supabase
-				.from('subscriptions')
+				.from('Subscription')
 				.update({ days_left: daysLeft })
 				.eq('stripeSubscriptionId', subscription.id);
 
