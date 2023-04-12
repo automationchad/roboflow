@@ -12,13 +12,13 @@ export default defineEventHandler(async (event) => {
 	// Function to handle pausing a subscription
 	async function pauseSubscription(subscription) {
 		const daysLeft =
-			subscription.current_period_end - Math.floor(Date.now() / 1000);
+			subscription.current_period_end * 1000 - Math.floor(Date.now());
 
 		const { data, error } = await supabase
 			.from('Subscription')
 			.update({
-				days_left: daysLeft,
-				paused_on: new Date(),
+				daysLeft,
+				pausedOn: new Date(),
 				status: 'paused',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 				tier:
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 		const { data, error } = await supabase
 			.from('Subscription')
 			.update({
-				resumes_at: null,
+				resumesAt: new Date(subscription.pause_collection.resumes_at * 1000),
 				status: 'active',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 				tier:
@@ -66,14 +66,14 @@ export default defineEventHandler(async (event) => {
 			const { data, error } = await supabase
 				.from('Subscription')
 				.update({
-					start_date: new Date(subscription.start_date * 1000),
-					end_date:
+					startDate: new Date(subscription.start_date * 1000),
+					endDate:
 						subscription.ended_at === null
 							? null
 							: new Date(subscription.ended_at * 1000),
 					deleted: subscription.ended_at !== null,
 					status: subscription.status,
-					deleted_at: subscription.ended_at,
+					deletedAt: subscription.ended_at,
 					type:
 						subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 					tier:
@@ -81,9 +81,9 @@ export default defineEventHandler(async (event) => {
 							? null
 							: subscription.plan.nickname,
 					quantity: subscription.plan.amount,
-					cancelled_at: subscription.cancel_at,
-					cancelled_on: subscription.canceled_at,
-					resumes_at:
+					cancelledAt: subscription.cancel_at,
+					cancelledOn: subscription.canceled_at,
+					resumesAt:
 						subscription.pause_collection !== null
 							? new Date(subscription.pause_collection.resumes_at * 1000)
 							: null,
