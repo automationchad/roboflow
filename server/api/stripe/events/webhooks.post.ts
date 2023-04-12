@@ -135,4 +135,5 @@ export default defineEventHandler(async (event) => {
 		default:
 			console.log(`Unhandled stripeEvent type ${stripeEvent.type}`);
 	}
+	return `Handled stripeEvent type ${stripeEvent.type}`;
 });
