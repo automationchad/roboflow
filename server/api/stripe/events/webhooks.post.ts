@@ -68,7 +68,9 @@ export default defineEventHandler(async (event) => {
 		canceled_at: any;
 		id: string;
 	}) {
-		const wasPaused = subscription.pause_collection !== null;
+		const wasPaused =
+			subscription.pause_collection.behavior === 'void' &&
+			subscription.pause_collection?.resumes_at === null;
 		const wasResumed = subscription.pause_collection?.resumes_at !== null;
 
 		if (wasPaused) {
