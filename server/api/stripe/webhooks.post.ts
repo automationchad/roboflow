@@ -32,7 +32,15 @@ export default defineEventHandler(async (event) => {
 			break;
 		case 'customer.subscription.paused':
 			subscription = stripeEvent.data.object;
-			// Then define and call a function to handle the stripeEvent customer.subscription.paused
+			// Update the days left in the subscription column in Supabase
+			const daysLeft =
+				subscription.current_period_end - Math.floor(Date.now() / 1000);
+			const { data, error } = await supabase
+				.from('subscriptions')
+				.update({ days_left: daysLeft })
+				.eq('stripeSubscriptionId', subscription.id);
+
+			if (error) throw error;
 			break;
 		case 'customer.subscription.resumed':
 			subscription = stripeEvent.data.object;
