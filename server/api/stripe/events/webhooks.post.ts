@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 			.from('Subscription')
 			.update({
 				resumesAt: new Date(subscription.pause_collection.resumes_at * 1000),
-				status: 'active',
+				status: 'resuming',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 				tier:
 					subscription.plan.nickname === 'hosting'
@@ -68,12 +68,8 @@ export default defineEventHandler(async (event) => {
 		canceled_at: any;
 		id: string;
 	}) {
-		const wasPaused =
-			subscription.pause_collection !== null &&
-			subscription.status === 'active';
-		const wasResumed =
-			subscription.pause_collection === null &&
-			subscription.status === 'paused';
+		const wasPaused = subscription.pause_collection !== null;
+		const wasResumed = subscription.pause_collection === null;
 
 		if (wasPaused) {
 			await pauseSubscription(subscription);
