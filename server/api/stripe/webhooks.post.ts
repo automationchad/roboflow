@@ -72,12 +72,26 @@ export default defineEventHandler(async (event) => {
 						cancelledOn: subscription.canceled_at,
 					})
 					.eq('stripeSubscriptionId', subscription.id);
-			} else {
+			} else if (subscription.pause_collection.resumes_at === null) {
 				const daysLeft =
 					subscription.current_period_end - Math.floor(Date.now() / 1000);
 				const { data: Subscription, error: subscriptionError } = await supabase
 					.from('Subscription')
-					.update({ days_left: daysLeft, status: 'paused' })
+					.update({
+						days_left: daysLeft,
+						pausedOn: new Date(),
+						status: 'paused',
+					})
+					.eq('stripeSubscriptionId', subscription.id);
+
+				if (subscriptionError) throw subscriptionError;
+			} else {
+				const { data: Subscription, error: subscriptionError } = await supabase
+					.from('Subscription')
+					.update({
+						resumesAt: new Date(subscription.pause_collection.resumes_at),
+						status: 'active',
+					})
 					.eq('stripeSubscriptionId', subscription.id);
 
 				if (subscriptionError) throw subscriptionError;

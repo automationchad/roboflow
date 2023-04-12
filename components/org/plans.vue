@@ -143,8 +143,14 @@
 														</div>
 													</div>
 													<div class="flex items-center text-xs text-white">
-														<span class="mr-1.5">10 days</span
-														><button
+														<span class="mr-1.5"
+															>{{
+																Math.floor(retainer.days_left / (24 * 3600))
+															}}
+															days</span
+														>
+														<button
+															v-if="retainer.status === 'active'"
 															@click="
 																handlePause(retainer.stripeSubscriptionId)
 															"
@@ -168,6 +174,30 @@
 																	stroke-linejoin="round"
 																	stroke-width="1.5"
 																	d="M8.75 6.75V17.25"
+																></path>
+															</svg>
+														</button>
+														<button
+															v-else
+															@click="
+																handleResume(
+																	retainer.stripeSubscriptionId,
+																	retainer.days_left
+																)
+															"
+															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 text-slate-200 hover:border-slate-600 hover:text-white"
+														>
+															<svg
+																class="h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M18.25 12L5.75 5.75V18.25L18.25 12Z"
 																></path>
 															</svg>
 														</button>
@@ -423,6 +453,20 @@
 				method: 'post',
 				body: {
 					subscriptionId,
+				},
+			}
+		);
+		return paused;
+	};
+
+	const handleResume = async (subscriptionId, days_left) => {
+		const { date: paused, error } = await $fetch(
+			'/api/stripe/subscription/resume',
+			{
+				method: 'post',
+				body: {
+					subscriptionId,
+					days_left,
 				},
 			}
 		);
