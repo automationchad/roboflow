@@ -50,9 +50,14 @@ export default defineEventHandler(async (event) => {
 			subscription = stripeEvent.data.object;
 
 			if (subscription.pause_collection === null) {
+				const daysLeft =
+					subscription.current_period_end * 1000 - Math.floor(Date.now());
 				const { data, error } = await supabase
 					.from('Subscription')
 					.update({
+						days_left: daysLeft,
+						pausedOn: null,
+						resumesAt: null,
 						startDate: new Date(subscription.start_date * 1000),
 						endDate:
 							subscription.ended_at === null
@@ -80,13 +85,25 @@ export default defineEventHandler(async (event) => {
 					.update({
 						days_left: daysLeft,
 						pausedOn: new Date(),
+						resumesAt: null,
 						status: 'paused',
+						startDate: new Date(subscription.start_date * 1000),
+						endDate:
+							subscription.ended_at === null
+								? null
+								: new Date(subscription.ended_at * 1000),
+						deleted: subscription.ended_at !== null,
+						status: subscription.status,
+						deletedAt: subscription.ended_at,
 						type:
 							subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 						tier:
 							subscription.plan.nickname === 'hosting'
 								? null
 								: subscription.plan.nickname,
+						amount: subscription.plan.amount,
+						cancelledAt: subscription.cancel_at,
+						cancelledOn: subscription.canceled_at,
 					})
 					.eq('stripeSubscriptionId', subscription.id);
 
@@ -99,12 +116,23 @@ export default defineEventHandler(async (event) => {
 							subscription.pause_collection.resumes_at * 1000
 						),
 						status: 'active',
+						startDate: new Date(subscription.start_date * 1000),
+						endDate:
+							subscription.ended_at === null
+								? null
+								: new Date(subscription.ended_at * 1000),
+						deleted: subscription.ended_at !== null,
+						status: subscription.status,
+						deletedAt: subscription.ended_at,
 						type:
 							subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 						tier:
 							subscription.plan.nickname === 'hosting'
 								? null
 								: subscription.plan.nickname,
+						amount: subscription.plan.amount,
+						cancelledAt: subscription.cancel_at,
+						cancelledOn: subscription.canceled_at,
 					})
 					.eq('stripeSubscriptionId', subscription.id);
 
