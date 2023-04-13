@@ -20,12 +20,6 @@
 	const route = useRoute();
 	const supabase = useSupabaseClient();
 	const user = useSupabaseUser();
-	const entitlements = [
-		{ plan: 'free', count: 0 },
-		{ plan: 'basic', count: 5 },
-		{ plan: 'growth', count: 25 },
-		{ plan: 'enterprise', count: 100 },
-	];
 
 	// Pagination refs
 	const buildingPage = ref(0);
@@ -37,6 +31,8 @@
 	const backlog_tickets = ref([]);
 	const done_tickets = ref([]);
 	const loading = ref(true);
+
+	const entitlements = await getEntitlements();
 
 	// Fetch User data
 	let { data: User, error: userError } = await supabase
@@ -94,9 +90,10 @@
 	const totalActive = User.Account.Ticket.filter(
 		(o) => o.status === 'active'
 	).length;
-	const entitlement = entitlements.find((v) => v.plan === retainer.tier);
+
+	const entitlement = entitlements[retainer.tier];
 	upgrade_needed.value =
-		totalActive >= entitlement.count &&
+		totalActive >= entitlement.ticket_count &&
 		retainer.status === 'active' &&
 		User.systemRole !== 'super_admin';
 </script>
@@ -109,10 +106,16 @@
 					<div
 						class="-mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 					>
-						<NuxtLink to="/settings/billing" class="bg-red-100 text-red-700 px-2 text-xs border border-red-200 py-0.5 rounded-full"
-							>Project has exceeded usage limits</NuxtLink
-						>
-						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
+						<div class="flex items-center">
+							<NuxtLink
+								v-if="upgrade_needed"
+								to="/settings/billing"
+								class="rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-xs text-red-700"
+								>Project has exceeded usage limits</NuxtLink
+							>
+						</div>
+
+						<div class="ml-4 space-x-3 text-right">
 							<button
 								:disabled="loading"
 								data-tooltip-target="tooltip-default"
