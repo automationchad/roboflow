@@ -67,8 +67,8 @@
 						>Tickets<LinkIcon class="ml-2 h-4 w-4"
 					/></a>
 				</div>
-				<ticket-list v-if="!upgrade_needed" />
-				<div
+				<ticket-list />
+				<!-- <div
 					v-else
 					class="py-24 text-center text-slate-700 dark:text-slate-300"
 				>
@@ -79,7 +79,7 @@
 						>select a plan</a
 					>
 					to see tickets
-				</div>
+				</div> -->
 			</div>
 
 			<div
