@@ -97,26 +97,6 @@
 																	new Date(new Date().getTime())
 															"
 														>
-															<svg
-																class="mr-1 h-5 w-5"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M4.75 12C4.75 7.99594 7.99594 4.75 12 4.75V4.75C16.0041 4.75 19.25 7.99594 19.25 12V12C19.25 16.0041 16.0041 19.25 12 19.25V19.25C7.99594 19.25 4.75 16.0041 4.75 12V12Z"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M9.75 12.75L10.1837 13.6744C10.5275 14.407 11.5536 14.4492 11.9564 13.7473L14.25 9.75"
-																></path>
-															</svg>
 															Active
 														</div>
 														<div
@@ -127,54 +107,12 @@
 																	new Date(new Date().getTime())
 															"
 														>
-															<svg
-																class="mr-1 h-5 w-5"
-																viewBox="0 0 24 24"
-																fill="none"
-																xmlns="http://www.w3.org/2000/svg"
-															>
-																<path
-																	d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-															</svg>
-
 															Resuming
 														</div>
 														<div
 															class="flex items-center rounded-md border border-yellow-400 bg-yellow-200 px-3 py-0.5 text-yellow-700"
 															v-else
 														>
-															<svg
-																class="mr-1 h-5 w-5"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M15.25 6.75V17.25"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M8.75 6.75V17.25"
-																></path>
-															</svg>
 															Paused
 														</div>
 													</div>
@@ -185,8 +123,26 @@
 																new Date(retainer.resumesAt) >
 																	new Date(new Date().getTime())
 															"
-															class="mr-1.5"
-															>Credits:
+															class="mr-1.5 flex items-center"
+															><svg
+																class="h4 mr-0.5 w-4"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<circle
+																	cx="12"
+																	cy="12"
+																	r="7.25"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																></circle>
+																<path
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	d="M12 8V12L14 14"
+																></path>
+															</svg>
+
 															{{
 																Math.floor(
 																	retainer.daysLeft / (24 * 3600 * 1000)
