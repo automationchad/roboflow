@@ -96,7 +96,7 @@
 			type: 'engineering',
 			title: 'Modify an existing automation',
 			min_plan: 'support',
-			gated: retainer.tier === 'free' && retainer.status === 'paused',
+			gated: retainer.tier === 'free' || retainer.status === 'paused',
 			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
 		},
 		{
@@ -106,7 +106,7 @@
 			min_plan: 'growth',
 			gated:
 				retainer.tier !== 'growth' &&
-				retainer.tier !== 'enterprise' &&
+				retainer.tier !== 'enterprise' ||
 				retainer.status === 'paused',
 			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 		},
