@@ -98,7 +98,7 @@
 	const workspaceId =
 		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
 	async function fetchData() {
-		const data = await $fetch(`/api/tray/timeseries/${workspaceId}`, {
+		const data = await $fetch(`/api/tray/executions/${workspaceId}`, {
 			method: 'get',
 		});
 		return data;

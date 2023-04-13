@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
 		current_period_end: number;
 		plan: { nickname: string };
 		id: string;
+		amount: number;
 	}) {
 		const daysLeft =
 			subscription.current_period_end * 1000 - Math.floor(Date.now());
@@ -25,6 +26,7 @@ export default defineEventHandler(async (event) => {
 				pausedOn: new Date(),
 				status: 'paused',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+				amount: subscription.plan.amount,
 				tier:
 					subscription.plan.nickname === 'hosting'
 						? null
@@ -40,6 +42,7 @@ export default defineEventHandler(async (event) => {
 		pause_collection: { resumes_at: number };
 		plan: { nickname: string };
 		id: string;
+		amount: number;
 	}) {
 		const { data, error } = await supabase
 			.from('Subscription')
@@ -47,6 +50,7 @@ export default defineEventHandler(async (event) => {
 				resumesAt: new Date(subscription.pause_collection.resumes_at * 1000),
 				status: 'active',
 				type: subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
+				amount: subscription.plan.amount,
 				tier:
 					subscription.plan.nickname === 'hosting'
 						? null
@@ -66,10 +70,11 @@ export default defineEventHandler(async (event) => {
 		plan: { nickname: string; amount: any };
 		cancel_at: any;
 		canceled_at: any;
+		amount: number,
 		id: string;
 	}) {
 		const wasPaused =
-			subscription.pause_collection.behavior === 'void' &&
+			subscription.pause_collection?.behavior === 'void' &&
 			subscription.pause_collection?.resumes_at === null;
 		const wasResumed = subscription.pause_collection?.resumes_at !== null;
 
@@ -89,6 +94,7 @@ export default defineEventHandler(async (event) => {
 					deleted: subscription.ended_at !== null,
 					status: subscription.status,
 					deletedAt: subscription.ended_at,
+					amount: subscription.plan.amount,
 					type:
 						subscription.plan.nickname === 'hosting' ? 'hosting' : 'retainer',
 					tier:

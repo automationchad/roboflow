@@ -1,9 +1,144 @@
 <template>
 	<div class="h-full">
 		<warning-access :role="User.systemRole" />
-		<div class="mt-10 space-y-6 lg:px-0">
+		<div class="space-y-6 lg:px-0">
 			<!-- Plan -->
-			<section aria-labelledby="plan-heading">
+			<div class="mx-auto w-full">
+				<div class="container max-w-4xl space-y-8 py-8">
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border dark:border-slate-800 border-slate-100 bg-slate-50 dark:bg-slate-900"
+							>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<div class="flex items-center justify-between px-6 pt-4">
+										<div class="flex flex-col">
+											<p class="text-sm text-slate-500">Current subscription</p>
+											<h3 class="mb-0 text-xl dark:text-slate-100">
+												<span class="capitalize">{{ retainer.tier }}</span> tier
+											</h3>
+										</div>
+										<div class="flex flex-col items-end space-y-2">
+											<button
+												class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+												type="button"
+												@click="
+													handleCheckout(
+														{ id: retainer.id },
+														'retainer',
+														User.Account.stripeCustomerId,
+														User.Account.subscription
+													)
+												"
+											>
+												<span class="truncate">Change subscription</span>
+											</button>
+										</div>
+									</div>
+									<div class="mt-2 px-6 pb-4">
+										<p class="text-sm text-slate-500">
+											See our
+											<a
+												href="https://app.motis.group/#pricing"
+												target="_blank"
+												class="underline"
+												>pricing</a
+											>
+											for a more detailed analysis of what Motis Group has on
+											offer.
+										</p>
+									</div>
+									<div
+										class="dark:border-panel-border-dark relative flex items-center border-t px-6 py-3 text-slate-500 dark:border-slate-800 border-slate-100"
+									>
+										<div class="w-[40%]">
+											<p class="text-scale-900 text-xs uppercase">Item</p>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<p class="text-scale-900 text-xs uppercase">Amount</p>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<p class="text-scale-900 text-xs uppercase">Unit Price</p>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<p class="text-scale-900 text-xs uppercase">Price</p>
+										</div>
+									</div>
+									<div
+										class="dark:border-panel-border-dark relative flex items-center border-t px-6 py-3 dark:border-slate-800 dark:text-slate-200 border-slate-100"
+									>
+										<div class="flex w-[40%] items-center gap-3">
+											<span class="text-sm">Retainer</span>
+											
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{ retainer.quantity }}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{
+												formatAccounting(retainer.amount / 100)
+											}}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{
+												formatAccounting(
+													(retainer.amount / 100) * retainer.quantity
+												)
+											}}</span>
+										</div>
+									</div>
+									<div
+										class="dark:border-panel-border-dark relative flex items-center border-t px-6 py-3 dark:border-slate-800 dark:text-slate-200 border-slate-100"
+									>
+										<div class="flex w-[40%] items-center gap-3">
+											<span class="text-sm">Hosting</span>
+											
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{ retainer.quantity }}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{
+												formatAccounting(retainer.amount / 100)
+											}}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{
+												formatAccounting(
+													(retainer.amount / 100) * retainer.quantity
+												)
+											}}</span>
+										</div>
+									</div>
+									<div
+										class="border-panel-border-light relative flex items-center border-t px-6 py-3 dark:border-slate-800"
+									>
+										<div class="w-[80%]">
+											<p class="text-sm text-slate-500">
+												Estimated cost for
+												{{
+													format(firstDay, 'MMM d, yyyy') +
+													' - ' +
+													format(addDays(firstDay, 30), 'MMM d, yyyy')
+												}}
+												so far
+											</p>
+										</div>
+										<div
+											class="flex w-[20%] items-center justify-end space-x-1"
+										>
+											<p class="text-slate-500">$</p>
+											<h3 class="m-0 text-xl dark:text-slate-200">{{ '' }}</h3>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<org-billing />
+			<section aria-labelledby="plan-heading" v-if="false">
 				<fieldset
 					:disabled="
 						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
@@ -366,7 +501,7 @@
 				</fieldset>
 			</section>
 			<!-- Add Ons -->
-			<section aria-labelledby="plan-heading">
+			<section aria-labelledby="plan-heading" v-if="false">
 				<fieldset
 					:disabled="
 						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
@@ -479,7 +614,7 @@
 		XMarkIcon,
 	} from '@heroicons/vue/24/outline';
 
-	import { format } from 'date-fns';
+	import { format, addDays } from 'date-fns';
 
 	import free from '@/assets/images/plans/free.png';
 	import support from '~/assets/images/plans/support.png';
@@ -561,6 +696,13 @@
 
 	let retainer = {};
 	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+
+	var date = new Date(Date.now());
+	var firstDay = new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		new Date(retainer.value.startDate).getDate()
+	);
 
 	let hosting = {};
 	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');

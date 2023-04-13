@@ -1,6 +1,1240 @@
+<script setup>
+	import { reactive, onMounted, ref } from 'vue';
+	import {
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
+		Menu,
+		MenuButton,
+		MenuItem,
+		MenuItems,
+		RadioGroup,
+		RadioGroupDescription,
+		RadioGroupLabel,
+		RadioGroupOption,
+		Switch,
+		SwitchGroup,
+		SwitchLabel,
+	} from '@headlessui/vue';
+	import {
+		MagnifyingGlassIcon,
+		QuestionMarkCircleIcon,
+		XCircleIcon,
+	} from '@heroicons/vue/20/solid';
+	import {
+		Bars3Icon,
+		BellIcon,
+		ExclamationTriangleIcon,
+		CogIcon,
+		CreditCardIcon,
+		SparklesIcon,
+		KeyIcon,
+		SquaresPlusIcon,
+		UserCircleIcon,
+		XMarkIcon,
+	} from '@heroicons/vue/24/outline';
+
+	import { format, addDays } from 'date-fns';
+
+	const user = useSupabaseUser();
+
+	const supabase = useSupabaseClient();
+
+	const state = reactive({
+		kpis: { 'Task Runs': 0 },
+		workflows: { count: 0, runs: 0 },
+		loading: true,
+	});
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select('*,Account(type,Subscription(*),Ticket(*),User(*))')
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	const super_admin = User.Account.type === 'super_admin';
+
+	const plans = [
+		{
+			name: 'Free',
+			id: 'free',
+			desc: 'Experiment for free',
+			features: ['No requests'],
+
+			priceMonthly: 0,
+			priceYearly: 0,
+			limit: 'No requests',
+		},
+		{
+			name: 'Basic',
+			id: 'basic',
+			desc: 'Great for running lightweight automations',
+			features: [
+				'Up to 2 hours of development',
+				'Unlimited debugging',
+				'48 hours (18/5) response time',
+			],
+
+			priceMonthly: 600,
+			priceYearly: 6000,
+			limit: 'Up to 5 active requests',
+		},
+		{
+			name: 'Growth',
+			id: 'growth',
+			desc: 'We scale as you scale',
+
+			features: [
+				'Up to 20 hours of development',
+				'Unlimited project requests',
+				'QA testing',
+				'Add us to your Slack',
+				'36-hour (18/5) response time',
+			],
+			priceMonthly: 1800,
+			priceYearly: 18000,
+			limit: 'Up to 25 active requests',
+		},
+		{
+			name: 'Enterprise',
+			id: 'enterprise',
+			desc: 'Governance, compliance and support.',
+			features: [
+				'Up to 80 hours of development',
+				'Concurrent requests',
+				'Regular unit & load testing',
+				'Team coaching',
+				'Monthly strategy call',
+				'Process documentation hub',
+				'24-hour (18/7) response time',
+			],
+
+			priceMonthly: 5400,
+			priceYearly: 54000,
+			limit: 'Unlimited active requests',
+		},
+	];
+
+	const entitlements = {
+		free: {
+			ticket_count: 0,
+			concurrent_ticket_count: 0,
+			execution_count: 0,
+			user_count: 2,
+			workflow_count: 0,
+			workflow_runs: 0,
+			document_count: 0,
+			document_size: 0,
+		},
+		basic: {
+			ticket_count: 0,
+			concurrent_ticket_count: 0,
+			execution_count: 0,
+			user_count: 5,
+			workflow_count: 0,
+			workflow_runs: 0,
+			document_count: 0,
+			document_size: 0,
+		},
+		growth: {
+			ticket_count: 15,
+			concurrent_ticket_count: 2,
+			execution_count: 100000,
+			user_count: 10,
+			workflow_count: 100,
+			workflow_runs: 500000,
+			document_count: 0,
+			document_size: 0,
+		},
+		enterprise: {
+			ticket_count: 25,
+			concurrent_ticket_count: 5,
+			execution_count: 10000,
+			user_count: 20,
+			workflow_count: 200,
+			workflow_runs: 5000,
+			document_count: 500,
+			document_size: 50000,
+		},
+	};
+
+	const task_entitlement = super_admin ? 10000 : 100000;
+
+	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+
+	let retainer = {};
+	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+
+	const tiers = 10;
+	const monthly_base = 150;
+
+	var date = new Date(Date.now());
+	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+
+	const monthly_sum = Math.round(
+		User.Account.Subscription.reduce((acc, item) => {
+			return acc + item.amount;
+		}, 0) / 100
+	);
+
+	const trayCost = (tasks) => {
+		if (tasks <= 1000000) return tasks * (2.04 / 1000);
+		if (tasks > 1000000 && tasks <= 3000000)
+			return 1000000 * (2.04 / 1000) + (tasks - 1000000) * (1.8 / 1000);
+		if (tasks > 3000000 && tasks <= 10000000)
+			return (
+				1000000 * (2.04 / 1000) +
+				3000000 * (1.8 / 1000) +
+				(tasks - 3000000) * (1.56 / 1000)
+			);
+		if (tasks > 10000000 && tasks <= 20000000)
+			return (
+				1000000 * (2.04 / 1000) +
+				3000000 * (1.8 / 1000) +
+				10000000 * (1.56 / 1000) +
+				(tasks - 10000000) * (1.2 / 1000)
+			);
+		if (tasks > 20000000 && tasks <= 40000000)
+			return (
+				1000000 * (2.04 / 1000) +
+				3000000 * (1.8 / 1000) +
+				10000000 * (1.56 / 1000) +
+				20000000 * (1.2 / 1000) +
+				(tasks - 20000000) * (0.96 / 1000)
+			);
+		else return tasks * 0.005;
+	};
+
+	const formatNumber = (num) => {
+		let formattedNum = Math.abs(num)
+			.toFixed(2)
+			.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+		return num < 0 ? `($${formattedNum})` : `$${formattedNum}`;
+	};
+
+	const workspaceId =
+		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
+
+	async function fetchData() {
+		const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
+		let workflows = {};
+		workflows.runs = await $fetch(`/api/tray/workflows/runs/${workspaceId}`);
+		workflows.count = kpis['Active Workflows'];
+		const data = { kpis, workflows };
+		return data;
+	}
+
+	const kpis = ref(state.kpis);
+	const workflows = ref(state.workflows);
+	const loading = ref(state.loading);
+
+	onMounted(async () => {
+		const { kpis, workflows } = await fetchData();
+		state.kpis = kpis;
+		state.workflows = workflows;
+		console.log(state.workflows);
+		loading.value = false;
+	});
+</script>
+
 <template>
 	<div class="">
-		<div role="tabpanel">
+		<div class="mx-auto w-full">
+			<div class="container max-w-4xl space-y-8 py-8">
+				<div class="relative">
+					<div class="transition-opacity duration-300">
+						<div v-if="!loading">
+							<div class="mb-10" v-if="true">
+								<div
+									class="border-slate-600 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 block w-full rounded border py-3"
+								>
+									<div class="flex flex-col px-4">
+										<div class="flex items-center justify-between">
+											<div class="flex w-full space-x-3 lg:items-start">
+												<span class="text-slate-900 dark:text-white"
+													><svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="21"
+														height="21"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="8" x2="12" y2="12"></line>
+														<line
+															x1="12"
+															y1="16"
+															x2="12.01"
+															y2="16"
+														></line></svg
+												></span>
+												<div class="flex-grow">
+													<h5 class="text-slate-900 dark:text-white text-sm">
+														You are exceeding your plans quota
+													</h5>
+												</div>
+											</div>
+										</div>
+										<div
+											class="mt-3 flex flex-col space-y-3 overflow-hidden transition-all"
+											style="max-height: 500px"
+										>
+											<div class="text-sm text-slate-500 dark:text-slate-400">
+												<div class="p-1">
+													<div>
+														<p>
+															Your project is currently on the
+															{{ retainer.tier }} tier - upgrade to the Pro tier
+															for a greatly increased quota and continue to
+															scale.
+														</p>
+														<p class="mb-4">
+															See
+															<a
+																class="text-indigo-800"
+																href="https://app.motis.group/#pricing"
+																>pricing page</a
+															>
+															for a full breakdown of available plans.
+														</p>
+														<button
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															type="button"
+														>
+															<span class="truncate">Upgrade</span>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Database -->
+							<div
+								
+								class="border-slate-200 dark:border-slate-800 dark:bg-slate-900 mb-8 overflow-hidden rounded border dark:text-white"
+							>
+								<table
+									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
+								>
+									<thead
+										class="bg-panel-header-light dark:bg-panel-header-dark"
+									>
+										<tr class="overflow-hidden rounded">
+											<th class="w-1/4 px-6 py-3 text-left">
+												<div class="flex items-center space-x-4">
+													<div
+														class="dark:bg-slate-800 flex h-8 w-8 items-center justify-center rounded"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="24"
+															height="24"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M8.25 5.75h-2.5a1 1 0 0 0-1 1v5.5m10.07-3.533c-1.786-1.074-.573-3.263-.573-3.263l-.946-.568a.95.95 0 0 0-1.325.37L6.88 14.448a1.034 1.034 0 0 0 .355 1.381l5.464 3.285a.95.95 0 0 0 1.325-.37l5.096-9.192a1.034 1.034 0 0 0-.355-1.381l-.946-.569s-1.213 2.19-3 1.115Z"
+															></path>
+														</svg>
+													</div>
+													<h5 class="mb-0">Requests</h5>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Active Tickets<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(User.Account.Ticket.filter(
+															(o) => o.status !== 'done'
+														).length /
+															entitlements[retainer.tier].ticket_count) *
+															100
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{
+																User.Account.Ticket.filter(
+																	(o) => o.status !== 'done'
+																).length
+															}}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{ entitlements[retainer.tier].ticket_count }}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																User.Account.Ticket.filter(
+																	(o) => o.status !== 'done'
+																).length /
+																	entitlements[retainer.tier].ticket_count <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(User.Account.Ticket.filter(
+																	(o) => o.status !== 'done'
+																).length /
+																	entitlements[retainer.tier].ticket_count) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Concurrent Tickets<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(User.Account.Ticket.filter(
+															(o) => o.status === 'active'
+														).length /
+															entitlements[retainer.tier]
+																.concurrent_ticket_count) *
+															100
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{
+																User.Account.Ticket.filter(
+																	(o) => o.status === 'active'
+																).length
+															}}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{
+																entitlements[retainer.tier]
+																	.concurrent_ticket_count
+															}}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																User.Account.Ticket.filter(
+																	(o) => o.status === 'active'
+																).length /
+																	entitlements[retainer.tier]
+																		.concurrent_ticket_count <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(User.Account.Ticket.filter(
+																	(o) => o.status === 'active'
+																).length /
+																	entitlements[retainer.tier]
+																		.concurrent_ticket_count) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<div
+								v-if="true"
+								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+							>
+								<table
+									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
+								>
+									<thead
+										class="bg-panel-header-light dark:bg-panel-header-dark"
+									>
+										<tr class="overflow-hidden rounded">
+											<th class="w-1/4 px-6 py-3 text-left">
+												<div class="flex items-center space-x-4">
+													<div
+														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="16"
+															height="16"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															class="sbui-icon dark:text-scale-100"
+														>
+															<path
+																d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
+															></path>
+														</svg>
+													</div>
+													<h5 class="mb-0">Auth</h5>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Monthly Active Users<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(User.Account.User.length /
+															entitlements[retainer.tier].user_count) *
+															100
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{ User.Account.User.length.toLocaleString() }}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{
+																entitlements[
+																	retainer.tier
+																].user_count.toLocaleString()
+															}}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																User.Account.User.length /
+																	entitlements[retainer.tier].user_count <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(User.Account.User.length /
+																	entitlements[retainer.tier].user_count) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<div
+								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+							>
+								<table
+									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
+								>
+									<thead
+										class="bg-panel-header-light dark:bg-panel-header-dark"
+									>
+										<tr class="overflow-hidden rounded">
+											<th class="w-1/4 px-6 py-3 text-left">
+												<div
+													class="flex items-center justify-between space-x-4"
+												>
+													<div class="flex items-center space-x-4">
+														<div
+															class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+														>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																width="16"
+																height="16"
+																viewBox="0 0 24 24"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="2"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																class="sbui-icon dark:text-scale-100"
+															>
+																<polyline points="16 18 22 12 16 6"></polyline>
+																<polyline points="8 6 2 12 8 18"></polyline>
+															</svg>
+														</div>
+														<h5 class="mb-0">Workflows</h5>
+													</div>
+													<div class="" v-if="!hosting">
+														<button
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															type="button"
+														>
+															<span class="truncate">Upgrade</span>
+														</button>
+													</div>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Workflow Count<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(state.workflows.count /
+															entitlements[retainer.tier].workflow_count) *
+															100
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{ state.workflows.count.toLocaleString() }}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{
+																entitlements[
+																	retainer.tier
+																].workflow_count.toLocaleString()
+															}}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																state.workflows.count /
+																	entitlements[retainer.tier].workflow_count <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(state.workflows.count /
+																	entitlements[retainer.tier].workflow_count) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Function Invocations<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(state.workflows.runs.count /
+															entitlements[retainer.tier].workflow_runs) *
+															100
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{ state.workflows.runs.count.toLocaleString() }}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{
+																entitlements[
+																	retainer.tier
+																].workflow_runs.toLocaleString()
+															}}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																state.workflows.runs.count /
+																	entitlements[retainer.tier].workflow_runs <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(state.workflows.runs.count /
+																	entitlements[retainer.tier].workflow_runs) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div
+								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+							>
+								<table
+									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
+								>
+									<thead
+										class="bg-panel-header-light dark:bg-panel-header-dark"
+									>
+										<tr class="overflow-hidden rounded">
+											<th class="w-1/4 px-6 py-3 text-left">
+												<div class="flex items-center space-x-4">
+													<div
+														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="16"
+															height="16"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															class="sbui-icon dark:text-scale-100"
+														>
+															<polygon
+																points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+															></polygon>
+														</svg>
+													</div>
+													<h5 class="mb-0">Tasks</h5>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Executions<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												{{
+													formatAccounting(
+														(state.kpis['Task Runs'] /
+															entitlements[retainer.tier].execution_count) *
+															100,
+														false
+													)
+												}}
+												%
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															{{ state.kpis['Task Runs'].toLocaleString() }}
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															{{
+																entitlements[
+																	retainer.tier
+																].execution_count.toLocaleString()
+															}}
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															:class="[
+																state.kpis['Task Runs'] /
+																	entitlements[retainer.tier].execution_count <
+																1
+																	? 'bg-lime-500'
+																	: 'bg-rose-700',
+																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+															]"
+															:style="`width: ${
+																(state.kpis['Task Runs'] /
+																	entitlements[retainer.tier].execution_count) *
+																100
+															}%`"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr
+											v-if="false"
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Realtime Concurrent Peak Connections<button
+													data-state="closed"
+												>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												0.00 %
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															0
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															200
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															class="bg-brand-900 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+															style="width: 0%"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div
+								v-if="false"
+								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border"
+							>
+								<table
+									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
+								>
+									<thead
+										class="bg-panel-header-light dark:bg-panel-header-dark"
+									>
+										<tr class="overflow-hidden rounded">
+											<th class="w-1/4 px-6 py-3 text-left">
+												<div class="flex items-center space-x-4">
+													<div
+														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="16"
+															height="16"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															class="sbui-icon dark:text-scale-100"
+														>
+															<polyline points="21 8 21 21 3 21 3 8"></polyline>
+															<rect x="1" y="3" width="22" height="5"></rect>
+															<line x1="10" y1="12" x2="14" y2="12"></line>
+														</svg>
+													</div>
+													<h5 class="mb-0">Storage</h5>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Storage space<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												7.64 %
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															78.21 MB
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															1 GB
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															class="bg-brand-900 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+															style="width: 7.63735%"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Storage egress<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												212.95 %
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex w-full flex-col">
+													<div
+														class="flex justify-between space-x-8 pb-1 align-baseline"
+													>
+														<p
+															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
+														>
+															4.26 GB
+														</p>
+														<p class="text-scale-1100 text-sm tabular-nums">
+															2 GB
+														</p>
+													</div>
+													<div
+														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+													>
+														<div
+															class="absolute inset-x-0 bottom-0 h-1 rounded bg-red-900 transition-all"
+															style="width: 212.945%"
+														></div>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr
+											class="border-slate-200 dark:border-slate-800 border-t"
+										>
+											<td
+												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
+											>
+												Storage Images Transformed<button data-state="closed">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon ml-2"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="16" x2="12" y2="12"></line>
+														<line x1="12" y1="8" x2="12.01" y2="8"></line>
+													</svg>
+												</button>
+											</td>
+											<td
+												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+											>
+												-
+											</td>
+											<td class="text-scale-1200 px-6 py-3 text-sm">
+												<div class="flex items-center justify-between">
+													<span>Not included in Free tier</span
+													><button
+														class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+														type="button"
+													>
+														<span class="truncate">Upgrade to Pro</span>
+													</button>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div v-else><loading-spinner /></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div role="tabpanel" v-if="false">
 			<div class="mt-8" v-if="!loading">
 				<div class="block">
 					<div class="">
@@ -117,14 +1351,10 @@
 										<div class="sc-hiMGwR dkaYIm">
 											<progress
 												id="file"
-												:value="
-													((kpis['Task Runs']) / task_entitlement) * 100
-												"
+												:value="(kpis['Task Runs'] / task_entitlement) * 100"
 												max="100"
 											>
-												{{
-													((kpis['Task Runs']) / task_entitlement) * 100
-												}}%
+												{{ (kpis['Task Runs'] / task_entitlement) * 100 }}%
 											</progress>
 										</div>
 									</div>
@@ -242,130 +1472,3 @@
 		}
 	}
 </style>
-
-<script setup>
-	import { reactive, onMounted, ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		ExclamationTriangleIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
-
-	import { format, addDays } from 'date-fns';
-
-	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
-	const state = reactive({
-		data: [],
-		loading: true,
-	});
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select('*,Account(type,Subscription(*))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	const super_admin = User.Account.type === 'super_admin';
-
-	const task_entitlement = super_admin ? 100000 : 100000;
-
-	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-
-	const tiers = 10;
-	const monthly_base = 150;
-
-	var date = new Date(Date.now());
-	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-
-	const monthly_sum = Math.round(
-		User.Account.Subscription.reduce((acc, item) => {
-			return acc + item.amount;
-		}, 0) / 100
-	);
-
-	const trayCost = (tasks) => {
-		if (tasks <= 1000000) return tasks * (2.04 / 1000);
-		if (tasks > 1000000 && tasks <= 3000000)
-			return 1000000 * (2.04 / 1000) + (tasks - 1000000) * (1.8 / 1000);
-		if (tasks > 3000000 && tasks <= 10000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				(tasks - 3000000) * (1.56 / 1000)
-			);
-		if (tasks > 10000000 && tasks <= 20000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				10000000 * (1.56 / 1000) +
-				(tasks - 10000000) * (1.2 / 1000)
-			);
-		if (tasks > 20000000 && tasks <= 40000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				10000000 * (1.56 / 1000) +
-				20000000 * (1.2 / 1000) +
-				(tasks - 20000000) * (0.96 / 1000)
-			);
-		else return tasks * 0.005;
-	};
-
-	const formatNumber = (num) => {
-		let formattedNum = Math.abs(num)
-			.toFixed(2)
-			.replace(/\d(?=(\d{3})+\.)/g, '$&,');
-		return num < 0 ? `($${formattedNum})` : `$${formattedNum}`;
-	};
-
-	const workspaceId =
-		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
-
-	async function fetchData() {
-		const data = hosting ? await $fetch(`/api/tray/kpis/${workspaceId}`) : {};
-		return data;
-	}
-
-	const kpis = ref(state.data);
-	const loading = ref(state.loading);
-
-	onMounted(async () => {
-		kpis.value = await fetchData();
-		loading.value = false;
-	});
-
-	const total_time_min = (kpis['Task Runs'] * 0.7) / 60;
-	const total_time_hrs = (kpis['Task Runs'] * 0.7) / 3600;
-</script>

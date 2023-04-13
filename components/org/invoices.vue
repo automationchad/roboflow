@@ -43,7 +43,7 @@
 													scope="col"
 													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
-													URL
+													
 												</th>
 												<!--
                               `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
@@ -171,7 +171,7 @@
 																	stroke-linejoin="round"
 																></path>
 															</svg>
-															
+
 															{{
 																formatDistance(
 																	invoice.due_date * 1000,
@@ -206,39 +206,41 @@
 												<td
 													class="whitespace-nowrap px-6 py-2 text-sm font-medium"
 												>
-													<a
-														:href="invoice.hosted_invoice_url"
-														target="_blank"
-														class="flex items-center text-indigo-600 hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-200"
-														>{{
-															invoice.status === 'paid' ? 'Receipt' : 'Payment'
-														}}<svg
-															class="ml-1 h-4 w-4"
-															fill="none"
-															viewBox="0 0 24 24"
+													<a v-if="invoice.invoice_pdf"
+														:href="invoice.invoice_pdf"
+														download
+														class="flex items-center text-indigo-600 hover:text-indigo-900 dark:text-indigo-100 dark:hover:text-indigo-50"
+														><div
+															class="rounded border border-indigo-500 bg-indigo-600"
 														>
-															<path
-																stroke="currentColor"
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M9.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H17.25C18.3546 19.25 19.25 18.3546 19.25 17.25V14.75"
-															></path>
-															<path
-																stroke="currentColor"
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M19.25 9.25V4.75H14.75"
-															></path>
-															<path
-																stroke="currentColor"
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M19 5L11.75 12.25"
-															></path>
-														</svg>
+															<svg
+																class="h-5 w-5"
+																fill="none"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M4.75 14.75V16.25C4.75 17.9069 6.09315 19.25 7.75 19.25H16.25C17.9069 19.25 19.25 17.9069 19.25 16.25V14.75"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M12 14.25L12 4.75"
+																></path>
+																<path
+																	stroke="currentColor"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="1.5"
+																	d="M8.75 10.75L12 14.25L15.25 10.75"
+																></path>
+															</svg>
+														</div>
 													</a>
 												</td>
 											</tr>

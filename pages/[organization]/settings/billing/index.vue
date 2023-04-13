@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<Head>
-            <Title>Motis Group | Plan & Billing</Title>
-         </Head>
+			<Title>Motis Group | Plan & Billing</Title>
+		</Head>
 		<div>
 			<!-- Your content -->
 			<div>
@@ -11,7 +11,7 @@
 						<div class="mx-auto flex flex-col lg:max-w-7xl">
 							<main class="max-w-7xl flex-1">
 								<div class="relative mx-auto">
-									<div class="pt-10 pb-16">
+									<div class="pb-16 pt-10">
 										<div class="px-4 sm:px-6 lg:px-0">
 											<p class="text-xs text-white">
 												{{ User.Account.name }}
@@ -60,7 +60,7 @@
 																		selected
 																			? 'border-indigo-500'
 																			: 'border-transparent',
-																		'cursor-pointer whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
+																		'cursor-pointer whitespace-nowrap border-b px-1 py-4 text-sm font-normal text-gray-500 outline-none dark:text-white',
 																	]"
 																	>{{ tab.name }}</a
 																></Tab
@@ -70,9 +70,9 @@
 												</TabList>
 												<TabPanels>
 													<TabPanel><org-plans /></TabPanel>
-													<TabPanel><org-billing /></TabPanel>
-													<TabPanel><org-invoices /></TabPanel>
 													<TabPanel><org-costs /></TabPanel>
+
+													<TabPanel><org-invoices /></TabPanel>
 												</TabPanels>
 
 												<!-- Description list with inline editing -->
@@ -140,23 +140,19 @@
 
 	const tabs = [
 		{
-			name: 'Plans',
+			name: 'Subscription',
 			href: `/${User.accountId}/settings/billing`,
 			current: true,
 		},
 		{
-			name: 'Billing info',
-			href: `/${User.accountId}/settings/billing/billing-info`,
+			name: 'Usage',
+			href: `/${User.accountId}/settings/billing/cost-management`,
 			current: false,
 		},
+
 		{
 			name: 'Invoices',
 			href: `/${User.accountId}/settings/billing/invoices`,
-			current: false,
-		},
-		{
-			name: 'Cost management',
-			href: `/${User.accountId}/settings/billing/cost-management`,
 			current: false,
 		},
 	];

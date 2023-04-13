@@ -107,8 +107,11 @@
 			<div class="mx-auto grid max-w-7xl">
 				<div class="mb-8 border-b border-gray-200 py-5 dark:border-gray-800">
 					<div
-						class="-mt-2 flex flex-wrap items-center justify-end sm:flex-nowrap"
+						class="-mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap"
 					>
+						<NuxtLink to="/settings/billing" class="bg-red-100 text-red-700 px-2 text-xs border border-red-200 py-0.5 rounded-full"
+							>Project has exceeded usage limits</NuxtLink
+						>
 						<div class="ml-4 mt-2 flex-shrink-0 space-x-3">
 							<button
 								:disabled="loading"
@@ -180,7 +183,12 @@
 										stroke-linejoin="round"
 									></path>
 								</svg>
-								<svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" v-else>
+								<svg
+									class="mr-2 h-5 w-5"
+									fill="none"
+									viewBox="0 0 24 24"
+									v-else
+								>
 									<path
 										stroke="currentColor"
 										stroke-linecap="round"

@@ -150,7 +150,7 @@
 
 	async function fetchData() {
 		const { elements: data } = await $fetch(
-			`/api/tray/workflows/${workspaceId}`
+			`/api/tray/workflows/list/${workspaceId}`
 		);
 		return data;
 	}

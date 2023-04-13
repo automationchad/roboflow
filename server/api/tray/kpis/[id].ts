@@ -41,5 +41,14 @@ export default defineEventHandler(async (event) => {
 		return obj;
 	}, {});
 
-	return data;
+	if (!data) {
+		return {
+			'Active Workflows': 0,
+			'Data Volume': 0,
+			'End Users': 0,
+			'Solution Instances': 0,
+			Solutions: 0,
+			'Task Runs': 0,
+		};
+	} else return data;
 });
