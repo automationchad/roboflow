@@ -81,13 +81,7 @@
 															class="h-4 w-4 shrink-0"
 															aria-hidden="true"
 														/>
-														{{ item.name
-														}}<span
-															v-if="item.count"
-															class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
-															aria-hidden="true"
-															>{{ abbreviatedNumber(item.count) }}</span
-														>
+														{{ item.name }}
 													</a>
 												</li>
 											</ul>
@@ -148,19 +142,32 @@
 			<div
 				class="flex grow flex-col overflow-y-auto bg-gray-50 px-6 pb-4 dark:bg-gray-900"
 			>
-				<div class="flex shrink-0 items-center justify-center py-4">
-					<img
-						class="mr-1 h-4 w-auto"
-						src="~/assets/images/logo.png"
-						alt="Your Company"
-					/>
-					<p class="text-xs text-slate-400">Motis Group</p>
+				<div
+					class="-mx-2 flex shrink-0 flex-col items-center justify-center space-y-3 pt-4"
+				>
+					<div class="flex items-center">
+						<img
+							class="mr-1 h-4 w-auto"
+							src="~/assets/images/logo.png"
+							alt="Your Company"
+						/>
+						<p class="text-xs text-slate-400">Motis Group</p>
+					</div>
+
+					<div class="flex h-6 w-full items-start mt-4">
+						<NuxtLink
+							v-if="upgrade_needed"
+							to="/settings/billing#usage"
+							class="rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-xs font-normal text-red-700"
+							>Account has exceeded usage limits</NuxtLink
+						>
+					</div>
 				</div>
 				<nav class="flex flex-1 flex-col">
 					<ul role="list" class="flex flex-1 flex-col gap-y-7">
 						<a
 							:class="[
-								'group -mx-6 flex items-center justify-between px-4 py-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
+								'group -mx-6 flex flex-col items-start justify-between space-y-2 px-4 py-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
 							]"
 						>
 							<div :class="['flex gap-x-3']">
@@ -179,14 +186,8 @@
 									}}</span>
 								</div>
 							</div>
-							<div class="flex items-center">
-								<span
-									v-if="item?.gated"
-									class="ml-auto w-9 min-w-max whitespace-nowrap"
-									><LockClosedIcon class="h-5 w-5 text-gray-200"
-								/></span>
-							</div>
 						</a>
+
 						<li>
 							<ul role="list" class="-mx-2 space-y-1">
 								<li v-for="item in navigation" :key="item.name">
@@ -209,17 +210,7 @@
 											]"
 											aria-hidden="true"
 										/>
-										{{ item.name
-										}}<span
-											v-if="item.count"
-											class="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-800 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
-											aria-hidden="true"
-											>{{ abbreviatedNumber(item.count) }}</span
-										><span
-											v-if="item?.gated"
-											class="ml-auto w-9 min-w-max whitespace-nowrap"
-											><LockClosedIcon class="h-5 w-5 text-gray-200"
-										/></span>
+										{{ item.name }}
 									</NuxtLink>
 								</li>
 							</ul>
@@ -382,9 +373,7 @@
 					id,
 					name
 				 ),
-				 Ticket (
-					count
-				 )
+				 Ticket (count)
 			   )
 			 `
 		)
@@ -393,11 +382,20 @@
 		.single();
 
 	const teams = ref([]);
+	const entitlements = await getEntitlements();
 
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-	const upgrade_needed =
-		retainer.tier !== 'enterprise' ||
-		(retainer.status !== 'active' && User.systemRole !== 'super_admin');
+
+	const entitlement = entitlements[retainer.tier];
+
+	const totalActive = User.Account.Ticket.filter(
+		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
+	).length;
+	const upgrade_needed = ref(false);
+	upgrade_needed.value =
+		totalActive > entitlement.ticket_count &&
+		// retainer.status === 'active' &&
+		User.systemRole !== 'super_admin';
 
 	function moveOrgToFront(arr) {
 		const orgIndex =
@@ -414,13 +412,13 @@
 	onMounted(async () => {
 		let { data: Account, error: accountError } = await supabase
 			.from('Account')
-			.select('*,Ticket(status)');
+			.select('*,Ticket(status,type)');
 		if (User.Account.type === 'super_admin') {
 			teams.value = Account;
 		} else {
 			teams.value = User.Account.Team;
-			const index = teams.indexOf((o) => User.defaultTeamId === o.id);
-			const item = teams.splice(index, 1)[0];
+			const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
+			const item = teams.value.splice(index, 1)[0];
 			teams.value.unshift(item);
 		}
 		teams.value = moveOrgToFront(teams.value);

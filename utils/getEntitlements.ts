@@ -3,7 +3,7 @@ export default function () {
 		free: {
 			name: 'Free',
 			ticket_types: ['asap', 'scheduled', 'sales_inquiry', 'billing', 'abuse'],
-			ticket_count: 100,
+			ticket_count: 0,
 			concurrent_ticket_count: 0,
 			execution_count: 0,
 			user_count: 1,

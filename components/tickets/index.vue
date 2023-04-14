@@ -87,14 +87,16 @@
 
 	// Calculate the current user's entitlement and update `upgrade_needed`
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status === 'active'
-	).length;
 
 	const entitlement = entitlements[retainer.tier];
+
+	const totalActive = User.Account.Ticket.filter(
+		(o) => o.status === 'active' && entitlement.ticket_types.includes(o.type)
+	).length;
+
 	upgrade_needed.value =
-		totalActive >= entitlement.ticket_count &&
-		retainer.status === 'active' &&
+		totalActive > entitlement.ticket_count &&
+		// retainer.status === 'active' &&
 		User.systemRole !== 'super_admin';
 </script>
 
