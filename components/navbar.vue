@@ -154,7 +154,7 @@
 						<p class="text-xs text-slate-400">Motis Group</p>
 					</div>
 
-					<div class="flex h-6 w-full items-start mt-4">
+					<div class="flex h-6 w-full items-center justify-center mt-4">
 						<NuxtLink
 							v-if="upgrade_needed"
 							to="/settings/billing#usage"
