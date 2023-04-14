@@ -8,7 +8,7 @@
 					<div class="relative">
 						<div class="transition-opacity duration-300">
 							<div
-								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-200  dark:border-slate-800 dark:bg-slate-900"
+								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-200 dark:border-slate-800 dark:bg-slate-900"
 							>
 								<div class="bg-panel-body-light dark:bg-panel-body-dark">
 									<div class="flex items-center justify-between px-6 pt-4">
@@ -31,11 +31,10 @@
 									<div class="mt-2 px-6 pb-4">
 										<p class="text-sm text-slate-500">
 											See our
-											<a
-												href="https://app.motis.group/#pricing"
-												target="_blank"
+											<NuxtLink
+												href="/settings/billing/update"
 												class="underline"
-												>pricing</a
+												>pricing</NuxtLink
 											>
 											for a more detailed analysis of what Motis Group has on
 											offer.
