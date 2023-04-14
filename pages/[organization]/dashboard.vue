@@ -51,10 +51,10 @@
 					class="py-24 text-center text-slate-700 dark:text-slate-300"
 				>
 					You'll need to
-					<a
-						:href="`/${User.Account.id}/settings/billing`"
+					<NuxtLink
+						:to="`/${User.Account.id}/settings/billing/update`"
 						class="font-semibold text-indigo-500"
-						>upgrade your hosting</a
+						>upgrade your hosting</NuxtLink
 					>
 					to see tasks
 				</div>
@@ -94,10 +94,10 @@
 					class="py-24 text-center text-slate-700 dark:text-slate-300"
 				>
 					You'll need to
-					<a
-						:href="`/${User.Account.id}/settings/billing`"
+					<NuxtLink
+						:to="`/${User.Account.id}/settings/billing/update`"
 						class="font-semibold text-indigo-500"
-						>upgrade your hosting</a
+						>upgrade your hosting</NuxtLink
 					>
 					to see workflows
 				</div>

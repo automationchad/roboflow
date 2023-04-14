@@ -456,19 +456,19 @@
 			name: 'Dashboard',
 			href: `/${User.Account.id}/dashboard`,
 			icon: ChartBarIcon,
-			current: route.path === `/${User.Account.id}/dashboard`,
+			current: route.path.includes`/${User.Account.id}/dashboard`,
 		},
 		{
 			name: 'Plan & Billing',
-			href: `/${User.Account.id}/settings/billing#subscription`,
+			href: `/${User.Account.id}/settings/billing`,
 			icon: CreditCardIcon,
-			current: route.path === `/${User.Account.id}/settings/billing`,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
 		},
 		{
 			name: 'Settings & Members',
 			href: `/${User.Account.id}/settings`,
 			icon: Cog8ToothIcon,
-			current: route.path === `/${User.Account.id}/settings`,
+			current: route.path.includes(`/${User.Account.id}/settings`),
 		},
 	];
 
