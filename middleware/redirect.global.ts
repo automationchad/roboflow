@@ -22,6 +22,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 			return navigateTo(`/${org_id}/dashboard`);
 		} else if (to.path === '/settings/billing') {
 			return navigateTo(`/${org_id}/settings/billing`);
+		} else if (to.path === '/settings/billing/update') {
+			return navigateTo(`/${org_id}/settings/billing/update`);
 		} else if (to.path === '/tickets') {
 			return navigateTo(`/${team_id}/tickets`);
 		}

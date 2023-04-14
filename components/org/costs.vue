@@ -1,160 +1,160 @@
 <script setup>
-	import { reactive, onMounted, ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		ExclamationTriangleIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
+import { reactive, onMounted, ref } from 'vue';
+import {
+	Disclosure,
+	DisclosureButton,
+	DisclosurePanel,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuItems,
+	RadioGroup,
+	RadioGroupDescription,
+	RadioGroupLabel,
+	RadioGroupOption,
+	Switch,
+	SwitchGroup,
+	SwitchLabel,
+} from '@headlessui/vue';
+import {
+	MagnifyingGlassIcon,
+	QuestionMarkCircleIcon,
+	XCircleIcon,
+} from '@heroicons/vue/20/solid';
+import {
+	Bars3Icon,
+	BellIcon,
+	ExclamationTriangleIcon,
+	CogIcon,
+	CreditCardIcon,
+	SparklesIcon,
+	KeyIcon,
+	SquaresPlusIcon,
+	UserCircleIcon,
+	XMarkIcon,
+} from '@heroicons/vue/24/outline';
 
-	import { format, addDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
-	const user = useSupabaseUser();
+const user = useSupabaseUser();
 
-	const supabase = useSupabaseClient();
+const supabase = useSupabaseClient();
 
-	const state = reactive({
-		kpis: { 'Task Runs': 0 },
-		workflows: { count: 0, runs: 0 },
-		loading: true,
-	});
+const state = reactive({
+	kpis: { 'Task Runs': 0 },
+	workflows: { count: 0, runs: 0 },
+	loading: true,
+});
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select('*,Account(type,Subscription(*),Ticket(*),User(*))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+let { data: User, error: userError } = await supabase
+	.from('User')
+	.select('*,Account(type,Subscription(*),Ticket(*),User(*))')
+	.eq('id', user.value.id)
+	.limit(1)
+	.single();
 
-	const super_admin = User.Account.type === 'super_admin';
+const super_admin = User.Account.type === 'super_admin';
 
-	const plans = [
-		{
-			name: 'Free',
-			id: 'free',
-			desc: 'Experiment for free',
-			features: ['No requests'],
+const plans = [
+	{
+		name: 'Free',
+		id: 'free',
+		desc: 'Experiment for free',
+		features: ['No requests'],
 
-			priceMonthly: 0,
-			priceYearly: 0,
-			limit: 'No requests',
-		},
-		{
-			name: 'Basic',
-			id: 'basic',
-			desc: 'Great for running lightweight automations',
-			features: [
-				'Up to 2 hours of development',
-				'Unlimited debugging',
-				'48 hours (18/5) response time',
-			],
+		priceMonthly: 0,
+		priceYearly: 0,
+		limit: 'No requests',
+	},
+	{
+		name: 'Basic',
+		id: 'basic',
+		desc: 'Great for running lightweight automations',
+		features: [
+			'Up to 2 hours of development',
+			'Unlimited debugging',
+			'48 hours (18/5) response time',
+		],
 
-			priceMonthly: 600,
-			priceYearly: 6000,
-			limit: 'Up to 5 active requests',
-		},
-		{
-			name: 'Growth',
-			id: 'growth',
-			desc: 'We scale as you scale',
+		priceMonthly: 600,
+		priceYearly: 6000,
+		limit: 'Up to 5 active requests',
+	},
+	{
+		name: 'Growth',
+		id: 'growth',
+		desc: 'We scale as you scale',
 
-			features: [
-				'Up to 20 hours of development',
-				'Unlimited project requests',
-				'QA testing',
-				'Add us to your Slack',
-				'36-hour (18/5) response time',
-			],
-			priceMonthly: 1800,
-			priceYearly: 18000,
-			limit: 'Up to 25 active requests',
-		},
-		{
-			name: 'Enterprise',
-			id: 'enterprise',
-			desc: 'Governance, compliance and support.',
-			features: [
-				'Up to 80 hours of development',
-				'Concurrent requests',
-				'Regular unit & load testing',
-				'Team coaching',
-				'Monthly strategy call',
-				'Process documentation hub',
-				'24-hour (18/7) response time',
-			],
+		features: [
+			'Up to 20 hours of development',
+			'Unlimited project requests',
+			'QA testing',
+			'Add us to your Slack',
+			'36-hour (18/5) response time',
+		],
+		priceMonthly: 1800,
+		priceYearly: 18000,
+		limit: 'Up to 25 active requests',
+	},
+	{
+		name: 'Enterprise',
+		id: 'enterprise',
+		desc: 'Governance, compliance and support.',
+		features: [
+			'Up to 80 hours of development',
+			'Concurrent requests',
+			'Regular unit & load testing',
+			'Team coaching',
+			'Monthly strategy call',
+			'Process documentation hub',
+			'24-hour (18/7) response time',
+		],
 
-			priceMonthly: 5400,
-			priceYearly: 54000,
-			limit: 'Unlimited active requests',
-		},
-	];
+		priceMonthly: 5400,
+		priceYearly: 54000,
+		limit: 'Unlimited active requests',
+	},
+];
 
-	const entitlements = await getEntitlements();
+const entitlements = await getEntitlements();
 
-	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
-	let retainer = {};
-	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+let retainer = {};
+retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
 
-	var date = new Date(Date.now());
-	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+var date = new Date(Date.now());
+var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
 
-	const monthly_sum = Math.round(
-		User.Account.Subscription.reduce((acc, item) => {
-			return acc + item.amount;
-		}, 0) / 100
-	);
+const monthly_sum = Math.round(
+	User.Account.Subscription.reduce((acc, item) => {
+		return acc + item.amount;
+	}, 0) / 100
+);
 
-	const workspaceId =
-		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
+const workspaceId =
+	User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
 
-	async function fetchData() {
-		const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
-		let workflows = {};
-		workflows.runs = await $fetch(`/api/tray/workflows/runs/${workspaceId}`);
-		workflows.count = kpis['Active Workflows'];
-		const data = { kpis, workflows };
-		return data;
-	}
+async function fetchData() {
+	const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
+	let workflows = {};
+	workflows.runs = await $fetch(`/api/tray/workflows/runs/${workspaceId}`);
+	workflows.count = kpis['Active Workflows'];
+	const data = { kpis, workflows };
+	return data;
+}
 
-	const kpis = ref(state.kpis);
-	const workflows = ref(state.workflows);
-	const loading = ref(state.loading);
+const kpis = ref(state.kpis);
+const workflows = ref(state.workflows);
+const loading = ref(state.loading);
 
-	onMounted(async () => {
-		const { kpis, workflows } = await fetchData();
-		state.kpis = kpis;
-		state.workflows = workflows;
-		console.log(state.workflows);
-		loading.value = false;
-	});
+onMounted(async () => {
+	const { kpis, workflows } = await fetchData();
+	state.kpis = kpis;
+	state.workflows = workflows;
+	console.log(state.workflows);
+	loading.value = false;
+});
 </script>
 
 <template>
@@ -164,7 +164,7 @@
 				<div class="relative">
 					<div class="transition-opacity duration-300">
 						<div v-if="!loading">
-							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0">
+							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length <= 0">
 								<div
 									class="block w-full rounded border border-slate-600 bg-slate-100 py-3 dark:border-slate-800 dark:bg-slate-900"
 								>
@@ -215,16 +215,15 @@
 															tier -
 															{{
 																retainer.tier === 'enterprise'
-																	? 'Please schedule a call with us to discuss a custom plan to scale up.'
-																	: `upgrade to the ${
-																			plans[
-																				plans.findIndex(
-																					(o) => o.id === retainer.tier
-																				) + 1
-																			].name
-																	  } tier
-															for a greatly increased quota and continue to
-															scale.`
+																? 'Please schedule a call with us to discuss a custom plan to scale up.'
+																: `upgrade to the ${plans[
+																	plans.findIndex(
+																		(o) => o.id === retainer.tier
+																	) + 1
+																].name
+																} tier
+																														for a greatly increased quota and continue to
+																														scale.`
 															}}
 															<p v-if="retainer.tier !== 'enterprise'">
 															See
@@ -243,10 +242,10 @@
 															type="button"
 														>
 															<span class="truncate">Upgrade to {{ plans[
-																				plans.findIndex(
-																					(o) => o.id === retainer.tier
-																				) + 1
-																			].name }} </span>
+																plans.findIndex(
+																	(o) => o.id === retainer.tier
+																) + 1
+															].name }} </span>
 														</button>
 														<button
 														v-else
@@ -326,18 +325,30 @@
 											<td
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
-												{{
-													formatAccounting(
+												{{ entitlements[retainer.tier]
+																.ticket_count === 0 ? '-' :
+													`${formatAccounting(
 														(User.Account.Ticket.filter(
-															(o) => o.status !== 'done'
+															(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
 														).length /
-															entitlements[retainer.tier].ticket_count) *
-															100
-													)
+															entitlements[retainer.tier]
+																.ticket_count) *
+														100
+													)} %`
 												}}
-												%
 											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
+											<td v-if="entitlements[retainer.tier]
+												.ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier}}</span> tier</span>
+												<NuxtLink to="/settings/billing/update"
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															
+														>
+															<span class="truncate">Upgrade to {{ Object.values(entitlements).find(item => {
+    return item['ticket_count'] > 0;
+  }).name }} </span>
+														</NuxtLink></div></td>
+											<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
 													<div
 														class="flex justify-between space-x-8 pb-1 align-baseline"
@@ -347,8 +358,8 @@
 														>
 															{{
 																User.Account.Ticket.filter(
-																	(o) => o.status !== 'done'
-																).length
+															(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
+														).length
 															}}
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -364,18 +375,17 @@
 																	(o) => o.status !== 'done'
 																).length /
 																	entitlements[retainer.tier].ticket_count <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(User.Account.Ticket.filter(
-																	(o) => o.status !== 'done'
-																).length /
+															:style="`width: ${(User.Account.Ticket.filter(
+																(o) => o.status !== 'done'
+															).length /
 																	entitlements[retainer.tier].ticket_count) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
@@ -407,19 +417,32 @@
 											<td
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
-												{{
-													formatAccounting(
+												{{ entitlements[retainer.tier]
+																.concurrent_ticket_count === 0 ? '-' :
+													`${formatAccounting(
 														(User.Account.Ticket.filter(
 															(o) => o.status === 'active'
 														).length /
 															entitlements[retainer.tier]
 																.concurrent_ticket_count) *
-															100
-													)
+														100
+													)} %`
 												}}
-												%
+												
 											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
+											
+											<td v-if="entitlements[retainer.tier]
+												.concurrent_ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier}}</span> tier</span>
+												<NuxtLink to="/settings/billing/update"
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															
+														>
+															<span class="truncate">Upgrade to {{ Object.values(entitlements).find(item => {
+    return item['concurrent_ticket_count'] > 0;
+  }).name }} </span>
+														</NuxtLink></div></td>
+										<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
 													<div
 														class="flex justify-between space-x-8 pb-1 align-baseline"
@@ -450,24 +473,23 @@
 																).length /
 																	entitlements[retainer.tier]
 																		.concurrent_ticket_count <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(User.Account.Ticket.filter(
-																	(o) => o.status === 'active'
-																).length /
+															:style="`width: ${(User.Account.Ticket.filter(
+																(o) => o.status === 'active'
+															).length /
 																	entitlements[retainer.tier]
 																		.concurrent_ticket_count) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
 											</td>
-										</tr>
+									</tr>
 									</tbody>
 								</table>
 							</div>
@@ -532,7 +554,7 @@
 													formatAccounting(
 														(User.Account.User.length /
 															entitlements[retainer.tier].user_count) *
-															100
+														100
 													)
 												}}
 												%
@@ -562,16 +584,15 @@
 															:class="[
 																User.Account.User.length /
 																	entitlements[retainer.tier].user_count <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(User.Account.User.length /
+															:style="`width: ${(User.Account.User.length /
 																	entitlements[retainer.tier].user_count) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
@@ -617,14 +638,7 @@
 														</div>
 														<h5 class="mb-0">Workflows</h5>
 													</div>
-													<div class="" v-if="!hosting">
-														<button
-															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
-															type="button"
-														>
-															<span class="truncate">Upgrade</span>
-														</button>
-													</div>
+													
 												</div>
 											</th>
 										</tr>
@@ -656,16 +670,24 @@
 											<td
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
-												{{
-													formatAccounting(
+												{{ hosting ?
+													`${formatAccounting(
 														(state.workflows.count /
 															entitlements[retainer.tier].workflow_count) *
-															100
-													)
+														100
+													)} %` : '-'
 												}}
-												%
+												
 											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
+											<td v-if="!hosting" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>No hosting selected</span>
+												<NuxtLink to="/settings/billing/update"
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															
+														>
+															<span class="truncate">Upgrade hosting </span>
+														</NuxtLink></div></td>
+											<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
 													<div
 														class="flex justify-between space-x-8 pb-1 align-baseline"
@@ -690,16 +712,15 @@
 															:class="[
 																state.workflows.count /
 																	entitlements[retainer.tier].workflow_count <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(state.workflows.count /
+															:style="`width: ${(state.workflows.count /
 																	entitlements[retainer.tier].workflow_count) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
@@ -731,16 +752,24 @@
 											<td
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
-												{{
-													formatAccounting(
+												{{ hosting ?
+													`${formatAccounting(
 														(state.workflows.runs.count /
 															entitlements[retainer.tier].workflow_runs) *
-															100
-													)
+														100
+													)} %` : '-'
 												}}
-												%
+												
 											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
+											<td v-if="!hosting" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>No hosting selected</span>
+												<NuxtLink to="/settings/billing/update"
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															
+														>
+															<span class="truncate">Upgrade hosting </span>
+														</NuxtLink></div></td>
+											<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
 													<div
 														class="flex justify-between space-x-8 pb-1 align-baseline"
@@ -765,16 +794,15 @@
 															:class="[
 																state.workflows.runs.count /
 																	entitlements[retainer.tier].workflow_runs <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(state.workflows.runs.count /
+															:style="`width: ${(state.workflows.runs.count /
 																	entitlements[retainer.tier].workflow_runs) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
@@ -847,17 +875,24 @@
 											<td
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
-												{{
-													formatAccounting(
+												
+												{{ hosting ?
+													`${formatAccounting(
 														(state.kpis['Task Runs'] /
 															entitlements[retainer.tier].execution_count) *
-															100,
-														false
-													)
+														100
+													)} %` : '-'
 												}}
-												%
 											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
+											<td v-if="!hosting" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>No hosting selected</span>
+												<NuxtLink to="/settings/billing/update"
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															
+														>
+															<span class="truncate">Upgrade hosting </span>
+														</NuxtLink></div></td>
+											<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
 													<div
 														class="flex justify-between space-x-8 pb-1 align-baseline"
@@ -882,16 +917,15 @@
 															:class="[
 																state.kpis['Task Runs'] /
 																	entitlements[retainer.tier].execution_count <
-																1
+																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${
-																(state.kpis['Task Runs'] /
+															:style="`width: ${(state.kpis['Task Runs'] /
 																	entitlements[retainer.tier].execution_count) *
 																100
-															}%`"
+																}%`"
 														></div>
 													</div>
 												</div>
@@ -1183,10 +1217,10 @@
 								>
 									{{
 										hosting
-											? super_admin
-												? `(${formatAccounting(trayCost(kpis['Task Runs']))})`
-												: formatAccounting(taskPrice(kpis['Task Runs']))
-											: formatAccounting(0)
+										? super_admin
+											? `(${formatAccounting(trayCost(kpis['Task Runs']))})`
+											: formatAccounting(taskPrice(kpis['Task Runs']))
+										: formatAccounting(0)
 									}}
 									<div v-if="User.Account.type === 'super_admin'" class="">
 										<!-- <p class="text-xs font-semibold text-rose-700">
@@ -1196,7 +1230,7 @@
 											{{
 												formatAccounting(
 													taskPrice(kpis['Task Runs']) -
-														trayCost(kpis['Task Runs'])
+													trayCost(kpis['Task Runs'])
 												)
 											}}
 										</p>
@@ -1288,8 +1322,8 @@
 											Self-hosted
 											{{
 												(kpis['Task Runs'] * 0.7) / 60 > 60
-													? 'hours'
-													: 'minutes'
+												? 'hours'
+												: 'minutes'
 											}}
 										</p>
 									</div>
@@ -1334,59 +1368,55 @@
 </template>
 
 <style scoped>
-	@media (prefers-color-scheme: dark) {
-		progress[value] {
-			-webkit-appearance: none;
-			appearance: none;
-			width: 100%;
-			height: 0.5rem;
-		}
-
-		progress[value]::-webkit-progress-bar {
-			background-color: hsl(220, 36%, 25%);
-			border-radius: 0.5rem;
-
-			overflow: hidden;
-		}
-
-		progress[value]::-webkit-progress-value {
-			background-image: -webkit-linear-gradient(
-					top,
-					rgba(255, 255, 255, 0.25),
-					rgba(0, 0, 0, 0.25)
-				),
-				-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
-
-			border-radius: 0.5rem;
-			background-size: 35px 20px, 100% 100%, 100% 100%;
-		}
+@media (prefers-color-scheme: dark) {
+	progress[value] {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 100%;
+		height: 0.5rem;
 	}
 
-	@media (prefers-color-scheme: light) {
-		progress[value] {
-			-webkit-appearance: none;
-			appearance: none;
-			width: 100%;
-			height: 0.5rem;
-		}
+	progress[value]::-webkit-progress-bar {
+		background-color: hsl(220, 36%, 25%);
+		border-radius: 0.5rem;
 
-		progress[value]::-webkit-progress-bar {
-			background-color: hsl(221, 100%, 96%);
-			border-radius: 0.5rem;
-
-			overflow: hidden;
-		}
-
-		progress[value]::-webkit-progress-value {
-			background-image: -webkit-linear-gradient(
-					top,
-					rgba(255, 255, 255, 0.25),
-					rgba(0, 0, 0, 0.25)
-				),
-				-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
-
-			border-radius: 0.5rem;
-			background-size: 35px 20px, 100% 100%, 100% 100%;
-		}
+		overflow: hidden;
 	}
+
+	progress[value]::-webkit-progress-value {
+		background-image: -webkit-linear-gradient(top,
+				rgba(255, 255, 255, 0.25),
+				rgba(0, 0, 0, 0.25)),
+			-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+
+		border-radius: 0.5rem;
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	progress[value] {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 100%;
+		height: 0.5rem;
+	}
+
+	progress[value]::-webkit-progress-bar {
+		background-color: hsl(221, 100%, 96%);
+		border-radius: 0.5rem;
+
+		overflow: hidden;
+	}
+
+	progress[value]::-webkit-progress-value {
+		background-image: -webkit-linear-gradient(top,
+				rgba(255, 255, 255, 0.25),
+				rgba(0, 0, 0, 0.25)),
+			-webkit-linear-gradient(left, rgb(58, 0, 204), rgb(75, 228, 255));
+
+		border-radius: 0.5rem;
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+}
 </style>
