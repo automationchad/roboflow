@@ -5,6 +5,103 @@
 			<!-- Plan -->
 			<div class="mx-auto w-full">
 				<div class="container max-w-4xl space-y-8 py-8">
+					<div class="mb-10" v-if="upgrade_needed || freePlan">
+								<div
+									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
+								>
+									<div class="flex flex-col px-4">
+										<div class="flex items-center justify-between">
+											<div class="flex w-full space-x-3 lg:items-start">
+												<span class="text-slate-900 dark:text-white"
+													><svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="21"
+														height="21"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="8" x2="12" y2="12"></line>
+														<line
+															x1="12"
+															y1="16"
+															x2="12.01"
+															y2="16"
+														></line></svg
+												></span>
+												<div class="flex-grow">
+													<h5 class="text-sm text-slate-900 dark:text-white">
+														{{ upgrade_needed ? "You are exceeding your plans quota" : `Your account plan is paused` }}
+													</h5>
+												</div>
+											</div>
+										</div>
+										<div
+											class="mt-3 flex flex-col space-y-3 overflow-hidden transition-all"
+											style="max-height: 500px"
+										>
+											<div class="text-sm text-slate-500 dark:text-slate-400">
+												<div class="p-1">
+													<div>
+														<p class="mb-4">
+															Your project is currently on the
+															<span class="capitalize">{{
+																retainer.tier
+															}}</span>
+															tier -
+															{{
+																retainer.tier === 'enterprise'
+																? 'Please schedule a call with us to discuss a custom plan to scale up.'
+																: `upgrade to the ${plans[
+																	plans.findIndex(
+																		(o) => o.id === retainer.tier
+																	) + 1
+																].name
+																} tier
+																																																																																																																																																																																																																		for a greatly increased quota and continue to
+																																																																																																																																																																																																																		scale.`
+															}}
+															<p v-if="retainer.tier !== 'enterprise'">
+															See
+															<a
+																class="text-indigo-800 dark:text-indigo-400"
+																href="/settings/billing/update"
+																>pricing page</a
+															>
+															for a full breakdown of available plans.
+														</p>
+														</p>
+														
+														<button
+														v-if="retainer.tier !== 'enterprise'"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															type="button"
+														>
+															<span class="truncate">Upgrade to {{ plans[
+																plans.findIndex(
+																	(o) => o.id === retainer.tier
+																) + 1
+															].name }} </span>
+														</button>
+														<button
+														v-else
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															type="button"
+														>
+															<span class="truncate">Enquire about custom</span>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 					<div class="relative">
 						<div class="transition-opacity duration-300">
 							<div
@@ -648,12 +745,72 @@ const kpis = ref(state.kpis);
 const workflows = ref(state.workflows);
 const loading = ref(state.loading);
 
+const plans = [
+	{
+		name: 'Free',
+		id: 'free',
+		desc: 'Experiment for free',
+		features: ['No requests'],
+
+		priceMonthly: 0,
+		priceYearly: 0,
+		limit: 'No requests',
+	},
+	{
+		name: 'Basic',
+		id: 'basic',
+		desc: 'Great for running lightweight automations',
+		features: [
+			'Up to 2 hours of development',
+			'Unlimited debugging',
+			'48 hours (18/5) response time',
+		],
+
+		priceMonthly: 600,
+		priceYearly: 6000,
+		limit: 'Up to 5 active requests',
+	},
+	{
+		name: 'Growth',
+		id: 'growth',
+		desc: 'We scale as you scale',
+
+		features: [
+			'Up to 20 hours of development',
+			'Unlimited project requests',
+			'QA testing',
+			'Add us to your Slack',
+			'36-hour (18/5) response time',
+		],
+		priceMonthly: 1800,
+		priceYearly: 18000,
+		limit: 'Up to 25 active requests',
+	},
+	{
+		name: 'Enterprise',
+		id: 'enterprise',
+		desc: 'Governance, compliance and support.',
+		features: [
+			'Up to 80 hours of development',
+			'Concurrent requests',
+			'Regular unit & load testing',
+			'Team coaching',
+			'Monthly strategy call',
+			'Process documentation hub',
+			'24-hour (18/7) response time',
+		],
+
+		priceMonthly: 5400,
+		priceYearly: 54000,
+		limit: 'Unlimited active requests',
+	},
+];
 
 
 let { data: User, error: userError } = await supabase
 	.from('User')
 	.select(
-		`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,type,Subscription(*))`
+		`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,type,Ticket(*),Subscription(*),User(*))`
 	)
 	.eq('id', user.value.id)
 	.limit(1)
@@ -667,14 +824,14 @@ async function fetchData() {
 	return data;
 }
 
-let retainer = {};
-retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+
+const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
 var date = new Date(Date.now());
 var firstDay = new Date(
 	date.getFullYear(),
 	date.getMonth(),
-	new Date(retainer.value.startDate).getDate()
+	new Date(retainer.startDate).getDate()
 );
 
 onMounted(async () => {
@@ -688,6 +845,14 @@ let hosting = {};
 hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
 const selectedPlan = ref(null);
+
+const upgrade_needed = ref(false);
+
+const entitlements = await getEntitlements();
+
+upgrade_needed.value = entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length < 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0
+
+const freePlan = retainer.tier === 'free';
 
 const handleCheckout = async (product, type, customer) => {
 	selectedPlan.value = product.id;
