@@ -211,7 +211,7 @@
 														download
 														class="flex items-center text-indigo-600 hover:text-indigo-900 dark:text-indigo-100 dark:hover:text-indigo-50"
 														><div
-															class="rounded border border-indigo-500 bg-indigo-600"
+															class="rounded border border-indigo-400 dark:bg-indigo-600 bg-indigo-100"
 														>
 															<svg
 																class="h-5 w-5"

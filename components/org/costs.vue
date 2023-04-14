@@ -166,7 +166,7 @@ onMounted(async () => {
 						<div v-if="!loading">
 							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length <= 0">
 								<div
-									class="block w-full rounded border border-slate-600 bg-slate-100 py-3 dark:border-slate-800 dark:bg-slate-900"
+									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
 								>
 									<div class="flex flex-col px-4">
 										<div class="flex items-center justify-between">
@@ -275,7 +275,7 @@ onMounted(async () => {
 											<th class="w-1/4 px-6 py-3 text-left">
 												<div class="flex items-center space-x-4">
 													<div
-														class="flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+														class="flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800 bg-slate-50"
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -496,7 +496,7 @@ onMounted(async () => {
 
 							<div
 								v-if="true"
-								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -508,7 +508,7 @@ onMounted(async () => {
 											<th class="w-1/4 px-6 py-3 text-left">
 												<div class="flex items-center space-x-4">
 													<div
-														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+														class="bg-slate-50 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 													>
 														<svg width="20" height="20" fill="none" viewBox="0 0 24 24">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.78168 19.25H13.2183C13.7828 19.25 14.227 18.7817 14.1145 18.2285C13.804 16.7012 12.7897 14 9.5 14C6.21031 14 5.19605 16.7012 4.88549 18.2285C4.773 18.7817 5.21718 19.25 5.78168 19.25Z"></path>
@@ -603,7 +603,7 @@ onMounted(async () => {
 							</div>
 
 							<div
-								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -618,7 +618,7 @@ onMounted(async () => {
 												>
 													<div class="flex items-center space-x-4">
 														<div
-															class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+															class="bg-slate-50 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 														>
 															<svg
 																xmlns="http://www.w3.org/2000/svg"
@@ -812,7 +812,7 @@ onMounted(async () => {
 								</table>
 							</div>
 							<div
-								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -824,7 +824,7 @@ onMounted(async () => {
 											<th class="w-1/4 px-6 py-3 text-left">
 												<div class="flex items-center space-x-4">
 													<div
-														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+														class="bg-slate-50 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -1006,7 +1006,7 @@ onMounted(async () => {
 											<th class="w-1/4 px-6 py-3 text-left">
 												<div class="flex items-center space-x-4">
 													<div
-														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
+														class="bg-slate-50 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
