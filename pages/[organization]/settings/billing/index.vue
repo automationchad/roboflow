@@ -54,7 +54,9 @@
 													>
 														<nav class="-mb-[2px] flex space-x-8">
 															<Tab
-																as="a"
+																as="div"
+																referrerpolicy="noreferrer"
+																target="_parent"
 																:href="tab.id"
 																v-for="(tab, idx) in tabs"
 																:key="tab.name"
