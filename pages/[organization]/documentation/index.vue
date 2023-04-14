@@ -1,5 +1,6 @@
 <script setup>
 	import { reactive, onMounted, ref } from 'vue';
+	import { download } from '@nuxtjs/axios';
 	import {
 		Dialog,
 		DialogPanel,
@@ -86,6 +87,17 @@
 				sortBy: { column: 'name', order: 'asc' },
 			});
 		return data;
+	};
+
+	const downloadPacket = async () => {
+		try {
+			const url =
+				'https://nsfipxnlucvgchlkqvqw.supabase.co/storage/v1/object/public/files/public_files/Retainer_Packet_Motis_Group.pdf';
+			const filename = 'Retainer_Packet_Motis_Group.pdf';
+			await download(url, filename);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	onMounted(async () => {
@@ -191,19 +203,241 @@
 			<div class="">
 				<div class="">
 					<div class="">
-						<h2
+						<h1
 							id="billing-history-heading"
-							class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+							class="text-3xl font-medium leading-6 text-gray-900 dark:text-white"
 						>
-							Documentation
-						</h2>
+							Motis Docs
+						</h1>
+
+						<div class="my-24">
+							<div class="max-w-xl">
+								<h3
+									id="reference-documentation"
+									class="group mb-10 scroll-mt-24 dark:text-white"
+								>
+									Reference Documentation<a
+										href="#reference-documentation"
+										class="ml-2 opacity-0 transition-opacity group-hover:opacity-100"
+										>#</a
+									>
+								</h3>
+							</div>
+							<div class="not-prose grid grid-cols-12 gap-6">
+								<div class="col-span-12 md:col-span-6">
+									<div
+										class="group relative h-full overflow-hidden rounded-lg border border-slate-400 bg-slate-900 bg-transparent text-left transition hover:border-slate-500 dark:border-slate-700"
+									>
+										<div
+											class="absolute left-0 top-0 h-[150px] w-[250px] scale-100 transform opacity-50 transition-all duration-700 ease-out group-hover:scale-150 group-hover:opacity-100"
+											style="
+												background: radial-gradient(
+													100% 100% at 0% 0%,
+													rgba(62, 172, 207, 0.094),
+													transparent
+												);
+											"
+										></div>
+										<div
+											class="relative flex h-full flex-col gap-6 px-8 pb-8 pt-8"
+										>
+											<div class="flex items-center gap-3">
+												<div
+													class="shrink-0 rounded bg-sky-300 p-1 text-sky-500"
+												>
+													<svg
+														class="h-6 w-6"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M4.75 4.75H19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M4.75 19.25H19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M6.75 16.2502H17.25C18.3546 16.2502 19.25 15.3548 19.25 14.2502V9.75C19.25 8.64543 18.3546 7.75 17.25 7.75H6.75C5.64543 7.75 4.75 8.64543 4.75 9.75V14.2502C4.75 15.3548 5.64543 16.2502 6.75 16.2502Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</div>
+												<h5 class="text-base text-slate-800 dark:text-white">
+													Enterprise Data Sheet
+												</h5>
+											</div>
+											<span
+												class="flex-grow text-sm text-slate-600 dark:text-slate-400"
+												>Presentation deck explaining our partnership
+												thesis.</span
+											>
+											<div
+												class="mt-4 flex items-center justify-start space-x-2"
+											>
+												<a
+													href="/Retainer_Packet_Motis_Group.pdf"
+													download
+													class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-700"
+												>
+													<svg
+														class="mr-1 h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M12.75 4.75H7.75C6.64543 4.75 5.75 5.64543 5.75 6.75V17.25C5.75 18.3546 6.64543 19.25 7.75 19.25H8.25M12.75 4.75V8.25C12.75 9.35457 13.6454 10.25 14.75 10.25H18.25M12.75 4.75L18.25 10.25M18.25 10.25V17.25C18.25 18.3546 17.3546 19.25 16.25 19.25H15.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M12 13.75V19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M9.75 16.75L12 19.25L14.25 16.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+
+													Download
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-span-12 md:col-span-6">
+									<div
+										class="group relative h-full overflow-hidden rounded-lg border border-slate-400 bg-slate-900 bg-transparent text-left transition hover:border-slate-500 dark:border-slate-700"
+									>
+										<div
+											class="absolute left-0 top-0 h-[150px] w-[250px] scale-100 transform opacity-50 transition-all duration-700 ease-out group-hover:scale-150 group-hover:opacity-100"
+											style="
+												background: radial-gradient(
+													100% 100% at 0% 0%,
+													rgba(62, 172, 207, 0.094),
+													transparent
+												);
+											"
+										></div>
+										<div
+											class="relative flex h-full flex-col gap-6 px-8 pb-8 pt-8"
+										>
+											<div class="flex items-center gap-3">
+												<div
+													class="shrink-0 rounded bg-sky-300 p-1 text-sky-500"
+												>
+													<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24">
+														<path
+															stroke="currentColor"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="1.5"
+															d="M7.75 19.25H16.25C17.3546 19.25 18.25 18.3546 18.25 17.25V9L14 4.75H7.75C6.64543 4.75 5.75 5.64543 5.75 6.75V17.25C5.75 18.3546 6.64543 19.25 7.75 19.25Z"
+														></path>
+														<path
+															stroke="currentColor"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="1.5"
+															d="M18 9.25H13.75V5"
+														></path>
+														<path
+															stroke="currentColor"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="1.5"
+															d="M9.75 15.25H14.25"
+														></path>
+														<path
+															stroke="currentColor"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="1.5"
+															d="M9.75 12.25H14.25"
+														></path>
+													</svg>
+												</div>
+												<h5 class="text-base text-slate-800 dark:text-white">
+													Fractional Job Description
+												</h5>
+											</div>
+											<span
+												class="flex-grow text-sm text-slate-600 dark:text-slate-400"
+												>Job description explaining our role in more
+												detail</span
+											>
+											<div
+												class="mt-4 flex items-center justify-start space-x-2"
+											>
+												<a
+													href="/Job_Description_Director_of_Automation_Motis_Group.pdf"
+													download
+													class="inline-flex items-center rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-700"
+												>
+													<svg
+														class="mr-1 h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M12.75 4.75H7.75C6.64543 4.75 5.75 5.64543 5.75 6.75V17.25C5.75 18.3546 6.64543 19.25 7.75 19.25H8.25M12.75 4.75V8.25C12.75 9.35457 13.6454 10.25 14.75 10.25H18.25M12.75 4.75L18.25 10.25M18.25 10.25V17.25C18.25 18.3546 17.3546 19.25 16.25 19.25H15.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M12 13.75V19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M9.75 16.75L12 19.25L14.25 16.75"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+
+													Download
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<form class="mt-4 grid grid-cols-3">
 							<div
-								class="flex flex-col"
+								class="col-span-3 flex flex-col"
 								v-if="User.Account.type === 'super_admin'"
 							>
-								<label class="text-sm">Organization</label>
-
 								<select
 									id="location"
 									name="location"
