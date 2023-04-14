@@ -162,7 +162,7 @@ onMounted(async () => {
 				<div class="relative">
 					<div class="transition-opacity duration-300">
 						<div >
-							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length <= 0">
+							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0">
 								<div
 									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
 								>
@@ -227,7 +227,7 @@ onMounted(async () => {
 															See
 															<a
 																class="text-indigo-800 dark:text-indigo-400"
-																href="https://app.motis.group/#pricing"
+																href="/settings/billing/update"
 																>pricing page</a
 															>
 															for a full breakdown of available plans.

@@ -2,9 +2,12 @@ export default function formatNumber(
 	num: string | number,
 	dollar: boolean
 ): string {
-	if (typeof num !== 'number') num = parseFloat(num);
+	if (typeof num === 'number' && !isFinite(num)) {
+		num = 0;
+	} else if (typeof num !== 'number') {
+		num = parseFloat(num);
+	}
 	let formattedNum = num;
-
 	if (Math.abs(formattedNum) >= 0.01) {
 		formattedNum = Number(formattedNum.toFixed(2));
 	} else if (Math.abs(formattedNum) < 0.01 && formattedNum !== 0) {

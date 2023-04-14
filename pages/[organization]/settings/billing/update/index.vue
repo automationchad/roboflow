@@ -61,9 +61,10 @@
 		{
 			name: 'Basic',
 			id: 'basic',
-			desc: 'Great for running lightweight automations',
+			desc: 'Simple connected apps for small teams',
 			features: [
 				'Up to 4 hours of development',
+				'1 project request',
 				'Unlimited debugging',
 				'Community support',
 			],
@@ -75,7 +76,7 @@
 		{
 			name: 'Growth',
 			id: 'growth',
-			desc: 'We scale as you scale',
+			desc: 'Customizable automation for growing teams',
 			image: growth,
 			features: [
 				'Up to 20 hours of development',
@@ -91,7 +92,7 @@
 		{
 			name: 'Enterprise',
 			id: 'enterprise',
-			desc: 'Governance, compliance and support.',
+			desc: 'Scalable automation for complex workflows',
 			features: [
 				'Up to 80 hours of development',
 				'Concurrent requests',
