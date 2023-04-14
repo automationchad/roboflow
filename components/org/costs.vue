@@ -488,24 +488,15 @@
 													<div
 														class="bg-scale-500 flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="16"
-															height="16"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon dark:text-scale-100"
-														>
-															<path
-																d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
-															></path>
-														</svg>
+														<svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.78168 19.25H13.2183C13.7828 19.25 14.227 18.7817 14.1145 18.2285C13.804 16.7012 12.7897 14 9.5 14C6.21031 14 5.19605 16.7012 4.88549 18.2285C4.773 18.7817 5.21718 19.25 5.78168 19.25Z"></path>
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 14C17.8288 14 18.6802 16.1479 19.0239 17.696C19.2095 18.532 18.5333 19.25 17.6769 19.25H16.75"></path>
+  <circle cx="9.5" cy="7.5" r="2.75" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.75 10.25C16.2688 10.25 17.25 9.01878 17.25 7.5C17.25 5.98122 16.2688 4.75 14.75 4.75"></path>
+</svg>
+
 													</div>
-													<h5 class="mb-0">Auth</h5>
+													<h5 class="mb-0">Users</h5>
 												</div>
 											</th>
 										</tr>
@@ -718,7 +709,7 @@
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
-												Function Invocations<button data-state="closed">
+												Workflow Invocations<button data-state="closed">
 													<svg
 														xmlns="http://www.w3.org/2000/svg"
 														width="14"
