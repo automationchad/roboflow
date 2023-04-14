@@ -42,7 +42,7 @@ const supabase = useSupabaseClient();
 
 const state = reactive({
 	kpis: { 'Task Runs': 0 },
-	workflows: { count: 0, runs: 0 },
+	workflows: { count: 0, runs: {count: 0} },
 	loading: true,
 });
 
@@ -152,7 +152,6 @@ onMounted(async () => {
 	const { kpis, workflows } = await fetchData();
 	state.kpis = kpis;
 	state.workflows = workflows;
-	console.log(state.workflows);
 	loading.value = false;
 });
 </script>
@@ -163,7 +162,7 @@ onMounted(async () => {
 			<div class="container max-w-4xl space-y-8 py-8">
 				<div class="relative">
 					<div class="transition-opacity duration-300">
-						<div v-if="!loading">
+						<div >
 							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length <= 0">
 								<div
 									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
@@ -667,7 +666,7 @@ onMounted(async () => {
 													</svg>
 												</button>
 											</td>
-											<td
+											<td 
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
 												{{ hosting ?
@@ -695,7 +694,72 @@ onMounted(async () => {
 														<p
 															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
 														>
-															{{ state.workflows.count.toLocaleString() }}
+														<span class="-mb-2" v-if="loading"><svg 
+			class="h-4 w-4 animate-spin m-0 p-0"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M12 4.75V6.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 6.87347L16.0659 7.93413"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M19.25 12L17.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 17.1265L16.0659 16.0659"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M12 17.75V19.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 16.0659L6.87354 17.1265"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M6.25 12L4.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 7.93413L6.87354 6.87347"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path></svg
+		></span>
+														
+														<span v-else>{{ state.workflows.count.toLocaleString() }}</span>
+															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
 															{{
@@ -776,8 +840,70 @@ onMounted(async () => {
 													>
 														<p
 															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-														>
-															{{ state.workflows.runs.count.toLocaleString() }}
+														><span class="-mb-2" v-if="loading"><svg 
+			class="h-4 w-4 animate-spin m-0 p-0"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M12 4.75V6.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 6.87347L16.0659 7.93413"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M19.25 12L17.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 17.1265L16.0659 16.0659"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M12 17.75V19.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 16.0659L6.87354 17.1265"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M6.25 12L4.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 7.93413L6.87354 6.87347"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path></svg
+		></span>
+															<span v-else>{{ state.workflows.runs.count.toLocaleString() }}</span>
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
 															{{
@@ -899,8 +1025,70 @@ onMounted(async () => {
 													>
 														<p
 															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-														>
-															{{ state.kpis['Task Runs'].toLocaleString() }}
+														><span class="-mb-2" v-if="loading"><svg 
+			class="h-4 w-4 animate-spin m-0 p-0"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M12 4.75V6.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 6.87347L16.0659 7.93413"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M19.25 12L17.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M17.1266 17.1265L16.0659 16.0659"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M12 17.75V19.25"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 16.0659L6.87354 17.1265"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M6.25 12L4.75 12"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path>
+			<path
+				d="M7.9342 7.93413L6.87354 6.87347"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			></path></svg
+		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }}</span>
+															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
 															{{
@@ -1181,7 +1369,7 @@ onMounted(async () => {
 								</table>
 							</div>
 						</div>
-						<div v-else><loading-spinner /></div>
+						<!-- <div v-else><loading-spinner /></div> -->
 					</div>
 				</div>
 			</div>
