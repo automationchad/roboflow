@@ -226,7 +226,7 @@
 							<div class="not-prose grid grid-cols-12 gap-6">
 								<div class="col-span-12 md:col-span-6">
 									<div
-										class="group relative h-full overflow-hidden rounded-lg border border-slate-200 dark:bg-slate-900 bg-transparent text-left transition hover:border-slate-200 dark:border-slate-700"
+										class="group relative h-full overflow-hidden rounded-lg border border-slate-200 bg-transparent text-left transition hover:border-slate-200 dark:border-slate-700 dark:bg-slate-900"
 									>
 										<div
 											class="absolute left-0 top-0 h-[150px] w-[250px] scale-100 transform opacity-50 transition-all duration-700 ease-out group-hover:scale-150 group-hover:opacity-100"
@@ -328,7 +328,7 @@
 								</div>
 								<div class="col-span-12 md:col-span-6">
 									<div
-										class="group relative h-full overflow-hidden rounded-lg border border-slate-200 dark:bg-slate-900 bg-transparent text-left transition hover:border-slate-200 dark:border-slate-700"
+										class="group relative h-full overflow-hidden rounded-lg border border-slate-200 bg-transparent text-left transition hover:border-slate-200 dark:border-slate-700 dark:bg-slate-900"
 									>
 										<div
 											class="absolute left-0 top-0 h-[150px] w-[250px] scale-100 transform opacity-50 transition-all duration-700 ease-out group-hover:scale-150 group-hover:opacity-100"
