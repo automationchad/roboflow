@@ -65,7 +65,7 @@ export default function () {
 				'performance_issues',
 			],
 			concurrent_ticket_count: 5,
-			execution_count: 10000,
+			execution_count: 100000,
 			user_count: 20,
 			workflow_count: 200,
 			workflow_runs: 5000,
