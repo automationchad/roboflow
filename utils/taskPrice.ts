@@ -1,4 +1,4 @@
-export default function (quantity) {
+export default function (quantity: number, base: boolean) {
 	const tiers = 10;
 	const multiplyAndDouble = (startNumber, tier_num) => {
 		let results = [];
@@ -43,5 +43,6 @@ export default function (quantity) {
 			remainingQuantity -= tierQuantity;
 		}
 	}
-	return price;
+	const monthly_base = base ? 150 : 0;
+	return price + monthly_base;
 }

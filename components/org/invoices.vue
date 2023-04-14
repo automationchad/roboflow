@@ -6,42 +6,42 @@
 			<!-- Billing history -->
 			<section aria-labelledby="billing-history-heading" v-else>
 				<div class="sm:overflow-hidden">
-					<div class="flex flex-col bg-white dark:bg-slate-800">
+					<div class="flex flex-col bg-white dark:bg-slate-900 border border-slate-100 max-w-4xl rounded dark:border-slate-800">
 						<div class="overflow-x-auto">
 							<div class="inline-block min-w-full pt-2 align-middle">
 								<div class="overflow-hidden">
 									<table
-										class="min-w-full divide-y divide-gray-200 dark:divide-slate-600"
+										class="w-full"
 									>
 										<thead class="bg-gray-50 dark:bg-transparent">
-											<tr class="border-b border-slate-600">
+											<tr class="border-b border-slate-800">
 												<th
 													scope="col"
-													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
-													Due Date
+													Date
 												</th>
 												<th
 													scope="col"
-													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
-													Reference Number
+													Invoice number
 												</th>
 												<th
 													scope="col"
-													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
-													Amount
+													Amount due
 												</th>
 												<th
 													scope="col"
-													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													Status
 												</th>
 												<th
 													scope="col"
-													class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="px-6 w-1/5 py-3 text-right text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													
 												</th>
@@ -49,22 +49,22 @@
                               `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
                             -->
 											</tr>
-											<tr class="px-6" v-if="state.invoices.length === 0">
+											<!-- <tr class="px-6" v-if="state.invoices.length === 0">
 												<th
 													colspan="4"
 													class="py-24 text-sm font-normal text-slate-300"
 												>
 													No invoices
 												</th>
-											</tr>
+											</tr> -->
 										</thead>
 
 										<tbody
-											class="divide-y divide-gray-200 bg-white dark:divide-slate-700 dark:bg-transparent"
+											class="divide-y divide-gray-200 bg-white dark:divide-slate-800 dark:bg-transparent"
 										>
 											<tr v-for="invoice in state.invoices" :key="invoice.id">
 												<td
-													class="whitespace-nowrap px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
+													class="whitespace-nowrap px-6 py-3 text-sm font-normal text-gray-900 dark:text-white"
 												>
 													<div class="flex items-center">
 														{{
@@ -74,7 +74,7 @@
 																		? invoice.due_date
 																		: invoice.created) * 1000
 																),
-																'MMM dd, yyyy'
+																'dd/MM/yyyy, HH:mm:ss'
 															)
 														}}
 														<div
@@ -204,12 +204,12 @@
 													>
 												</td>
 												<td
-													class="whitespace-nowrap px-6 py-2 text-sm font-medium"
+													class="whitespace-nowrap px-6 py-2 text-sm text-right font-medium"
 												>
 													<a v-if="invoice.invoice_pdf"
 														:href="invoice.invoice_pdf"
 														download
-														class="flex items-center text-indigo-600 hover:text-indigo-900 dark:text-indigo-100 dark:hover:text-indigo-50"
+														class="flex items-center justify-end text-indigo-600 hover:text-indigo-900 dark:text-indigo-100 dark:hover:text-indigo-50"
 														><div
 															class="rounded border border-indigo-400 dark:bg-indigo-600 bg-indigo-100"
 														>
@@ -296,7 +296,7 @@
 
 	const state = reactive({
 		invoices: [],
-		loading: true,
+		loading: false,
 	});
 
 	const user = useSupabaseUser();

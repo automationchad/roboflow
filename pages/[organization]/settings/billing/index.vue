@@ -26,8 +26,7 @@
 											<TabGroup
 												class="py-6"
 												as="div"
-												:selectedIndex="selectedTab"
-												@change="changeTab"
+												
 											>
 												<!-- Tabs -->
 												<div class="lg:hidden">
@@ -64,7 +63,7 @@
 																class="whitespace-nowrap py-4 text-sm font-medium outline-none"
 																><a
 																	:class="[
-																		selectedTab === idx
+																		selected
 																			? 'border-indigo-500'
 																			: 'border-transparent',
 																		'cursor-pointer whitespace-nowrap border-b px-1 py-4 text-sm font-normal text-gray-500 outline-none dark:text-white',
@@ -76,7 +75,7 @@
 													</div>
 												</TabList>
 												<TabPanels>
-													<TabPanel><org-plans /></TabPanel>
+													<TabPanel><org-subscription /></TabPanel>
 													<TabPanel><org-costs /></TabPanel>
 
 													<TabPanel><org-invoices /></TabPanel>

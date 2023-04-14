@@ -367,7 +367,7 @@
 				</fieldset>
 			</section>
 			<!-- Add Ons -->
-			<section aria-labelledby="plan-heading" v-if="false">
+			<section aria-labelledby="plan-heading" v-if="true">
 				<fieldset
 					:disabled="
 						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'

@@ -67,14 +67,14 @@
 										</div>
 										<div class="flex w-[20%] justify-end">
 											<span class="text-sm">{{
-												formatAccounting(retainer.amount / 100)
+												formatAccounting(retainer.amount / 100, true)
 											}}</span>
 										</div>
 										<div class="flex w-[20%] justify-end">
 											<span class="text-sm">{{
 												formatAccounting(
 													(retainer.amount / 100) * retainer.quantity
-												)
+													, true)
 											}}</span>
 										</div>
 									</div>
@@ -85,17 +85,39 @@
 											<span class="text-sm">Hosting</span>
 										</div>
 										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{ retainer.quantity }}</span>
+											<span class="text-sm">{{ 1 }}</span>
 										</div>
 										<div class="flex w-[20%] justify-end">
 											<span class="text-sm">{{
-												formatAccounting(retainer.amount / 100)
+												formatAccounting(150, true)
 											}}</span>
 										</div>
 										<div class="flex w-[20%] justify-end">
 											<span class="text-sm">{{
 												formatAccounting(
-													(retainer.amount / 100) * retainer.quantity
+													150 * retainer.quantity, true
+												)
+											}}</span>
+										</div>
+									</div>
+									<div
+										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
+									>
+										<div class="flex w-[40%] items-center gap-3">
+											<span class="text-sm">Executions</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{ state.kpis['Task Runs'].toLocaleString() }}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">${{
+												formatAccounting(taskPrice(state.kpis['Task Runs'], false) / state.kpis['Task Runs'])
+											}}</span>
+										</div>
+										<div class="flex w-[20%] justify-end">
+											<span class="text-sm">{{
+												formatAccounting(
+													taskPrice(state.kpis['Task Runs']) * retainer.quantity, true
 												)
 											}}</span>
 										</div>
@@ -118,7 +140,7 @@
 											class="flex w-[20%] items-center justify-end space-x-1"
 										>
 											<p class="text-slate-500">$</p>
-											<h3 class="m-0 text-xl dark:text-slate-200">{{ '' }}</h3>
+											<h3 class="m-0 text-xl dark:text-slate-200">{{ formatAccounting(taskPrice(state.kpis['Task Runs']) * retainer.quantity + retainer.amount / 100 * retainer.quantity + 150, false) }}</h3>
 										</div>
 									</div>
 								</div>
@@ -219,7 +241,7 @@
 															v-if="
 																retainer.status === 'active' &&
 																new Date(retainer.resumesAt) <=
-																	new Date(new Date().getTime())
+																new Date(new Date().getTime())
 															"
 														>
 															Active
@@ -229,7 +251,7 @@
 															v-else-if="
 																retainer.status === 'active' &&
 																new Date(retainer.resumesAt) >
-																	new Date(new Date().getTime())
+																new Date(new Date().getTime())
 															"
 														>
 															Resuming
@@ -246,7 +268,7 @@
 															v-if="
 																retainer.status === 'paused' ||
 																new Date(retainer.resumesAt) >
-																	new Date(new Date().getTime())
+																new Date(new Date().getTime())
 															"
 															class="mr-1.5 flex items-center"
 															><svg
@@ -477,8 +499,8 @@
 													{{
 														idx <
 														plans.findIndex((plan) => retainer.tier === plan.id)
-															? 'Downgrade'
-															: 'Upgrade'
+														? 'Downgrade'
+														: 'Upgrade'
 													}}
 												</button>
 											</div>
@@ -538,16 +560,16 @@
 										@click="
 											hosting
 												? handleCheckout(
-														{ id: selectedPlan.id },
-														'retainer',
-														User.Account.stripeCustomerId,
-														User.Account.Subscription
-												  )
+													{ id: selectedPlan.id },
+													'retainer',
+													User.Account.stripeCustomerId,
+													User.Account.Subscription
+												)
 												: handleCheckout(
-														{},
-														'add_on',
-														User.Account.stripeCustomerId
-												  )
+													{},
+													'add_on',
+													User.Account.stripeCustomerId
+												)
 										"
 										class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-black shadow dark:bg-slate-100"
 									>
@@ -566,114 +588,132 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		CheckCircleIcon,
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		PencilIcon,
-		ExclamationTriangleIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		CheckIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
+import { ref } from 'vue';
+import {
+	Disclosure,
+	DisclosureButton,
+	DisclosurePanel,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuItems,
+	RadioGroup,
+	RadioGroupDescription,
+	RadioGroupLabel,
+	RadioGroupOption,
+	Switch,
+	SwitchGroup,
+	SwitchLabel,
+} from '@headlessui/vue';
+import {
+	CheckCircleIcon,
+	MagnifyingGlassIcon,
+	QuestionMarkCircleIcon,
+	XCircleIcon,
+} from '@heroicons/vue/20/solid';
+import {
+	Bars3Icon,
+	BellIcon,
+	PencilIcon,
+	ExclamationTriangleIcon,
+	CogIcon,
+	CreditCardIcon,
+	SparklesIcon,
+	KeyIcon,
+	SquaresPlusIcon,
+	UserCircleIcon,
+	CheckIcon,
+	XMarkIcon,
+} from '@heroicons/vue/24/outline';
 
-	import { format, addDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
-	import free from '@/assets/images/plans/free.png';
-	import support from '~/assets/images/plans/support.png';
-	import growth from '~/assets/images/plans/growth.png';
-	import enterprise from '~/assets/images/plans/enterprise.png';
+import free from '@/assets/images/plans/free.png';
+import support from '~/assets/images/plans/support.png';
+import growth from '~/assets/images/plans/growth.png';
+import enterprise from '~/assets/images/plans/enterprise.png';
 
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
-	const loading = ref(false);
-	const plans = [
-		{
-			name: 'Free',
-			id: 'free',
-			desc: 'Experiment for free',
-			features: ['No requests'],
-			image: free,
-			priceMonthly: 0,
-			priceYearly: 0,
-			limit: 'No requests',
+const user = useSupabaseUser();
+const supabase = useSupabaseClient();
+
+const state = reactive({
+	kpis: { 'Task Runs': 0 },
+	loading: true,
+});
+
+
+
+const kpis = ref(state.kpis);
+const workflows = ref(state.workflows);
+const loading = ref(state.loading);
+
+
+
+let { data: User, error: userError } = await supabase
+	.from('User')
+	.select(
+		`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,type,Subscription(*))`
+	)
+	.eq('id', user.value.id)
+	.limit(1)
+	.single();
+
+async function fetchData() {
+	const workspaceId =
+		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
+	const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
+	const data = { kpis };
+	return data;
+}
+
+let retainer = {};
+retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+
+var date = new Date(Date.now());
+var firstDay = new Date(
+	date.getFullYear(),
+	date.getMonth(),
+	new Date(retainer.value.startDate).getDate()
+);
+
+onMounted(async () => {
+	const { kpis } = await fetchData();
+	state.kpis = kpis;
+
+	loading.value = false;
+});
+
+let hosting = {};
+hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+
+const selectedPlan = ref(null);
+
+const handleCheckout = async (product, type, customer) => {
+	selectedPlan.value = product.id;
+	const { url } = await $fetch('/api/stripe/checkout', {
+		method: 'post',
+		body: {
+			product: { id: selectedPlan.value },
+			type,
+			customer,
+			account: User.Account,
 		},
+	});
+	location.href = url;
+};
+
+const handlePause = async (subscriptionId) => {
+	loading.value = true;
+	const { date: paused, error } = await $fetch(
+		'/api/stripe/subscription/pause',
 		{
-			name: 'Basic',
-			id: 'basic',
-			desc: 'Great for running lightweight automations',
-			features: [
-				'Up to 2 hours of development',
-				'Unlimited debugging',
-				'48 hours (18/5) response time',
-			],
-			image: support,
-			priceMonthly: 600,
-			priceYearly: 6000,
-			limit: 'Up to 5 active requests',
-		},
-		{
-			name: 'Growth',
-			id: 'growth',
-			desc: 'We scale as you scale',
-			image: growth,
-			features: [
-				'Up to 20 hours of development',
-				'Unlimited project requests',
-				'QA testing',
-				'Add us to your Slack',
-				'36-hour (18/5) response time',
-			],
-			priceMonthly: 1800,
-			priceYearly: 18000,
-			limit: 'Up to 25 active requests',
-		},
-		{
-			name: 'Enterprise',
-			id: 'enterprise',
-			desc: 'Governance, compliance and support.',
-			features: [
-				'Up to 80 hours of development',
-				'Concurrent requests',
-				'Regular unit & load testing',
-				'Team coaching',
-				'Monthly strategy call',
-				'Process documentation hub',
-				'24-hour (18/7) response time',
-			],
-			image: enterprise,
-			priceMonthly: 5400,
-			priceYearly: 54000,
-			limit: 'Unlimited active requests',
-		},
-	];
+			method: 'post',
+			body: {
+				subscriptionId,
+			},
+		}
+	);
+	location.reload();
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -684,86 +724,35 @@
 		.limit(1)
 		.single();
 
-	let retainer = {};
-	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
-
-	var date = new Date(Date.now());
-	var firstDay = new Date(
-		date.getFullYear(),
-		date.getMonth(),
-		new Date(retainer.value.startDate).getDate()
+	retainer.value = User.Account.Subscription.find(
+		(o) => o.type === 'retainer'
 	);
+};
 
-	let hosting = {};
-	hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-
-	const selectedPlan = ref(null);
-
-	const handleCheckout = async (product, type, customer) => {
-		selectedPlan.value = product.id;
-		const { url } = await $fetch('/api/stripe/checkout', {
+const handleResume = async (subscriptionId, days_left) => {
+	loading.value = true;
+	const { date: resumed, error } = await $fetch(
+		'/api/stripe/subscription/resume',
+		{
 			method: 'post',
 			body: {
-				product: { id: selectedPlan.value },
-				type,
-				customer,
-				account: User.Account,
+				subscriptionId,
+				days_left,
 			},
-		});
-		location.href = url;
-	};
+		}
+	);
+	location.reload();
 
-	const handlePause = async (subscriptionId) => {
-		loading.value = true;
-		const { date: paused, error } = await $fetch(
-			'/api/stripe/subscription/pause',
-			{
-				method: 'post',
-				body: {
-					subscriptionId,
-				},
-			}
-		);
-		location.reload();
-
-		let { data: User, error: userError } = await supabase
-			.from('User')
-			.select(
-				`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
-			)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-
-		retainer.value = User.Account.Subscription.find(
-			(o) => o.type === 'retainer'
-		);
-	};
-
-	const handleResume = async (subscriptionId, days_left) => {
-		loading.value = true;
-		const { date: resumed, error } = await $fetch(
-			'/api/stripe/subscription/resume',
-			{
-				method: 'post',
-				body: {
-					subscriptionId,
-					days_left,
-				},
-			}
-		);
-		location.reload();
-
-		let { data: User, error: userError } = await supabase
-			.from('User')
-			.select(
-				`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
-			)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-		retainer.value = User.Account.Subscription.find(
-			(o) => o.type === 'retainer'
-		);
-	};
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+	retainer.value = User.Account.Subscription.find(
+		(o) => o.type === 'retainer'
+	);
+};
 </script>

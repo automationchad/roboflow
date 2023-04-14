@@ -37,12 +37,11 @@ import {
 import { format, addDays } from 'date-fns';
 
 const user = useSupabaseUser();
-
 const supabase = useSupabaseClient();
 
 const state = reactive({
 	kpis: { 'Task Runs': 0 },
-	workflows: { count: 0, runs: {count: 0} },
+	workflows: { count: 0, runs: { count: 0 } },
 	loading: true,
 });
 
@@ -221,8 +220,8 @@ onMounted(async () => {
 																	) + 1
 																].name
 																} tier
-																														for a greatly increased quota and continue to
-																														scale.`
+																																													for a greatly increased quota and continue to
+																																													scale.`
 															}}
 															<p v-if="retainer.tier !== 'enterprise'">
 															See
@@ -325,7 +324,7 @@ onMounted(async () => {
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
 												{{ entitlements[retainer.tier]
-																.ticket_count === 0 ? '-' :
+													.ticket_count === 0 ? '-' :
 													`${formatAccounting(
 														(User.Account.Ticket.filter(
 															(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
@@ -337,15 +336,15 @@ onMounted(async () => {
 												}}
 											</td>
 											<td v-if="entitlements[retainer.tier]
-												.ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier}}</span> tier</span>
+												.ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier }}</span> tier</span>
 												<NuxtLink to="/settings/billing/update"
 														v-if="retainer.tier !== 'enterprise'"
 															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
 															
 														>
 															<span class="truncate">Upgrade to {{ Object.values(entitlements).find(item => {
-    return item['ticket_count'] > 0;
-  }).name }} </span>
+																return item['ticket_count'] > 0;
+															}).name }} </span>
 														</NuxtLink></div></td>
 											<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
@@ -357,8 +356,8 @@ onMounted(async () => {
 														>
 															{{
 																User.Account.Ticket.filter(
-															(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
-														).length
+																	(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
+																).length
 															}}
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -382,7 +381,7 @@ onMounted(async () => {
 															:style="`width: ${(User.Account.Ticket.filter(
 																(o) => o.status !== 'done'
 															).length /
-																	entitlements[retainer.tier].ticket_count) *
+																entitlements[retainer.tier].ticket_count) *
 																100
 																}%`"
 														></div>
@@ -417,7 +416,7 @@ onMounted(async () => {
 												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
 											>
 												{{ entitlements[retainer.tier]
-																.concurrent_ticket_count === 0 ? '-' :
+													.concurrent_ticket_count === 0 ? '-' :
 													`${formatAccounting(
 														(User.Account.Ticket.filter(
 															(o) => o.status === 'active'
@@ -431,15 +430,15 @@ onMounted(async () => {
 											</td>
 											
 											<td v-if="entitlements[retainer.tier]
-												.concurrent_ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier}}</span> tier</span>
+												.concurrent_ticket_count === 0" class="px-6 py-3 text-sm text-scale-1200"><div class="flex items-center justify-between"><span>Not included in <span class="capitalize">{{ retainer.tier }}</span> tier</span>
 												<NuxtLink to="/settings/billing/update"
 														v-if="retainer.tier !== 'enterprise'"
 															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
 															
 														>
 															<span class="truncate">Upgrade to {{ Object.values(entitlements).find(item => {
-    return item['concurrent_ticket_count'] > 0;
-  }).name }} </span>
+																return item['concurrent_ticket_count'] > 0;
+															}).name }} </span>
 														</NuxtLink></div></td>
 										<td v-else class="text-scale-1200 px-6 py-3 text-sm">
 												<div class="flex w-full flex-col">
@@ -480,8 +479,8 @@ onMounted(async () => {
 															:style="`width: ${(User.Account.Ticket.filter(
 																(o) => o.status === 'active'
 															).length /
-																	entitlements[retainer.tier]
-																		.concurrent_ticket_count) *
+																entitlements[retainer.tier]
+																	.concurrent_ticket_count) *
 																100
 																}%`"
 														></div>
@@ -589,7 +588,7 @@ onMounted(async () => {
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
 															:style="`width: ${(User.Account.User.length /
-																	entitlements[retainer.tier].user_count) *
+																entitlements[retainer.tier].user_count) *
 																100
 																}%`"
 														></div>
@@ -782,7 +781,7 @@ onMounted(async () => {
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
 															:style="`width: ${(state.workflows.count /
-																	entitlements[retainer.tier].workflow_count) *
+																entitlements[retainer.tier].workflow_count) *
 																100
 																}%`"
 														></div>
@@ -926,7 +925,7 @@ onMounted(async () => {
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
 															:style="`width: ${(state.workflows.runs.count /
-																	entitlements[retainer.tier].workflow_runs) *
+																entitlements[retainer.tier].workflow_runs) *
 																100
 																}%`"
 														></div>
@@ -1111,7 +1110,7 @@ onMounted(async () => {
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
 															:style="`width: ${(state.kpis['Task Runs'] /
-																	entitlements[retainer.tier].execution_count) *
+																entitlements[retainer.tier].execution_count) *
 																100
 																}%`"
 														></div>
