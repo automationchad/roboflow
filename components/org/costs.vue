@@ -115,12 +115,12 @@ const plans = [
 	},
 ];
 
-const entitlements = await getEntitlements();
+const entitlements = getEntitlements();
 
 const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
 let retainer = {};
-retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
+retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
 var date = new Date(Date.now());
 var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -147,6 +147,12 @@ const kpis = ref(state.kpis);
 const workflows = ref(state.workflows);
 const loading = ref(state.loading);
 
+const upgrade_needed = ref(false);
+
+upgrade_needed.value = entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length < 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0
+
+const freePlan = retainer.tier === 'free';
+
 onMounted(async () => {
 	const { kpis, workflows } = await fetchData();
 	state.kpis = kpis;
@@ -162,7 +168,7 @@ onMounted(async () => {
 				<div class="relative">
 					<div class="transition-opacity duration-300">
 						<div >
-							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0">
+							<div class="mb-10" v-if="upgrade_needed || freePlan">
 								<div
 									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
 								>
@@ -193,7 +199,7 @@ onMounted(async () => {
 												></span>
 												<div class="flex-grow">
 													<h5 class="text-sm text-slate-900 dark:text-white">
-														You are exceeding your plans quota
+														{{ upgrade_needed ? "You are exceeding your plans quota" : `Your account plan is paused` }}
 													</h5>
 												</div>
 											</div>
@@ -220,8 +226,8 @@ onMounted(async () => {
 																	) + 1
 																].name
 																} tier
-																																													for a greatly increased quota and continue to
-																																													scale.`
+																																																																																																																																																																																																																		for a greatly increased quota and continue to
+																																																																																																																																																																																																																		scale.`
 															}}
 															<p v-if="retainer.tier !== 'enterprise'">
 															See

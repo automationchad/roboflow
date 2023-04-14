@@ -60,7 +60,7 @@
 										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
 									>
 										<div class="flex w-[40%] items-center gap-3">
-											<span class="text-sm">Retainer</span>
+											<span class="text-sm">Base Plan</span>
 										</div>
 										<div class="flex w-[20%] justify-end">
 											<span class="text-sm">{{ retainer.quantity }}</span>

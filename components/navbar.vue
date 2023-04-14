@@ -158,8 +158,14 @@
 						<NuxtLink
 							v-if="upgrade_needed"
 							to="/settings/billing#usage"
-							class="rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-xs font-normal text-red-700"
+							class="rounded-full border w-full text-center border-red-200 dark:border-red-600 dark:bg-red-800 dark:text-red-300 bg-red-100 px-2 py-0.5 text-xs font-normal text-red-700"
 							>Account has exceeded usage limits</NuxtLink
+						>
+						<NuxtLink
+							v-else-if="retainer.tier === 'free'"
+							to="/settings/billing#usage"
+							class="rounded-full border w-full text-center border-yellow-200 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300 bg-yellow-100 px-2 py-0.5 text-xs font-normal text-yellow-700"
+							>Account is paused</NuxtLink
 						>
 					</div>
 				</div>
