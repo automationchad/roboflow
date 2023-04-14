@@ -78,7 +78,7 @@
 											}}</span>
 										</div>
 									</div>
-									<div
+									<div v-if="hosting"
 										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
 									>
 										<div class="flex w-[40%] items-center gap-3">
@@ -100,7 +100,7 @@
 											}}</span>
 										</div>
 									</div>
-									<div
+									<div v-if="hosting"
 										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
 									>
 										<div class="flex w-[40%] items-center gap-3">
@@ -140,7 +140,8 @@
 											class="flex w-[20%] items-center justify-end space-x-1"
 										>
 											<p class="text-slate-500">$</p>
-											<h3 class="m-0 text-xl dark:text-slate-200">{{ formatAccounting(taskPrice(state.kpis['Task Runs']) * retainer.quantity + retainer.amount / 100 * retainer.quantity + 150, false) }}</h3>
+											<h3 class="m-0 text-xl dark:text-slate-200">{{ formatAccounting(
+												taskPrice(hosting ? state.kpis['Task Runs'] : 0) * retainer.quantity + (retainer.amount / 100 * retainer.quantity) + (hosting ? 150 : 0), false) }}</h3>
 										</div>
 									</div>
 								</div>
