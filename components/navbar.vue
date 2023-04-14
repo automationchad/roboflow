@@ -164,8 +164,8 @@
 						<NuxtLink
 							v-else-if="retainer.tier === 'free'"
 							to="/settings/billing#usage"
-							class="rounded-full border w-full text-center border-yellow-200 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300 bg-yellow-100 px-2 py-0.5 text-xs font-normal text-yellow-700"
-							>Account is paused</NuxtLink
+							class="rounded-full border w-full inline-flex items-center space-x-1 justify-center text-center border-yellow-200 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300 bg-yellow-100 px-2 py-0.5 text-xs font-normal text-yellow-700"
+							><svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="10" y1="15" x2="10" y2="9"></line><line x1="14" y1="15" x2="14" y2="9"></line></svg>Paused</NuxtLink
 						>
 					</div>
 				</div>
@@ -323,53 +323,53 @@
 </template>
 
 <script setup>
-	import { ref } from 'vue';
-	import {
-		Dialog,
-		DialogPanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		TransitionChild,
-		TransitionRoot,
-	} from '@headlessui/vue';
-	import {
-		Bars3Icon,
-		BellIcon,
-		CalendarIcon,
-		Cog6ToothIcon,
-		Cog8ToothIcon,
-		CodeBracketIcon,
-		DocumentDuplicateIcon,
-		CircleStackIcon,
-		QueueListIcon,
-		FolderIcon,
-		HomeIcon,
-		PlusIcon,
-		UsersIcon,
-		TicketIcon,
-		QuestionMarkCircleIcon,
-		CreditCardIcon,
-		XMarkIcon,
-		LockClosedIcon,
-		CpuChipIcon,
-	} from '@heroicons/vue/24/outline';
-	import {
-		ChevronDownIcon,
-		MagnifyingGlassIcon,
-		ChartBarIcon,
-		StarIcon,
-	} from '@heroicons/vue/20/solid';
+import { ref } from 'vue';
+import {
+	Dialog,
+	DialogPanel,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuItems,
+	TransitionChild,
+	TransitionRoot,
+} from '@headlessui/vue';
+import {
+	Bars3Icon,
+	BellIcon,
+	CalendarIcon,
+	Cog6ToothIcon,
+	Cog8ToothIcon,
+	CodeBracketIcon,
+	DocumentDuplicateIcon,
+	CircleStackIcon,
+	QueueListIcon,
+	FolderIcon,
+	HomeIcon,
+	PlusIcon,
+	UsersIcon,
+	TicketIcon,
+	QuestionMarkCircleIcon,
+	CreditCardIcon,
+	XMarkIcon,
+	LockClosedIcon,
+	CpuChipIcon,
+} from '@heroicons/vue/24/outline';
+import {
+	ChevronDownIcon,
+	MagnifyingGlassIcon,
+	ChartBarIcon,
+	StarIcon,
+} from '@heroicons/vue/20/solid';
 
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
-	const avatarUrl = ref(null);
+const user = useSupabaseUser();
+const supabase = useSupabaseClient();
+const avatarUrl = ref(null);
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,
+let { data: User, error: userError } = await supabase
+	.from('User')
+	.select(
+		`*,
 				Account (
 			     id,
 				 name,
@@ -382,99 +382,99 @@
 				 Ticket (count)
 			   )
 			 `
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	)
+	.eq('id', user.value.id)
+	.limit(1)
+	.single();
 
-	const teams = ref([]);
-	const entitlements = await getEntitlements();
+const teams = ref([]);
+const entitlements = await getEntitlements();
 
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
-	const entitlement = entitlements[retainer.tier];
+const entitlement = entitlements[retainer.tier];
 
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
-	).length;
-	const upgrade_needed = ref(false);
-	upgrade_needed.value =
-		totalActive > entitlement.ticket_count &&
-		// retainer.status === 'active' &&
-		User.systemRole !== 'super_admin';
+const totalActive = User.Account.Ticket.filter(
+	(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
+).length;
+const upgrade_needed = ref(false);
+upgrade_needed.value =
+	totalActive > entitlement.ticket_count &&
+	// retainer.status === 'active' &&
+	User.systemRole !== 'super_admin';
 
-	function moveOrgToFront(arr) {
-		const orgIndex =
-			User.Account.type === 'super_admin'
-				? arr.findIndex((obj) => obj.id === User.Account.id)
-				: arr.findIndex((obj) => obj.name === 'Organization');
-		if (orgIndex > -1) {
-			const orgObj = arr.splice(orgIndex, 1)[0];
-			arr.unshift(orgObj);
-		}
-		return arr;
+function moveOrgToFront(arr) {
+	const orgIndex =
+		User.Account.type === 'super_admin'
+			? arr.findIndex((obj) => obj.id === User.Account.id)
+			: arr.findIndex((obj) => obj.name === 'Organization');
+	if (orgIndex > -1) {
+		const orgObj = arr.splice(orgIndex, 1)[0];
+		arr.unshift(orgObj);
 	}
+	return arr;
+}
 
-	onMounted(async () => {
-		let { data: Account, error: accountError } = await supabase
-			.from('Account')
-			.select('*,Ticket(status,type)');
-		if (User.Account.type === 'super_admin') {
-			teams.value = Account;
-		} else {
-			teams.value = User.Account.Team;
-			const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
-			const item = teams.value.splice(index, 1)[0];
-			teams.value.unshift(item);
-		}
-		teams.value = moveOrgToFront(teams.value);
+onMounted(async () => {
+	let { data: Account, error: accountError } = await supabase
+		.from('Account')
+		.select('*,Ticket(status,type)');
+	if (User.Account.type === 'super_admin') {
+		teams.value = Account;
+	} else {
+		teams.value = User.Account.Team;
+		const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
+		const item = teams.value.splice(index, 1)[0];
+		teams.value.unshift(item);
+	}
+	teams.value = moveOrgToFront(teams.value);
+});
+
+const getAvatarUrl = async (avatar) => {
+	const {
+		data: [File],
+		error: fileError,
+	} = await supabase.storage.from('avatars').list(`${avatar}/`, {
+		limit: 100,
+		offset: 0,
+		sortBy: { column: 'updated_at', order: 'desc' },
+		search: `${user.value.id}`,
 	});
-
-	const getAvatarUrl = async (avatar) => {
+	if (File) {
 		const {
-			data: [File],
-			error: fileError,
-		} = await supabase.storage.from('avatars').list(`${avatar}/`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${user.value.id}`,
-		});
-		if (File) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from('avatars')
-				.getPublicUrl(`/${user.value.id}/${File.name}`);
+			data: { publicUrl },
+		} = await supabase.storage
+			.from('avatars')
+			.getPublicUrl(`/${user.value.id}/${File.name}`);
 
-			return publicUrl;
-		} else return null;
-	};
+		return publicUrl;
+	} else return null;
+};
 
-	avatarUrl.value = await getAvatarUrl(user.value.id);
+avatarUrl.value = await getAvatarUrl(user.value.id);
 
-	const route = useRoute();
+const route = useRoute();
 
-	const navigation = [
-		{
-			name: 'Dashboard',
-			href: `/${User.Account.id}/dashboard`,
-			icon: ChartBarIcon,
-			current: route.path.includes`/${User.Account.id}/dashboard`,
-		},
-		{
-			name: 'Plan & Billing',
-			href: `/${User.Account.id}/settings/billing`,
-			icon: CreditCardIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
-		{
-			name: 'Settings & Members',
-			href: `/${User.Account.id}/settings`,
-			icon: Cog8ToothIcon,
-			current: route.path.includes(`/${User.Account.id}/settings`),
-		},
-	];
+const navigation = [
+	{
+		name: 'Dashboard',
+		href: `/${User.Account.id}/dashboard`,
+		icon: ChartBarIcon,
+		current: route.path.includes`/${User.Account.id}/dashboard`,
+	},
+	{
+		name: 'Plan & Billing',
+		href: `/${User.Account.id}/settings/billing`,
+		icon: CreditCardIcon,
+		current: route.path.includes(`/${User.Account.id}/settings/billing`),
+	},
+	{
+		name: 'Settings & Members',
+		href: `/${User.Account.id}/settings`,
+		icon: Cog8ToothIcon,
+		current: route.path.includes(`/${User.Account.id}/settings`),
+	},
+];
 
-	const sidebarOpen = ref(false);
+const sidebarOpen = ref(false);
 </script>
