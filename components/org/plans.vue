@@ -8,7 +8,7 @@
 					<div class="relative">
 						<div class="transition-opacity duration-300">
 							<div
-								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-200  dark:border-slate-800 dark:bg-slate-900"
 							>
 								<div class="bg-panel-body-light dark:bg-panel-body-dark">
 									<div class="flex items-center justify-between px-6 pt-4">

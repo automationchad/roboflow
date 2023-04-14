@@ -1,7 +1,7 @@
 <template>
 	<div class="mx-auto w-full">
 		<div
-			class="max-w-4xl rounded border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+			class="max-w-4xl rounded border border-slate-200  dark:border-slate-800 dark:bg-slate-900"
 		>
 			<warning-access :role="User.systemRole" />
 
