@@ -109,7 +109,7 @@
 						<div class="flex items-center">
 							<NuxtLink
 								v-if="upgrade_needed"
-								to="/settings/billing"
+								to="/settings/billing#usage"
 								class="rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-xs text-red-700"
 								>Project has exceeded usage limits</NuxtLink
 							>

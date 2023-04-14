@@ -23,7 +23,12 @@
 											</h1>
 										</div>
 										<div class="px-4 sm:px-6 lg:px-0">
-											<TabGroup class="py-6" as="div">
+											<TabGroup
+												class="py-6"
+												as="div"
+												:selectedIndex="selectedTab"
+												@change="changeTab"
+											>
 												<!-- Tabs -->
 												<div class="lg:hidden">
 													<label for="selected-tab" class="sr-only"
@@ -49,15 +54,15 @@
 													>
 														<nav class="-mb-[2px] flex space-x-8">
 															<Tab
-																as="div"
-																v-for="tab in tabs"
+																as="a"
+																:href="tab.id"
+																v-for="(tab, idx) in tabs"
 																:key="tab.name"
-																rel="noreferrer"
 																v-slot="{ selected }"
 																class="whitespace-nowrap py-4 text-sm font-medium outline-none"
 																><a
 																	:class="[
-																		selected
+																		selectedTab === idx
 																			? 'border-indigo-500'
 																			: 'border-transparent',
 																		'cursor-pointer whitespace-nowrap border-b px-1 py-4 text-sm font-normal text-gray-500 outline-none dark:text-white',
@@ -141,21 +146,36 @@
 	const tabs = [
 		{
 			name: 'Subscription',
+			id: '#subscription',
 			href: `/${User.accountId}/settings/billing`,
 			current: true,
 		},
 		{
 			name: 'Usage',
+			id: '#usage',
 			href: `/${User.accountId}/settings/billing/cost-management`,
 			current: false,
 		},
 
 		{
 			name: 'Invoices',
+			id: '#invoices',
 			href: `/${User.accountId}/settings/billing/invoices`,
 			current: false,
 		},
 	];
+
+	console.log(route);
+
+	const selectedTab = ref(
+		tabs.findIndex((o) => o.id === route.hash) !== ''
+			? tabs.findIndex((o) => o.id === route.hash)
+			: 0
+	);
+
+	function changeTab(index) {
+		selectedTab.value = index;
+	}
 
 	const sidebarOpen = ref(false);
 </script>

@@ -11,7 +11,7 @@ export default function () {
 			document_size: 0,
 		},
 		basic: {
-			ticket_count: 0,
+			ticket_count: 5,
 			concurrent_ticket_count: 0,
 			execution_count: 0,
 			user_count: 5,
@@ -21,9 +21,9 @@ export default function () {
 			document_size: 0,
 		},
 		growth: {
-			ticket_count: 15,
-			concurrent_ticket_count: 2,
-			execution_count: 100000,
+			ticket_count: 10,
+			concurrent_ticket_count: 0,
+			execution_count: 1000000,
 			user_count: 10,
 			workflow_count: 100,
 			workflow_runs: 500000,
@@ -31,7 +31,7 @@ export default function () {
 			document_size: 0,
 		},
 		enterprise: {
-			ticket_count: 25,
+			ticket_count: 20,
 			concurrent_ticket_count: 5,
 			execution_count: 10000,
 			user_count: 20,

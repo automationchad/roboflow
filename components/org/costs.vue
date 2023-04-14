@@ -116,58 +116,12 @@
 		},
 	];
 
-	const entitlements = {
-		free: {
-			ticket_count: 0,
-			concurrent_ticket_count: 0,
-			execution_count: 0,
-			user_count: 2,
-			workflow_count: 0,
-			workflow_runs: 0,
-			document_count: 0,
-			document_size: 0,
-		},
-		basic: {
-			ticket_count: 0,
-			concurrent_ticket_count: 0,
-			execution_count: 0,
-			user_count: 5,
-			workflow_count: 0,
-			workflow_runs: 0,
-			document_count: 0,
-			document_size: 0,
-		},
-		growth: {
-			ticket_count: 15,
-			concurrent_ticket_count: 2,
-			execution_count: 100000,
-			user_count: 10,
-			workflow_count: 100,
-			workflow_runs: 500000,
-			document_count: 0,
-			document_size: 0,
-		},
-		enterprise: {
-			ticket_count: 25,
-			concurrent_ticket_count: 5,
-			execution_count: 10000,
-			user_count: 20,
-			workflow_count: 200,
-			workflow_runs: 5000,
-			document_count: 500,
-			document_size: 50000,
-		},
-	};
-
-	const task_entitlement = super_admin ? 10000 : 100000;
+	const entitlements = await getEntitlements();
 
 	const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
 
 	let retainer = {};
 	retainer = ref(User.Account.Subscription.find((o) => o.type === 'retainer'));
-
-	const tiers = 10;
-	const monthly_base = 150;
 
 	var date = new Date(Date.now());
 	var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -177,41 +131,6 @@
 			return acc + item.amount;
 		}, 0) / 100
 	);
-
-	const trayCost = (tasks) => {
-		if (tasks <= 1000000) return tasks * (2.04 / 1000);
-		if (tasks > 1000000 && tasks <= 3000000)
-			return 1000000 * (2.04 / 1000) + (tasks - 1000000) * (1.8 / 1000);
-		if (tasks > 3000000 && tasks <= 10000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				(tasks - 3000000) * (1.56 / 1000)
-			);
-		if (tasks > 10000000 && tasks <= 20000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				10000000 * (1.56 / 1000) +
-				(tasks - 10000000) * (1.2 / 1000)
-			);
-		if (tasks > 20000000 && tasks <= 40000000)
-			return (
-				1000000 * (2.04 / 1000) +
-				3000000 * (1.8 / 1000) +
-				10000000 * (1.56 / 1000) +
-				20000000 * (1.2 / 1000) +
-				(tasks - 20000000) * (0.96 / 1000)
-			);
-		else return tasks * 0.005;
-	};
-
-	const formatNumber = (num) => {
-		let formattedNum = Math.abs(num)
-			.toFixed(2)
-			.replace(/\d(?=(\d{3})+\.)/g, '$&,');
-		return num < 0 ? `($${formattedNum})` : `$${formattedNum}`;
-	};
 
 	const workspaceId =
 		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
@@ -245,9 +164,9 @@
 				<div class="relative">
 					<div class="transition-opacity duration-300">
 						<div v-if="!loading">
-							<div class="mb-10" v-if="true">
+							<div class="mb-10" v-if="entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length <= 0">
 								<div
-									class="border-slate-600 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 block w-full rounded border py-3"
+									class="block w-full rounded border border-slate-600 bg-slate-100 py-3 dark:border-slate-800 dark:bg-slate-900"
 								>
 									<div class="flex flex-col px-4">
 										<div class="flex items-center justify-between">
@@ -275,7 +194,7 @@
 														></line></svg
 												></span>
 												<div class="flex-grow">
-													<h5 class="text-slate-900 dark:text-white text-sm">
+													<h5 class="text-sm text-slate-900 dark:text-white">
 														You are exceeding your plans quota
 													</h5>
 												</div>
@@ -288,26 +207,53 @@
 											<div class="text-sm text-slate-500 dark:text-slate-400">
 												<div class="p-1">
 													<div>
-														<p>
-															Your project is currently on the
-															{{ retainer.tier }} tier - upgrade to the Pro tier
-															for a greatly increased quota and continue to
-															scale.
-														</p>
 														<p class="mb-4">
+															Your project is currently on the
+															<span class="capitalize">{{
+																retainer.tier
+															}}</span>
+															tier -
+															{{
+																retainer.tier === 'enterprise'
+																	? 'Please schedule a call with us to discuss a custom plan to scale up.'
+																	: `upgrade to the ${
+																			plans[
+																				plans.findIndex(
+																					(o) => o.id === retainer.tier
+																				) + 1
+																			].name
+																	  } tier
+															for a greatly increased quota and continue to
+															scale.`
+															}}
+															<p v-if="retainer.tier !== 'enterprise'">
 															See
 															<a
-																class="text-indigo-800"
+																class="text-indigo-800 dark:text-indigo-400"
 																href="https://app.motis.group/#pricing"
 																>pricing page</a
 															>
 															for a full breakdown of available plans.
 														</p>
+														</p>
+														
 														<button
+														v-if="retainer.tier !== 'enterprise'"
 															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
 															type="button"
 														>
-															<span class="truncate">Upgrade</span>
+															<span class="truncate">Upgrade to {{ plans[
+																				plans.findIndex(
+																					(o) => o.id === retainer.tier
+																				) + 1
+																			].name }} </span>
+														</button>
+														<button
+														v-else
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
+															type="button"
+														>
+															<span class="truncate">Enquire about custom</span>
 														</button>
 													</div>
 												</div>
@@ -318,8 +264,7 @@
 							</div>
 							<!-- Database -->
 							<div
-								
-								class="border-slate-200 dark:border-slate-800 dark:bg-slate-900 mb-8 overflow-hidden rounded border dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -331,7 +276,7 @@
 											<th class="w-1/4 px-6 py-3 text-left">
 												<div class="flex items-center space-x-4">
 													<div
-														class="dark:bg-slate-800 flex h-8 w-8 items-center justify-center rounded"
+														class="flex h-8 w-8 items-center justify-center rounded dark:bg-slate-800"
 													>
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -355,9 +300,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -438,9 +381,7 @@
 												</div>
 											</td>
 										</tr>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -533,7 +474,7 @@
 
 							<div
 								v-if="true"
-								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -570,9 +511,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -652,7 +591,7 @@
 							</div>
 
 							<div
-								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -700,9 +639,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -777,9 +714,7 @@
 												</div>
 											</td>
 										</tr>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -858,7 +793,7 @@
 								</table>
 							</div>
 							<div
-								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border bg-slate-900 dark:text-white"
+								class="mb-8 overflow-hidden rounded border border-slate-200 bg-slate-900 dark:border-slate-800 dark:text-white"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -895,9 +830,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -975,7 +908,7 @@
 										</tr>
 										<tr
 											v-if="false"
-											class="border-slate-200 dark:border-slate-800 border-t"
+											class="border-t border-slate-200 dark:border-slate-800"
 										>
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
@@ -1036,7 +969,7 @@
 							</div>
 							<div
 								v-if="false"
-								class="border-slate-200 dark:border-slate-800 mb-8 overflow-hidden rounded border"
+								class="mb-8 overflow-hidden rounded border border-slate-200 dark:border-slate-800"
 							>
 								<table
 									class="bg-panel-body-light dark:bg-panel-body-dark w-full"
@@ -1073,9 +1006,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -1128,9 +1059,7 @@
 												</div>
 											</td>
 										</tr>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>
@@ -1183,9 +1112,7 @@
 												</div>
 											</td>
 										</tr>
-										<tr
-											class="border-slate-200 dark:border-slate-800 border-t"
-										>
+										<tr class="border-t border-slate-200 dark:border-slate-800">
 											<td
 												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
 											>

@@ -460,7 +460,7 @@
 		},
 		{
 			name: 'Plan & Billing',
-			href: `/${User.Account.id}/settings/billing`,
+			href: `/${User.Account.id}/settings/billing#subscription`,
 			icon: CreditCardIcon,
 			current: route.path === `/${User.Account.id}/settings/billing`,
 		},
