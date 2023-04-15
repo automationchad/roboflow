@@ -332,9 +332,9 @@
 											<button
 												:class="[
 													retainer.tier === plan.id
-														? 'pointer-events-none border-slate-500 bg-slate-700 opacity-50'
-														: 'border-indigo-400 bg-indigo-600 ',
-													'hover:bg-scale-300 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 relative flex w-full cursor-pointer items-center justify-center space-x-2 rounded border  px-2.5 py-1 text-center text-xs font-normal shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-indigo-600',
+														? 'pointer-events-none border-slate-500 bg-slate-700 text-slate-300 opacity-50'
+														: 'border-indigo-400 bg-indigo-600 text-white',
+													'hover:bg-scale-300 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 relative flex w-full cursor-pointer items-center justify-center space-x-2  rounded border  px-2.5 py-1 text-center text-xs font-normal shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-indigo-600',
 												]"
 												:disabled="retainer.tier === plan.id"
 												type="button"
