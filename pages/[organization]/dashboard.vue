@@ -6,13 +6,13 @@
 		<div class="mb-8 grid grid-cols-2 gap-x-8">
 			<div class="grid grid-cols-3 gap-x-8">
 				<div
-					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+					class="rounded border  p-8 dark:border-slate-800 dark:bg-slate-900"
 				>
 					<h3 class="text-sm text-slate-300">Total value</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">$0.00</h2>
 				</div>
 				<div
-					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+					class="rounded border  p-8 dark:border-slate-800 dark:bg-slate-900"
 				>
 					<h3 class="text-sm text-slate-300">Total requests</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">
@@ -20,7 +20,7 @@
 					</h2>
 				</div>
 				<div
-					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+					class="rounded border  p-8 dark:border-slate-800 dark:bg-slate-900"
 				>
 					<h3 class="text-sm text-slate-300">Number of task</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">0</h2>
@@ -30,9 +30,9 @@
 		</div>
 		<div class="grid grid-flow-row grid-cols-2 grid-rows-2 gap-8">
 			<div
-				class="items-center rounded border border-slate-800 bg-slate-50 text-sm dark:bg-slate-900 dark:text-slate-100"
+				class="items-center rounded border dark:border-slate-800 border-slate-200  text-sm dark:bg-slate-900 dark:text-slate-100"
 			>
-				<div class="border-b border-slate-800 px-6 py-3 text-left">
+				<div class="border-b dark:border-slate-800  px-6 py-3 text-left">
 					<div class="flex items-center space-x-4">
 						<div
 							class="flex h-8 w-8 items-center  justify-center rounded bg-slate-50 dark:bg-slate-800"
@@ -77,7 +77,7 @@
 				</div>
 			</div>
 			<div
-				class="rounded border bg-slate-50 p-0 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+				class="rounded border  p-0 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
 			>
 				<workflow-health
 					v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
@@ -96,7 +96,7 @@
 				</div>
 			</div>
 			<div
-				class="row-span-2 items-center rounded border bg-slate-50 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+				class="row-span-2 items-center rounded border  text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
 			>
 				<ticket-list />
 				<!-- <div
@@ -114,7 +114,7 @@
 			</div>
 
 			<div
-				class="row-span-2 items-center rounded border bg-slate-50 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+				class="row-span-2 items-center rounded border  text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
 			>
 				<workflow-list
 					v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
