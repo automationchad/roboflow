@@ -2,7 +2,7 @@
 	<div class="">
 		<main class="">
 			<div class="">
-				<div class="px-6">
+				<div class="">
 					<div
 						v-if="state.loading"
 						class="flex items-center justify-center py-36"
@@ -10,7 +10,7 @@
 						<loading-spinner />
 					</div>
 					<div v-else class="">
-						<div id="chart" class="mt-8 h-full w-full">
+						<div id="chart" class="h-full w-full">
 							<div
 								class="flex items-center py-24 text-sm font-normal text-slate-300"
 								v-if="!state.data"

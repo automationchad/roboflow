@@ -974,7 +974,7 @@ onMounted(async () => {
 															></polygon>
 														</svg>
 													</div>
-													<h5 class="mb-0">Tasks</h5>
+													<h5 class="mb-0">Executions</h5>
 												</div>
 											</th>
 										</tr>

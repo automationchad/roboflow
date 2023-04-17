@@ -1,77 +1,77 @@
 <template>
 	<div class="">
-		<table class="min-w-full divide-y divide-gray-200 dark:divide-slate-600">
-			<thead class="bg-slate-50 dark:bg-transparent">
-				<tr class="border-b border-slate-400">
-					<th
-						scope="col"
-						class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+		<div
+			v-if="true"
+			class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+		>
+			<table class="bg-panel-body-light dark:bg-panel-body-dark w-full">
+				<thead class="bg-panel-header-light dark:bg-panel-header-dark">
+					<tr class="overflow-hidden rounded">
+						<th class="w-1/4 px-6 py-3 text-left">
+							<div class="flex items-center space-x-4">
+								<div
+									class="flex h-8 w-8 items-center justify-center rounded bg-slate-50 dark:bg-slate-800"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M8.25 5.75h-2.5a1 1 0 0 0-1 1v5.5m10.07-3.533c-1.786-1.074-.573-3.263-.573-3.263l-.946-.568a.95.95 0 0 0-1.325.37L6.88 14.448a1.034 1.034 0 0 0 .355 1.381l5.464 3.285a.95.95 0 0 0 1.325-.37l5.096-9.192a1.034 1.034 0 0 0-.355-1.381l-.946-.569s-1.213 2.19-3 1.115Z"
+										></path>
+									</svg>
+								</div>
+								<h5 class="mb-0">Tickets</h5>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						v-for="ticket in tickets.slice(0, 15)"
+						:key="ticket.id"
+						class="border-t border-slate-200 dark:border-slate-800"
 					>
-						Name
-					</th>
-					<th
-						scope="col"
-						class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
-					>
-						Updated
-					</th>
-					<th
-						scope="col"
-						class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
-					>
-						Type
-					</th>
-
-					<!--
-                              `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
-                            -->
-				</tr>
-				<tr class="px-6" v-if="tickets.length === 0">
-					<th colspan="4" class="py-24 text-sm font-normal text-slate-300">
-						No tickets
-					</th>
-				</tr>
-			</thead>
-
-			<tbody
-				class="max-h-[100px] divide-y divide-slate-200 overflow-y-scroll bg-slate-50 dark:divide-slate-700 dark:bg-transparent"
-			>
-				<tr v-for="ticket in tickets.slice(0, 15)" :key="ticket.id">
-					<td
-						class="flex items-center px-6 py-2 text-sm font-normal text-gray-900 dark:text-white"
-					>
-						<span
-							><a
-								class="hover:underline"
-								:href="`/${User.defaultTeamId}/tickets/${ticket.id}`"
-								>{{ ticket.name }}</a
-							></span
+						<td class="text-scale-1200 whitespace-nowrap w-2/3 px-6 py-3 text-sm">
+							<span
+								><a
+									class="hover:underline"
+									:href="`/${User.defaultTeamId}/tickets/${ticket.id}`"
+									>{{ ticket.name }}</a
+								></span
+							>
+						</td>
+						<td
+							class="text-scale-1200 hidden w-1/6 whitespace-nowrap p-3 text-sm lg:table-cell"
 						>
-					</td>
-					<td
-						class="px-6 py-2 text-left text-sm text-gray-500 dark:text-slate-200"
-					>
-						{{
-							format(new Date(ticket.updatedOn), 'MMM dd, yyyy') +
-							' at ' +
-							format(new Date(ticket.updatedOn), 'hh:mm')
-						}}
-					</td>
-					<td
-						class="px-6 py-2 text-left text-sm text-gray-500 dark:text-slate-200"
-					>
-						<span
-							:class="[
-								styles[ticket.type],
-								'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] leading-3 font-medium capitalize ring-1',
-							]"
-						>
-							{{ ticket.type }}
-						</span>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+							{{
+								format(new Date(ticket.updatedOn), 'MMM dd, yyyy') +
+								' at ' +
+								format(new Date(ticket.updatedOn), 'hh:mm')
+							}}
+						</td>
+						<td class="text-scale-1200 px-6 py-3 w-1/6 text-right text-sm">
+							<span
+								:class="[
+									styles[ticket.type],
+									'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium capitalize leading-3 ring-1',
+								]"
+							>
+								{{ ticket.type }}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
 	</div>
 </template>
 

@@ -1,6 +1,71 @@
 <template>
 	<div class="">
-		<div class="space-y-6 lg:px-0">
+		<div
+			v-if="true"
+			class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+		>
+			<table class="bg-panel-body-light dark:bg-panel-body-dark w-full ">
+				<thead class="bg-panel-header-light dark:bg-panel-header-dark">
+					<tr class="overflow-hidden rounded">
+						<th class="w-1/4 px-6 py-3 text-left">
+							<div class="flex items-center space-x-4">
+								<div
+									class="flex h-8 w-8 items-center justify-center rounded bg-slate-50 dark:bg-slate-800"
+								>
+									<svg
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M15.75 8.75L19.25 12L15.75 15.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M8.25 8.75L4.75 12L8.25 15.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+									</svg>
+								</div>
+								<h5 class="mb-0">Workflows</h5>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody class="overflow-hidden">
+					<tr
+						v-for="workflow in state.data.slice(0,5)"
+						:key="workflow.id"
+						class="border-t border-slate-200 dark:border-slate-800"
+					>
+						<td
+							class="text-scale-1200 w-2/3 whitespace-nowrap px-6 py-3 text-sm"
+						>
+							<span class="max-w-[200px] truncate text-ellipsis">{{
+								workflow.id
+							}}</span>
+						</td>
+						<td
+							class="text-scale-1200 hidden w-1/6 whitespace-nowrap p-3 text-sm lg:table-cell"
+						>
+							{{ workflow.name }}
+						</td>
+						<td class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
+							<span> </span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="space-y-6 lg:px-0" v-if="false">
 			<!-- Workflows -->
 
 			<div class="grid grid-cols-1 gap-8">

@@ -1,21 +1,27 @@
 <template>
 	<div>
 		<Head>
-            <Title>Motis Group | Dashboard</Title>
-         </Head>
+			<Title>Motis Group | Dashboard</Title>
+		</Head>
 		<div class="mb-8 grid grid-cols-2 gap-x-8">
 			<div class="grid grid-cols-3 gap-x-8">
-				<div class="bg-slate-50 p-8 dark:bg-slate-800">
+				<div
+					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+				>
 					<h3 class="text-sm text-slate-300">Total value</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">$0.00</h2>
 				</div>
-				<div class="bg-slate-50 p-8 dark:bg-slate-800">
+				<div
+					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+				>
 					<h3 class="text-sm text-slate-300">Total requests</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">
 						{{ User.Account.Ticket[0].count }}
 					</h2>
 				</div>
-				<div class="bg-slate-50 p-8 dark:bg-slate-800">
+				<div
+					class="rounded border bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+				>
 					<h3 class="text-sm text-slate-300">Number of task</h3>
 					<h2 class="text-3xl font-semibold dark:text-white">0</h2>
 				</div>
@@ -24,25 +30,36 @@
 		</div>
 		<div class="grid grid-flow-row grid-cols-2 grid-rows-2 gap-8">
 			<div
-				class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+				class="items-center rounded border border-slate-800 bg-slate-50 text-sm dark:bg-slate-900 dark:text-slate-100"
 			>
-				<div class="flex items-center justify-between pr-8">
-					<div class="px-4 text-base font-semibold">Tasks</div>
-					<div>
-						<select
-							v-model="period"
-							id="location"
-							name="location"
-							class="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 dark:bg-slate-700 dark:ring-slate-600 dark:text-slate-100 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+				<div class="border-b border-slate-800 px-6 py-3 text-left">
+					<div class="flex items-center space-x-4">
+						<div
+							class="flex h-8 w-8 items-center  justify-center rounded bg-slate-50 dark:bg-slate-800"
 						>
-							<option value="7">Last 7 days</option>
-							<option value="30">Last 30 days</option>
-							<option value="90">All time</option>
-						</select>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="sbui-icon dark:text-scale-100"
+							>
+								<polygon
+									points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+								></polygon>
+							</svg>
+						</div>
+						<h5 class="mb-0 font-semibold">Executions</h5>
 					</div>
 				</div>
 
 				<executions-list
+					class="px-6 py-6"
 					:period="'30'"
 					v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
 				/>
@@ -60,13 +77,27 @@
 				</div>
 			</div>
 			<div
-				class="items-center row-span-2 bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+				class="rounded border bg-slate-50 p-0 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
 			>
-				<div class="px-4 text-base font-semibold">
-					<a class="flex items-center" :href="`/${User.defaultTeamId}/tickets`"
-						>Tickets<LinkIcon class="ml-2 h-4 w-4"
-					/></a>
+				<workflow-health
+					v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
+				/>
+				<div
+					v-else
+					class="py-24 text-center text-slate-700 dark:text-slate-300"
+				>
+					You'll need to
+					<NuxtLink
+						:to="`/${User.Account.id}/settings/billing/update`"
+						class="font-semibold text-indigo-500"
+						>upgrade your hosting</NuxtLink
+					>
+					to see tasks
 				</div>
+			</div>
+			<div
+				class="row-span-2 items-center rounded border bg-slate-50 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+			>
 				<ticket-list />
 				<!-- <div
 					v-else
@@ -83,9 +114,8 @@
 			</div>
 
 			<div
-				class="items-center bg-slate-50 py-6 text-sm dark:bg-slate-800 dark:text-slate-100"
+				class="row-span-2 items-center rounded border bg-slate-50 text-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
 			>
-				<div class="px-4 text-base font-semibold">Workflows</div>
 				<workflow-list
 					v-if="!hosting_needed && User.Account.trayWorkspaceId !== null"
 				/>
