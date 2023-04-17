@@ -1,15 +1,18 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
 
 export default defineEventHandler(async (event) => {
+	const user = await serverSupabaseUser(event);
+	const supabase = await serverSupabaseClient(event);
 	const currentDate = new Date();
-	const firstDay = new Date(
-		currentDate.getFullYear(),
-		currentDate.getMonth(),
-		1
-	);
-	const test = false;
-	const tray_key = test
-		? 'bf2d37099d0b4d59bdf52ee88f05faef222946f102064753abc50be648775156'
+	const firstDay = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+	const { data: User } = await supabase
+		.from('User')
+		.select('id,Account(trayBearerToken)')
+		.eq('id', user.id);
+
+	const tray_key = User.Account.trayBearerToken
+		? User.Account.trayBearerToken
 		: 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
 	const { id } = event.context.params;
 	const filters = id !== 'null' ? { workspaces: [id] } : {};

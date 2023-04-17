@@ -1,358 +1,214 @@
 <template>
 	<div class="">
-		<main class="">
-			<div class="">
-				<div class="">
-					<div class="">
-						<div id="chart" class="h-full w-full">
-							<div>
-								<div
-									class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
-								>
-									<table
-										class="bg-panel-body-light dark:bg-panel-body-dark w-full"
-									>
-										<thead
-											class="bg-panel-header-light dark:bg-panel-header-dark"
+		<div id="health" class="h-full w-full">
+			<div>
+				<div
+					class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+				>
+					<table class="bg-panel-body-light dark:bg-panel-body-dark w-full">
+						<thead class="bg-panel-header-light dark:bg-panel-header-dark">
+							<tr class="overflow-hidden rounded">
+								<td class="w-1/3 px-6 py-3">
+									<div class="flex items-center justify-between space-x-4">
+										<div class="flex items-center space-x-4">
+											<div
+												class="flex h-8 w-8 items-center justify-center rounded bg-slate-50 dark:bg-slate-800"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="24"
+													height="24"
+													fill="none"
+													viewBox="0 0 24 24"
+												>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="m11.75 16.75 1.25 1.5s5.025-6.058 5.883-7.732c.857-1.675.162-3.71-1.553-4.548-1.525-.744-3.343.534-4.33 1.82-.987-1.286-2.805-2.564-4.33-1.82-1.542.753-2.26 2.474-1.766 4.03l.08.254M4.75 12.75H8l1 3.5 2-5.5 2 2h1.25"
+													></path>
+												</svg>
+											</div>
+											<h5 class="mb-0">Health</h5>
+										</div>
+									</div>
+								</td>
+								<td></td>
+								<td class="w-2/3 px-6 py-3 text-right tabular-nums">
+									{{ abbreviatedNumber(state.data.count) }}
+								</td>
+							</tr>
+						</thead>
+						<tbody v-if="state.loading">
+							<tr>
+								<td colspan="3" class="px-6 py-3 text-center">
+									<loading-spinner />
+								</td>
+							</tr>
+						</tbody>
+						<tbody v-else>
+							<tr class="border-t border-slate-200 dark:border-slate-800">
+								<td class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm">
+									Successful<button data-state="closed">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="sbui-icon ml-2"
 										>
-											<tr class="overflow-hidden rounded">
-												<th class="w-1/4 px-6 py-3 text-left">
-													<div class="flex items-center space-x-4">
-														<div
-															class="flex h-8 w-8 items-center justify-center rounded bg-slate-50 dark:bg-slate-800"
-														>
-															<svg
-																xmlns="http://www.w3.org/2000/svg"
-																width="24"
-																height="24"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="m11.75 16.75 1.25 1.5s5.025-6.058 5.883-7.732c.857-1.675.162-3.71-1.553-4.548-1.525-.744-3.343.534-4.33 1.82-.987-1.286-2.805-2.564-4.33-1.82-1.542.753-2.26 2.474-1.766 4.03l.08.254M4.75 12.75H8l1 3.5 2-5.5 2 2h1.25"
-																></path>
-															</svg>
-														</div>
-														<h5 class="mb-0">Health</h5>
-													</div>
-												</th>
-											</tr>
-										</thead>
-										<tbody v-if="state.loading">
-											<tr>
-												<td colspan="3" class="text-center px-6 py-3">
-													<loading-spinner />
-												</td>
-											</tr>
-										</tbody>
-										<tbody v-else>
-											<tr
-												class="border-t border-slate-200 dark:border-slate-800"
+											<circle cx="12" cy="12" r="10"></circle>
+											<line x1="12" y1="16" x2="12" y2="12"></line>
+											<line x1="12" y1="8" x2="12.01" y2="8"></line>
+										</svg>
+									</button>
+								</td>
+								<td
+									class="text-scale-1200 hidden whitespace-nowrap p-3 text-sm lg:table-cell"
+								>
+									{{
+										formatAccounting(
+											((state.data.response.successful +
+												state.data.response.terminated) /
+												state.data.count) *
+												100,
+											false
+										)
+									}}
+									%
+								</td>
+								<td class="text-scale-1200 w-2/3 px-6 py-3 text-sm">
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
 											>
-												<td
-													class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
-												>
-													Successful<button data-state="closed">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="14"
-															height="14"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon ml-2"
-														>
-															<circle cx="12" cy="12" r="10"></circle>
-															<line x1="12" y1="16" x2="12" y2="12"></line>
-															<line x1="12" y1="8" x2="12.01" y2="8"></line>
-														</svg>
-													</button>
-												</td>
-												<td
-													class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
-												>
-													{{
-														formatAccounting(
-															(state.data.response.successful /
-																state.data.count) *
-																100,
-															false
-														)
-													}}
-													%
-												</td>
-												<td class="text-scale-1200 px-6 py-3 text-sm">
-													<div class="flex w-full flex-col">
-														<div
-															class="flex justify-between space-x-8 pb-1 align-baseline"
-														>
-															<p
-																class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-															>
-																{{ state.data.response.successful }}
-															</p>
-															<p class="text-scale-1100 text-sm tabular-nums">
-																{{ state.data.count }}
-															</p>
-														</div>
-														<div
-															class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
-														>
-															<div
-																:class="[
-																	state.data.response.successful /
-																		state.data.count >
-																	0.5
-																		? 'bg-lime-500'
-																		: 'bg-rose-700',
-																	'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
-																]"
-																:style="`width: ${
-																	(state.data.response.successful /
-																		state.data.count) *
-																	100
-																}%`"
-															></div>
-														</div>
-													</div>
-												</td>
-											</tr>
-											<tr
-												class="border-t border-slate-200 dark:border-slate-800"
+												{{
+													(
+														state.data.response.successful +
+														state.data.response.terminated
+													).toLocaleString()
+												}}
+											</p>
+											<p class="text-scale-1100 text-sm tabular-nums">
+												<!-- {{ abbreviatedNumber(state.data.count) }} -->
+											</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+										>
+											<div
+												:class="[
+													(state.data.response.successful +
+														state.data.response.terminated) /
+														state.data.count >
+													0.5
+														? 'bg-lime-500'
+														: 'bg-rose-700',
+													'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+												]"
+												:style="`width: ${
+													((state.data.response.successful +
+														state.data.response.terminated) /
+														state.data.count) *
+													100
+												}%`"
+											></div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr class="border-t border-slate-200 dark:border-slate-800">
+								<td class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm">
+									Failed<button data-state="closed">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="sbui-icon ml-2"
+										>
+											<circle cx="12" cy="12" r="10"></circle>
+											<line x1="12" y1="16" x2="12" y2="12"></line>
+											<line x1="12" y1="8" x2="12.01" y2="8"></line>
+										</svg>
+									</button>
+								</td>
+								<td
+									class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
+								>
+									{{
+										formatAccounting(
+											((state.data.response.failed +
+												state.data.response.stopped) /
+												state.data.count) *
+												100,
+											false
+										)
+									}}
+									%
+								</td>
+								<td class="text-scale-1200 px-6 py-3 text-sm">
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
 											>
-												<td
-													class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
-												>
-													Failed<button data-state="closed">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="14"
-															height="14"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon ml-2"
-														>
-															<circle cx="12" cy="12" r="10"></circle>
-															<line x1="12" y1="16" x2="12" y2="12"></line>
-															<line x1="12" y1="8" x2="12.01" y2="8"></line>
-														</svg>
-													</button>
-												</td>
-												<td
-													class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
-												>
-													{{
-														formatAccounting(
-															(state.data.response.failed / state.data.count) *
-																100,
-															false
-														)
-													}}
-													%
-												</td>
-												<td class="text-scale-1200 px-6 py-3 text-sm">
-													<div class="flex w-full flex-col">
-														<div
-															class="flex justify-between space-x-8 pb-1 align-baseline"
-														>
-															<p
-																class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-															>
-																{{ state.data.response.failed }}
-															</p>
-															<p class="text-scale-1100 text-sm tabular-nums">
-																{{ state.data.count }}
-															</p>
-														</div>
-														<div
-															class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
-														>
-															<div
-																:class="[
-																	state.data.response.failed /
-																		state.data.count <
-																	0.5
-																		? 'bg-rose-800'
-																		: 'bg-rose-900',
-																	'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
-																]"
-																:style="`width: ${
-																	(state.data.response.failed /
-																		state.data.count) *
-																	100
-																}%`"
-															></div>
-														</div>
-													</div>
-												</td>
-											</tr>
-											<tr
-												class="border-t border-slate-200 dark:border-slate-800"
-											>
-												<td
-													class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
-												>
-													Terminated<button data-state="closed">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="14"
-															height="14"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon ml-2"
-														>
-															<circle cx="12" cy="12" r="10"></circle>
-															<line x1="12" y1="16" x2="12" y2="12"></line>
-															<line x1="12" y1="8" x2="12.01" y2="8"></line>
-														</svg>
-													</button>
-												</td>
-												<td
-													class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
-												>
-													{{
-														formatAccounting(
-															(state.data.response.terminated /
-																state.data.count) *
-																100,
-															false
-														)
-													}}
-													%
-												</td>
-												<td class="text-scale-1200 px-6 py-3 text-sm">
-													<div class="flex w-full flex-col">
-														<div
-															class="flex justify-between space-x-8 pb-1 align-baseline"
-														>
-															<p
-																class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-															>
-																{{ state.data.response.terminated }}
-															</p>
-															<p class="text-scale-1100 text-sm tabular-nums">
-																{{ state.data.count }}
-															</p>
-														</div>
-														<div
-															class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
-														>
-															<div
-																:class="[
-																	state.data.response.terminated /
-																		state.data.count <
-																	0.5
-																		? 'bg-amber-500'
-																		: 'bg-rose-700',
-																	'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
-																]"
-																:style="`width: ${
-																	(state.data.response.terminated /
-																		state.data.count) *
-																	100
-																}%`"
-															></div>
-														</div>
-													</div>
-												</td>
-											</tr>
-											<tr
-												class="border-t border-slate-200 dark:border-slate-800"
-											>
-												<td
-													class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
-												>
-													Stopped<button data-state="closed">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="14"
-															height="14"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon ml-2"
-														>
-															<circle cx="12" cy="12" r="10"></circle>
-															<line x1="12" y1="16" x2="12" y2="12"></line>
-															<line x1="12" y1="8" x2="12.01" y2="8"></line>
-														</svg>
-													</button>
-												</td>
-												<td
-													class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
-												>
-													{{
-														formatAccounting(
-															(state.data.response.stopped / state.data.count) *
-																100,
-															false
-														)
-													}}
-													%
-												</td>
-												<td class="text-scale-1200 px-6 py-3 text-sm">
-													<div class="flex w-full flex-col">
-														<div
-															class="flex justify-between space-x-8 pb-1 align-baseline"
-														>
-															<p
-																class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-															>
-																{{ state.data.response.stopped }}
-															</p>
-															<p class="text-scale-1100 text-sm tabular-nums">
-																{{ state.data.count }}
-															</p>
-														</div>
-														<div
-															class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
-														>
-															<div
-																:class="[
-																	state.data.response.stopped /
-																		state.data.count <
-																	0.5
-																		? 'bg-lime-500'
-																		: 'bg-rose-700',
-																	'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
-																]"
-																:style="`width: ${
-																	(state.data.response.stopped /
-																		state.data.count) *
-																	100
-																}%`"
-															></div>
-														</div>
-													</div>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
+												{{
+													(
+														state.data.response.failed +
+														state.data.response.stopped
+													).toLocaleString()
+												}}
+											</p>
+											<p class="text-scale-1100 text-sm tabular-nums">
+												<!-- {{ state.data.count.toLocaleString() }} -->
+											</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
+										>
+											<div
+												:class="[
+													(state.data.response.failed +
+														state.data.response.stopped) /
+														state.data.count <
+													0.5
+														? 'bg-rose-800'
+														: 'bg-rose-900',
+													'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
+												]"
+												:style="`width: ${
+													((state.data.response.failed +
+														state.data.response.stopped) /
+														state.data.count) *
+													100
+												}%`"
+											></div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
-		</main>
+		</div>
 	</div>
 </template>
 
@@ -399,7 +255,7 @@
 	});
 
 	const state = reactive({
-		data: null,
+		data: { count: 0, response: {} },
 		loading: true,
 	});
 

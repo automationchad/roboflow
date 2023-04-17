@@ -116,7 +116,11 @@
 				},
 				y: {
 					grid: { display: false },
-					ticks: { color: isDarkMode.value ? 'white' : 'black' },
+					ticks: {
+						color: isDarkMode.value ? 'white' : 'black',
+						maxTicksLimit: 8,
+						
+					},
 				},
 			},
 		};
