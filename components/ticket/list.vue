@@ -1,7 +1,7 @@
 <template>
 	<div class="">
 		<div
-			v-if="true"
+			
 			class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
 		>
 			<table class="bg-panel-body-light dark:bg-panel-body-dark w-full">

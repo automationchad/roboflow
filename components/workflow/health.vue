@@ -3,23 +3,10 @@
 		<main class="">
 			<div class="">
 				<div class="">
-					<div
-						v-if="state.loading"
-						class="flex items-center justify-center py-36"
-					>
-						<loading-spinner />
-					</div>
-					<div v-else class="">
+					<div class="">
 						<div id="chart" class="h-full w-full">
-							<div
-								class="flex items-center py-24 text-sm font-normal text-slate-300"
-								v-if="!state.data"
-							>
-								No tasks
-							</div>
-							<div v-else>
+							<div>
 								<div
-									v-if="true"
 									class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
 								>
 									<table
@@ -55,7 +42,14 @@
 												</th>
 											</tr>
 										</thead>
-										<tbody>
+										<tbody v-if="state.loading">
+											<tr>
+												<td colspan="3" class="text-center px-6 py-3">
+													<loading-spinner />
+												</td>
+											</tr>
+										</tbody>
+										<tbody v-else>
 											<tr
 												class="border-t border-slate-200 dark:border-slate-800"
 											>
