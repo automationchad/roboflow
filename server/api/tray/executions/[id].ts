@@ -11,17 +11,17 @@ export default defineEventHandler(async (event) => {
 
 	const { data: User } = await supabase
 		.from('User')
-		.select('id, Account(*)')
+		.select('id,Account(trayBearerToken)')
 		.eq('id', user.id);
 
-	const tray_key = User.Account.trayBearerToken
-		? 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447'
-		: 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
+	const tray_key = User.Account
+		? 'd65c23cd63324565b2541cd6fad80f585510039a5d3d4bd59b3021f7ef97c268'
+		: 'd65c23cd63324565b2541cd6fad80f585510039a5d3d4bd59b3021f7ef97c268';
 
 	console.log(User);
 
 	const { id } = event.context.params;
-	const filters = id !== 'null' ? { workspaces: [id] } : {};
+	const filters = id != 'null' ? { workspaces: [id] } : {};
 
 	const response = await $fetch(
 		'https://api.tray.io/insights/v1/executions/timeseries',
