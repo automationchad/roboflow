@@ -494,7 +494,8 @@
 
 												<div class="">
 													<div class="flex items-center">
-														<NuxtLink :to="`/profile/${Ticket.User.id}`"
+														<NuxtLink
+															:to="`/profile/${Ticket.User.id}`"
 															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 														>
 															{{ Ticket.User.firstName }}
@@ -1479,15 +1480,14 @@
 																				</button>
 																			</div>
 																		</footer>
-																		<p
-																			v-html="convert(reply.text)"
-																			class="prose pl-8 dark:prose-invert"
-																		></p>
+																		<p class="prose pl-8 dark:prose-invert">
+																			{{ reply.text }}
+																		</p>
 																		<div class="mt-2 pl-8">
 																			<NuxtLink
 																				v-if="
 																					reply.text.includes(
-																						'https://calendly.com/motis-group/partners'
+																						'below'
 																					)
 																				"
 																				:to="`https://calendly.com/motis-group/partners?name=${
@@ -2126,7 +2126,7 @@
 			#eabcb1 77.15%,
 			#cf9a8c
 		);
-		color: #000000ab
+		color: #000000ab;
 	}
 
 	.mg_officer {
@@ -2138,6 +2138,6 @@
 			#e9d8ab 75%,
 			#e3bc5a
 		);
-		color: #000000ab
+		color: #000000ab;
 	}
 </style>

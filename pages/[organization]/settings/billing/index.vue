@@ -23,11 +23,7 @@
 											</h1>
 										</div>
 										<div class="px-4 sm:px-6 lg:px-0">
-											<TabGroup
-												class="py-6"
-												as="div"
-												
-											>
+											<TabGroup class="py-6" as="div">
 												<!-- Tabs -->
 												<div class="lg:hidden">
 													<label for="selected-tab" class="sr-only"
@@ -39,7 +35,10 @@
 														class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6"
 													>
 														<option
-															v-for="tab in tabs"
+															v-for="tab in User.Account.partner_type ===
+															'affiliate'
+																? partnerTabs
+																: tabs"
 															:key="tab.name"
 															:selected="tab.current"
 														>
@@ -57,7 +56,10 @@
 																referrerpolicy="noreferrer"
 																target="_parent"
 																:href="tab.id"
-																v-for="(tab, idx) in tabs"
+																v-for="(tab, idx) in User.Account
+																	.partner_type == 'affiliate'
+																	? partnerTabs
+																	: tabs"
 																:key="tab.name"
 																v-slot="{ selected }"
 																class="whitespace-nowrap py-4 text-sm font-medium outline-none"
@@ -75,10 +77,14 @@
 													</div>
 												</TabList>
 												<TabPanels>
-													<TabPanel><org-subscription /></TabPanel>
-													<TabPanel><org-costs /></TabPanel>
-
-													<TabPanel><org-invoices /></TabPanel>
+													<TabPanel
+														v-for="(tab, idx) in User.Account.partner_type ==
+														'affiliate'
+															? partnerTabs
+															: tabs"
+														:key="tab.name"
+														><component :is="tab.component"
+													/></TabPanel>
 												</TabPanels>
 
 												<!-- Description list with inline editing -->
@@ -131,6 +137,10 @@
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
+	import orgCosts from '~/components/org/costs.vue';
+	import orgSubscription from '~/components/org/subscription.vue';
+	import orgInvoices from '~/components/org/invoices.vue';
+
 	const route = useRoute();
 
 	const user = useSupabaseUser();
@@ -139,7 +149,7 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select('systemRole,accountId,Account(name)')
+		.select('systemRole,accountId,Account(name,partner_type)')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
@@ -148,12 +158,14 @@
 		{
 			name: 'Subscription',
 			id: '#subscription',
+			component: orgSubscription,
 			href: `/${User.accountId}/settings/billing`,
 			current: true,
 		},
 		{
 			name: 'Usage',
 			id: '#usage',
+			component: orgCosts,
 			href: `/${User.accountId}/settings/billing/cost-management`,
 			current: false,
 		},
@@ -161,6 +173,24 @@
 		{
 			name: 'Invoices',
 			id: '#invoices',
+			component: orgInvoices,
+			href: `/${User.accountId}/settings/billing/invoices`,
+			current: false,
+		},
+	];
+
+	const partnerTabs = [
+		{
+			name: 'Billing info',
+			id: '#subscription',
+			component: orgSubscription,
+			href: `/${User.accountId}/settings/billing`,
+			current: true,
+		},
+		{
+			name: 'Invoices',
+			id: '#invoices',
+			component: orgInvoices,
 			href: `/${User.accountId}/settings/billing/invoices`,
 			current: false,
 		},

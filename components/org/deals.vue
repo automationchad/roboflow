@@ -51,10 +51,12 @@
 												v-for="(deal, idx) in deals"
 												:to="`/${deal.teamId}/tickets/${deal.id}`"
 												:key="deal.name"
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
 											>
 												<div class="flex w-[40%] items-center gap-3">
-													<span class="text-sm">{{ deal.name }}</span>
+													<span class="text-sm">{{
+														truncateString(deal.name, 50)
+													}}</span>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<span

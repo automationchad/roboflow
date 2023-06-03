@@ -528,12 +528,7 @@
 			icon: CreditCardIcon,
 			current: route.path.includes(`/${User.Account.id}/settings/billing`),
 		},
-		{
-			name: 'Invoices',
-			href: `/${User.Account.id}/settings/billing`,
-			icon: DocumentTextIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
+		
 		{
 			name: 'Cost reports',
 			href: `/${User.Account.id}/cost-reports`,
@@ -542,7 +537,7 @@
 		},
 		{
 			name: 'Partner Central',
-			href: `/${User.Account.id}/settings/billing`,
+			href: `/${User.Account.id}/documentation/partners`,
 			icon: ArrowTopRightOnSquareIcon,
 			current: route.path.includes(`/${User.Account.id}/settings/billing`),
 		},
