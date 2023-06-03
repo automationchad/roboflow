@@ -512,7 +512,9 @@
 																badge.id,
 																'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
 															]"
-															>{{ badge.text }}</span
+															><span :class="`${badge.id}-text`">{{
+																badge.text
+															}}</span></span
 														>
 													</div>
 												</div>
@@ -873,12 +875,35 @@
 																	class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
 																>
 																	<span class="cursor-pointer"
-																		><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-<path d="M17 14.75V19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-<path d="M19.25 17L14.75 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-</span>
+																		><svg
+																			class="h-6 w-6"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																		>
+																			<path
+																				d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M17 14.75V19.25"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M19.25 17L14.75 17"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																		</svg>
+																	</span>
 
 																	<input
 																		type="file"
@@ -955,7 +980,7 @@
 													v-if="comments.length <= 0"
 													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
 												>
-													No comments yet
+													No activity yet
 												</div>
 
 												<section
@@ -964,276 +989,123 @@
 												>
 													<div class="mx-auto">
 														<article
-															v-for="activityItem in comments"
+															v-for="(
+																activityItem, activityItemIdx
+															) in comments"
 															:key="activityItem.id"
 															id="parent-comment"
-															class="mb-6 rounded-lg bg-white text-base dark:bg-transparent"
+															class="relative mb-6 rounded-lg bg-white text-base dark:bg-transparent"
 														>
+															<div
+																:class="[
+																	activityItemIdx === comments.length - 1
+																		? 'h-6'
+																		: '-bottom-6',
+																	'absolute left-0 top-0 flex w-5 justify-center',
+																]"
+															>
+																<div
+																	class="w-px bg-gray-200 dark:bg-slate-800"
+																/>
+															</div>
 															<div
 																class=""
 																v-if="
-																	!activityItem.deleted ||
-																	activityItem.Comment.length > 0
+																	activityItem.activity_type === 'user_comment'
 																"
 															>
-																<footer
-																	v-if="!activityItem.deleted"
-																	class="mb-2 flex items-center justify-between"
-																>
-																	<div class="flex items-center">
-																		<div
-																			class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
-																		>
-																			<img
-																				v-if="activityItem.avatarUrl"
-																				class="mr-2 h-5 w-5 rounded-full object-cover"
-																				:src="activityItem.avatarUrl"
-																				alt=""
-																			/>
-																			<div
-																				v-else
-																				class="mr-2 flex h-5 w-5 items-center justify-center rounded-full border border-sky-600/20 bg-sky-100 text-xs text-sky-500"
-																			>
-																				<UserCircleIconMini
-																					class="m-0 h-5 w-5"
-																				/>
-																			</div>
-
-																			{{ activityItem.User.firstName }}
-																			{{ activityItem.User.lastName }}
-																			<div class="ml-2 mr-1 space-x-1">
-																				<span
-																					v-for="badge in activityItem.User.badges.slice(
-																						0,
-																						1
-																					)"
-																					:key="badge.id"
-																					:class="[
-																						badge.id,
-																						'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
-																					]"
-																					>{{ badge.text }}</span
-																				>
-																				<span
-																					v-if="
-																						activityItem.User.badges.length - 1
-																					"
-																					class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
-																					>+{{
-																						activityItem.User.badges.length - 1
-																					}}</span
-																				>
-																			</div>
-
-																			<span
-																				class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
-																			>
-																				{{ ticketDate(activityItem.createdOn) }}
-																			</span>
-																		</div>
-																	</div>
-
-																	<div
-																		class="flex space-x-1"
-																		v-if="activityItem.createdBy === User.id"
-																	>
-																		<button
-																			class="text-slate-400 transition-colors hover:text-indigo-400"
-																		>
-																			<svg
-																				class="h-5 w-5"
-																				fill="none"
-																				viewBox="0 0 24 24"
-																			>
-																				<path
-																					stroke="currentColor"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																					stroke-width="1.5"
-																					d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-																				></path>
-																				<path
-																					stroke="currentColor"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																					stroke-width="1.5"
-																					d="M19.25 19.25H13.75"
-																				></path>
-																			</svg>
-																		</button>
-																		<button
-																			@click="handleDelete(activityItem.id)"
-																			class="text-slate-400 transition-colors hover:text-rose-400"
-																		>
-																			<svg
-																				class="h-5 w-5"
-																				viewBox="0 0 24 24"
-																				fill="none"
-																				xmlns="http://www.w3.org/2000/svg"
-																			>
-																				<path
-																					d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																				<path
-																					d="M9.75 10.75V16.25"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																				<path
-																					d="M13.25 10.75V16.25"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																				<path
-																					d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																				<path
-																					d="M4.75 7.75H18.25"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																			</svg>
-																		</button>
-																	</div>
-																	<div class="flex space-x-1" v-else>
-																		<button
-																			class="text-slate-400 transition-colors hover:text-indigo-400"
-																		>
-																			<svg
-																				class="h-5 w-5"
-																				viewBox="0 0 24 24"
-																				fill="none"
-																				xmlns="http://www.w3.org/2000/svg"
-																			>
-																				<path
-																					d="M4.75 5.75V19.25"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																				<path
-																					d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																			</svg>
-																		</button>
-																	</div>
-																</footer>
 																<div
-																	:class="[
-																		activityItem.deleted
-																			? 'text-gray-400 dark:text-gray-400'
-																			: 'text-gray-900 dark:text-gray-200',
-																		'prose pb-2 font-normal dark:prose-invert',
-																	]"
-																	v-html="convert(activityItem.text)"
-																></div>
-																<div
+																	class=""
 																	v-if="
-																		activityItem.attachment &&
-																		!activityItem.deleted
+																		!activityItem.deleted ||
+																		activityItem.Comment.length > 0
 																	"
-																	data-test="war_room_comment_text"
-																	class="mt-1 flex overflow-hidden"
-																>
-																	<button
-																		@click="
-																			(commentImageId =
-																				activityItem.attachment),
-																				(showImageModal = true)
-																		"
-																	>
-																		<img
-																			v-for="image in activityItem.attachments"
-																			:src="image"
-																			:alt="activityItem.id"
-																			data-test="comment-image"
-																			class="max-h-48 max-w-full cursor-pointer rounded-lg"
-																		/>
-																	</button>
-																</div>
-															</div>
-
-															<div
-																class="ml-2 border-l border-slate-300 dark:border-slate-700"
-																v-if="activityItem.Comment.length > 0"
-															>
-																<article
-																	v-for="reply in activityItem.Comment"
-																	id="reply-messages"
-																	:key="reply.id"
-																	class="my-6 w-full pl-2 text-base lg:pl-4"
 																>
 																	<footer
+																		v-if="!activityItem.deleted"
 																		class="mb-2 flex items-center justify-between"
 																	>
 																		<div class="flex items-center">
 																			<div
 																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																			>
-																				<div v-if="reply.avatarUrl">
-																					<img
-																						class="mr-2 h-5 w-5 rounded-full object-cover"
-																						:src="reply.avatarUrl"
-																						alt="Jese Leos"
+																				<img
+																					v-if="activityItem.avatarUrl"
+																					class="z-10 mr-2 h-5 w-5 rounded-full object-cover"
+																					:src="activityItem.avatarUrl"
+																					alt=""
+																				/>
+																				<div
+																					v-else
+																					class="mr-2 flex h-5 w-5 items-center justify-center rounded-full border border-sky-600/20 bg-sky-100 text-xs text-sky-500"
+																				>
+																					<UserCircleIconMini
+																						class="m-0 h-5 w-5"
 																					/>
 																				</div>
 
+																				{{ activityItem.User.firstName }}
+																				{{ activityItem.User.lastName }}
 																				<div
-																					v-else
-																					class="mr-2 h-5 w-5 rounded-full bg-slate-300"
-																				></div>
-
-																				{{ reply.User.firstName }}
-																				{{ reply.User.lastName }}
-																				<div class="ml-2 mr-1 space-x-1">
-																					<span
-																						v-for="badge in reply.User.badges.slice(
+																					class="ml-2 mr-1 flex items-center space-x-1"
+																				>
+																					<div
+																						v-for="badge in activityItem.User.badges.slice(
 																							0,
 																							1
 																						)"
 																						:key="badge.id"
 																						:class="[
 																							badge.id,
-																							'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
+																							'py-0.25 flex items-center justify-center rounded-md px-1 text-xs',
 																						]"
-																						>{{ badge.text }}</span
 																					>
-																					<span
+																						<span
+																							:class="`${badge.id}-text flex items-center`"
+																							><svg
+																								v-if="badge.id === 'mg_ai'"
+																								class="h-4 w-4"
+																								viewBox="0 0 24 24"
+																								fill="none"
+																								xmlns="http://www.w3.org/2000/svg"
+																							>
+																								<path
+																									d="M9.75 13C14 13 14 7.75 14 7.75C14 7.75 14 13 18.25 13C14 13 14 18.25 14 18.25C14 18.25 14 13 9.75 13Z"
+																									fill="#8900ff"
+																								></path>
+																								<path
+																									d="M5.75 8C8 8 8 5.75 8 5.75C8 5.75 8 8 10.25 8C8 8 8 10.25 8 10.25C8 10.25 8 8 5.75 8Z"
+																									fill="#8900ff"
+																								></path>
+																								<path
+																									d="M7.75 16.25H7.76M18.25 5.75H18.26M18.25 18.25H18.26M14 7.75C14 7.75 14 13 9.75 13C14 13 14 18.25 14 18.25C14 18.25 14 13 18.25 13C14 13 14 7.75 14 7.75ZM8 5.75C8 5.75 8 8 5.75 8C8 8 8 10.25 8 10.25C8 10.25 8 8 10.25 8C8 8 8 5.75 8 5.75Z"
+																									stroke="#8900ff"
+																									stroke-width="1.5"
+																									stroke-linecap="round"
+																									stroke-linejoin="round"
+																								></path></svg
+																							>{{ badge.text }}</span
+																						>
+																					</div>
+																					<div
+																						v-if="
+																							activityItem.User.badges.length -
+																							1
+																						"
 																						class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
-																						>+{{
-																							reply.User.badges.length - 1
-																						}}</span
 																					>
+																						+{{
+																							activityItem.User.badges.length -
+																							1
+																						}}
+																					</div>
 																				</div>
 
 																				<span
 																					class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 																				>
 																					{{
-																						formatDistance(
-																							new Date(reply.createdOn),
-																							new Date(),
-																							{ addSuffix: true }
-																						)
+																						ticketDate(activityItem.createdOn)
 																					}}
 																				</span>
 																			</div>
@@ -1241,7 +1113,7 @@
 
 																		<div
 																			class="flex space-x-1"
-																			v-if="reply.createdBy === User.id"
+																			v-if="activityItem.createdBy === User.id"
 																		>
 																			<button
 																				class="text-slate-400 transition-colors hover:text-indigo-400"
@@ -1268,12 +1140,7 @@
 																				</svg>
 																			</button>
 																			<button
-																				@click="
-																					handleDelete(
-																						reply.id,
-																						activityItem.Comment
-																					)
-																				"
+																				@click="handleDelete(activityItem.id)"
 																				class="text-slate-400 transition-colors hover:text-rose-400"
 																			>
 																				<svg
@@ -1348,149 +1215,572 @@
 																			</button>
 																		</div>
 																	</footer>
-																	<p
-																		class="text-base text-gray-900 dark:text-slate-100"
-																	>
-																		{{ reply.text }}
-																	</p>
-																</article>
-															</div>
-															<div
-																class="mt-2"
-																v-if="
-																	!activityItem.deleted ||
-																	activityItem.Comment.length > 0
-																"
-															>
-																<Disclosure v-slot="{ open }">
 																	<div
-																		class="flex items-center justify-between"
+																		:class="[
+																			activityItem.deleted
+																				? 'text-gray-400 dark:text-gray-400'
+																				: 'text-gray-900 dark:text-gray-200',
+																			'prose pb-2 pl-8 font-normal dark:prose-invert',
+																		]"
+																		v-html="convert(activityItem.text)"
+																	></div>
+																	<div
+																		v-if="
+																			activityItem.attachment &&
+																			!activityItem.deleted
+																		"
+																		data-test="war_room_comment_text"
+																		class="mt-1 flex overflow-hidden"
 																	>
-																		<DisclosureButton
-																			class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
+																		<button
+																			@click="
+																				(commentImageId =
+																					activityItem.attachment),
+																					(showImageModal = true)
+																			"
+																		>
+																			<img
+																				v-for="image in activityItem.attachments"
+																				:src="image"
+																				:alt="activityItem.id"
+																				data-test="comment-image"
+																				class="max-h-48 max-w-full cursor-pointer rounded-lg"
+																			/>
+																		</button>
+																	</div>
+																</div>
+
+																<div
+																	class="ml-4"
+																	v-if="activityItem.Comment.length > 0"
+																>
+																	<article
+																		v-for="(reply, idx) in activityItem.Comment"
+																		id="reply-messages"
+																		:key="reply.id"
+																		class="relative my-6 pl-2 text-base lg:pl-4"
+																	>
+																		<div v-if="idx < activityItem.Comment.length - 1"
+																			:class="[
+																				activityItemIdx === comments.length - 1
+																					? 'h-6'
+																					: '-bottom-6',
+																				'absolute left-0 top-0 flex w-12 justify-center',
+																			]"
 																		>
 																			<div
-																				data-v-164b91a0=""
-																				data-test="open-reply-button"
-																				class="flex items-center"
-																			>
-																				<svg
-																					data-v-164b91a0=""
-																					viewBox="0 0 16 16"
-																					fill="none"
-																					xmlns="http://www.w3.org/2000/svg"
-																					class="mr-1 h-4 w-4"
-																				>
-																					<path
-																						data-v-164b91a0=""
-																						d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
-																						fill="currentColor"
-																					></path>
-																				</svg>
-																				Reply
-																			</div>
-																		</DisclosureButton>
-
-																		<!-- <p
-																				class="mr-2 text-xs text-gray-500 dark:text-slate-400"
-																			>
-																				{{
-																					format(
-																						new Date(activityItem.createdOn),
-																						'MMM dd, hh:mm aa'
-																					)
-																				}}
-																			</p> -->
-																	</div>
-
-																	<DisclosurePanel
-																		class="mt-3 flex items-start space-x-4"
-																	>
-																		<div class="min-w-0 flex-1">
-																			<form
-																				@submit.prevent="
-																					handleCommentAdd(activityItem.id)
-																				"
-																				class="relative"
-																			>
+																				class="w-px bg-gray-200 dark:bg-slate-800"
+																			/>
+																		</div>
+																		<footer
+																			class="mb-2 flex items-center justify-between"
+																		>
+																			<div class="flex items-center">
 																				<div
-																					class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
+																					class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 																				>
-																					<label for="comment" class="sr-only"
-																						>Reply...</label
-																					>
-																					<textarea
-																						v-model="reply_text"
-																						name="comment"
-																						id="comment"
-																						class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
-																						placeholder="Reply..."
-																					/>
+																					<div v-if="reply.avatarUrl">
+																						<img
+																							class="z-10 mr-2 h-5 w-5 rounded-full object-cover relative"
+																							:src="reply.avatarUrl"
+																							alt="Jese Leos"
+																						/>
+																					</div>
 
-																					<!-- Spacer element to match the height of the toolbar -->
-																					<div class="py-2" aria-hidden="true">
-																						<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																						<div class="py-px">
-																							<div class="h-9" />
+																					<div
+																						v-else
+																						class="mr-2 h-5 w-5 rounded-full bg-slate-300"
+																					></div>
+
+																					{{ reply.User.firstName }}
+																					{{ reply.User.lastName }}
+																					<div
+																						class="ml-2 mr-1 flex items-center space-x-1"
+																					>
+																						<div
+																							v-for="badge in reply.User.badges.slice(
+																								0,
+																								1
+																							)"
+																							:key="badge.id"
+																							:class="[
+																								badge.id,
+																								'py-0.25 flex items-center justify-center rounded-md px-1 text-xs',
+																							]"
+																						>
+																							<span
+																								:class="`${badge.id}-text flex items-center`"
+																								><svg
+																									v-if="badge.id === 'mg_ai'"
+																									class="h-4 w-4"
+																									viewBox="0 0 24 24"
+																									fill="none"
+																									xmlns="http://www.w3.org/2000/svg"
+																								>
+																									<path
+																										d="M9.75 13C14 13 14 7.75 14 7.75C14 7.75 14 13 18.25 13C14 13 14 18.25 14 18.25C14 18.25 14 13 9.75 13Z"
+																										fill="#8900ff"
+																									></path>
+																									<path
+																										d="M5.75 8C8 8 8 5.75 8 5.75C8 5.75 8 8 10.25 8C8 8 8 10.25 8 10.25C8 10.25 8 8 5.75 8Z"
+																										fill="#8900ff"
+																									></path>
+																									<path
+																										d="M7.75 16.25H7.76M18.25 5.75H18.26M18.25 18.25H18.26M14 7.75C14 7.75 14 13 9.75 13C14 13 14 18.25 14 18.25C14 18.25 14 13 18.25 13C14 13 14 7.75 14 7.75ZM8 5.75C8 5.75 8 8 5.75 8C8 8 8 10.25 8 10.25C8 10.25 8 8 10.25 8C8 8 8 5.75 8 5.75Z"
+																										stroke="#8900ff"
+																										stroke-width="1.5"
+																										stroke-linecap="round"
+																										stroke-linejoin="round"
+																									></path></svg
+																								>{{ badge.text }}</span
+																							>
+																						</div>
+
+																						<div
+																							class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
+																						>
+																							+{{
+																								reply.User.badges.length - 1
+																							}}
 																						</div>
 																					</div>
-																				</div>
 
+																					<span
+																						class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+																					>
+																						{{
+																							formatDistance(
+																								new Date(reply.createdOn),
+																								new Date(),
+																								{ addSuffix: true }
+																							)
+																						}}
+																					</span>
+																				</div>
+																			</div>
+
+																			<div
+																				class="flex space-x-1"
+																				v-if="reply.createdBy === User.id"
+																			>
+																				<button
+																					class="text-slate-400 transition-colors hover:text-indigo-400"
+																				>
+																					<svg
+																						class="h-5 w-5"
+																						fill="none"
+																						viewBox="0 0 24 24"
+																					>
+																						<path
+																							stroke="currentColor"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																							stroke-width="1.5"
+																							d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																						></path>
+																						<path
+																							stroke="currentColor"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																							stroke-width="1.5"
+																							d="M19.25 19.25H13.75"
+																						></path>
+																					</svg>
+																				</button>
+																				<button
+																					@click="
+																						handleDelete(
+																							reply.id,
+																							activityItem.Comment
+																						)
+																					"
+																					class="text-slate-400 transition-colors hover:text-rose-400"
+																				>
+																					<svg
+																						class="h-5 w-5"
+																						viewBox="0 0 24 24"
+																						fill="none"
+																						xmlns="http://www.w3.org/2000/svg"
+																					>
+																						<path
+																							d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																						<path
+																							d="M9.75 10.75V16.25"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																						<path
+																							d="M13.25 10.75V16.25"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																						<path
+																							d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																						<path
+																							d="M4.75 7.75H18.25"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																					</svg>
+																				</button>
+																			</div>
+																			<div class="flex space-x-1" v-else>
+																				<button
+																					class="text-slate-400 transition-colors hover:text-indigo-400"
+																				>
+																					<svg
+																						class="h-5 w-5"
+																						viewBox="0 0 24 24"
+																						fill="none"
+																						xmlns="http://www.w3.org/2000/svg"
+																					>
+																						<path
+																							d="M4.75 5.75V19.25"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																						<path
+																							d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
+																							stroke="currentColor"
+																							stroke-width="1.5"
+																							stroke-linecap="round"
+																							stroke-linejoin="round"
+																						></path>
+																					</svg>
+																				</button>
+																			</div>
+																		</footer>
+																		<p
+																			class="pl-8 text-base text-gray-900 dark:text-slate-100"
+																		>
+																			{{ reply.text }}
+																		</p>
+																	</article>
+																</div>
+																<div
+																	id="reply-to-comment"
+																	class="mt-2"
+																	v-if="
+																		!activityItem.deleted ||
+																		activityItem.Comment.length > 0
+																	"
+																>
+																	<Disclosure v-slot="{ open }">
+																		<div class="flex items-center justify-end">
+																			<DisclosureButton
+																				class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
+																			>
 																				<div
-																					class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
+																					data-v-164b91a0=""
+																					data-test="open-reply-button"
+																					class="flex items-center"
+																				>
+																					<svg
+																						data-v-164b91a0=""
+																						viewBox="0 0 16 16"
+																						fill="none"
+																						xmlns="http://www.w3.org/2000/svg"
+																						class="mr-1 h-4 w-4"
+																					>
+																						<path
+																							data-v-164b91a0=""
+																							d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
+																							fill="currentColor"
+																						></path>
+																					</svg>
+																					Reply
+																				</div>
+																			</DisclosureButton>
+																		</div>
+
+																		<DisclosurePanel
+																			class="mt-3 pl-8 flex items-start space-x-4"
+																		>
+																			<div class="min-w-0 flex-1">
+																				<form
+																					@submit.prevent="
+																						handleCommentAdd(activityItem.id)
+																					"
+																					class="relative"
 																				>
 																					<div
-																						class="flex flex-shrink-0 items-center space-x-2"
+																						class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
 																					>
-																						<DisclosureButton
-																							class="inline-flex items-center rounded-md border border-gray-300 p-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+																						<label for="comment" class="sr-only"
+																							>Reply...</label
 																						>
-																							<svg
-																								class="h-5 w-5"
-																								fill="none"
-																								viewBox="0 0 24 24"
-																							>
-																								<path
-																									stroke="currentColor"
-																									stroke-linecap="round"
-																									stroke-linejoin="round"
-																									stroke-width="1.5"
-																									d="M17.25 6.75L6.75 17.25"
-																								></path>
-																								<path
-																									stroke="currentColor"
-																									stroke-linecap="round"
-																									stroke-linejoin="round"
-																									stroke-width="1.5"
-																									d="M6.75 6.75L17.25 17.25"
-																								></path>
-																							</svg>
-																						</DisclosureButton>
-																						<button
-																							type="submit"
-																							class="inline-flex items-center rounded-md border border-indigo-500 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																						<textarea
+																							v-model="reply_text"
+																							name="comment"
+																							id="comment"
+																							class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																							placeholder="Reply..."
+																						/>
+
+																						<!-- Spacer element to match the height of the toolbar -->
+																						<div
+																							class="py-2"
+																							aria-hidden="true"
 																						>
-																							<svg
-																								class="h-5 w-5"
-																								viewBox="0 0 24 24"
-																								fill="none"
-																								xmlns="http://www.w3.org/2000/svg"
-																							>
-																								<path
-																									d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
-																									stroke="currentColor"
-																									stroke-width="1.5"
-																									stroke-linecap="round"
-																									stroke-linejoin="round"
-																								></path>
-																							</svg>
-																						</button>
+																							<!-- Matches height of button in toolbar (1px border + 36px content height) -->
+																							<div class="py-px">
+																								<div class="h-9" />
+																							</div>
+																						</div>
 																					</div>
+
+																					<div
+																						class="absolute inset-x-0 bottom-0 flex justify-end py-2 pl-3 pr-2"
+																					>
+																						<div
+																							class="flex flex-shrink-0 items-center space-x-2"
+																						>
+																							<DisclosureButton
+																								class="inline-flex items-center rounded-md border border-gray-300 p-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+																							>
+																								<svg
+																									class="h-5 w-5"
+																									fill="none"
+																									viewBox="0 0 24 24"
+																								>
+																									<path
+																										stroke="currentColor"
+																										stroke-linecap="round"
+																										stroke-linejoin="round"
+																										stroke-width="1.5"
+																										d="M17.25 6.75L6.75 17.25"
+																									></path>
+																									<path
+																										stroke="currentColor"
+																										stroke-linecap="round"
+																										stroke-linejoin="round"
+																										stroke-width="1.5"
+																										d="M6.75 6.75L17.25 17.25"
+																									></path>
+																								</svg>
+																							</DisclosureButton>
+																							<button
+																								type="submit"
+																								class="inline-flex items-center rounded-md border border-indigo-500 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
+																							>
+																								<svg
+																									class="h-5 w-5"
+																									viewBox="0 0 24 24"
+																									fill="none"
+																									xmlns="http://www.w3.org/2000/svg"
+																								>
+																									<path
+																										d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
+																										stroke="currentColor"
+																										stroke-width="1.5"
+																										stroke-linecap="round"
+																										stroke-linejoin="round"
+																									></path>
+																								</svg>
+																							</button>
+																						</div>
+																					</div>
+																				</form>
+																			</div>
+																		</DisclosurePanel>
+																	</Disclosure>
+																</div>
+															</div>
+															<div class="" v-else>
+																<div
+																	class="py-2"
+																	v-if="
+																		!activityItem.deleted ||
+																		activityItem.Comment.length > 0
+																	"
+																>
+																	<footer
+																		v-if="!activityItem.deleted"
+																		class="mb-2 flex items-center justify-between"
+																	>
+																		<div class="flex items-center">
+																			<div
+																				class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
+																			>
+																				<img
+																					v-if="activityItem.avatarUrl"
+																					class="z-10 mr-2 h-5 w-5 rounded-full object-cover"
+																					:src="activityItem.avatarUrl"
+																					alt=""
+																				/>
+																				<div
+																					v-else
+																					class="mr-2 flex h-5 w-5 items-center justify-center rounded-full border border-sky-600/20 bg-sky-100 text-xs text-sky-500"
+																				>
+																					<UserCircleIconMini
+																						class="m-0 h-5 w-5"
+																					/>
 																				</div>
-																			</form>
+																				<div
+																					class="mr-1 flex items-center space-x-1"
+																				>
+																					{{ activityItem.User.firstName }} {{ activityItem.User.lastName }}
+																				</div>
+																				<span class="font-normal text-slate-400">{{ activityItem.text }}</span>
+
+																				<span
+																					class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+																				>
+																					{{
+																						ticketDate(activityItem.createdOn)
+																					}}
+																				</span>
+																			</div>
 																		</div>
-																	</DisclosurePanel>
-																</Disclosure>
+
+																		<div
+																			class="flex space-x-1"
+																			v-if="activityItem.createdBy === User.id"
+																		>
+																			<button
+																				class="text-slate-400 transition-colors hover:text-indigo-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					fill="none"
+																					viewBox="0 0 24 24"
+																				>
+																					<path
+																						stroke="currentColor"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																						stroke-width="1.5"
+																						d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
+																					></path>
+																					<path
+																						stroke="currentColor"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																						stroke-width="1.5"
+																						d="M19.25 19.25H13.75"
+																					></path>
+																				</svg>
+																			</button>
+																			<button
+																				@click="handleDelete(activityItem.id)"
+																				class="text-slate-400 transition-colors hover:text-rose-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					viewBox="0 0 24 24"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																				>
+																					<path
+																						d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M9.75 10.75V16.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M13.25 10.75V16.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M4.75 7.75H18.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																				</svg>
+																			</button>
+																		</div>
+																		<div class="flex space-x-1" v-else>
+																			<button
+																				class="text-slate-400 transition-colors hover:text-indigo-400"
+																			>
+																				<svg
+																					class="h-5 w-5"
+																					viewBox="0 0 24 24"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																				>
+																					<path
+																						d="M4.75 5.75V19.25"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																					<path
+																						d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																				</svg>
+																			</button>
+																		</div>
+																	</footer>
+
+																	<div
+																		v-if="
+																			activityItem.attachment &&
+																			!activityItem.deleted
+																		"
+																		data-test="war_room_comment_text"
+																		class="mt-1 flex overflow-hidden"
+																	>
+																		<button
+																			@click="
+																				(commentImageId =
+																					activityItem.attachment),
+																					(showImageModal = true)
+																			"
+																		>
+																			<img
+																				v-for="image in activityItem.attachments"
+																				:src="image"
+																				:alt="activityItem.id"
+																				data-test="comment-image"
+																				class="max-h-48 max-w-full cursor-pointer rounded-lg"
+																			/>
+																		</button>
+																	</div>
+																</div>
 															</div>
 														</article>
 													</div>
@@ -1657,7 +1947,7 @@
 								<div class="flex items-center space-x-2">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
-										class="h-6 w-6  text-gray-400"
+										class="h-6 w-6 text-gray-400"
 										fill="none"
 										viewBox="0 0 24 24"
 									>
@@ -1758,6 +2048,38 @@
 			#a7b5bb 270deg,
 			#ecf1f4 1turn
 		);
+		border: solid 1px white;
+	}
+
+	.mg_admin-text {
+		color: black;
+	}
+
+	.mg_ai {
+		color: transparent;
+		transition: 0.3s cubic-bezier(0.6, 0.6, 0, 1) opacity,
+			0.3s cubic-bezier(0.6, 0.6, 0, 1) transform;
+	}
+
+	.mg_ai-text {
+		animation: hue-rotate 3s ease-in-out infinite;
+		background: linear-gradient(135deg, #aa00ed 0%, #2fe3fe 50%, #8900ff 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		background-size: 200% 100%;
+		font-size: 13px;
+		font-weight: 400;
+		line-height: 24px;
+		-webkit-text-fill-color: transparent;
+	}
+
+	@keyframes hue-rotate {
+		0% {
+			background-position: 0%;
+		}
+		100% {
+			background-position: 200%;
+		}
 	}
 
 	.member {

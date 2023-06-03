@@ -31,7 +31,7 @@
 						<div
 							:class="[
 								styles[ticket.type],
-								'relative inline-flex items-center rounded-full  px-2.5 py-0.5 ring-1 ring-inset',
+								'relative inline-flex items-center rounded-full px-2.5 py-0.5 ring-1 ring-inset',
 							]"
 						>
 							<div class="text-xs font-normal">
@@ -112,6 +112,7 @@
 		billing:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
 		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
+		referral: 'inline-flex bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 ring-white text-white ',
 		sales_inquiry:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
 	};

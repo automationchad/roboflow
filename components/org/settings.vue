@@ -64,7 +64,7 @@
 										</ul>
 									</div>
 								</div>
-								<div id="danger">
+								<div id="danger" v-if="User.Account.type !== 'super_admin'">
 									<div>
 										<div
 											class="mb-4 flex border-b border-slate-300 py-8 dark:text-white"
@@ -112,7 +112,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="text-slate-500">
+								<div class="text-slate-500" v-if="User.Account.type !== 'super_admin'">
 									<div class="flex flex-col">
 										<small
 											>Motis Group<a
@@ -195,8 +195,6 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-
-
 
 	const handleCheckout = async (product, type, customer) => {
 		const { url } = await $fetch('/api/stripe/checkout', {

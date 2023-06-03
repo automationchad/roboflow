@@ -70,7 +70,7 @@
 		.from('User')
 		.select(
 			`*,Account (
-	     id,type,stripeCustomerId,Subscription(*))`
+		     id,type,partner_type,stripeCustomerId,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
@@ -105,8 +105,7 @@
 			title: 'Create a new automation project',
 			min_plan: 'growth',
 			gated:
-				retainer.tier !== 'growth' &&
-				retainer.tier !== 'enterprise' ||
+				(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
 				retainer.status === 'paused',
 			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 		},
@@ -120,6 +119,10 @@
 			id: 'performance_issues',
 			type: 'engineering',
 			title: 'Perfomance issues',
+			min_plan: 'enterprise',
+			gated:
+				(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
+				retainer.status === 'paused',
 			desc: 'Reporting of performance issues is only available on the Enterprise tier',
 		},
 		{
@@ -141,7 +144,86 @@
 			desc: 'Report abuse of a Motis project or Motis brand',
 		},
 	];
-	const selectedTicket = ref(ticketTypes[0]);
+
+	const partnerTicketTypes = [
+		{
+			id: 'referral',
+			type: 'sales',
+			title: 'New deal registration',
+			desc: 'Submit a new deal. As a partner, all of the clients in your partner account will enjoy priority support and advantageous pricing tiers.',
+		},
+		{
+			id: 'sales_inquiry',
+			type: 'sales',
+			title: 'Sales enquiry',
+			desc: 'Questions about pricing, paid plans and Enterprise plans.',
+		},
+
+		{
+			id: 'billing',
+			type: 'sales',
+			title: 'Billing',
+			desc: 'Issues with credit card charges | invoices | overcharging',
+		},
+		{
+			id: 'dashboard_bug',
+			type: 'engineering',
+			title: 'Dashboard bug',
+			desc: 'Issues with Motis dashboard',
+		},
+		{
+			id: 'abuse',
+			type: 'sales',
+			title: 'Abuse report',
+			desc: 'Report abuse of a Motis project or Motis brand',
+		},
+	];
+
+	const severityTypes = [
+		{
+			id: 'low',
+			type: 'engineering',
+			title: 'Low',
+			desc: 'General guidance',
+		},
+		{
+			id: 'scheduled',
+			type: 'engineering',
+			title: 'Normal',
+			desc: 'System impaired',
+		},
+		{
+			id: 'bug',
+			type: 'engineering',
+			title: 'High',
+			min_plan: 'support',
+
+			desc: 'Production system impaired',
+		},
+		{
+			id: 'new',
+			type: 'engineering',
+			title: 'Urgent',
+
+			desc: 'Production system down',
+		},
+		{
+			id: 'dashboard_bug',
+			type: 'engineering',
+			title: 'Critical',
+			min_plan: 'enterprise',
+			gated: retainer.tier !== 'enterprise',
+			desc: 'Business-critical system down',
+		},
+	];
+	const selectedSeverity = severityTypes[0];
+
+	const selectedTicket = ref(
+		User.Account.partner_type === 'affiliate'
+			? partnerTicketTypes[0]
+			: ticketTypes[0]
+	);
+
 	const accountId =
 		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
 	const teamId =
@@ -358,7 +440,10 @@
 													>
 														<ListboxOption
 															as="template"
-															v-for="ticketType in ticketTypes"
+															v-for="ticketType in User.Account.partner_type ===
+															'affiliate'
+																? partnerTicketTypes
+																: ticketTypes"
 															:key="ticketType.id"
 															:value="ticketType"
 															:disabled="ticketType.gated"
@@ -413,14 +498,171 @@
 												</transition>
 											</div>
 										</Listbox>
-										<p class="mt-1 text-sm text-slate-500">
+										<div
+											class="grid grid-cols-2 gap-4 pt-6"
+											v-if="!User.Account.partner_type"
+										>
+											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
+												<div
+													class="col-span-12 flex flex-row justify-between space-x-2"
+												>
+													<label
+														class="text-scale-1100 block text-sm"
+														for="projectRef"
+														>Which project is affected?</label
+													>
+												</div>
+												<div class="col-span-12">
+													<div class="">
+														<button
+															class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2 indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current aria-expanded:ring-2"
+															name=""
+															id="projectRef"
+															type="button"
+															aria-haspopup="menu"
+															aria-expanded="false"
+															data-state="closed"
+														>
+															<span
+																class="flex w-full flex-row items-center space-x-3"
+																><span class="truncate">motis-group</span></span
+															><span
+																class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+																><svg
+																	class="text-scale-600 h-5 w-5"
+																	xmlns="http://www.w3.org/2000/svg"
+																	viewBox="0 0 20 20"
+																	fill="currentColor"
+																	aria-hidden="true"
+																>
+																	<path
+																		fill-rule="evenodd"
+																		d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+																		clip-rule="evenodd"
+																	></path></svg
+															></span>
+														</button>
+													</div>
+													<p
+														data-state="hide"
+														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+													></p>
+												</div>
+											</div>
+											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
+												<div class="col-span-12">
+													<Listbox as="div" v-model="selectedSeverity">
+														<ListboxLabel
+															class="block text-sm leading-6 text-gray-600 dark:text-slate-400"
+															>Severity</ListboxLabel
+														>
+														<div class="relative mt-2">
+															<ListboxButton
+																class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+															>
+																<span class="inline-flex w-full truncate">
+																	<span class="truncate">{{
+																		selectedSeverity.title
+																	}}</span>
+																</span>
+																<span
+																	class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+																>
+																	<ChevronUpDownIcon
+																		class="h-5 w-5 text-gray-400"
+																		aria-hidden="true"
+																	/>
+																</span>
+															</ListboxButton>
+
+															<transition
+																leave-active-class="transition ease-in duration-100"
+																leave-from-class="opacity-100"
+																leave-to-class="opacity-0"
+															>
+																<ListboxOptions
+																	class="absolute z-10 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-slate-800 dark:ring-slate-700 sm:text-sm"
+																>
+																	<ListboxOption
+																		as="template"
+																		v-for="ticketType in severityTypes"
+																		:key="ticketType.id"
+																		:value="ticketType"
+																		:disabled="ticketType.gated"
+																		v-slot="{ active, selected }"
+																	>
+																		<li
+																			:class="[
+																				active
+																					? 'bg-slate-50 dark:bg-slate-700'
+																					: '',
+																				selected
+																					? 'bg-slate-200 dark:bg-slate-600'
+																					: '',
+																				'relative flex cursor-default select-none items-center justify-between py-2 pl-3 pr-9 transition-colors',
+																			]"
+																		>
+																			<div class="flex flex-col">
+																				<span
+																					:class="[
+																						selected
+																							? 'text-gray-600 dark:text-slate-400'
+																							: 'text-gray-400 dark:text-slate-400',
+																						active
+																							? 'text-gray-800 dark:text-white'
+																							: '',
+																						'truncate',
+																					]"
+																					>{{ ticketType.title
+																					}}<NuxtLink
+																						to="/settings/billing"
+																						class="ml-1 rounded-md bg-sky-200 px-2 text-xs text-sky-600"
+																						v-if="ticketType.gated"
+																						>Upgrade to
+																						<span class="capitalize">{{
+																							ticketType.min_plan
+																						}}</span>
+																					</NuxtLink></span
+																				><span
+																					:class="[
+																						active
+																							? 'text-gray-600 dark:text-slate-300'
+																							: 'text-gray-500 dark:text-slate-300',
+																						'truncate text-xs',
+																					]"
+																					>{{ ticketType.desc }}</span
+																				>
+																			</div>
+																			<div
+																				v-if="selected"
+																				class="text-lime-400"
+																			>
+																				<CheckIcon class="h-5 w-5" />
+																			</div>
+																		</li>
+																	</ListboxOption>
+																</ListboxOptions>
+															</transition>
+														</div>
+													</Listbox>
+												</div>
+											</div>
+										</div>
+										<p
+											class="mt-1 text-sm text-slate-500"
+											v-if="!User.Account.partner_type"
+										>
 											You are on the
 											<span class="capitalize">{{ retainer.tier }}</span> tier
+										</p>
+										<p v-else class="mt-1 text-sm text-slate-500">
+											You are on the
+											<span class="capitalize">partner</span> tier
 										</p>
 									</div>
 									<div
 										class="sm:col-span-2"
-										v-if="selectedTicket.id === 'asap'"
+										v-if="false"
 									>
 										<Disclosure
 											v-slot="{ open }"
@@ -602,7 +844,7 @@
 									</div>
 									<div
 										class="sm:col-span-2"
-										v-else-if="selectedTicket.id !== 'scheduled'"
+										
 									>
 										<Disclosure
 											v-slot="{ open }"
@@ -757,8 +999,189 @@
 								</div>
 								<div
 									class="col-span-2 space-y-6 px-10"
-									v-if="selectedTicket.id !== 'scheduled'"
+									v-if="selectedTicket.id === 'scheduled'"
 								>
+									<div class="h-[700px] sm:col-span-2">
+										<label
+											for="name"
+											class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"
+											>Calendar</label
+										>
+										<ticket-calendly class="-ml-4" />
+									</div>
+								</div>
+								<div
+									class="col-span-2 space-y-6 px-10"
+									v-else-if="selectedTicket.id === 'referral'"
+								>
+									<div class="sm:col-span-2">
+										<label
+											for="name"
+											class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"
+											>Client</label
+										>
+										<div class="mt-2.5">
+											<input
+												v-model="name"
+												required
+												type="text"
+												name="text"
+												id="name"
+												placeholder="A brief summary of the client"
+												class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:placeholder:text-slate-400 sm:text-sm sm:leading-6"
+											/>
+										</div>
+									</div>
+
+									<div class="sm:col-span-2">
+										<div
+											class="flex items-center justify-between text-sm text-slate-400"
+										>
+											<label
+												for="message"
+												class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
+												>Message</label
+											>5000 character limit
+										</div>
+
+										<div class="mt-2.5">
+											<textarea
+												v-model="brief"
+												required
+												name="message"
+												id="message"
+												rows="4"
+												max="5000"
+												placeholder="Provide a brief summary of the lead's automation needs. Include an overview of their desired automation outcomes, their budget, and the decision-making structure. Indicate if this involves migrating from a Tray.io competitor or creating new automation. "
+												class="block w-full rounded-md border-0 px-3.5 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:placeholder:text-slate-400 sm:text-sm sm:leading-6"
+											/>
+										</div>
+										<p
+											:class="[
+												brief === ''
+													? 'mt-2 opacity-100 '
+													: '-mb-6 -translate-y-3 opacity-0',
+												'text-sm text-red-900 transition-all dark:text-red-500',
+											]"
+										>
+											Please add a message about the issue that you're facing
+										</p>
+									</div>
+									<div
+										class="sm:col-span-2"
+										v-if="selectedTicket.id !== 'asap'"
+									>
+										<label
+											for="desired-date"
+											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
+											>Desired deadline</label
+										>
+										<div class="relative mt-2 rounded-md shadow-sm">
+											<input
+												v-model="due_date"
+												type="date"
+												name="desired-date"
+												id="desired-date"
+												:min="format(addDays(new Date(), 7), 'yyyy-MM-dd')"
+												class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 sm:text-sm sm:leading-6"
+											/>
+										</div>
+									</div>
+									<div
+										class="sm:cols-span-2"
+										v-if="selectedTicket.id !== 'asap'"
+									>
+										<label
+											for="desired-date"
+											class="block text-sm leading-6 text-gray-600 dark:text-slate-300"
+											>Attachments</label
+										>
+										<p class="text-xs dark:text-slate-500">
+											Upload up to 5 screenshots that might be relevant to the
+											client project
+										</p>
+										<div class="mt-6 flex items-center justify-start space-x-4">
+											<div
+												class="relative h-full"
+												v-for="(image, idx) in imageSrc"
+											>
+												<img
+													:src="image"
+													alt=""
+													loading="eager"
+													class="h-12 w-12 rounded object-cover"
+												/>
+												<div
+													class="absolute left-0 top-0 h-12 w-12 rounded border border-slate-200 opacity-20"
+												></div>
+												<!---->
+												<div
+													v-if="!loading"
+													@click="removeImage(idx)"
+													class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-red-600 bg-red-700 text-slate-200 hover:bg-red-600"
+													:disabled="loading"
+												>
+													<svg
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+														class="h-4 w-4"
+													>
+														<path
+															d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+															fill="currentColor"
+														></path>
+													</svg>
+												</div>
+											</div>
+
+											<div
+												v-if="imageSrc.length < 5"
+												class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-md border border-slate-400 p-2 text-slate-900 transition-colors dark:border-slate-600 dark:text-slate-400 dark:hover:text-slate-100"
+											>
+												<span class="cursor-pointer"
+													><svg
+														class="h-6 w-6"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M17 14.75V19.25"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19.25 17L14.75 17"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</span>
+
+												<input
+													type="file"
+													accept="image/jpeg, image/png, image/jpg"
+													@change="uploadImage"
+													ref="fileInput"
+													data-test="image-input"
+													class="absolute h-full w-full opacity-0 file:cursor-pointer"
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-span-2 space-y-6 px-10" v-else>
 									<div class="sm:col-span-2">
 										<label
 											for="name"
@@ -924,16 +1347,6 @@
 												/>
 											</div>
 										</div>
-									</div>
-								</div>
-								<div class="col-span-2 space-y-6 px-10" v-else>
-									<div class="h-[700px] sm:col-span-2">
-										<label
-											for="name"
-											class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"
-											>Calendar</label
-										>
-										<ticket-calendly class="-ml-4" />
 									</div>
 								</div>
 							</div>

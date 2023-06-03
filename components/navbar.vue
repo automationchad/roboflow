@@ -151,21 +151,36 @@
 							src="~/assets/images/logo.png"
 							alt="Your Company"
 						/>
-						<p class="text-xs text-slate-400">Motis Group</p>
+						<p class="text-xs text-slate-400">Partner Account</p>
 					</div>
 
-					<div class="flex h-6 w-full items-center justify-center mt-4">
+					<div class="mt-4 flex h-6 w-full items-center justify-center">
 						<NuxtLink
 							v-if="upgrade_needed"
 							to="/settings/billing#usage"
-							class="rounded-full border w-full text-center border-red-200 dark:border-red-600 dark:bg-red-800 dark:text-red-300 bg-red-100 px-2 py-0.5 text-xs font-normal text-red-700"
+							class="w-full rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-center text-xs font-normal text-red-700 dark:border-red-600 dark:bg-red-800 dark:text-red-300"
 							>Account has exceeded usage limits</NuxtLink
 						>
 						<NuxtLink
 							v-else-if="retainer.tier === 'free'"
 							to="/settings/billing#usage"
-							class="rounded-full border w-full inline-flex items-center space-x-1 justify-center text-center border-yellow-200 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300 bg-yellow-100 px-2 py-0.5 text-xs font-normal text-yellow-700"
-							><svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="10" y1="15" x2="10" y2="9"></line><line x1="14" y1="15" x2="14" y2="9"></line></svg>Paused</NuxtLink
+							class="inline-flex w-full items-center justify-center space-x-1 rounded-full border border-yellow-200 bg-yellow-100 px-2 py-0.5 text-center text-xs font-normal text-yellow-700 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300"
+							><svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="mr-1"
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<circle cx="12" cy="12" r="10"></circle>
+								<line x1="10" y1="15" x2="10" y2="9"></line>
+								<line x1="14" y1="15" x2="14" y2="9"></line></svg
+							>Paused</NuxtLink
 						>
 					</div>
 				</div>
@@ -185,7 +200,7 @@
 									<p
 										class="text-xs font-normal text-slate-600 dark:text-slate-400"
 									>
-										Organization
+										Account
 									</p>
 									<span class="truncate text-base">{{
 										User.Account.name
@@ -196,7 +211,13 @@
 
 						<li>
 							<ul role="list" class="-mx-2 space-y-1">
-								<li v-for="item in navigation" :key="item.name">
+								<li
+									v-for="item in User.Account.type === 'super_admin' ||
+									User.Account.partner_type === 'affiliate'
+										? adminNavigation
+										: navigation"
+									:key="item.name"
+								>
 									<NuxtLink
 										:to="item.href"
 										:class="[
@@ -221,7 +242,12 @@
 								</li>
 							</ul>
 						</li>
-						<li>
+						<li
+							v-if="
+								User.Account.type !== 'super_admin' &&
+								User.Account.partner_type !== 'affiliate'
+							"
+						>
 							<div
 								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
 							>
@@ -323,57 +349,63 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import {
-	Dialog,
-	DialogPanel,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuItems,
-	TransitionChild,
-	TransitionRoot,
-} from '@headlessui/vue';
-import {
-	Bars3Icon,
-	BellIcon,
-	CalendarIcon,
-	Cog6ToothIcon,
-	Cog8ToothIcon,
-	CodeBracketIcon,
-	DocumentDuplicateIcon,
-	CircleStackIcon,
-	QueueListIcon,
-	FolderIcon,
-	HomeIcon,
-	PlusIcon,
-	UsersIcon,
-	TicketIcon,
-	QuestionMarkCircleIcon,
-	CreditCardIcon,
-	XMarkIcon,
-	LockClosedIcon,
-	CpuChipIcon,
-} from '@heroicons/vue/24/outline';
-import {
-	ChevronDownIcon,
-	MagnifyingGlassIcon,
-	ChartBarIcon,
-	StarIcon,
-} from '@heroicons/vue/20/solid';
+	import { ref } from 'vue';
+	import {
+		Dialog,
+		DialogPanel,
+		Menu,
+		MenuButton,
+		MenuItem,
+		MenuItems,
+		TransitionChild,
+		TransitionRoot,
+	} from '@headlessui/vue';
+	import {
+		Bars3Icon,
+		BellIcon,
+		CalendarIcon,
+		Cog6ToothIcon,
+		Cog8ToothIcon,
+		CodeBracketIcon,
+		DocumentDuplicateIcon,
+		CircleStackIcon,
+		QueueListIcon,
+		FolderIcon,
+		HomeIcon,
+		PlusIcon,
+		UsersIcon,
+		TicketIcon,
+		QuestionMarkCircleIcon,
+		CreditCardIcon,
+		XMarkIcon,
+		LockClosedIcon,
+		DocumentTextIcon,
+		DocumentChartBarIcon,
+		BuildingOfficeIcon,
+		CpuChipIcon,
+		InboxStackIcon,
+	} from '@heroicons/vue/24/outline';
+	import {
+		ChevronDownIcon,
+		MagnifyingGlassIcon,
+		ChartBarIcon,
+		StarIcon,
+		ArrowTopRightOnSquareIcon,
+	} from '@heroicons/vue/20/solid';
 
-const user = useSupabaseUser();
-const supabase = useSupabaseClient();
-const avatarUrl = ref(null);
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+	const avatarUrl = ref(null);
 
-let { data: User, error: userError } = await supabase
-	.from('User')
-	.select(
-		`*,
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,
 				Account (
 			     id,
 				 name,
 				 type,
+				 partner_type,
 				 Subscription(*),
 				 Team (
 					id,
@@ -382,99 +414,148 @@ let { data: User, error: userError } = await supabase
 				 Ticket (count)
 			   )
 			 `
-	)
-	.eq('id', user.value.id)
-	.limit(1)
-	.single();
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
 
-const teams = ref([]);
-const entitlements = await getEntitlements();
+	const teams = ref([]);
+	const entitlements = await getEntitlements();
 
-const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
-const entitlement = entitlements[retainer.tier];
+	const entitlement = entitlements[retainer.tier];
 
-const totalActive = User.Account.Ticket.filter(
-	(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
-).length;
-const upgrade_needed = ref(false);
-upgrade_needed.value =
-	totalActive > entitlement.ticket_count &&
-	// retainer.status === 'active' &&
-	User.systemRole !== 'super_admin';
+	const totalActive = User.Account.Ticket.filter(
+		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
+	).length;
+	const upgrade_needed = ref(false);
+	upgrade_needed.value =
+		totalActive > entitlement.ticket_count &&
+		// retainer.status === 'active' &&
+		User.systemRole !== 'super_admin';
 
-function moveOrgToFront(arr) {
-	const orgIndex =
-		User.Account.type === 'super_admin'
-			? arr.findIndex((obj) => obj.id === User.Account.id)
-			: arr.findIndex((obj) => obj.name === 'Organization');
-	if (orgIndex > -1) {
-		const orgObj = arr.splice(orgIndex, 1)[0];
-		arr.unshift(orgObj);
+	function moveOrgToFront(arr) {
+		const orgIndex =
+			User.Account.type === 'super_admin'
+				? arr.findIndex((obj) => obj.id === User.Account.id)
+				: arr.findIndex((obj) => obj.name === 'Organization');
+		if (orgIndex > -1) {
+			const orgObj = arr.splice(orgIndex, 1)[0];
+			arr.unshift(orgObj);
+		}
+		return arr;
 	}
-	return arr;
-}
 
-onMounted(async () => {
-	let { data: Account, error: accountError } = await supabase
-		.from('Account')
-		.select('*,Ticket(status,type)');
-	if (User.Account.type === 'super_admin') {
-		teams.value = Account;
-	} else {
-		teams.value = User.Account.Team;
-		const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
-		const item = teams.value.splice(index, 1)[0];
-		teams.value.unshift(item);
-	}
-	teams.value = moveOrgToFront(teams.value);
-});
-
-const getAvatarUrl = async (avatar) => {
-	const {
-		data: [File],
-		error: fileError,
-	} = await supabase.storage.from('avatars').list(`${avatar}/`, {
-		limit: 100,
-		offset: 0,
-		sortBy: { column: 'updated_at', order: 'desc' },
-		search: `${user.value.id}`,
+	onMounted(async () => {
+		let { data: Account, error: accountError } = await supabase
+			.from('Account')
+			.select('*,Ticket(status,type)');
+		if (User.Account.type === 'super_admin') {
+			teams.value = Account;
+		} else {
+			teams.value = User.Account.Team;
+			const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
+			const item = teams.value.splice(index, 1)[0];
+			teams.value.unshift(item);
+		}
+		teams.value = moveOrgToFront(teams.value);
 	});
-	if (File) {
+
+	const getAvatarUrl = async (avatar) => {
 		const {
-			data: { publicUrl },
-		} = await supabase.storage
-			.from('avatars')
-			.getPublicUrl(`/${user.value.id}/${File.name}`);
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from('avatars').list(`${avatar}/`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${user.value.id}`,
+		});
+		if (File) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from('avatars')
+				.getPublicUrl(`/${user.value.id}/${File.name}`);
 
-		return publicUrl;
-	} else return null;
-};
+			return publicUrl;
+		} else return null;
+	};
 
-avatarUrl.value = await getAvatarUrl(user.value.id);
+	avatarUrl.value = await getAvatarUrl(user.value.id);
 
-const route = useRoute();
+	const route = useRoute();
 
-const navigation = [
-	{
-		name: 'Dashboard',
-		href: `/${User.Account.id}/dashboard`,
-		icon: ChartBarIcon,
-		current: route.path.includes`/${User.Account.id}/dashboard`,
-	},
-	{
-		name: 'Plan & Billing',
-		href: `/${User.Account.id}/settings/billing`,
-		icon: CreditCardIcon,
-		current: route.path.includes(`/${User.Account.id}/settings/billing`),
-	},
-	{
-		name: 'Settings & Members',
-		href: `/${User.Account.id}/settings`,
-		icon: Cog8ToothIcon,
-		current: route.path.includes(`/${User.Account.id}/settings`),
-	},
-];
+	const navigation = [
+		{
+			name: 'Dashboard',
+			href: `/${User.Account.id}/dashboard`,
+			icon: ChartBarIcon,
+			current: route.path.includes`/${User.Account.id}/dashboard`,
+		},
+		{
+			name: 'Plan & Billing',
+			href: `/${User.Account.id}/settings/billing`,
+			icon: CreditCardIcon,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
+		},
+		{
+			name: 'Settings & Members',
+			href: `/${User.Account.id}/settings`,
+			icon: Cog8ToothIcon,
+			current: route.path.includes(`/${User.Account.id}/settings`),
+		},
+	];
 
-const sidebarOpen = ref(false);
+	const adminNavigation = [
+		{
+			name: 'Client organizations',
+			href: `/${User.Account.id}/clients`,
+			icon: BuildingOfficeIcon,
+			current: route.path.includes`/${User.Account.id}/clients`,
+		},
+
+		{
+			name: 'Members & Details',
+			href: `/${User.Account.id}/settings`,
+			icon: UsersIcon,
+			current: route.path.includes(`/${User.Account.id}/settings`),
+		},
+		{
+			name: 'Billing info',
+			href: `/${User.Account.id}/settings/billing`,
+			icon: CreditCardIcon,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
+		},
+		{
+			name: 'Invoices',
+			href: `/${User.Account.id}/settings/billing`,
+			icon: DocumentTextIcon,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
+		},
+		{
+			name: 'Cost reports',
+			href: `/${User.Account.id}/cost-reports`,
+			icon: DocumentChartBarIcon,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
+		},
+		{
+			name: 'Partner Central',
+			href: `/${User.Account.id}/settings/billing`,
+			icon: ArrowTopRightOnSquareIcon,
+			current: route.path.includes(`/${User.Account.id}/settings/billing`),
+		},
+	];
+
+	if (User.Account.partner_type === 'affiliate') {
+		adminNavigation[0] = {
+			name: 'Deals',
+			href: `/${User.Account.id}/deals`,
+			icon: InboxStackIcon,
+			current: route.path.includes`/${User.Account.id}/deals`,
+		};
+	}
+
+	const sidebarOpen = ref(false);
 </script>
