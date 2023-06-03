@@ -9,6 +9,8 @@
 <style>
 	* {
 		font-family: circular, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		/* font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI,
+			Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif; */
 		font-smooth: always;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;

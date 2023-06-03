@@ -68,6 +68,7 @@
 												</TabList>
 												<TabPanels>
 													<TabPanel><org-settings /></TabPanel>
+													<TabPanel><org-integrations /></TabPanel>
 													<TabPanel><members /></TabPanel>
 												</TabPanels>
 
@@ -153,6 +154,11 @@
 			name: 'Settings',
 			href: `/${User.Account.id}/settings`,
 			current: true,
+		},
+		{
+			name: 'Integrations',
+			href: `/${User.Account.id}/settings`,
+			current: false,
 		},
 		{
 			name: 'Members',

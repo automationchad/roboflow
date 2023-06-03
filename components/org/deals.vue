@@ -47,21 +47,22 @@
 													<p class="text-scale-900 text-xs uppercase">Tasks</p>
 												</div>
 											</div>
-											<div
-												v-for="(team, idx) in deals"
-												:key="team.name"
+											<NuxtLink
+												v-for="(deal, idx) in deals"
+												:to="`/${deal.teamId}/tickets/${deal.id}`"
+												:key="deal.name"
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
 											>
 												<div class="flex w-[40%] items-center gap-3">
-													<span class="text-sm">{{ team.name }}</span>
+													<span class="text-sm">{{ deal.name }}</span>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<span
 														:class="[
-															styles[team.status],
+															styles[deal.status],
 															'rounded-full px-2 text-xs capitalize ring-1 ',
 														]"
-														>{{ team.status }}</span
+														>{{ deal.status }}</span
 													>
 												</div>
 												<div class="flex w-[20%] justify-end">
@@ -77,7 +78,7 @@
 														)
 													}}</span>
 												</div>
-											</div>
+											</NuxtLink>
 										</div>
 									</div>
 								</div>

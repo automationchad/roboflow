@@ -1,5 +1,6 @@
 <script setup>
 	import { ref } from 'vue';
+
 	import {
 		Dialog,
 		DialogPanel,
@@ -47,7 +48,9 @@
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
 
 	const user = useSupabaseUser();
+
 	const supabase = useSupabaseClient();
+
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
 
@@ -127,7 +130,7 @@
 	let { data: Ticket, error } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
@@ -330,14 +333,12 @@
 	}
 
 	const convert = (text) => {
-		let converter = new showdown.Converter();
 		const formatted = converter.makeHtml(text);
 		return formatted;
 	};
 
 	const handleCommentAdd = async (thread_id) => {
 		loading.value = true;
-
 		try {
 			if (selectedFile.value) {
 				const { data, error: insertError } = await supabase
@@ -366,25 +367,28 @@
 					return;
 				}
 				if (insertError) {
-					console.error('Error inserting comment:', insertError);
+					console.error(
+						'Error inserting comment with attachment:',
+						insertError
+					);
 				} else {
 					console.log('Image uploaded and comment created successfully');
 					removeImage();
 				}
 			} else {
-				const { data, error: insertError } = await supabase
+				const { data, error: insertCommentError } = await supabase
 					.from('Comment')
 					.insert([
 						{
-							text: thread_id ? reply_text.value : comment_text.value,
+							text: thread_id !== null ? reply_text.value : comment_text.value,
 							createdBy: user.value.id,
 							ticketId: Ticket.id,
 							threadId: thread_id,
 						},
 					]);
 
-				if (insertError) {
-					console.error('Error inserting comment:', insertError);
+				if (insertCommentError) {
+					console.error('Error inserting comment:', insertCommentError);
 				} else {
 					console.log('Comment created successfully');
 					removeImage();
@@ -490,12 +494,12 @@
 
 												<div class="">
 													<div class="flex items-center">
-														<span
+														<NuxtLink :to="`/profile/${Ticket.User.id}`"
 															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 														>
 															{{ Ticket.User.firstName }}
 															{{ Ticket.User.lastName }}
-														</span>
+														</NuxtLink>
 
 														<span
 															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
@@ -1011,7 +1015,9 @@
 															<div
 																class=""
 																v-if="
-																	activityItem.activity_type === 'user_comment'
+																	activityItem.activity_type ===
+																		'user_comment' ||
+																	activityItem.activity_type === 'ai_comment'
 																"
 															>
 																<div
@@ -1057,7 +1063,7 @@
 																						:key="badge.id"
 																						:class="[
 																							badge.id,
-																							'py-0.25 flex items-center justify-center rounded-md px-1 text-xs',
+																							'py-0.25 flex items-center justify-center rounded-md px-1 text-xs leading-4',
 																						]"
 																					>
 																						<span
@@ -1229,7 +1235,6 @@
 																			activityItem.attachment &&
 																			!activityItem.deleted
 																		"
-																		data-test="war_room_comment_text"
 																		class="mt-1 flex overflow-hidden"
 																	>
 																		<button
@@ -1260,7 +1265,10 @@
 																		:key="reply.id"
 																		class="relative my-6 pl-2 text-base lg:pl-4"
 																	>
-																		<div v-if="idx < activityItem.Comment.length - 1"
+																		<div
+																			v-if="
+																				idx < activityItem.Comment.length - 1
+																			"
 																			:class="[
 																				activityItemIdx === comments.length - 1
 																					? 'h-6'
@@ -1281,7 +1289,7 @@
 																				>
 																					<div v-if="reply.avatarUrl">
 																						<img
-																							class="z-10 mr-2 h-5 w-5 rounded-full object-cover relative"
+																							class="relative z-10 mr-2 h-5 w-5 rounded-full object-cover"
 																							:src="reply.avatarUrl"
 																							alt="Jese Leos"
 																						/>
@@ -1337,6 +1345,9 @@
 																						</div>
 
 																						<div
+																							v-if="
+																								reply.User.badges.length > 1
+																							"
 																							class="rounded-md border border-gray-600 px-1.5 text-xs text-gray-400"
 																						>
 																							+{{
@@ -1469,10 +1480,27 @@
 																			</div>
 																		</footer>
 																		<p
-																			class="pl-8 text-base text-gray-900 dark:text-slate-100"
-																		>
-																			{{ reply.text }}
-																		</p>
+																			v-html="convert(reply.text)"
+																			class="prose pl-8 dark:prose-invert"
+																		></p>
+																		<div class="mt-2 pl-8">
+																			<NuxtLink
+																				v-if="
+																					reply.text.includes(
+																						'https://calendly.com/motis-group/partners'
+																					)
+																				"
+																				:to="`https://calendly.com/motis-group/partners?name=${
+																					Ticket.User.firstName +
+																					' ' +
+																					Ticket.User.lastName
+																				}&email=${
+																					Ticket.User.email
+																				}&utm_source=${Ticket.id}`"
+																				class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
+																				>Schedule a call</NuxtLink
+																			>
+																		</div>
 																	</article>
 																</div>
 																<div
@@ -1512,7 +1540,7 @@
 																		</div>
 
 																		<DisclosurePanel
-																			class="mt-3 pl-8 flex items-start space-x-4"
+																			class="mt-3 flex items-start space-x-4 pl-8"
 																		>
 																			<div class="min-w-0 flex-1">
 																				<form
@@ -1637,9 +1665,13 @@
 																				<div
 																					class="mr-1 flex items-center space-x-1"
 																				>
-																					{{ activityItem.User.firstName }} {{ activityItem.User.lastName }}
+																					{{ activityItem.User.firstName }}
+																					{{ activityItem.User.lastName }}
 																				</div>
-																				<span class="font-normal text-slate-400">{{ activityItem.text }}</span>
+																				<span
+																					class="font-normal text-slate-400"
+																					>{{ activityItem.text }}</span
+																				>
 
 																				<span
 																					class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
@@ -1761,7 +1793,6 @@
 																			activityItem.attachment &&
 																			!activityItem.deleted
 																		"
-																		data-test="war_room_comment_text"
 																		class="mt-1 flex overflow-hidden"
 																	>
 																		<button
@@ -2038,6 +2069,9 @@
 </template>
 
 <style scoped>
+	:deep p a {
+		color: #9382ff;
+	}
 	.mg_admin {
 		background: conic-gradient(
 			from 171.52deg at 50% 50%,
@@ -2057,6 +2091,9 @@
 
 	.mg_ai {
 		color: transparent;
+		background: #2a004f;
+		border: 1px solid #aa00eda0;
+
 		transition: 0.3s cubic-bezier(0.6, 0.6, 0, 1) opacity,
 			0.3s cubic-bezier(0.6, 0.6, 0, 1) transform;
 	}
@@ -2067,9 +2104,7 @@
 		-webkit-background-clip: text;
 		background-clip: text;
 		background-size: 200% 100%;
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 24px;
+
 		-webkit-text-fill-color: transparent;
 	}
 
@@ -2091,6 +2126,7 @@
 			#eabcb1 77.15%,
 			#cf9a8c
 		);
+		color: #000000ab
 	}
 
 	.mg_officer {
@@ -2102,5 +2138,6 @@
 			#e9d8ab 75%,
 			#e3bc5a
 		);
+		color: #000000ab
 	}
 </style>
