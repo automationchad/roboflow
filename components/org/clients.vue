@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<warning-access :role="User.systemRole" />
+		
 		<div class="mt-8 space-y-6 lg:px-0">
 			<loading-spinner v-if="state.loading" />
 			<!-- Billing history -->

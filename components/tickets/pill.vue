@@ -26,7 +26,7 @@
 								class="hover:underline"
 								>{{ ticket.name }}</a
 							>
-							<span v-else>{{ ticket.name }}</span>
+							<span v-else>{{ truncateString(ticket.name,30) }}</span>
 						</div>
 						<div
 							:class="[
@@ -86,7 +86,7 @@
 					>
 						<CalendarIcon class="h-4 w-4" />
 						<span>{{
-							format(new Date(ticket.dueDate), 'MMM d') ?? 'null'
+							formatDateDistance(new Date(ticket.dueDate)) ?? 'null'
 						}}</span>
 					</div>
 				</div>

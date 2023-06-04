@@ -64,7 +64,7 @@
 															styles[deal.status],
 															'rounded-full px-2 text-xs capitalize ring-1 ',
 														]"
-														>{{ deal.status }}</span
+														>{{ deal.status.replace(/_/g, ' ') }}</span
 													>
 												</div>
 												<div class="flex w-[20%] justify-end">
@@ -156,6 +156,9 @@
 	const pastDue = () => {};
 
 	const styles = {
+        proposal_submitted: '',
+        requirements_gathering: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
+        backlog: 'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300  text-amber-900 dark:text-amber-200',
 		active:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
 		pending:

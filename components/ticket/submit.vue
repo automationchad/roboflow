@@ -150,7 +150,7 @@
 			id: 'referral',
 			type: 'sales',
 			title: 'New deal registration',
-			desc: 'Submit a new deal. As a partner, all of the clients in your partner account will enjoy priority support and advantageous pricing tiers.',
+			desc: "Submit a new referral deal. As a partner, we'll kick back anything you help us close.",
 		},
 		{
 			id: 'sales_inquiry',
@@ -662,7 +662,7 @@
 									</div>
 									<div
 										class="sm:col-span-2"
-										v-if="false"
+										v-if="selectedTicket.type === 'sales'"
 									>
 										<Disclosure
 											v-slot="{ open }"
@@ -702,7 +702,7 @@
 														></path>
 													</svg>
 
-													Expected waiting time {{ 15 }} min
+													Expected response time {{ 15 }} min
 												</div>
 												<!-- <DisclosureButton
 													class="flex rounded-lg text-left text-sm font-medium text-slate-400 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:text-slate-100"
@@ -842,10 +842,7 @@
 											>
 										</Disclosure>
 									</div>
-									<div
-										class="sm:col-span-2"
-										
-									>
+									<div v-else class="sm:col-span-2">
 										<Disclosure
 											v-slot="{ open }"
 											as="div"
