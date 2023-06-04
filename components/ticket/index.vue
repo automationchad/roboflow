@@ -229,8 +229,6 @@
 		} else return '';
 	};
 
-	
-
 	const getCommentImageUrl = async (id) => {
 		const {
 			data: [File],
@@ -1108,7 +1106,7 @@
 																				>
 																					<img
 																						v-if="activityItem.avatarUrl"
-																						class="relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
+																						class="relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#020014]"
 																						:src="activityItem.avatarUrl"
 																						alt=""
 																					/>
@@ -1298,10 +1296,13 @@
 																		</footer>
 																		<div
 																			:class="[
+																				activityItem.User.id === User.id
+																					? 'bg-[#0166C8]'
+																					: 'bg-[#1C1B2C]',
 																				activityItem.deleted
 																					? 'text-gray-400 dark:text-gray-400'
 																					: 'text-gray-900 dark:text-gray-200',
-																				'prose pb-2 pl-8 font-normal dark:prose-invert',
+																				'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
 																			]"
 																			v-html="convert(activityItem.text)"
 																		></div>
@@ -1371,7 +1372,7 @@
 																					'absolute  left-0 top-0 flex w-12 justify-center',
 																				]"
 																			>
-																				<div class="w-px bg-slate-700/20" />
+																				<div class="w-px bg-gradient-to-b from-slate-300/0 via-slate-300/20 to-slate-300/0" />
 																			</div>
 																			<footer
 																				class="mb-2 flex items-center justify-between"
@@ -1385,9 +1386,13 @@
 																							class=""
 																						>
 																							<img
-																								class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
+																								class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#020014]"
 																								:src="reply.avatarUrl"
-																								alt="Jese Leos"
+																								:alt="
+																									reply.User.firstName +
+																									' ' +
+																									reply.User.lastName
+																								"
 																							/>
 																						</div>
 
@@ -1573,7 +1578,17 @@
 																					</button>
 																				</div>
 																			</footer>
-																			<p class="prose pl-8 dark:prose-invert">
+																			<p
+																				:class="[
+																					reply.User.id === User.id
+																						? 'bg-[#0166C8]'
+																						: 'bg-[#1C1B2C]',
+																					reply.activity_type === 'ai_comment'
+																						? 'ai_shadow shadow-[#9643FF]/25'
+																						: '',
+																					'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
+																				]"
+																			>
 																				{{ reply.text }}
 																			</p>
 																			<div class="mt-2 pl-8">
@@ -1615,11 +1630,11 @@
 																				/>
 
 																				<DisclosureButton
-																					class="flex ml-2 items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
+																					class="ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
 																				>
 																					<div class="flex items-center">
 																						<svg
-																							class="h-4 w-4 mr-0.5"
+																							class="mr-0.5 h-4 w-4"
 																							viewBox="0 0 24 24"
 																							fill="none"
 																							xmlns="http://www.w3.org/2000/svg"
@@ -1630,8 +1645,12 @@
 																								stroke-width="1.5"
 																								stroke-linecap="round"
 																								stroke-linejoin="round"
-																							></path>
-																						</svg><span>Comment as &nbsp;</span><span class="font-medium">{{ User.firstName }} {{ User.lastName }}</span>
+																							></path></svg
+																						><span>Comment as &nbsp;</span
+																						><span class="font-medium"
+																							>{{ User.firstName }}
+																							{{ User.lastName }}</span
+																						>
 																					</div>
 																				</DisclosureButton>
 																			</div>
@@ -2150,6 +2169,10 @@
 </template>
 
 <style scoped>
+	.ai_shadow {
+		box-shadow: inset 5px -5px 20px 0  rgba(150,67,255,0.15);
+		border: 1px solid rgba(201, 150, 255, 0.16)
+	}
 	:deep p a {
 		color: #9382ff;
 	}

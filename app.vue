@@ -1,5 +1,5 @@
 <template>
-	<div class="min-h-screen bg-white dark:bg-[#0A1125]">
+	<div class="min-h-screen bg-white dark:bg-[#020014]">
 		<NuxtLayout
 			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
 		/></NuxtLayout>
