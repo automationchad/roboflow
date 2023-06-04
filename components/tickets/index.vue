@@ -228,7 +228,7 @@
 						<div>
 							<tickets-section
 								title="Active"
-								:tickets="active_tickets"
+								:tickets="tickets"
 								:page="buildingPage"
 								:loading="loading"
 								@update:page="buildingPage = $event"

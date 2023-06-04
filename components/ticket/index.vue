@@ -229,6 +229,8 @@
 		} else return '';
 	};
 
+	
+
 	const getCommentImageUrl = async (id) => {
 		const {
 			data: [File],
@@ -492,9 +494,13 @@
 												<div class="relative" v-if="ticketAvatar">
 													<img
 														:src="ticketAvatar"
-														class="mr-2 flex h-12 w-12 items-center relative justify-center rounded-full object-cover"
+														class="relative mr-2 flex h-12 w-12 items-center justify-center rounded-full object-cover"
 													/>
-<img src="~/assets/images/logo.png" alt="" class="absolute h-5 w-5 rounded-full object-cover right-1 bottom-0"/>
+													<img
+														src="~/assets/images/logo.png"
+														alt=""
+														class="absolute bottom-0 right-1 h-5 w-5 rounded-full object-cover"
+													/>
 												</div>
 
 												<div
@@ -853,7 +859,9 @@
 														v-model="aiEnabled"
 														@click="handleAIToggle(Ticket.id)"
 														:class="[
-															aiEnabled ? 'bg-[#8900ff]' : 'bg-gray-200 dark:bg-slate-700',
+															aiEnabled
+																? 'bg-[#8900ff]'
+																: 'bg-gray-200 dark:bg-slate-700',
 															'relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
 														]"
 													>
@@ -861,13 +869,17 @@
 														<span
 															aria-hidden="true"
 															:class="[
-																aiEnabled ? 'translate-x-5' : 'translate-x-0 dark:bg-slate-500',
+																aiEnabled
+																	? 'translate-x-5'
+																	: 'translate-x-0 dark:bg-slate-500',
 																'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
 															]"
 														/> </Switch
 													><svg
 														:class="[
-															aiEnabled ? 'text-[#8900ff]' : 'text-gray-200 dark:text-slate-600',
+															aiEnabled
+																? 'text-[#8900ff]'
+																: 'text-gray-200 dark:text-slate-600',
 															'h-6 w-6 transition-colors duration-200',
 														]"
 														viewBox="0 0 24 24"
@@ -1294,23 +1306,23 @@
 																			v-html="convert(activityItem.text)"
 																		></div>
 																		<div class="mt-2 pl-8">
-																				<NuxtLink
-																					v-if="
-																						activityItem.text.includes('below') &&
-																						activityItem.User.systemRole ===
-																							'super_admin'
-																					"
-																					:to="`https://calendly.com/motis-group/partners?name=${
-																						Ticket.User.firstName +
-																						' ' +
-																						Ticket.User.lastName
-																					}&email=${
-																						Ticket.User.email
-																					}&utm_source=${Ticket.id}`"
-																					class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
-																					>Schedule a call</NuxtLink
-																				>
-																			</div>
+																			<NuxtLink
+																				v-if="
+																					activityItem.text.includes('below') &&
+																					activityItem.User.systemRole ===
+																						'super_admin'
+																				"
+																				:to="`https://calendly.com/motis-group/partners?name=${
+																					Ticket.User.firstName +
+																					' ' +
+																					Ticket.User.lastName
+																				}&email=${
+																					Ticket.User.email
+																				}&utm_source=${Ticket.id}`"
+																				class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
+																				>Schedule a call</NuxtLink
+																			>
+																		</div>
 																		<div
 																			v-if="
 																				activityItem.attachment &&
@@ -1353,8 +1365,7 @@
 																					idx < activityItem.Comment.length - 1
 																				"
 																				:class="[
-																					activityItemIdx ===
-																					comments.length
+																					activityItemIdx === comments.length
 																						? 'h-6 '
 																						: '-bottom-6',
 																					'absolute  left-0 top-0 flex w-12 justify-center',
@@ -1374,7 +1385,7 @@
 																							class=""
 																						>
 																							<img
-																								class="relative z-50 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
+																								class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
 																								:src="reply.avatarUrl"
 																								alt="Jese Leos"
 																							/>
@@ -1595,30 +1606,32 @@
 																	>
 																		<Disclosure v-slot="{ open }">
 																			<div
-																				class="flex items-center justify-end"
+																				class="flex items-center justify-start pl-8"
 																			>
+																				<img
+																					:src="currentAvatar"
+																					alt=""
+																					class="h-5 w-5 rounded-full object-cover"
+																				/>
+
 																				<DisclosureButton
-																					class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
+																					class="flex ml-2 items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
 																				>
-																					<div
-																						data-v-164b91a0=""
-																						data-test="open-reply-button"
-																						class="flex items-center"
-																					>
+																					<div class="flex items-center">
 																						<svg
-																							data-v-164b91a0=""
-																							viewBox="0 0 16 16"
+																							class="h-4 w-4 mr-0.5"
+																							viewBox="0 0 24 24"
 																							fill="none"
 																							xmlns="http://www.w3.org/2000/svg"
-																							class="mr-1 h-4 w-4"
 																						>
 																							<path
-																								data-v-164b91a0=""
-																								d="M13.74 12.793a4.668 4.668 0 00-1.827-7.046 5.333 5.333 0 10-9.46 4.193l-.926.92a.667.667 0 00-.14.727A.667.667 0 002 12h3.793A4.667 4.667 0 0010 14.667h4a.667.667 0 00.613-.414.667.667 0 00-.14-.726l-.733-.734zM5.333 10c.001.223.02.446.054.667h-1.78l.233-.227a.666.666 0 000-.947 3.953 3.953 0 01-1.173-2.826 4 4 0 014-4 3.96 3.96 0 013.766 2.666H10A4.667 4.667 0 005.333 10zm7.027 3.333l.033.034H10a3.334 3.334 0 112.36-.974.667.667 0 00-.2.467.666.666 0 00.2.473z"
-																								fill="currentColor"
+																								d="M4.75 11L11.25 4.75V9.25C19.25 9.25 19.25 15 19.25 19.25C17 13 11.25 12.75 11.25 12.75V17.25L4.75 11Z"
+																								stroke="currentColor"
+																								stroke-width="1.5"
+																								stroke-linecap="round"
+																								stroke-linejoin="round"
 																							></path>
-																						</svg>
-																						Reply
+																						</svg><span>Comment as &nbsp;</span><span class="font-medium">{{ User.firstName }} {{ User.lastName }}</span>
 																					</div>
 																				</DisclosureButton>
 																			</div>
@@ -1736,7 +1749,7 @@
 																				>
 																					<img
 																						v-if="activityItem.avatarUrl"
-																						class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-black"
+																						class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
 																						:src="activityItem.avatarUrl"
 																						alt=""
 																					/>
@@ -1987,23 +2000,11 @@
 										></path>
 									</svg>
 								</button>
-
-								<!-- <button
-												type="button"
-												@click="handleTicketDelete()"
-												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-											>
-												<TrashIcon
-													class="-ml-0.5 h-5 w-5 text-gray-400"
-													aria-hidden="true"
-												/>
-												Delete
-											</button> -->
 							</div>
 							<h2 class="sr-only">Details</h2>
 							<div class="space-y-3">
 								<div
-									class="flex items-center space-x-2"
+									class="flex items-center space-x-2 dark:text-white"
 									v-if="Ticket.status !== 'done'"
 								>
 									<svg
@@ -2080,7 +2081,7 @@
 								<div class="flex items-center space-x-2">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
-										class="h-6 w-6 text-gray-400"
+										class="h-6 w-6 text-gray-400 dark:text-slate-300"
 										fill="none"
 										viewBox="0 0 24 24"
 									>
@@ -2093,7 +2094,7 @@
 										></path>
 									</svg>
 
-									<span class="text-sm text-gray-500 dark:text-slate-300"
+									<span class="text-sm text-gray-500 dark:text-slate-400"
 										>Due in <span>{{ dueDate }}</span></span
 									>
 								</div>
@@ -2168,7 +2169,6 @@
 
 	.badge-extra {
 		font-size: 10px;
-		
 	}
 
 	.mg_admin-text {
