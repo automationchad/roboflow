@@ -53,7 +53,7 @@
 							</TransitionChild>
 							<!-- Sidebar component, swap this element with another sidebar if you like -->
 							<div
-								class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10"
+								class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#06051A] px-6 pb-4 ring-1 ring-white/10"
 							>
 								<div class="flex h-16 shrink-0 items-center">
 									<img
@@ -140,7 +140,7 @@
 		>
 			<!-- Sidebar component, swap this element with another sidebar if you like -->
 			<div
-				class="flex grow flex-col overflow-y-auto bg-gray-50 px-6 pb-4 dark:bg-gray-900"
+				class="flex grow flex-col overflow-y-auto bg-gray-50 px-6 pb-4 border-r border-white/10 dark:bg-[#06051A]"
 			>
 				<div
 					class="-mx-2 flex shrink-0 flex-col items-center justify-center space-y-3 pt-4"

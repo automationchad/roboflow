@@ -50,13 +50,13 @@
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
 
 	const user = useSupabaseUser();
-
 	const supabase = useSupabaseClient();
 
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
 
 	const converter = await new showdown.Converter();
+
 	const loading = ref(true);
 
 	const ticketAvatar = ref(null);
@@ -240,7 +240,6 @@
 			search: `${id}`,
 		});
 
-		console.log(File);
 		if (File) {
 			const {
 				data: { publicUrl },
@@ -331,6 +330,8 @@
 	};
 
 	const ticketAttachments = ref([]);
+
+	const aiResponse = ref('');
 
 	ticketAttachments.value = await getTicketAttachments(Ticket.id);
 	console.log(ticketAttachments.value);
@@ -839,71 +840,9 @@
 							<section aria-labelledby="activity-title" class="mt-8 xl:mt-10">
 								<div>
 									<div class="divide-gray-200 dark:divide-slate-800">
-										<div class="pb-4">
-											<div class="flex justify-between">
-												<h2
-													id="activity-title"
-													class="text-md font-medium text-gray-900 dark:text-white"
-												>
-													{{ comments.filter((o) => !o.deleted).length }}
-													comment{{
-														comments.filter((o) => !o.deleted).length > 1
-															? 's'
-															: ''
-													}}
-												</h2>
-												<div class="flex items-center space-x-2">
-													<Switch
-														v-model="aiEnabled"
-														@click="handleAIToggle(Ticket.id)"
-														:class="[
-															aiEnabled
-																? 'bg-[#8900ff]'
-																: 'bg-gray-200 dark:bg-slate-700',
-															'relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
-														]"
-													>
-														<span class="sr-only">Use setting</span>
-														<span
-															aria-hidden="true"
-															:class="[
-																aiEnabled
-																	? 'translate-x-5'
-																	: 'translate-x-0 dark:bg-slate-500',
-																'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-															]"
-														/> </Switch
-													><svg
-														:class="[
-															aiEnabled
-																? 'text-[#8900ff]'
-																: 'text-gray-200 dark:text-slate-600',
-															'h-6 w-6 transition-colors duration-200',
-														]"
-														viewBox="0 0 24 24"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path
-															d="M9.75 13C14 13 14 7.75 14 7.75C14 7.75 14 13 18.25 13C14 13 14 18.25 14 18.25C14 18.25 14 13 9.75 13Z"
-															fill="currentColor"
-														></path>
-														<path
-															d="M5.75 8C8 8 8 5.75 8 5.75C8 5.75 8 8 10.25 8C8 8 8 10.25 8 10.25C8 10.25 8 8 5.75 8Z"
-															fill="currentColor"
-														></path>
-														<path
-															d="M7.75 16.25H7.76M18.25 5.75H18.26M18.25 18.25H18.26M14 7.75C14 7.75 14 13 9.75 13C14 13 14 18.25 14 18.25C14 18.25 14 13 18.25 13C14 13 14 7.75 14 7.75ZM8 5.75C8 5.75 8 8 5.75 8C8 8 8 10.25 8 10.25C8 10.25 8 8 10.25 8C8 8 8 5.75 8 5.75Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-													</svg>
-												</div>
-											</div>
-
-											<div class="mt-3">
+										<div class="space-y-3 pb-4">
+											<TicketAiModal :comment="comment_text" :enabled="Ticket.ai_enabled" />
+											<div class="">
 												<div
 													class="flex space-x-3 rounded-lg p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:ring-slate-800"
 												>
@@ -937,109 +876,111 @@
 																	id="comment"
 																	name="comment"
 																	rows="3"
-																	class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-base sm:leading-6"
-																	placeholder="Message ticket"
+																	class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-white/30 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																	placeholder="Press 'ctrl' for Tracy AI"
 																/>
 															</div>
 															<div
 																class="mt-6 flex items-end justify-end space-x-4"
 															>
-																<div
-																	v-if="!imageSrc"
-																	class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
-																>
-																	<span class="cursor-pointer"
-																		><svg
-																			class="h-6 w-6"
+																<div class="flex space-x-4">
+																	<div
+																		v-if="!imageSrc"
+																		class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
+																	>
+																		<span class="cursor-pointer"
+																			><svg
+																				class="h-6 w-6"
+																				viewBox="0 0 24 24"
+																				fill="none"
+																				xmlns="http://www.w3.org/2000/svg"
+																			>
+																				<path
+																					d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M17 14.75V19.25"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M19.25 17L14.75 17"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																			</svg>
+																		</span>
+
+																		<input
+																			type="file"
+																			accept="image/*"
+																			@change="uploadImage"
+																			ref="fileInput"
+																			data-test="image-input"
+																			class="absolute h-full w-full opacity-0 file:cursor-pointer"
+																		/>
+																	</div>
+																	<div v-else class="relative ml-auto h-full">
+																		<img
+																			:src="imageSrc"
+																			width="40"
+																			height="40"
+																			alt=""
+																			loading="eager"
+																			class="h-10 rounded object-cover"
+																		/>
+																		<div
+																			class="absolute left-0 top-0 h-10 w-10 rounded border border-slate-200 opacity-20"
+																		></div>
+																		<!---->
+																		<button
+																			v-if="!loading"
+																			@click="removeImage"
+																			class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600"
+																			:disabled="loading"
+																		>
+																			<svg
+																				fill="none"
+																				xmlns="http://www.w3.org/2000/svg"
+																				class="h-4 w-4"
+																			>
+																				<path
+																					d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
+																					fill="currentColor"
+																				></path>
+																			</svg>
+																		</button>
+																	</div>
+
+																	<button
+																		:disabled="comment_text === ''"
+																		type="submit"
+																		class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 p-2 text-sm font-semibold text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+																	>
+																		<svg
+																			class="h-5 w-5"
 																			viewBox="0 0 24 24"
 																			fill="none"
 																			xmlns="http://www.w3.org/2000/svg"
 																		>
 																			<path
-																				d="M11.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V16M4.75 16V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V12.25L16.5856 9.43947C15.7663 8.48581 14.2815 8.51598 13.5013 9.50017L13.4914 9.51294C13.3977 9.63414 11.9621 11.4909 10.9257 12.8094M4.75 16L7.49619 12.5067C8.2749 11.5161 9.76453 11.4837 10.5856 12.4395L10.9257 12.8094M10.9257 12.8094L12.25 14.25M10.9257 12.8094C10.9221 12.814 10.9186 12.8185 10.915 12.823"
+																				d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
 																				stroke="currentColor"
 																				stroke-width="1.5"
 																				stroke-linecap="round"
 																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M17 14.75V19.25"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M19.25 17L14.75 17"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																		</svg>
-																	</span>
-
-																	<input
-																		type="file"
-																		accept="image/*"
-																		@change="uploadImage"
-																		ref="fileInput"
-																		data-test="image-input"
-																		class="absolute h-full w-full opacity-0 file:cursor-pointer"
-																	/>
-																</div>
-																<div v-else class="relative ml-auto h-full">
-																	<img
-																		:src="imageSrc"
-																		width="40"
-																		height="40"
-																		alt=""
-																		loading="eager"
-																		class="h-10 rounded object-cover"
-																	/>
-																	<div
-																		class="absolute left-0 top-0 h-10 w-10 rounded border border-slate-200 opacity-20"
-																	></div>
-																	<!---->
-																	<button
-																		v-if="!loading"
-																		@click="removeImage"
-																		class="absolute -right-1.5 -top-1.5 h-4 w-4 cursor-pointer rounded-full border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600"
-																		:disabled="loading"
-																	>
-																		<svg
-																			fill="none"
-																			xmlns="http://www.w3.org/2000/svg"
-																			class="h-4 w-4"
-																		>
-																			<path
-																				d="M7.822 7l2.509-2.503a.586.586 0 00-.829-.828L7 6.177 4.497 3.67a.586.586 0 10-.828.828L6.177 7 3.67 9.502a.583.583 0 00.19.957.584.584 0 00.638-.128L7 7.822l2.502 2.509a.583.583 0 00.957-.19.583.583 0 00-.128-.639L7.822 7z"
-																				fill="currentColor"
 																			></path>
 																		</svg>
 																	</button>
 																</div>
-
-																<button
-																	:disabled="comment_text === ''"
-																	type="submit"
-																	class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 p-2 text-sm font-semibold text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
-																>
-																	<svg
-																		class="h-5 w-5"
-																		viewBox="0 0 24 24"
-																		fill="none"
-																		xmlns="http://www.w3.org/2000/svg"
-																	>
-																		<path
-																			d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
-																			stroke="currentColor"
-																			stroke-width="1.5"
-																			stroke-linecap="round"
-																			stroke-linejoin="round"
-																		></path>
-																	</svg>
-																</button>
 															</div>
 														</form>
 													</div>
@@ -1069,20 +1010,22 @@
 																) in comments"
 																:key="activityItem.id"
 																id="parent-comment"
-																class="relative mb-6 rounded-lg bg-white text-base dark:bg-transparent"
+																class="relative mb-6 rounded-lg text-base"
 															>
-																<!-- <div
+																<div
+																	v-if="activityItemIdx < comments.length - 1"
 																	:class="[
-																		activityItemIdx === comments.length - 1
-																			? '-bottom-6 h-full'
-																			: '',
-																		'absolute  h-6 left-0 top-0 flex w-5 justify-center',
+																		activityItemIdx === comments.length
+																			? 'h-6'
+																			: '-bottom-6',
+																		'absolute left-0 top-0 flex w-6 justify-center',
 																	]"
 																>
-																	<div class="w-px bg-slate-700/20" />
-																</div> -->
+																	<div
+																		class="w-px bg-gradient-to-b from-slate-300/10 via-slate-300/20 to-slate-300/10"
+																	/>
+																</div>
 																<div
-																	class=""
 																	v-if="
 																		activityItem.activity_type ===
 																			'user_comment' ||
@@ -1191,7 +1134,8 @@
 																			<div
 																				class="flex space-x-1"
 																				v-if="
-																					activityItem.createdBy === User.id
+																					activityItem.createdBy === User.id ||
+																					User.systemRole === 'super_admin'
 																				"
 																			>
 																				<button
@@ -1297,12 +1241,16 @@
 																		<div
 																			:class="[
 																				activityItem.User.id === User.id
-																					? 'bg-[#0166C8]'
-																					: 'bg-[#1C1B2C]',
+																					? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
+																					: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
+																				activityItem.activity_type ===
+																				'ai_comment'
+																					? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
+																					: '',
 																				activityItem.deleted
-																					? 'text-gray-400 dark:text-gray-400'
-																					: 'text-gray-900 dark:text-gray-200',
-																				'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
+																					? 'text-black/30 dark:text-white/50'
+																					: '',
+																				'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
 																			]"
 																			v-html="convert(activityItem.text)"
 																		></div>
@@ -1329,7 +1277,7 @@
 																				activityItem.attachment &&
 																				!activityItem.deleted
 																			"
-																			class="mt-1 flex overflow-hidden pl-8"
+																			class="my-3 flex overflow-hidden pl-8"
 																		>
 																			<button
 																				@click="
@@ -1372,7 +1320,9 @@
 																					'absolute  left-0 top-0 flex w-12 justify-center',
 																				]"
 																			>
-																				<div class="w-px bg-gradient-to-b from-slate-300/0 via-slate-300/20 to-slate-300/0" />
+																				<div
+																					class="w-px bg-gradient-to-b from-slate-300/0 via-slate-300/20 to-slate-300/0"
+																				/>
 																			</div>
 																			<footer
 																				class="mb-2 flex items-center justify-between"
@@ -1471,7 +1421,13 @@
 
 																				<div
 																					class="flex space-x-1"
-																					v-if="reply.createdBy === User.id"
+																					v-if="
+																						reply.createdBy === User.id ||
+																						(User.systemRole ===
+																							'super_admin' &&
+																							reply.activity_type ===
+																								'ai_comment')
+																					"
 																				>
 																					<button
 																						class="text-slate-400 transition-colors hover:text-indigo-400"
@@ -1581,12 +1537,12 @@
 																			<p
 																				:class="[
 																					reply.User.id === User.id
-																						? 'bg-[#0166C8]'
-																						: 'bg-[#1C1B2C]',
+																						? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:prose-invert dark:bg-[#0166C8]'
+																						: 'prose bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:ring-white/5',
 																					reply.activity_type === 'ai_comment'
-																						? 'ai_shadow shadow-[#9643FF]/25'
+																						? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 																						: '',
-																					'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
+																					'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
 																				]"
 																			>
 																				{{ reply.text }}
@@ -1677,7 +1633,7 @@
 																								v-model="reply_text"
 																								name="comment"
 																								id="comment"
-																								class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																								class="block w-full resize-none border-0 bg-transparent px-4 py-3 text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-2 text-sm sm:leading-6"
 																								placeholder="Reply..."
 																							/>
 
@@ -1750,16 +1706,9 @@
 																		</Disclosure>
 																	</div>
 																</div>
-																<div class="" v-else>
-																	<div
-																		class="py-2"
-																		v-if="
-																			!activityItem.deleted ||
-																			activityItem.Comment.length > 0
-																		"
-																	>
+																<div v-else>
+																	<div class="py-2">
 																		<footer
-																			v-if="!activityItem.deleted"
 																			class="mb-2 flex items-center justify-between"
 																		>
 																			<div class="flex items-center">
@@ -1768,7 +1717,7 @@
 																				>
 																					<img
 																						v-if="activityItem.avatarUrl"
-																						class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
+																						class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#020015]"
 																						:src="activityItem.avatarUrl"
 																						alt=""
 																					/>
@@ -1786,10 +1735,11 @@
 																						{{ activityItem.User.firstName }}
 																						{{ activityItem.User.lastName }}
 																					</div>
-																					<span
+																					<div
 																						class="font-normal text-slate-400"
-																						>{{ activityItem.text }}</span
 																					>
+																						{{ activityItem.text }}
+																					</div>
 
 																					<span
 																						class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
@@ -1801,112 +1751,6 @@
 																						}}
 																					</span>
 																				</div>
-																			</div>
-
-																			<div
-																				class="flex space-x-1"
-																				v-if="
-																					activityItem.createdBy === User.id
-																				"
-																			>
-																				<button
-																					class="text-slate-400 transition-colors hover:text-indigo-400"
-																				>
-																					<svg
-																						class="h-5 w-5"
-																						fill="none"
-																						viewBox="0 0 24 24"
-																					>
-																						<path
-																							stroke="currentColor"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																							stroke-width="1.5"
-																							d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-																						></path>
-																						<path
-																							stroke="currentColor"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																							stroke-width="1.5"
-																							d="M19.25 19.25H13.75"
-																						></path>
-																					</svg>
-																				</button>
-																				<button
-																					@click="handleDelete(activityItem.id)"
-																					class="text-slate-400 transition-colors hover:text-rose-400"
-																				>
-																					<svg
-																						class="h-5 w-5"
-																						viewBox="0 0 24 24"
-																						fill="none"
-																						xmlns="http://www.w3.org/2000/svg"
-																					>
-																						<path
-																							d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																						<path
-																							d="M9.75 10.75V16.25"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																						<path
-																							d="M13.25 10.75V16.25"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																						<path
-																							d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																						<path
-																							d="M4.75 7.75H18.25"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																					</svg>
-																				</button>
-																			</div>
-																			<div class="flex space-x-1" v-else>
-																				<button
-																					class="text-slate-400 transition-colors hover:text-indigo-400"
-																				>
-																					<svg
-																						class="h-5 w-5"
-																						viewBox="0 0 24 24"
-																						fill="none"
-																						xmlns="http://www.w3.org/2000/svg"
-																					>
-																						<path
-																							d="M4.75 5.75V19.25"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																						<path
-																							d="M19.25 15.25V5.75C19.25 5.75 18.5 6.25 16 6.25C13.5 6.25 12 4.75 9 4.75C6 4.75 4.75 5.75 4.75 5.75V15.25C4.75 15.25 6.5 14.25 9 14.25C11.5 14.25 13.5 16.25 16 16.25C18.5 16.25 19.25 15.25 19.25 15.25Z"
-																							stroke="currentColor"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																					</svg>
-																				</button>
 																			</div>
 																		</footer>
 
@@ -2170,8 +2014,8 @@
 
 <style scoped>
 	.ai_shadow {
-		box-shadow: inset 5px -5px 20px 0  rgba(150,67,255,0.15);
-		border: 1px solid rgba(201, 150, 255, 0.16)
+		box-shadow: inset 0px -5px 20px 0 rgba(150, 67, 255, 0.15);
+		border: 1px solid rgba(201, 150, 255, 0.16);
 	}
 	:deep p a {
 		color: #9382ff;
