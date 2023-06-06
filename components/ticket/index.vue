@@ -43,8 +43,19 @@
 		MagnifyingGlassIcon,
 		PencilIcon,
 		TagIcon,
+		CheckIcon,
+		ChevronUpDownIcon,
 		UserCircleIcon as UserCircleIconMini,
 	} from '@heroicons/vue/20/solid';
+
+	import {
+		Combobox,
+		ComboboxButton,
+		ComboboxInput,
+		ComboboxLabel,
+		ComboboxOption,
+		ComboboxOptions,
+	} from '@headlessui/vue';
 
 	import showdown from 'showdown';
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
@@ -74,11 +85,63 @@
 	const selectedFile = ref(null);
 	const dealSize = ref(0);
 
+	const selectedPerson = ref({
+		id: 'proposal_submitted',
+		name: 'Proposal Submitted',
+	});
+
 	const ticketAttachments = ref([]);
 	const aiResponse = ref('');
 
 	const commentImageId = ref('');
 	const showImageModal = ref(false);
+
+	const shouldDisable = (id, index) => {
+		if (
+			(index < 4 && selectedIndex.value > index) ||
+			(selectedIndex.value < 3 && index > selectedIndex.value + 1)
+		) {
+			return true;
+		}
+		return false;
+	};
+
+	const handleTicketEdit = async (status, idx) => {
+		if (shouldDisable(status, idx)) {
+			return;
+		}
+		const { data, error } = await supabase
+			.from('Ticket')
+			.update({ status })
+			.eq('id', route.params.id);
+	};
+
+	const people = [
+		{ id: 'proposal_submitted', name: 'Proposal Submitted' },
+		{ id: 'requirements_gathering', name: 'Requirements Gathering' },
+		{ id: 'contract_sent', name: 'Contract Sent' },
+		{ id: 'invoice_paid', name: 'Invoice Paid' },
+		{ id: 'solution_design', name: 'Solution Design' },
+		{ id: 'in_development', name: 'In Development' },
+		{ id: 'unit_testing', name: 'Unit Testing' },
+		{ id: 'integration_testing', name: 'Integration Testing' },
+		{ id: 'user_acceptance_testing', name: 'User Acceptance Testing' },
+		{ id: 'bug_fixing', name: 'Bug Fixing' },
+		{ id: 'deployment_preparation', name: 'Deployment Preparation' },
+		{ id: 'in_deployment', name: 'In Deployment' },
+		{ id: 'post_deployment_review', name: 'Post Deployment Review' },
+		{ id: 'maintenance_mode', name: 'Maintenance Mode' },
+		{ id: 'upgrades_and_enhancements', name: 'Upgrades and Enhancements' },
+		{ id: 'project_on_hold', name: 'Project On Hold' },
+		{ id: 'project_cancelled', name: 'Project Cancelled' },
+		{ id: 'project_completed', name: 'Project Completed' },
+	];
+
+	const selectedIndex = computed(() =>
+		people.findIndex((person) => person.id === selectedPerson.value.id)
+	);
+
+	const query = ref('');
 
 	// const aiEnabled = ref(Ticket.ai_enabled);
 
@@ -119,6 +182,41 @@
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
 	};
 
+	const stageType = {
+		proposal_submitted:
+			'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300 text-purple-900 dark:text-purple-200',
+		requirements_gathering:
+			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
+		solution_design:
+			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
+		in_development:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+		unit_testing:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		integration_testing:
+			'bg-indigo-100 dark:bg-indigo-700 dark:ring-indigo-500 ring-indigo-300 text-indigo-900 dark:text-indigo-200',
+		user_acceptance_testing:
+			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300 text-pink-900 dark:text-pink-200',
+		bug_fixing:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		deployment_preparation:
+			'bg-gray-100 dark:bg-gray-700 dark:ring-gray-500 ring-gray-300 text-gray-900 dark:text-gray-200',
+		in_deployment:
+			'bg-teal-100 dark:bg-teal-700 dark:ring-teal-500 ring-teal-300 text-teal-900 dark:text-teal-200',
+		post_deployment_review:
+			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
+		maintenance_mode:
+			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
+		upgrades_and_enhancements:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+		project_on_hold:
+			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
+		project_cancelled:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		project_completed:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+	};
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -145,6 +243,15 @@
 		.eq('id', route.params.id)
 		.limit(1)
 		.single();
+
+	selectedPerson.value = people.find((o) => o.id === Ticket.status);
+	const filteredPeople = computed(() =>
+		query.value === ''
+			? people
+			: people.filter((person) => {
+					return person.name.toLowerCase().includes(query.value.toLowerCase());
+			  })
+	);
 
 	dealSize.value = Ticket.deal_size;
 
@@ -621,10 +728,104 @@
 													></path>
 												</svg>
 
-												<ticket-stage-change
-													:status="Ticket.status"
-													:enabled="User.Account.type === 'super_admin'"
-												/>
+												<Combobox v-if="User.Account.type === 'super_admin'">
+													as="div" v-model="selectedPerson" class="group w-full"
+													:disabled="User.Account.type !== 'super_admin'" >
+													<div class="relative">
+														<ComboboxInput
+															:disabled="User.Account.type !== 'super_admin'"
+															class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+															@change="query = $event.target.value"
+															:display-value="(person) => person?.name"
+														/>
+														<ComboboxButton
+															:disabled="User.Account.type !== 'super_admin'"
+															class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+														>
+															<ChevronUpDownIcon
+																class="h-5 w-5 text-gray-400"
+																aria-hidden="true"
+															/>
+														</ComboboxButton>
+
+														<ComboboxOptions
+															v-if="filteredPeople.length > 0"
+															class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
+														>
+															<ComboboxOption
+																@click="handleTicketEdit(person.id, idx)"
+																v-for="(person, idx) in filteredPeople"
+																:key="person.id"
+																:value="person"
+																:disabled="
+																	shouldDisable(selectedPerson.id, idx)
+																"
+																as="template"
+																v-slot="{ active, selected }"
+															>
+																<li
+																	:class="[
+																		shouldDisable(selectedPerson.id, idx)
+																			? 'cursor-not-allowed opacity-50'
+																			: 'pl-8',
+																		'relative flex cursor-default select-none py-2 pr-4',
+																		active
+																			? 'bg-indigo-600 text-white dark:text-white'
+																			: 'text-gray-900 dark:text-slate-300',
+																	]"
+																>
+																	<span
+																		:class="[
+																			'block truncate',
+																			selected && 'font-semibold',
+																		]"
+																	>
+																		{{ person.name }}
+																	</span>
+
+																	<span
+																		v-if="selected"
+																		:class="[
+																			'absolute inset-y-0 left-0 flex items-center pl-1.5',
+																			active
+																				? 'text-white dark:text-white'
+																				: 'text-indigo-600',
+																		]"
+																	>
+																		<svg
+																			v-if="
+																				shouldDisable(selectedPerson.id, idx)
+																			"
+																			class="h-5 w-5"
+																			viewBox="0 0 24 24"
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																		>
+																			<path
+																				d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																			<path
+																				d="M7 7L17 17"
+																				stroke="currentColor"
+																				stroke-width="1.5"
+																				stroke-linecap="round"
+																				stroke-linejoin="round"
+																			></path>
+																		</svg>
+																		<CheckIcon
+																			class="h-5 w-5"
+																			aria-hidden="true"
+																		/>
+																	</span>
+																</li>
+															</ComboboxOption>
+														</ComboboxOptions>
+													</div>
+												</Combobox>
 											</div>
 										</div>
 										<div
@@ -751,7 +952,10 @@
 												></div>
 												<div class="">
 													<DisclosureButton
-														v-if="!open && Ticket.createdBy === user.id"
+														v-if="
+															(!open && Ticket.createdBy === user.id) ||
+															User.Account.type === 'super_admin'
+														"
 														class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 													>
 														<div
@@ -821,8 +1025,105 @@
 											</button>
 										</div>
 									</div>
-									<div class="mt-16 text-white">
-										<button>Up and down</button>
+									<div class="mt-16 flex space-x-2 text-white">
+										<div
+											class="flex items-center space-x-2 rounded border border-white/20 px-2 py-1"
+										>
+											<div class="flex items-center">
+												<button
+													class="text-white/30 transition-colors hover:text-white/60"
+												>
+													<svg
+														class="h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M12 9.75L16.25 15.25H7.75L12 9.75Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</button>
+											</div>
+											<div class="text-sm">{{ Ticket.votes }}</div>
+											<div class="flex items-center">
+												<button
+													class="text-white/30 transition-colors hover:text-white/60"
+												>
+													<svg
+														class="h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M12 15.25L16.25 9.75H7.75L12 15.25Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+												</button>
+											</div>
+										</div>
+										<div class="">
+											<div
+												class="flex items-center rounded border border-white/20 px-2 py-1"
+											>
+												<button
+													class="flex items-center text-sm text-gray-400 transition-colors hover:text-gray-200"
+												>
+													<svg
+														class="mr-1 h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															d="M19.25 7C19.25 8.24264 18.2426 9.25 17 9.25C15.7574 9.25 14.75 8.24264 14.75 7C14.75 5.75736 15.7574 4.75 17 4.75C18.2426 4.75 19.25 5.75736 19.25 7Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M9.25 12C9.25 13.2426 8.24264 14.25 7 14.25C5.75736 14.25 4.75 13.2426 4.75 12C4.75 10.7574 5.75736 9.75 7 9.75C8.24264 9.75 9.25 10.7574 9.25 12Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M19.25 17C19.25 18.2426 18.2426 19.25 17 19.25C15.7574 19.25 14.75 18.2426 14.75 17C14.75 15.7574 15.7574 14.75 17 14.75C18.2426 14.75 19.25 15.7574 19.25 17Z"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M14.5 16L9 13.5"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+														<path
+															d="M14.5 8.5L9 11"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+													Share
+												</button>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -830,7 +1131,12 @@
 								<div>
 									<div class="divide-gray-200 dark:divide-slate-800">
 										<div class="space-y-3 pb-4">
-											<div class="flex justify-end">
+											<div class="flex justify-between">
+												<div class="flex items-center text-slate-300">
+													{{ Ticket.Comment.length }} comment{{
+														Ticket.Comment.length > 0 ? 's' : ''
+													}}
+												</div>
 												<div
 													class="flex items-center rounded-full border border-[#423455] bg-[#1A1B2C] pl-2 pr-3 text-sm text-white"
 												>
@@ -1087,9 +1393,16 @@
 																							class="m-0 h-5 w-5"
 																						/>
 																					</div>
+																					<NuxtLink
+																						:to="
+																							'/profile/' + activityItem.User.id
+																						"
+																						>{{ activityItem.User.firstName }}
+																						{{
+																							activityItem.User.lastName
+																						}}</NuxtLink
+																					>
 
-																					{{ activityItem.User.firstName }}
-																					{{ activityItem.User.lastName }}
 																					<div
 																						class="ml-2 mr-1 flex items-center space-x-1"
 																					>
@@ -1382,9 +1695,14 @@
 																							v-else
 																							class="mr-2 h-5 w-5 rounded-full bg-slate-300"
 																						></div>
+																						<NuxtLink
+																							:to="'/profile/' + reply.User.id"
+																							>{{ reply.User.firstName }}
+																							{{
+																								reply.User.lastName
+																							}}</NuxtLink
+																						>
 
-																						{{ reply.User.firstName }}
-																						{{ reply.User.lastName }}
 																						<div
 																							class="ml-2 mr-1 flex items-center space-x-1"
 																						>
@@ -1917,12 +2235,115 @@
 										></path>
 									</svg>
 
-									<ticket-stage-change
-										:status="Ticket.status"
-										:enabled="User.Account.type === 'super_admin'"
-									/>
+									<Combobox
+										v-if="User.Account.type === 'super_admin'"
+										as="div"
+										v-model="selectedPerson"
+										class="group w-full"
+										:disabled="User.Account.type !== 'super_admin'"
+									>
+										<div class="relative">
+											<ComboboxInput
+												:disabled="User.Account.type !== 'super_admin'"
+												class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+												@change="query = $event.target.value"
+												:display-value="(person) => person?.name"
+											/>
+											<ComboboxButton
+												:disabled="User.Account.type !== 'super_admin'"
+												class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+											>
+												<ChevronUpDownIcon
+													class="h-5 w-5 text-gray-400"
+													aria-hidden="true"
+												/>
+											</ComboboxButton>
+
+											<ComboboxOptions
+												v-if="filteredPeople.length > 0"
+												class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
+											>
+												<ComboboxOption
+													@click="handleTicketEdit(person.id, idx)"
+													v-for="(person, idx) in filteredPeople"
+													:key="person.id"
+													:value="person"
+													:disabled="shouldDisable(selectedPerson.id, idx)"
+													as="template"
+													v-slot="{ active, selected }"
+												>
+													<li
+														:class="[
+															shouldDisable(selectedPerson.id, idx)
+																? 'cursor-not-allowed opacity-50'
+																: '',
+															'relative flex cursor-default select-none py-2 pl-8 pr-4',
+															active
+																? 'bg-indigo-600 text-white dark:text-white'
+																: 'text-gray-900 dark:text-slate-300',
+														]"
+													>
+														<span
+															:class="[
+																'block truncate',
+																selected && 'font-semibold',
+															]"
+														>
+															{{ person.name }}
+														</span>
+
+														<span
+															v-if="selected"
+															:class="[
+																'absolute inset-y-0 left-0 flex items-center pl-1.5',
+																active
+																	? 'text-white dark:text-white'
+																	: 'text-indigo-600',
+															]"
+														>
+															<CheckIcon class="h-5 w-5" aria-hidden="true" />
+														</span>
+														<span
+															v-else
+															class="absolute inset-y-0 left-0 flex items-center pl-1.5"
+															><svg
+																v-if="shouldDisable(selectedPerson.id, idx)"
+																class="h-5 w-5"
+																viewBox="0 0 24 24"
+																fill="none"
+																xmlns="http://www.w3.org/2000/svg"
+															>
+																<path
+																	d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path>
+																<path
+																	d="M7 7L17 17"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path></svg
+														></span>
+													</li>
+												</ComboboxOption>
+											</ComboboxOptions>
+										</div>
+									</Combobox>
+									<div
+										v-else
+										:class="[stageType[Ticket.status], 'rounded-md text-sm px-2 py-1 capitalize']"
+									>
+										{{ Ticket.status.replace(/_/g, ' ') }}
+									</div>
 								</div>
-								<div class="flex items-center space-x-2 dark:text-white">
+								<div
+									class="flex items-center space-x-2 dark:text-white"
+									v-if="User.Account.type === 'super_admin'"
+								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										class="h-6 w-6"
@@ -1944,7 +2365,7 @@
 											<span class="text-gray-500 sm:text-sm">$</span>
 										</div>
 										<input
-											:disabled="!User.Account.type === 'super_admin'"
+											:disabled="User.Account.type !== 'super_admin'"
 											type="text"
 											v-model="dealSize"
 											name="price"
@@ -1956,7 +2377,11 @@
 										<div
 											class="absolute inset-y-0 right-0 flex items-center pr-3"
 										>
-											<button class="relative" @click="handleDealSizeUpdate()">
+											<button
+												:disabled="User.Account.type !== 'super_admin'"
+												class="relative disabled:opacity-60"
+												@click="handleDealSizeUpdate()"
+											>
 												<svg
 													v-if="!loading"
 													class="h-4 w-4"

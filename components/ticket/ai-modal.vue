@@ -14,6 +14,14 @@
 		UserPlusIcon,
 	} from '@heroicons/vue/20/solid';
 
+	import showdown from 'showdown';
+	const converter = await new showdown.Converter();
+
+	const convert = (text) => {
+		const formatted = converter.makeHtml(text);
+		return formatted;
+	};
+
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 
@@ -33,6 +41,13 @@
 	const stored_subtype = ref('');
 	const stored_ai_response = ref(false);
 	const showDiv = ref(false);
+
+	const { data: Ticket, ticketError: error } = await supabase
+		.from('Ticket')
+		.select('status')
+		.eq('id', route.params.id)
+		.limit(1)
+		.single();
 
 	function handleKeydown(event) {
 		if (event.ctrlKey) {
@@ -216,9 +231,8 @@
 									></path>
 								</svg>
 							</div>
-							<div>
-								{{ typedText
-								}}<span v-if="writing" class="caret text-purple-500">|</span>
+							<div class="flex flex-wrap">
+								<div v-html="convert(typedText)" class="inline-block"></div>
 							</div>
 						</div>
 					</div>
@@ -486,7 +500,7 @@
 										Find action items
 									</button>
 								</MenuItem>
-								<MenuItem v-slot="{ active }">
+								<MenuItem v-slot="{ active }" v-if="['requirements_gathering','proposal_submitted'].includes(Ticket.status)">
 									<button
 										@click="
 											handleAIRequest('audit_create', false),
@@ -531,7 +545,7 @@
 										Create audit
 									</button>
 								</MenuItem>
-								<MenuItem v-slot="{ active }">
+								<MenuItem v-slot="{ active }" v-if="['requirements_gathering','proposal_submitted'].includes(Ticket.status)">
 									<button
 										@click="
 											handleAIRequest('sow_create', false),
@@ -597,7 +611,7 @@
 										Create SOW
 									</button>
 								</MenuItem>
-								<MenuItem v-slot="{ active }">
+								<MenuItem v-slot="{ active }" v-if="['requirements_gathering','proposal_submitted'].includes(Ticket.status)">
 									<button
 										@click="
 											handleAIRequest('invoice_create', false),
@@ -783,7 +797,13 @@
 							<div class="py-1">
 								<MenuItem v-slot="{ active }">
 									<button
-										@click="handleCommentAdd(null), (open = false)"
+										@click="
+											handleCommentAdd(null),
+												(open = false),
+												(showDiv = false),
+												(typedText = ''),
+												(prompt = '')
+										"
 										:class="[
 											active
 												? 'bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white'
@@ -972,7 +992,7 @@
 										@click="
 											(finished = false),
 												(open = false),
-												showDiv = false,
+												(showDiv = false),
 												(aiResponse = ''),
 												(typedText = ''),
 												(prompt = '')

@@ -1094,7 +1094,7 @@ onMounted(async () => {
 				stroke-linecap="round"
 				stroke-linejoin="round"
 			></path></svg
-		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }} </span><span class="text-xs ml-2 text-lime-400">${{ formatAccounting(taskPrice(state.kpis['Task Runs']) - trayCost(state.kpis['Task Runs'])) }}</span>
+		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }} </span><span class="text-xs ml-2 text-rose-400">${{ formatAccounting(trayCost(state.kpis['Task Runs'])) }}</span>
 															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">

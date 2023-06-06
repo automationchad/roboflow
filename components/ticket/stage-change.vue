@@ -23,21 +23,48 @@
 				class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
 			>
 				<ComboboxOption
-					@click="handleTicketEdit(person.id)"
-					v-for="person in filteredPeople"
+					@click="handleTicketEdit(person.id, idx)"
+					v-for="(person, idx) in filteredPeople"
 					:key="person.id"
 					:value="person"
+					:disabled="shouldDisable(selectedPerson.id, idx)"
 					as="template"
 					v-slot="{ active, selected }"
 				>
 					<li
 						:class="[
-							'relative cursor-default select-none py-2 pl-8 pr-4',
+							shouldDisable(selectedPerson.id, idx)
+								? 'cursor-not-allowed pl-2 opacity-50'
+								: 'pl-8',
+							'relative flex cursor-default select-none py-2 pr-4',
 							active
 								? 'bg-indigo-600 text-white dark:text-white'
 								: 'text-gray-900 dark:text-slate-300',
 						]"
 					>
+						<svg
+							v-if="shouldDisable(selectedPerson.id, idx)"
+							class="mr-1 h-5 w-5"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+							<path
+								d="M7 7L17 17"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+
 						<span :class="['block truncate', selected && 'font-semibold']">
 							{{ person.name }}
 						</span>
@@ -74,7 +101,10 @@
 
 	const route = useRoute();
 
-	const handleTicketEdit = async (status) => {
+	const handleTicketEdit = async (status, idx) => {
+		if (shouldDisable(status, idx)) {
+			return;
+		}
 		const { data, error } = await supabase
 			.from('Ticket')
 			.update({ status })
@@ -101,6 +131,17 @@
 		{ id: 'project_cancelled', name: 'Project Cancelled' },
 		{ id: 'project_completed', name: 'Project Completed' },
 	];
+
+	const selectedIndex = computed(() =>
+		people.findIndex((person) => person.id === selectedPerson.value.id)
+	);
+
+	const shouldDisable = (id, index) => {
+		if ((index < 4 && selectedIndex.value > index) || selectedIndex.value < 3 && index > selectedIndex.value + 1) {
+			return true;
+		}
+		return false;
+	};
 
 	const props = defineProps({
 		status: {

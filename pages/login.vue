@@ -58,7 +58,7 @@
 								<div>
 									<button
 										@click="handleLoginProvider('google')"
-										class="inline-flex w-full justify-center dark:bg-slate-800 dark:text-white dark:ring-slate-600 rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+										class="inline-flex w-full justify-center dark:bg-slate-900 dark:text-white dark:ring-slate-700 rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors focus:outline-offset-0"
 									>
 										<span class="sr-only">Sign in with Google</span>
 										<svg
@@ -98,7 +98,7 @@
 								<div>
 									<button
 										@click="handleLoginProvider('github')"
-										class="inline-flex dark:bg-slate-800 dark:text-white dark:ring-slate-600 w-full justify-center rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+										class="inline-flex dark:bg-slate-900 dark:text-white dark:ring-slate-700 w-full justify-center rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
 									>
 										<span class="sr-only">Sign in with GitHub</span>
 										<svg
@@ -126,7 +126,7 @@
 								<div class="w-full border-t border-gray-300 dark:border-slate-600" />
 							</div>
 							<div class="relative flex justify-center text-sm">
-								<span class="bg-white px-2 text-gray-500 dark:text-white dark:bg-[#0A1125]"
+								<span class="bg-white px-2 text-gray-500 dark:text-white dark:bg-[#020014]"
 									>Or continue with</span
 								>
 							</div>
@@ -149,7 +149,7 @@
 										type="email"
 										autocomplete="email"
 										required=""
-										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-white dark:ring-slate-600 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-900 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>

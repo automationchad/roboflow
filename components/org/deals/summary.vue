@@ -4,11 +4,11 @@
 	import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 
 	let getStyleClass = (number) => {
-		if (number < 5000) {
+		if (number < 10000) {
 			return { style: 'bronze', 'row-span': '1' };
-		} else if (number < 10000) {
+		} else if (number < 20000) {
 			return { style: 'silver', 'row-span': '1' };
-		} else if (number < 15000) {
+		} else if (number < 50000) {
 			return { style: 'gold', 'row-span': '2' };
 		} else {
 			return { style: 'platinum', 'row-span': '2' };
