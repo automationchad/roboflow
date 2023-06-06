@@ -1,7 +1,6 @@
 <template>
 	<div class="">
 		<div
-			
 			class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
 		>
 			<table class="bg-panel-body-light dark:bg-panel-body-dark w-full">
@@ -36,14 +35,17 @@
 				<tbody>
 					<tr
 						v-for="ticket in tickets.slice(0, 15)"
+						v-if="tickets.length > 0"
 						:key="ticket.id"
 						class="border-t border-slate-200 dark:border-slate-800"
 					>
-						<td class="text-scale-1200 whitespace-nowrap w-2/3 px-6 py-3 text-sm">
+						<td
+							class="text-scale-1200 w-2/3 whitespace-nowrap px-6 py-3 text-sm"
+						>
 							<span
 								><a
 									class="hover:underline"
-									:href="`/${User.defaultTeamId}/tickets/${ticket.id}`"
+									:href="`/${route.params.organization}/tickets/${ticket.id}`"
 									>{{ ticket.name }}</a
 								></span
 							>
@@ -57,7 +59,7 @@
 								format(new Date(ticket.updatedOn), 'hh:mm')
 							}}
 						</td>
-						<td class="text-scale-1200 px-6 py-3 w-1/6 text-right text-sm">
+						<td class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
 							<span
 								:class="[
 									styles[ticket.type],
@@ -68,10 +70,16 @@
 							</span>
 						</td>
 					</tr>
+					<tr class="border-t border-slate-200 dark:border-slate-800" v-else>
+						<td
+							class="text-scale-1200 w-full whitespace-nowrap px-6 py-3 text-sm"
+						>
+							No tickets
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
-		
 	</div>
 </template>
 
@@ -120,10 +128,12 @@
 
 	const search_term = ref('');
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
+	const route = useRoute();
+
+	let { data: Account, error: userError } = await supabase
+		.from('Account')
 		.select(
-			`*,Account (
+			`
 		     id,
 			 type,
 			 Ticket (
@@ -136,18 +146,18 @@
 				id,
 				name
 			 )
-		   )`
+		   `
 		)
-		.eq('id', user.value.id)
+		.eq('id', route.params.organization)
 		.limit(1)
 		.single();
 
 	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
 
 	let tickets =
-		User.Account.type === 'super_admin'
+		Account.type === 'super_admin'
 			? Ticket.sort((a, b) => b['priority'] - a['priority'])
-			: User.Account.Ticket;
+			: Account.Ticket;
 
 	const styles = {
 		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',

@@ -140,7 +140,7 @@
 		>
 			<!-- Sidebar component, swap this element with another sidebar if you like -->
 			<div
-				class="flex grow flex-col overflow-y-auto bg-gray-50 px-6 pb-4 border-r border-white/10 dark:bg-[#06051A]"
+				class="flex grow flex-col overflow-y-auto border-r border-white/10 bg-gray-50 px-6 pb-4 dark:bg-[#06051A]"
 			>
 				<div
 					class="-mx-2 flex shrink-0 flex-col items-center justify-center space-y-3 pt-4"
@@ -151,7 +151,9 @@
 							src="~/assets/images/logo.png"
 							alt="Your Company"
 						/>
-						<p class="text-xs text-slate-400">Partner Account</p>
+						<p class="text-xs capitalize text-slate-400">
+							{{ User.Account.type.replace(/_/g, ' ') }} Account
+						</p>
 					</div>
 
 					<div class="mt-4 flex h-6 w-full items-center justify-center">
@@ -193,14 +195,14 @@
 						>
 							<div :class="['flex gap-x-3']">
 								<span
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-400 bg-gray-800 text-sm font-medium text-white dark:border-gray-700"
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-400 bg-gray-800 text-sm font-medium text-white uppercase dark:border-gray-700"
 									>{{ User.Account.name[0] }}</span
 								>
 								<div class="">
 									<p
 										class="text-xs font-normal text-slate-600 dark:text-slate-400"
 									>
-										Account
+										Organization
 									</p>
 									<span class="truncate text-base">{{
 										User.Account.name
@@ -213,7 +215,7 @@
 							<ul role="list" class="-mx-2 space-y-1">
 								<li
 									v-for="item in User.Account.type === 'super_admin' ||
-									User.Account.partner_type === 'affiliate'
+									User.Account.type === 'partner'
 										? adminNavigation
 										: navigation"
 									:key="item.name"
@@ -245,7 +247,7 @@
 						<li
 							v-if="
 								User.Account.type !== 'super_admin' &&
-								User.Account.partner_type !== 'affiliate'
+								User.Account.type !== 'partner'
 							"
 						>
 							<div
@@ -405,7 +407,6 @@
 			     id,
 				 name,
 				 type,
-				 partner_type,
 				 Subscription(*),
 				 Team (
 					id,
@@ -513,7 +514,7 @@
 			name: 'Client organizations',
 			href: `/${User.Account.id}/clients`,
 			icon: BuildingOfficeIcon,
-			current: route.path.includes`/${User.Account.id}/clients`,
+			current: route.path.includes(`/${User.Account.id}/clients`),
 		},
 
 		{
@@ -528,7 +529,7 @@
 			icon: CreditCardIcon,
 			current: route.path.includes(`/${User.Account.id}/settings/billing`),
 		},
-		
+
 		{
 			name: 'Cost reports',
 			href: `/${User.Account.id}/cost-reports`,
@@ -543,12 +544,12 @@
 		},
 	];
 
-	if (User.Account.partner_type === 'affiliate') {
+	if (User.Account.type === 'partner') {
 		adminNavigation[0] = {
-			name: 'Deals',
-			href: `/${User.Account.id}/deals`,
-			icon: InboxStackIcon,
-			current: route.path.includes`/${User.Account.id}/deals`,
+			name: 'Dashboard',
+			href: `/${User.Account.id}/dashboard`,
+			icon: ChartBarIcon,
+			current: route.path.includes`/${User.Account.id}/dashboard`,
 		};
 	}
 

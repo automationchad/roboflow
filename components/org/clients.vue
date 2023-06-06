@@ -1,6 +1,5 @@
 <template>
 	<div class="">
-		
 		<div class="mt-8 space-y-6 lg:px-0">
 			<loading-spinner v-if="state.loading" />
 			<!-- Billing history -->
@@ -22,6 +21,7 @@
 												</div>
 												<div class="flex flex-col items-end space-y-2">
 													<button
+														@click="showSubmitModal = true"
 														class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
 														type="button"
 													>
@@ -36,11 +36,12 @@
 												<div class="w-[40%]">
 													<p class="text-scale-900 text-xs uppercase">Name</p>
 												</div>
+
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs uppercase">Status</p>
+													<p class="text-scale-900 text-xs uppercase">Type</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs uppercase">Plan</p>
+													<p class="text-scale-900 text-xs uppercase">Status</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<p class="text-scale-900 text-xs uppercase">Tasks</p>
@@ -48,12 +49,22 @@
 											</div>
 											<NuxtLink
 												v-for="(team, idx) in teams"
-												:to="`/${team.id}/tickets`"
+												:to="`/${team.id}/dashboard`"
 												:key="team.name"
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
 											>
 												<div class="flex w-[40%] items-center gap-3">
-													<span class="text-sm">{{ team.name }}</span>
+													<span class="text-sm">{{
+														team.name +
+														(team.name === User.Account.name ? ' (You)' : '')
+													}}</span>
+												</div>
+
+												<div class="flex w-[20%] justify-end">
+													<span
+														class="rounded-full border border-slate-400 bg-slate-500 px-2 text-xs capitalize text-slate-100"
+														>{{ team.type.replace(/_/g, ' ') }}</span
+													>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<span
@@ -63,11 +74,6 @@
 														]"
 														>{{ team.status }}</span
 													>
-												</div>
-												<div class="flex w-[20%] justify-end">
-													<span class="text-sm">{{
-														formatAccounting(retainer.amount / 100, true)
-													}}</span>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<div
@@ -88,9 +94,10 @@
 			</section>
 		</div>
 	</div>
-	<ticket-submit
+	<org-submit
 		v-show="showSubmitModal"
 		@close-modal="showSubmitModal = false"
+		@org-submit="getData()"
 	/>
 </template>
 
@@ -181,7 +188,6 @@
 			     id,
 				 name,
 				 type,
-				 partner_type,
 				 Subscription(*),
 				 Team (
 					id,
@@ -223,7 +229,7 @@
 		return arr;
 	}
 
-	onMounted(async () => {
+	const getData = async () => {
 		let { data: Account, error: accountError } = await supabase
 			.from('Account')
 			.select('*,Ticket(count)');
@@ -237,5 +243,9 @@
 		}
 		teams.value = moveOrgToFront(teams.value);
 		console.log(teams.value);
+	};
+
+	onMounted(async () => {
+		await getData();
 	});
 </script>

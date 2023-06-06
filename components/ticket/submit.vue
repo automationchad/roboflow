@@ -70,7 +70,7 @@
 		.from('User')
 		.select(
 			`*,Account (
-		     id,type,partner_type,stripeCustomerId,Subscription(*))`
+		     id,type,type,stripeCustomerId,Subscription(*))`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
@@ -219,7 +219,7 @@
 	const selectedSeverity = severityTypes[0];
 
 	const selectedTicket = ref(
-		User.Account.partner_type === 'affiliate'
+		User.Account.type === 'partner'
 			? partnerTicketTypes[0]
 			: ticketTypes[0]
 	);
@@ -318,7 +318,6 @@
 				{
 					name: body.name,
 					type: selectedTicket.value.id,
-					status: 'backlog',
 					createdBy: user.value.id,
 					dueDate: due_date.value ?? new Date(),
 					accountId: accountId,
@@ -440,8 +439,8 @@
 													>
 														<ListboxOption
 															as="template"
-															v-for="ticketType in User.Account.partner_type ===
-															'affiliate'
+															v-for="ticketType in User.Account.type ===
+															'partner'
 																? partnerTicketTypes
 																: ticketTypes"
 															:key="ticketType.id"
@@ -500,7 +499,7 @@
 										</Listbox>
 										<div
 											class="grid grid-cols-2 gap-4 pt-6"
-											v-if="!User.Account.partner_type"
+											v-if="!User.Account.type"
 										>
 											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
 												<div
@@ -650,7 +649,7 @@
 										</div>
 										<p
 											class="mt-1 text-sm text-slate-500"
-											v-if="!User.Account.partner_type"
+											v-if="!User.Account.type"
 										>
 											You are on the
 											<span class="capitalize">{{ retainer.tier }}</span> tier
@@ -1024,7 +1023,7 @@
 												type="text"
 												name="text"
 												id="name"
-												placeholder="A brief summary of the client"
+												placeholder="Client name"
 												class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:placeholder:text-slate-400 sm:text-sm sm:leading-6"
 											/>
 										</div>

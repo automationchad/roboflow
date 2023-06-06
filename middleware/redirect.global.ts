@@ -2,19 +2,24 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 	const user = await useSupabaseUser();
 	const supabase = await useSupabaseClient();
 
+	const route = useRoute();
+
 	if (user.value) {
 		let { data: User, error: userError } = await supabase
 			.from('User')
-			.select('defaultTeamId,accountId,Account(type)')
+			.select('defaultTeamId,accountId,Account(id,type)')
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
 
-		const org_id = User?.accountId;
+		const org_id = User.Account.id;
+
 		const team_id =
 			User?.Account.type === 'super_admin'
 				? User.accountId
 				: User?.defaultTeamId;
+
+		
 
 		if (to.path === '/documentation') {
 			return navigateTo(`/${org_id}/documentation`);

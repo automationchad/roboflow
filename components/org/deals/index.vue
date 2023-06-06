@@ -15,39 +15,46 @@
 									>
 										<div class="bg-panel-body-light dark:bg-panel-body-dark">
 											<div class="flex items-center justify-between px-6 pt-4">
-												<div class="flex flex-col">
-													<h3 class="mb-0 text-xl dark:text-slate-100">
-														Referrals
-													</h3>
-												</div>
-												<div class="flex flex-col items-end space-y-2">
-													<button
-														@click="showSubmitModal = true"
-														class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
-														type="button"
+												<div class="flex items-center">
+													<h3
+														class="text-md mb-0 font-medium dark:text-slate-100"
 													>
-														<span class="truncate">New referral</span>
-													</button>
+														{{ quarter.quarter + ' ' + quarter.year }}
+													</h3>
+													<div
+														class="ml-3 flex space-x-4"
+														v-if="deals.length > 0"
+													>
+														<p class="text-sm text-slate-400">
+															Pipeline ${{ formatAccounting(pipeline, false) }}
+														</p>
+														<p class="text-sm text-slate-400">
+															Revenue ${{ formatAccounting(revenue, false) }}
+														</p>
+													</div>
 												</div>
 											</div>
 											<div class="mt-2 px-6 pb-4"></div>
 											<div
+												v-if="deals.length > 0"
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 text-slate-500 dark:border-slate-800"
 											>
 												<div class="w-[40%]">
-													<p class="text-scale-900 text-xs uppercase">Name</p>
+													<p class="text-scale-900 text-xs">Name</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs uppercase">Status</p>
+													<p class="text-scale-900 text-xs">Size, $</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs uppercase">Plan</p>
+													<p class="text-scale-900 text-xs">Status</p>
 												</div>
+
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs uppercase">Tasks</p>
+													<p class="text-scale-900 text-xs">Month</p>
 												</div>
 											</div>
 											<NuxtLink
+												v-if="deals.length > 0"
 												v-for="(deal, idx) in deals"
 												:to="`/${deal.teamId}/tickets/${deal.id}`"
 												:key="deal.name"
@@ -56,6 +63,12 @@
 												<div class="flex w-[40%] items-center gap-3">
 													<span class="text-sm">{{
 														truncateString(deal.name, 50)
+													}}</span>
+												</div>
+
+												<div class="flex w-[20%] justify-end">
+													<span class="text-sm font-medium">{{
+														abbreviatedNumber(deal.deal_size)
 													}}</span>
 												</div>
 												<div class="flex w-[20%] justify-end">
@@ -67,20 +80,25 @@
 														>{{ deal.status.replace(/_/g, ' ') }}</span
 													>
 												</div>
+
 												<div class="flex w-[20%] justify-end">
 													<span class="text-sm">{{
-														formatAccounting(retainer.amount / 100, true)
-													}}</span>
-												</div>
-												<div class="flex w-[20%] justify-end">
-													<span class="text-sm">{{
-														formatAccounting(
-															(retainer.amount / 100) * retainer.quantity,
-															true
-														)
+														format(new Date(deal.createdOn), 'MMM')
 													}}</span>
 												</div>
 											</NuxtLink>
+											<div
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
+												v-else
+											>
+												<div
+													class="flex w-full items-center justify-center gap-3"
+												>
+													<div class="text-sm">
+														There are no deals for this quarter
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -91,10 +109,6 @@
 			</section>
 		</div>
 	</div>
-	<ticket-submit
-		v-show="showSubmitModal"
-		@close-modal="showSubmitModal = false"
-	/>
 </template>
 
 <script setup>
@@ -140,6 +154,13 @@
 		loading: false,
 	});
 
+	const props = defineProps({
+		quarter: {
+			type: Object,
+			required: true,
+		},
+	});
+
 	const showSubmitModal = ref(false);
 
 	const user = useSupabaseUser();
@@ -156,9 +177,11 @@
 	const pastDue = () => {};
 
 	const styles = {
-        proposal_submitted: '',
-        requirements_gathering: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
-        backlog: 'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300  text-amber-900 dark:text-amber-200',
+		proposal_submitted: '',
+		requirements_gathering:
+			'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
+		backlog:
+			'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300  text-amber-900 dark:text-amber-200',
 		active:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
 		pending:
@@ -187,7 +210,6 @@
 			     id,
 				 name,
 				 type,
-				 partner_type,
 				 Subscription(*),
 				 Team (
 					id,
@@ -201,14 +223,35 @@
 		.limit(1)
 		.single();
 
-	let { data: Tickets, error: ticketError } = await supabase
-		.from('User')
-		.select('*,Account(id,type,trayWorkspaceId,Ticket(*),Subscription(*))')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	let { data: Ticket, error: ticketError } = await supabase
+		.from('Ticket')
+		.select(
+			`*, User(
+			id
+			)`
+		)
+		.eq('type', 'referral');
 
-	let deals = Tickets.Account.Ticket.filter((o) => o.type === 'referral');
+	let deals = Ticket.filter((o) => o.User.id === user.value.id).filter(
+		(o) =>
+			new Date(o.createdOn) >= new Date(props.quarter.start) &&
+			new Date(o.createdOn) <= new Date(props.quarter.end)
+	);
+	// .gte('createdOn', new Date(props.quarter.start))
+	// .lte('createdOn', new Date (props.quarter.end));
+
+	const pipeline = deals.reduce((a, c) => a + c.deal_size, 0);
+
+	const revenue = deals
+		.filter(
+			(o) =>
+				![
+					'proposal_submitted',
+					'requirements_gathering',
+					'contract_sent',
+				].includes(o.status)
+		)
+		.reduce((a, c) => a + c.deal_size, 0);
 
 	const teams = ref([]);
 	const entitlements = await getEntitlements();
