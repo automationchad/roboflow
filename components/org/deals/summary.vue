@@ -1,6 +1,8 @@
 <script setup>
 	import { format } from 'date-fns';
 
+	import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+
 	let getStyleClass = (number) => {
 		if (number < 5000) {
 			return { style: 'bronze', 'row-span': '1' };
@@ -43,7 +45,7 @@
 		.limit(1)
 		.single();
 
-	let deals = Ticket.filter((o) => o.Account.id === User.Account.id)
+	let deals = Ticket.filter((o) => o.Account.id === route.params.organization)
 		.filter(
 			(o) =>
 				![
@@ -58,79 +60,106 @@
 
 <template>
 	<div class="mb-8">
-		<div class="">
-			<h2 class="mb-2 text-sm text-white">Top deals</h2>
-			<div class="grid h-84 grid-cols-4 grid-rows-2 gap-4">
-				<div
-					v-if="deals.length > 0"
-					v-for="(deal, idx) in deals"
-					:key="deal.name"
-					:class="[
-						getStyleClass(deal.deal_size).style,
-						idx < 2 ? 'row-span-2' : `row-span-1`,
-						'h-full rounded border border-white/10',
-					]"
+		<TabGroup>
+			<TabList class="flex space-x-3">
+				<Tab v-slot="{ selected }">
+					<h2
+						:class="[
+							selected ? 'border-b border-indigo-400 font-medium bg-white/5' : '',
+							'mb-2 p-4 text-sm text-white rounded-t-md',
+						]"
+					>
+						Top deals
+					</h2>
+				</Tab>
+				<Tab v-slot="{ selected }"
+					><h2
+						:class="[
+							selected ? 'border-b border-indigo-400 font-medium bg-white/5' : '',
+							'mb-2 p-4 text-sm text-white rounded-t-md',
+						]"
+					>
+						Graphs
+					</h2></Tab
 				>
-					<NuxtLink
-						class="flex h-full flex-col justify-between p-1"
-						:to="`/${route.params.organization}/tickets/${deal.id}`"
-						><div
+			</TabList>
+			<TabPanels
+				><TabPanel
+					><div class="h-84 grid grid-cols-4 grid-rows-2 gap-4">
+						<div
+							v-if="deals.length > 0"
+							v-for="(deal, idx) in deals"
+							:key="deal.name"
 							:class="[
-								getStyleClass(deal.deal_size).style + '-month',
-								'flex justify-end px-2 py-2 text-xs',
+								getStyleClass(deal.deal_size).style,
+								idx < 2 ? 'row-span-2' : `row-span-1`,
+								'h-full rounded border border-white/10',
 							]"
 						>
-							{{ format(new Date(deal.close_date), 'MMM') }}
+							<NuxtLink
+								class="flex h-full flex-col justify-between p-1"
+								:to="`/${route.params.organization}/tickets/${deal.id}`"
+								><div
+									:class="[
+										getStyleClass(deal.deal_size).style + '-month',
+										'flex justify-end px-2 py-2 text-xs',
+									]"
+								>
+									{{ format(new Date(deal.close_date), 'MMM') }}
+								</div>
+								<div class="flex flex-1 flex-col justify-center p-2">
+									<h2
+										:class="[
+											getStyleClass(deal.deal_size).style + '-text',
+											'text-3xl font-semibold ',
+										]"
+									>
+										{{ abbreviatedNumber(deal.deal_size) }}
+									</h2>
+									<p
+										:class="[
+											getStyleClass(deal.deal_size).style + '-month',
+											'text-xs',
+										]"
+									>
+										{{ deal.name }}
+									</p>
+								</div>
+								<div class="">
+									<div
+										:class="[
+											getStyleClass(deal.deal_size).style + '-border',
+											'border-t',
+										]"
+									></div>
+									<div
+										:class="[
+											getStyleClass(deal.deal_size).style + '-button',
+											'mt-3 rounded-sm p-2 text-xs text-white',
+										]"
+									>
+										Add deal story
+									</div>
+								</div>
+							</NuxtLink>
 						</div>
-						<div class="flex flex-1 flex-col justify-center p-2">
-							<h2
-								:class="[
-									getStyleClass(deal.deal_size).style + '-text',
-									'text-3xl font-semibold ',
-								]"
-							>
-								{{ abbreviatedNumber(deal.deal_size) }}
-							</h2>
-							<p
-								:class="[
-									getStyleClass(deal.deal_size).style + '-month',
-									'text-xs',
-								]"
-							>
-								{{ deal.name }}
-							</p>
-						</div>
-						<div class="">
-							<div
-								:class="[
-									getStyleClass(deal.deal_size).style + '-border',
-									'border-t',
-								]"
-							></div>
-							<div
-								:class="[
-									getStyleClass(deal.deal_size).style + '-button',
-									'mt-3 rounded-sm p-2 text-xs text-white',
-								]"
-							>
-								Add deal story
+						<div
+							v-else
+							class="col-span-4 row-span-2 h-full rounded border border-white/10"
+						>
+							<div class="flex h-full flex-col justify-between p-1">
+								<div class="flex flex-1 flex-col justify-center p-2">
+									<h2 :class="['text-3xl font-semibold text-white']">
+										No deals
+									</h2>
+									<p :class="['text-xs']">Test</p>
+								</div>
 							</div>
 						</div>
-					</NuxtLink>
-				</div>
-				<div
-					v-else
-					class="col-span-4 row-span-2 h-full rounded border border-white/10"
-				>
-					<div class="flex h-full flex-col justify-between p-1">
-						<div class="flex flex-1 flex-col justify-center p-2">
-							<h2 :class="['text-3xl font-semibold text-white']">No deals</h2>
-							<p :class="['text-xs']">Test</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+					</div></TabPanel
+				><TabPanel>Test</TabPanel></TabPanels
+			>
+		</TabGroup>
 
 		<div class=""></div>
 	</div>

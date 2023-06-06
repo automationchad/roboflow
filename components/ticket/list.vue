@@ -37,38 +37,40 @@
 						v-for="ticket in tickets.slice(0, 15)"
 						v-if="tickets.length > 0"
 						:key="ticket.id"
-						class="border-t border-slate-200 dark:border-slate-800"
+						class="border-t border-slate-200 hover:bg-white/[2%] dark:border-slate-800"
 					>
-						<td
-							class="text-scale-1200 w-2/3 whitespace-nowrap px-6 py-3 text-sm"
-						>
-							<span
-								><a
-									class="hover:underline"
-									:href="`/${route.params.organization}/tickets/${ticket.id}`"
-									>{{ ticket.name }}</a
-								></span
+						<NuxtLink class="h w-full"
+							><td
+								class="text-scale-1200 w-2/3 whitespace-nowrap px-6 py-3 text-sm"
 							>
-						</td>
-						<td
-							class="text-scale-1200 hidden w-1/6 whitespace-nowrap p-3 text-sm lg:table-cell"
-						>
-							{{
-								format(new Date(ticket.updatedOn), 'MMM dd, yyyy') +
-								' at ' +
-								format(new Date(ticket.updatedOn), 'hh:mm')
-							}}
-						</td>
-						<td class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
-							<span
-								:class="[
-									styles[ticket.type],
-									'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium capitalize leading-3 ring-1',
-								]"
+								<span
+									><a
+										class="hover:underline"
+										:href="`/${route.params.organization}/tickets/${ticket.id}`"
+										>{{ ticket.name }}</a
+									></span
+								>
+							</td>
+							<td
+								class="text-scale-1200 hidden w-1/6 whitespace-nowrap p-3 text-sm lg:table-cell"
 							>
-								{{ ticket.type }}
-							</span>
-						</td>
+								{{
+									format(new Date(ticket.updatedOn), 'MMM dd, yyyy') +
+									' at ' +
+									format(new Date(ticket.updatedOn), 'hh:mm')
+								}}
+							</td>
+							<td class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
+								<span
+									:class="[
+										styles[ticket.type],
+										'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium capitalize leading-3 ring-1',
+									]"
+								>
+									{{ ticket.type }}
+								</span>
+							</td></NuxtLink
+						>
 					</tr>
 					<tr class="border-t border-slate-200 dark:border-slate-800" v-else>
 						<td
@@ -154,12 +156,11 @@
 
 	let { data: Ticket, error } = await supabase.from('Ticket').select('*');
 
-	let tickets =
-		Account.type === 'super_admin'
-			? Ticket.sort((a, b) => b['priority'] - a['priority'])
-			: Account.Ticket;
+	let tickets = Account.type === 'super_admin' ? Ticket : Account.Ticket;
 
 	const styles = {
+		referral:
+			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300  text-pink-900 dark:text-pink-200',
 		bug: 'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
 		billing:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',

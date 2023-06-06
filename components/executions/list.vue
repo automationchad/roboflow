@@ -26,7 +26,9 @@
 					<h5 class="mb-0 font-semibold">Executions</h5>
 				</div>
 
-				<span class="text-sm tabular-nums">{{ abbreviatedNumber(state.count) }}</span>
+				<span class="text-sm tabular-nums">{{
+					abbreviatedNumber(state.count)
+				}}</span>
 			</div>
 		</div>
 		<div v-if="state.loading" class="flex items-center justify-center py-36">
@@ -96,6 +98,9 @@
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
+
+	const route = useRoute();
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -115,8 +120,16 @@
 		.limit(1)
 		.single();
 
-	const workspaceId =
-		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
+	let workspaceId;
+
+	const { data: Account, error: accountError } = await supabase
+		.from('Account')
+		.select('trayWorkspaceId')
+		.eq('id', route.params.organization)
+		.limit(1)
+		.single();
+	workspaceId = Account.trayWorkspaceId;
+
 	async function fetchData() {
 		const { data, count } = await $fetch(
 			`/api/tray/executions/${workspaceId}`,

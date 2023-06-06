@@ -1,13 +1,12 @@
 <template>
 	<div class="">
 		<div
-			v-if="true"
-			class="mb-8 overflow-hidden rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+			class="mb-8 max-h-[400px] overflow-y-scroll rounded border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
 		>
-			<table class="bg-panel-body-light dark:bg-panel-body-dark w-full ">
-				<thead class="bg-panel-header-light dark:bg-panel-header-dark">
-					<tr class="overflow-hidden rounded">
-						<th class="w-1/4 px-6 py-3 text-left">
+			<div class="bg-panel-body-light dark:bg-panel-body-dark w-full">
+				<div class="bg-panel-header-light dark:bg-panel-header-dark w-full">
+					<div class="rounded">
+						<div class="flex w-full items-center justify-between px-6 py-3">
 							<div class="flex items-center space-x-4">
 								<div
 									class="flex h-8 w-8 items-center justify-center rounded bg-slate-50 dark:bg-slate-800"
@@ -37,33 +36,36 @@
 								</div>
 								<h5 class="mb-0">Workflows</h5>
 							</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody class="overflow-hidden">
-					<tr
-						v-for="workflow in state.data.slice(0,5)"
+							<div class="">
+								<span>{{ state.data.length }}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="overflow-hidden">
+					<div
+						v-for="workflow in state.data"
 						:key="workflow.id"
-						class="border-t border-slate-200 dark:border-slate-800"
+						class="border-t border-slate-200 dark:border-slate-800 flex"
 					>
-						<td
+						<div
 							class="text-scale-1200 w-2/3 whitespace-nowrap px-6 py-3 text-sm"
 						>
 							<span class="max-w-[200px] truncate text-ellipsis">{{
 								workflow.id
 							}}</span>
-						</td>
-						<td
+						</div>
+						<div
 							class="text-scale-1200 hidden w-1/6 whitespace-nowrap p-3 text-sm lg:table-cell"
 						>
 							{{ workflow.name }}
-						</td>
-						<td class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
+						</div>
+						<div class="text-scale-1200 w-1/6 px-6 py-3 text-right text-sm">
 							<span> </span>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="space-y-6 lg:px-0" v-if="false">
 			<!-- Workflows -->
@@ -211,7 +213,7 @@
 		.limit(1)
 		.single();
 	const workspaceId =
-		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
+		User.Account.type === 'super_admin' ? User.Account.trayWorkspaceId : null;
 
 	async function fetchData() {
 		const { elements: data } = await $fetch(

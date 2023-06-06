@@ -135,11 +135,11 @@
 	}
 
 	const handleCommentAdd = async (thread_id) => {
-        loading.value = true;
-        finished.value = false;
+		loading.value = true;
+		finished.value = false;
 		stored_prompt.value = prompt.value;
 		prompt.value = '';
-        typedText.value = '';
+		typedText.value = '';
 		try {
 			const { data, error: insertCommentError } = await supabase
 				.from('Comment')
@@ -363,7 +363,7 @@
 					</div>
 
 					<transition
-						v-show="finished || open"
+						v-show="!loading || finished || open"
 						enter-active-class="transition ease-out duration-100"
 						enter-from-class="transform opacity-0 scale-95"
 						enter-to-class="transform opacity-100 scale-100"
@@ -374,7 +374,7 @@
 						<MenuItems
 							static
 							v-if="!typedText"
-							class="absolute left-0 z-10 mt-2 w-56 origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/10 focus:outline-none dark:divide-white/10 dark:bg-[#06051A] dark:ring-white/10"
+							class="absolute left-0 z-10 mt-2 max-h-72 w-56 origin-top-left divide-y divide-gray-100 overflow-y-auto rounded-md bg-white shadow-lg ring-1 ring-black/10 focus:outline-none dark:divide-white/10 dark:bg-[#06051A] dark:ring-white/10"
 						>
 							<div class="py-1">
 								<div
@@ -484,6 +484,148 @@
 										</svg>
 
 										Find action items
+									</button>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<button
+										@click="
+											handleAIRequest('audit_create', false),
+												(stored_prompt = 'audit_create')
+										"
+										:class="[
+											active
+												? 'bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white'
+												: 'text-gray-700 dark:text-gray-300',
+											'group flex w-full items-center px-4 py-2 text-sm',
+										]"
+									>
+										<svg
+											class="mr-3 h-5 w-5 text-[#9382ff]"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												d="M12.75 4.75H7.75C6.64543 4.75 5.75 5.64543 5.75 6.75V17.25C5.75 18.3546 6.64543 19.25 7.75 19.25H16.25C17.3546 19.25 18.25 18.3546 18.25 17.25V10.25M12.75 4.75V8.25C12.75 9.35457 13.6454 10.25 14.75 10.25H18.25M12.75 4.75L18.25 10.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.75 15.75H15.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.75 12.75H11.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+										</svg>
+
+										Create audit
+									</button>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<button
+										@click="
+											handleAIRequest('sow_create', false),
+												(stored_prompt = 'sow_create')
+										"
+										:class="[
+											active
+												? 'bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white'
+												: 'text-gray-700 dark:text-gray-300',
+											'group flex w-full items-center px-4 py-2 text-sm',
+										]"
+									>
+										<svg
+											class="mr-3 h-5 w-5 text-[#9382ff]"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												d="M4.75 15.75L8.25 19.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.25 15.75L4.75 19.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M11.75 19.25H15.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.75 8.75H15.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M9.75 11.75H14.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M19.25 19.25V6.75C19.25 5.64543 18.3546 4.75 17.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V12.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+										</svg>
+
+										Create SOW
+									</button>
+								</MenuItem>
+								<MenuItem v-slot="{ active }">
+									<button
+										@click="
+											handleAIRequest('invoice_create', false),
+												(stored_prompt = 'invoice_create')
+										"
+										:class="[
+											active
+												? 'bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white'
+												: 'text-gray-700 dark:text-gray-300',
+											'group flex w-full items-center px-4 py-2 text-sm',
+										]"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="mr-3 h-5 w-5 text-[#9382ff]"
+											fill="none"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="1.5"
+												d="M13.75 4.75h-8v14.5l1.599-1.243a1 1 0 0 1 1.272.036L10 19.25l1.341-1.174a1 1 0 0 1 1.318 0L14 19.25l1.379-1.207a1 1 0 0 1 1.272-.036l1.599 1.243v-9m-4.5-5.5 4.5 5.5m-4.5-5.5v3.5a2 2 0 0 0 2 2h2.5"
+											></path>
+										</svg>
+
+										Create invoice
 									</button>
 								</MenuItem>
 							</div>
@@ -830,6 +972,7 @@
 										@click="
 											(finished = false),
 												(open = false),
+												showDiv = false,
 												(aiResponse = ''),
 												(typedText = ''),
 												(prompt = '')

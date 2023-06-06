@@ -51,7 +51,7 @@
 												v-for="(team, idx) in teams"
 												:to="`/${team.id}/dashboard`"
 												:key="team.name"
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors hover:bg-white/[2%] dark:border-slate-800 dark:text-slate-200"
 											>
 												<div class="flex w-[40%] items-center gap-3">
 													<span class="text-sm">{{
@@ -173,12 +173,7 @@
 		delinquent:
 			'bg-rose-100 dark:bg-rose-700 dark:ring-rose-500 ring-rose-300 text-rose-900 dark:text-rose-200',
 	};
-	const fetchData = async () => {
-		const { data } = await $fetch(
-			`/api/stripe/invoices/${User.Account.stripeCustomerId}`
-		);
-		return data;
-	};
+	
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -242,7 +237,6 @@
 			teams.value.unshift(item);
 		}
 		teams.value = moveOrgToFront(teams.value);
-		console.log(teams.value);
 	};
 
 	onMounted(async () => {

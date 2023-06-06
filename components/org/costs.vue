@@ -975,7 +975,9 @@ onMounted(async () => {
 														</svg>
 													</div>
 													<h5 class="mb-0">Executions</h5>
+													
 												</div>
+												
 											</th>
 										</tr>
 									</thead>
@@ -1092,7 +1094,7 @@ onMounted(async () => {
 				stroke-linecap="round"
 				stroke-linejoin="round"
 			></path></svg
-		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }}</span>
+		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }} </span><span class="text-xs ml-2 text-lime-400">${{ formatAccounting(taskPrice(state.kpis['Task Runs']) - trayCost(state.kpis['Task Runs'])) }}</span>
 															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -1384,7 +1386,7 @@ onMounted(async () => {
 				<div class="block">
 					<div class="">
 						<div class="flex w-full">
-							<div class="sc-gsnTZi w-1/3">
+							<div class="w-1/3">
 								<p
 									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
@@ -1394,7 +1396,7 @@ onMounted(async () => {
 									{{ formatAccounting(monthly_sum) }}
 								</h3>
 							</div>
-							<div class="sc-gsnTZi w-1/3">
+							<div class="w-1/3">
 								<p
 									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
@@ -1431,7 +1433,7 @@ onMounted(async () => {
 								</h3>
 							</div>
 
-							<div class="sc-gsnTZi w-1/3">
+							<div class="w-1/3">
 								<p
 									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
 								>
@@ -1450,7 +1452,7 @@ onMounted(async () => {
 								</h3>
 							</div>
 						</div>
-						<div class="sc-gsnTZi mb-4 dark:text-white">
+						<div class="mb-4 dark:text-white">
 							{{
 								format(firstDay, 'MMM d') +
 								' - ' +
@@ -1461,9 +1463,9 @@ onMounted(async () => {
 				</div>
 				<div class="grid grid-cols-2 gap-8">
 					<div class="gwIZYl bg-gray-50 p-6 dark:bg-slate-800">
-						<div class="sc-ckMVTt jUiJgh">
+						<div class="">
 							<div
-								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3 dark:border-slate-600"
+								class="border-b border-gray-300 pb-3 dark:border-slate-600"
 							>
 								<h4 class="bOtoTi text-base font-semibold dark:text-white">
 									Task Runs
@@ -1493,7 +1495,7 @@ onMounted(async () => {
 								</div>
 								<div class="mt-2">
 									<div class="">
-										<div class="sc-hiMGwR dkaYIm">
+										<div class="">
 											<progress
 												id="file"
 												:value="(kpis['Task Runs'] / task_entitlement) * 100"
@@ -1537,10 +1539,10 @@ onMounted(async () => {
 						</div>
 					</div>
 					<div class="bg-gray-50 p-6 dark:bg-slate-800">
-						<div class="sc-ckMVTt jUiJgh">
+						<div class="">
 							<div
 								display="flex"
-								class="sc-gsnTZi eMxiQG border-b border-gray-300 pb-3 dark:border-slate-600"
+								class="border-b border-gray-300 pb-3 dark:border-slate-600"
 							>
 								<h4 class="text-md font-semibold dark:text-white">
 									Assistant user seats

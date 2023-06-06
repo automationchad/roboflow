@@ -58,7 +58,7 @@
 												v-for="(deal, idx) in deals"
 												:to="`/${deal.teamId}/tickets/${deal.id}`"
 												:key="deal.name"
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-white/[2%]"
 											>
 												<div class="flex w-[40%] items-center gap-3">
 													<span class="text-sm">{{
@@ -161,11 +161,13 @@
 		},
 	});
 
-	const showSubmitModal = ref(false);
-
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
+
+	const route = useRoute();
+
+	const showSubmitModal = ref(false);
 
 	// let { data: User, error: userError } = await supabase
 	// 	.from('User')
@@ -177,24 +179,40 @@
 	const pastDue = () => {};
 
 	const styles = {
-		proposal_submitted: '',
+		proposal_submitted:
+			'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300 text-purple-900 dark:text-purple-200',
 		requirements_gathering:
-			'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
-		backlog:
-			'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300  text-amber-900 dark:text-amber-200',
-		active:
-			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
-		pending:
-			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300  text-yellow-900 dark:text-yellow-200',
-		deleted:
-			'bg-slate-100 dark:bg-slate-700 dark:ring-slate-500 ring-slate-300  text-slate-900 dark:text-slate-200',
-		inactive:
-			'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300  text-amber-900 dark:text-amber-200',
-		cancelled:
-			'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
-		delinquent:
-			'bg-rose-100 dark:bg-rose-700 dark:ring-rose-500 ring-rose-300 text-rose-900 dark:text-rose-200',
+			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
+		solution_design:
+			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
+		in_development:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+		unit_testing:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		integration_testing:
+			'bg-indigo-100 dark:bg-indigo-700 dark:ring-indigo-500 ring-indigo-300 text-indigo-900 dark:text-indigo-200',
+		user_acceptance_testing:
+			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300 text-pink-900 dark:text-pink-200',
+		bug_fixing:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		deployment_preparation:
+			'bg-gray-100 dark:bg-gray-700 dark:ring-gray-500 ring-gray-300 text-gray-900 dark:text-gray-200',
+		in_deployment:
+			'bg-teal-100 dark:bg-teal-700 dark:ring-teal-500 ring-teal-300 text-teal-900 dark:text-teal-200',
+		post_deployment_review:
+			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
+		maintenance_mode:
+			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
+		upgrades_and_enhancements:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+		project_on_hold:
+			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
+		project_cancelled:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
+		project_completed:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
 	};
+
 	const fetchData = async () => {
 		const { data } = await $fetch(
 			`/api/stripe/invoices/${User.Account.stripeCustomerId}`
@@ -225,14 +243,12 @@
 
 	let { data: Ticket, error: ticketError } = await supabase
 		.from('Ticket')
-		.select(
-			`*, User(
-			id
-			)`
-		)
+		.select(`*`)
 		.eq('type', 'referral');
 
-	let deals = Ticket.filter((o) => o.User.id === user.value.id).filter(
+	let deals = Ticket.filter(
+		(o) => o.accountId === route.params.organization
+	).filter(
 		(o) =>
 			new Date(o.createdOn) >= new Date(props.quarter.start) &&
 			new Date(o.createdOn) <= new Date(props.quarter.end)

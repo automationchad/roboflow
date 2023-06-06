@@ -72,9 +72,15 @@
 	const imageSrc = ref(null);
 	const fileInput = ref(null);
 	const selectedFile = ref(null);
+	const dealSize = ref(0);
+
+	const ticketAttachments = ref([]);
+	const aiResponse = ref('');
 
 	const commentImageId = ref('');
 	const showImageModal = ref(false);
+
+	// const aiEnabled = ref(Ticket.ai_enabled);
 
 	const showImage = (id) => {
 		commentImageId.value = id;
@@ -140,19 +146,19 @@
 		.limit(1)
 		.single();
 
-	const aiEnabled = ref(Ticket.ai_enabled);
+	dealSize.value = Ticket.deal_size;
+
+	const input = ref(Ticket.desc);
+
+	if (!Ticket) {
+		navigateTo('/ticket-not-found');
+	}
 
 	const dueDate = computed(() => {
 		return formatDistance(new Date(Ticket.dueDate), new Date(), {
 			addPrefix: true,
 		});
 	});
-
-	if (!Ticket) {
-		navigateTo('/ticket-not-found');
-	}
-
-	const input = ref(Ticket.desc);
 
 	const { data: AssignedTo, error: assignedError } = await supabase
 		.from('User')
@@ -169,12 +175,12 @@
 		}
 	};
 
-	const handleAIToggle = async (id) => {
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ ai_enabled: !aiEnabled.value })
-			.eq('id', id);
-	};
+	// const handleAIToggle = async (id) => {
+	// 	const { data, error } = await supabase
+	// 		.from('Ticket')
+	// 		.update({ ai_enabled: !aiEnabled.value })
+	// 		.eq('id', id);
+	// };
 
 	const removeImage = () => {
 		imageSrc.value = null;
@@ -329,14 +335,11 @@
 		return commentList;
 	};
 
-	const ticketAttachments = ref([]);
-
-	const aiResponse = ref('');
-
 	ticketAttachments.value = await getTicketAttachments(Ticket.id);
 	console.log(ticketAttachments.value);
 
 	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
+
 	currentAvatar.value = await getAvatarUrl(user.value.id);
 	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
 
@@ -425,14 +428,23 @@
 			.eq('id', route.params.id);
 	};
 
-	const handleTicketClose = async (status) => {
-		const ticket_status = status !== 'done' ? 'done' : 'backlog';
+	const handleDealSizeUpdate = async () => {
+		loading.value = true;
 		const { data, error } = await supabase
 			.from('Ticket')
-			.update({ status: ticket_status })
+			.update({ deal_size: parseInt(dealSize.value) })
 			.eq('id', route.params.id);
-		navigateTo(`/${route.params.team}/tickets`);
+		loading.value = false;
 	};
+
+	// const handleTicketClose = async (status) => {
+	// 	const ticket_status = status !== 'done' ? 'done' : 'backlog';
+	// 	const { data, error } = await supabase
+	// 		.from('Ticket')
+	// 		.update({ status: ticket_status })
+	// 		.eq('id', route.params.id);
+	// 	navigateTo(`/${route.params.team}/tickets`);
+	// };
 
 	const handleDelete = async (id, arr) => {
 		loading.value = true;
@@ -457,18 +469,18 @@
 		}
 	};
 
-	const handleTicketDelete = async (id) => {
-		try {
-			const { data, error: deleteError } = await supabase
-				.from('Ticket')
-				.delete()
-				.eq('id', id);
-		} catch (error) {
-			alert(error.message);
-		} finally {
-			navigateTo(`/tickets`);
-		}
-	};
+	// const handleTicketDelete = async (id) => {
+	// 	try {
+	// 		const { data, error: deleteError } = await supabase
+	// 			.from('Ticket')
+	// 			.delete()
+	// 			.eq('id', id);
+	// 	} catch (error) {
+	// 		alert(error.message);
+	// 	} finally {
+	// 		navigateTo(`/tickets`);
+	// 	}
+	// };
 </script>
 
 <template>
@@ -486,7 +498,7 @@
 								<div>
 									<div class="grid grid-cols-7 justify-between md:space-x-4">
 										<div class="col-span-7">
-											<footer
+											<header
 												class="mb-4 flex w-full items-center"
 												id="posted-by"
 											>
@@ -543,47 +555,44 @@
 														>
 													</div>
 												</div>
-											</footer>
-											<h1
-												class="text-2xl font-bold text-gray-900 dark:text-white"
+											</header>
+											<div
+												class="mb-2 mt-5 flex items-center space-x-2 text-xs capitalize text-sky-400"
 											>
-												{{ Ticket.name }}
+												<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24">
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M12 4.75L13.75 10.25H19.25L14.75 13.75L16.25 19.25L12 15.75L7.75 19.25L9.25 13.75L4.75 10.25H10.25L12 4.75Z"
+													></path>
+												</svg>
+
+												{{ Ticket.User.companyName }} {{ Ticket.type }}
+											</div>
+											<h1
+												class="text-2xl font-semibold text-gray-900 dark:text-white"
+											>
+												<div class="" v-if="Ticket.type === 'referral'">
+													{{ Ticket.User.firstName }}
+													<span class="text-slate-400">referred</span>
+													{{ Ticket.name }}
+													<span class="text-slate-400">for a</span>
+													${{ abbreviatedNumber(dealSize) }}
+													<span class="text-slate-400">deal</span>
+												</div>
+												<div class="" v-else>{{ Ticket.name }}</div>
 											</h1>
 										</div>
 									</div>
+									<!-- Aside for smaller screens -->
 									<aside class="mt-8 xl:hidden">
-										<div
-											class="col-span-2 mt-4 flex items-center justify-end space-x-3 md:mt-0"
-										>
-											<button
-												@click="handleTicketClose(Ticket.status)"
-												type="button"
-												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-slate-800"
-											>
-												<CheckCircleIcon
-													class="-ml-0.5 h-5 w-5 text-green-500"
-													aria-hidden="true"
-												/>
-												Close ticket
-											</button>
-
-											<!-- <button
-												type="button"
-												@click="handleTicketDelete()"
-												class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-											>
-												<TrashIcon
-													class="-ml-0.5 h-5 w-5 text-gray-400"
-													aria-hidden="true"
-												/>
-												Delete
-											</button> -->
-										</div>
 										<h2 class="sr-only">Details</h2>
 										<div class="space-y-5">
 											<div class="flex items-center space-x-2">
 												<svg
-													class="h-5 w-5 text-green-500"
+													class="h-5 w-5 text-white"
 													aria-hidden="true"
 													viewBox="0 0 24 24"
 													fill="none"
@@ -612,23 +621,10 @@
 													></path>
 												</svg>
 
-												<span class="text-sm font-medium text-green-700">{{
-													Ticket.status
-												}}</span>
-											</div>
-
-											<div class="flex items-center space-x-2">
-												<CalendarIcon
-													class="h-5 w-5 text-gray-400"
-													aria-hidden="true"
+												<ticket-stage-change
+													:status="Ticket.status"
+													:enabled="User.Account.type === 'super_admin'"
 												/>
-												<span
-													class="text-sm font-medium text-gray-900 dark:text-white"
-													>Created on
-													<span>{{
-														format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
-													}}</span></span
-												>
 											</div>
 										</div>
 										<div
@@ -825,15 +821,8 @@
 											</button>
 										</div>
 									</div>
-									<div class="mt-2 py-3 text-xs xl:pb-0 xl:pt-6">
-										<NuxtLink
-											:to="`/${route.params.team}/tickets`"
-											:class="[
-												styles[Ticket.type],
-												'rounded-md px-2 py-1 font-normal capitalize ring-1 ring-inset transition-colors',
-											]"
-											>{{ Ticket.type }}</NuxtLink
-										>
+									<div class="mt-16 text-white">
+										<button>Up and down</button>
 									</div>
 								</div>
 							</div>
@@ -841,7 +830,44 @@
 								<div>
 									<div class="divide-gray-200 dark:divide-slate-800">
 										<div class="space-y-3 pb-4">
-											<TicketAiModal :comment="comment_text" :enabled="Ticket.ai_enabled" />
+											<div class="flex justify-end">
+												<div
+													class="flex items-center rounded-full border border-[#423455] bg-[#1A1B2C] pl-2 pr-3 text-sm text-white"
+												>
+													<svg
+														class="mr-0.5 h-5 w-5"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<defs>
+															<linearGradient
+																id="gradient"
+																x1="0%"
+																y1="0%"
+																x2="0%"
+																y2="100%"
+															>
+																<stop offset="0%" stop-color="#7000FF" />
+																<stop offset="100%" stop-color="#00C2FF" />
+															</linearGradient>
+														</defs>
+														<path
+															d="M12 18.25C15.866 18.25 19.25 16.1552 19.25 11.5C19.25 6.84483 15.866 4.75 12 4.75C8.13401 4.75 4.75 6.84483 4.75 11.5C4.75 13.2675 5.23783 14.6659 6.05464 15.7206C6.29358 16.0292 6.38851 16.4392 6.2231 16.7926C6.12235 17.0079 6.01633 17.2134 5.90792 17.4082C5.45369 18.2242 6.07951 19.4131 6.99526 19.2297C8.0113 19.0263 9.14752 18.722 10.0954 18.2738C10.2933 18.1803 10.5134 18.1439 10.7305 18.1714C11.145 18.224 11.5695 18.25 12 18.25Z"
+															stroke="url(#gradient)"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														></path>
+													</svg>
+
+													#ask-motis
+												</div>
+											</div>
+											<TicketAiModal
+												:comment="comment_text"
+												:enabled="Ticket.ai_enabled"
+											/>
 											<div class="">
 												<div
 													class="flex space-x-3 rounded-lg p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:ring-slate-800"
@@ -1163,7 +1189,12 @@
 																					</svg>
 																				</button>
 																				<button
-																					@click="handleDelete(activityItem.id)"
+																					@click="
+																						handleDelete(
+																							activityItem.id,
+																							activityItem.Comment
+																						)
+																					"
 																					class="text-slate-400 transition-colors hover:text-rose-400"
 																				>
 																					<svg
@@ -1255,21 +1286,22 @@
 																			v-html="convert(activityItem.text)"
 																		></div>
 																		<div class="mt-2 pl-8">
-																			<NuxtLink
+																			<a
 																				v-if="
 																					activityItem.text.includes('below') &&
 																					activityItem.User.systemRole ===
 																						'super_admin'
 																				"
-																				:to="`https://calendly.com/motis-group/partners?name=${
+																				:href="`https://calendly.com/motis-group/partners?name=${
 																					Ticket.User.firstName +
 																					' ' +
 																					Ticket.User.lastName
 																				}&email=${
 																					Ticket.User.email
 																				}&utm_source=${Ticket.id}`"
+																				target="_blank"
 																				class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
-																				>Schedule a call</NuxtLink
+																				>Schedule a call</a
 																			>
 																		</div>
 																		<div
@@ -1561,6 +1593,7 @@
 																					}&email=${
 																						Ticket.User.email
 																					}&utm_source=${Ticket.id}`"
+																					target="_blank"
 																					class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
 																					>Schedule a call</NuxtLink
 																				>
@@ -1633,7 +1666,7 @@
 																								v-model="reply_text"
 																								name="comment"
 																								id="comment"
-																								class="block w-full resize-none border-0 bg-transparent px-4 py-3 text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-2 text-sm sm:leading-6"
+																								class="block w-full resize-none border-0 bg-transparent px-4 py-3 text-sm text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-2 sm:leading-6"
 																								placeholder="Reply..."
 																							/>
 
@@ -1796,117 +1829,103 @@
 								</div>
 							</section>
 						</div>
+						<!-- Ticket details big -->
 						<aside class="hidden xl:block xl:pl-8">
-							<div
-								class="mb-8 mt-4 flex items-center justify-between space-x-3 md:mt-0"
-							>
-								<button
-									@click="handleTicketClose(Ticket.status)"
-									type="button"
-									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-white dark:hover:ring-slate-600"
-								>
-									<CheckCircleIcon
-										class="-ml-0.5 h-5 w-5 text-green-500"
-										aria-hidden="true"
-									/>
-
-									{{
-										Ticket.status !== 'done' ? 'Close ticket' : 'Open ticket'
-									}}
-								</button>
-								<button
-									v-if="User.Account.type === 'super_admin'"
-									@click="handleTicketDelete(Ticket.id)"
-									type="button"
-									class="inline-flex justify-center gap-x-1.5 rounded-md bg-white p-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50 dark:bg-red-800 dark:text-red-300 dark:ring-red-700 dark:hover:bg-red-800 dark:hover:text-red-100 dark:hover:ring-red-600"
-								>
-									<svg
-										class="h-5 w-5"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M5.75 7.75L6.59115 17.4233C6.68102 18.4568 7.54622 19.25 8.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75H5.75Z"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M9.75 10.75V16.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M13.25 10.75V16.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M8.75 7.75V6.75C8.75 5.64543 9.64543 4.75 10.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.75"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M4.75 7.75H18.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-									</svg>
-								</button>
-							</div>
 							<h2 class="sr-only">Details</h2>
 							<div class="space-y-3">
 								<div
-									class="flex items-center space-x-2 dark:text-white"
-									v-if="Ticket.status !== 'done'"
+									class="flex items-center space-x-2 text-sm dark:text-white"
 								>
+									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24">
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M19.25 11.75L17.6644 6.20056C17.4191 5.34195 16.6344 4.75 15.7414 4.75H8.2586C7.36564 4.75 6.58087 5.34196 6.33555 6.20056L4.75 11.75"
+										></path>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M10.2142 12.3689C9.95611 12.0327 9.59467 11.75 9.17085 11.75H4.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H17.25C18.3546 19.25 19.25 18.3546 19.25 17.25V11.75H14.8291C14.4053 11.75 14.0439 12.0327 13.7858 12.3689C13.3745 12.9046 12.7276 13.25 12 13.25C11.2724 13.25 10.6255 12.9046 10.2142 12.3689Z"
+										></path>
+									</svg>
+
+									<NuxtLink
+										:to="`/${route.params.team}/tickets`"
+										:class="[
+											styles[Ticket.type],
+											'rounded-md px-2 py-1 font-normal capitalize ring-1 ring-inset transition-colors',
+										]"
+										>{{ Ticket.type }}</NuxtLink
+									>
+								</div>
+								<div class="flex items-center space-x-2 dark:text-white">
 									<svg
 										class="h-6 w-6"
-										aria-hidden="true"
 										viewBox="0 0 24 24"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
 									>
 										<path
-											d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+											d="M9.25 9.25V6.75C9.25 6.19772 8.80228 5.75 8.25 5.75H5.75C5.19772 5.75 4.75 6.19772 4.75 6.75V9.25C4.75 9.80228 5.19772 10.25 5.75 10.25H8.25C8.80228 10.25 9.25 9.80228 9.25 9.25Z"
 											stroke="currentColor"
 											stroke-width="1.5"
 											stroke-linecap="round"
 											stroke-linejoin="round"
 										></path>
 										<path
-											d="M16.0753 17.7902C15.4999 16.5 13.6564 15.75 12 15.75C10.3436 15.75 8.49988 16.5 7.92468 17.7902"
+											d="M9.25 18.25H5.75C5.19772 18.25 4.75 17.8023 4.75 17.25V13.75"
 											stroke="currentColor"
 											stroke-width="1.5"
 											stroke-linecap="round"
 											stroke-linejoin="round"
 										></path>
 										<path
-											d="M11.75 12.25L14.25 9.75"
+											d="M12.75 6.75H19.25"
 											stroke="currentColor"
 											stroke-width="1.5"
 											stroke-linecap="round"
 											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 14.75H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 9.25H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 17.25H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M8 16.25L7.42383 16.7301C7.59297 16.9331 7.85641 17.0321 8.11735 16.9908C8.37829 16.9494 8.59824 16.7738 8.69636 16.5285L8 16.25ZM10.8011 13.2587C11.0821 12.9543 11.0631 12.4799 10.7587 12.1989C10.4543 11.9179 9.97985 11.9369 9.6989 12.2413L10.8011 13.2587ZM7.32617 14.2699C7.06099 13.9517 6.58807 13.9087 6.26986 14.1738C5.95165 14.439 5.90866 14.9119 6.17383 15.2301L7.32617 14.2699ZM8.69636 16.5285C9.03866 15.6728 9.56133 14.855 10.0115 14.2398C10.2345 13.9351 10.4349 13.6865 10.5785 13.5152C10.6503 13.4296 10.7076 13.3637 10.7462 13.32C10.7655 13.2981 10.7801 13.2819 10.7894 13.2716C10.7941 13.2664 10.7974 13.2627 10.7994 13.2606C10.8004 13.2595 10.801 13.2588 10.8013 13.2585C10.8015 13.2583 10.8015 13.2583 10.8015 13.2583C10.8015 13.2583 10.8014 13.2584 10.8014 13.2584C10.8013 13.2585 10.8013 13.2585 10.8012 13.2586C10.8012 13.2586 10.8011 13.2587 10.25 12.75C9.6989 12.2413 9.69881 12.2414 9.69872 12.2415C9.69868 12.2415 9.69858 12.2416 9.6985 12.2417C9.69835 12.2419 9.69817 12.2421 9.69797 12.2423C9.69757 12.2427 9.69708 12.2433 9.6965 12.2439C9.69534 12.2452 9.69382 12.2468 9.69194 12.2489C9.68819 12.253 9.68303 12.2587 9.67653 12.2658C9.66352 12.2802 9.64515 12.3007 9.62195 12.327C9.57558 12.3795 9.50986 12.4551 9.42926 12.5512C9.26825 12.7432 9.04679 13.0181 8.80098 13.354C8.31367 14.02 7.71134 14.9522 7.30364 15.9715L8.69636 16.5285ZM6.17383 15.2301L7.42383 16.7301L8.57617 15.7699L7.32617 14.2699L6.17383 15.2301Z"
+											fill="currentColor"
 										></path>
 									</svg>
 
-									<span class="text-sm capitalize">{{
-										Ticket.status.replace(/_/g, ' ')
-									}}</span>
+									<ticket-stage-change
+										:status="Ticket.status"
+										:enabled="User.Account.type === 'super_admin'"
+									/>
 								</div>
-								<div class="flex items-center space-x-2" v-else>
+								<div class="flex items-center space-x-2 dark:text-white">
 									<svg
-										class="h-6 w-6 text-red-500"
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-6 w-6"
 										fill="none"
 										viewBox="0 0 24 24"
 									>
@@ -1915,32 +1934,127 @@
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											stroke-width="1.5"
-											d="M5.75 11.75C5.75 11.1977 6.19772 10.75 6.75 10.75H17.25C17.8023 10.75 18.25 11.1977 18.25 11.75V17.25C18.25 18.3546 17.3546 19.25 16.25 19.25H7.75C6.64543 19.25 5.75 18.3546 5.75 17.25V11.75Z"
-										></path>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="1.5"
-											d="M7.75 10.5V10.3427C7.75 8.78147 7.65607 7.04125 8.74646 5.9239C9.36829 5.2867 10.3745 4.75 12 4.75C13.6255 4.75 14.6317 5.2867 15.2535 5.9239C16.3439 7.04125 16.25 8.78147 16.25 10.3427V10.5"
+											d="M19.25 12.25v-3.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v6.5a2 2 0 0 0 2 2h12.5m0 0-1.5-1.5m1.5 1.5L17.75 19m-3.5-7c0 1.795-1.007 3.25-2.25 3.25S9.75 13.795 9.75 12 10.757 8.75 12 8.75s2.25 1.455 2.25 3.25Z"
 										></path>
 									</svg>
-
-									<span class="text-sm text-red-700">Closed Ticket</span>
+									<div class="relative w-full rounded-md shadow-sm">
+										<div
+											class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+										>
+											<span class="text-gray-500 sm:text-sm">$</span>
+										</div>
+										<input
+											:disabled="!User.Account.type === 'super_admin'"
+											type="text"
+											v-model="dealSize"
+											name="price"
+											id="price"
+											class="w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
+											placeholder="0.00"
+											aria-describedby="price-currency"
+										/>
+										<div
+											class="absolute inset-y-0 right-0 flex items-center pr-3"
+										>
+											<button class="relative" @click="handleDealSizeUpdate()">
+												<svg
+													v-if="!loading"
+													class="h-4 w-4"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M12 10V15.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M9.75 11.25L12 9L14.25 11.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+												</svg>
+												<svg
+													v-else
+													class="h-4 w-4 animate-spin"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M12 4.75V6.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M17.1266 6.87347L16.0659 7.93413"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M19.25 12L17.75 12"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M17.1266 17.1265L16.0659 16.0659"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M12 17.75V19.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M7.9342 16.0659L6.87354 17.1265"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M6.25 12L4.75 12"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M7.9342 7.93413L6.87354 6.87347"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+												</svg>
+											</button>
+										</div>
+									</div>
 								</div>
 
-								<!-- <div class="flex items-center space-x-2">
-									<CalendarIcon
-										class="h-5 w-5 text-gray-400"
-										aria-hidden="true"
-									/>
-									<span class="text-sm text-gray-900 dark:text-slate-300"
-										>Created
-										<span>{{
-											format(new Date(Ticket.createdOn), 'MMM dd, yyyy')
-										}}</span></span
-									>
-								</div> -->
 								<div class="flex items-center space-x-2">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -2059,6 +2173,14 @@
 		background-size: 200% 100%;
 		font-size: 10px;
 		-webkit-text-fill-color: transparent;
+	}
+
+	.svg-gradient {
+		width: 24px;
+		height: 24px;
+		background: linear-gradient(to bottom, #7000ff, #00c2ff);
+		-webkit-mask: url(#mask) center / contain no-repeat;
+		mask: url(#mask) center / contain no-repeat;
 	}
 
 	@keyframes hue-rotate {

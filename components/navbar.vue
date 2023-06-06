@@ -15,7 +15,7 @@
 					leave-from="opacity-100"
 					leave-to="opacity-0"
 				>
-					<div class="fixed inset-0 bg-gray-900/80" />
+					<div class="fixed inset-0 bg-slate-900/80" />
 				</TransitionChild>
 
 				<div class="fixed inset-0 flex">
@@ -71,8 +71,8 @@
 														:href="item.href"
 														:class="[
 															item.current
-																? 'bg-gray-800 text-white'
-																: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+																? 'bg-slate-800 text-white'
+																: 'text-slate-400 hover:bg-slate-800 hover:text-white',
 															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
 														]"
 													>
@@ -88,7 +88,7 @@
 										</li>
 										<li>
 											<div
-												class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
+												class="flex justify-between text-xs font-semibold leading-6 text-slate-400"
 											>
 												<div>Workspace</div>
 												<button><PlusIcon class="h-5 w-5 text-white" /></button>
@@ -99,13 +99,13 @@
 														to="'/tickets/' + team.id"
 														:class="[
 															route.params.team == team.id
-																? 'bg-gray-800 text-white'
-																: 'text-gray-400 hover:bg-gray-800 hover:text-white',
+																? 'bg-slate-800 text-white'
+																: 'text-slate-400 hover:bg-slate-800 hover:text-white',
 															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
 														]"
 													>
 														<span
-															class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white"
+															class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-[0.625rem] font-medium text-slate-400 group-hover:text-white"
 															>{{ team.initial }}</span
 														>
 														<span class="truncate">{{ team.name }}</span>
@@ -116,7 +116,7 @@
 										<li class="mt-auto">
 											<a
 												href="#"
-												class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
+												class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-slate-400 hover:bg-slate-800 hover:text-white"
 											>
 												<Cog6ToothIcon
 													class="h-6 w-6 shrink-0"
@@ -140,7 +140,7 @@
 		>
 			<!-- Sidebar component, swap this element with another sidebar if you like -->
 			<div
-				class="flex grow flex-col overflow-y-auto border-r border-white/10 bg-gray-50 px-6 pb-4 dark:bg-[#06051A]"
+				class="flex grow flex-col overflow-y-auto border-r border-white/10 bg-slate-50 px-6 pb-4 dark:bg-white/[2%]"
 			>
 				<div
 					class="-mx-2 flex shrink-0 flex-col items-center justify-center space-y-3 pt-4"
@@ -190,12 +190,12 @@
 					<ul role="list" class="flex flex-1 flex-col gap-y-7">
 						<a
 							:class="[
-								'group -mx-6 flex flex-col items-start justify-between space-y-2 px-4 py-4 text-sm font-semibold leading-6 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800',
+								'group -mx-6 flex flex-col items-start justify-between space-y-2 px-4 py-4 text-sm font-semibold leading-6 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-800',
 							]"
 						>
 							<div :class="['flex gap-x-3']">
 								<span
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-400 bg-gray-800 text-sm font-medium text-white uppercase dark:border-gray-700"
+									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-800 text-sm font-medium uppercase text-white dark:border-slate-700"
 									>{{ User.Account.name[0] }}</span
 								>
 								<div class="">
@@ -214,18 +214,15 @@
 						<li>
 							<ul role="list" class="-mx-2 space-y-1">
 								<li
-									v-for="item in User.Account.type === 'super_admin' ||
-									User.Account.type === 'partner'
-										? adminNavigation
-										: navigation"
+									v-for="item in navigation[User.Account.type]"
 									:key="item.name"
 								>
 									<NuxtLink
 										:to="item.href"
 										:class="[
 											route.path === item.href
-												? ' text-gray-900 dark:text-white'
-												: 'text-gray-700 hover:text-gray-900 dark:text-gray-400  dark:hover:text-white',
+												? ' text-slate-900 dark:text-white'
+												: 'text-slate-700 hover:text-slate-900 dark:text-slate-400  dark:hover:text-white',
 											'group flex items-center gap-x-3 rounded-md p-1 text-sm font-normal leading-6 transition-colors',
 										]"
 									>
@@ -233,8 +230,8 @@
 											:is="item.icon"
 											:class="[
 												route.path === item.href
-													? 'text-gray-900 dark:text-indigo-500'
-													: 'text-gray-700',
+													? 'text-slate-900 dark:text-indigo-500'
+													: 'text-slate-700',
 												'h-5 w-5 shrink-0',
 											]"
 											aria-hidden="true"
@@ -251,7 +248,7 @@
 							"
 						>
 							<div
-								class="flex justify-between text-xs font-semibold leading-6 text-gray-400"
+								class="flex justify-between text-xs font-semibold leading-6 text-slate-400"
 							>
 								<div>Workspaces</div>
 							</div>
@@ -262,9 +259,9 @@
 										:class="[
 											route.params.team == team.id
 												? ' dark:text-white'
-												: 'text-gray-600 dark:text-gray-400  dark:hover:text-white',
+												: 'text-slate-600 dark:text-slate-400  dark:hover:text-white',
 											idx === 0
-												? 'border-b border-gray-300 dark:border-gray-800'
+												? 'border-b border-slate-300 dark:border-slate-800'
 												: '',
 											'group flex items-center justify-between text-sm font-semibold leading-6 ',
 										]"
@@ -273,9 +270,9 @@
 											<span
 												:class="[
 													route.params.team == team.id
-														? 'text-gray-900 dark:text-white'
+														? 'text-slate-900 dark:text-white'
 														: '',
-													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-gray-400 group-hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:group-hover:text-white',
+													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-slate-400 group-hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:group-hover:text-white',
 												]"
 												>{{ team.name[0] }}</span
 											>
@@ -299,7 +296,7 @@
 											<span
 												v-if="false"
 												class="ml-auto w-9 min-w-max whitespace-nowrap"
-												><LockClosedIcon class="h-5 w-5 text-gray-200"
+												><LockClosedIcon class="h-5 w-5 text-slate-200"
 											/></span>
 										</div>
 									</NuxtLink>
@@ -307,7 +304,7 @@
 								<button
 									v-if="User.Account.type !== 'super_admin'"
 									:disabled="upgrade_needed"
-									class="group relative flex items-center px-1 py-3 text-sm text-gray-500 disabled:text-gray-300"
+									class="group relative flex items-center px-1 py-3 text-sm text-slate-500 disabled:text-slate-300"
 								>
 									<PlusIcon class="mr-2 h-4 w-4" />New Workspace
 									<upgrade-access
@@ -335,7 +332,7 @@
 									<span class="hidden lg:flex lg:items-center">
 										<span
 											style="font-weight: 100"
-											class="ml-4 text-sm leading-6 text-gray-900 dark:text-white"
+											class="ml-4 text-sm leading-6 text-slate-900 dark:text-white"
 											aria-hidden="true"
 											>{{ User.firstName }} {{ User.lastName }}</span
 										>
@@ -488,70 +485,92 @@
 
 	const route = useRoute();
 
-	const navigation = [
-		{
-			name: 'Dashboard',
-			href: `/${User.Account.id}/dashboard`,
-			icon: ChartBarIcon,
-			current: route.path.includes`/${User.Account.id}/dashboard`,
-		},
-		{
-			name: 'Plan & Billing',
-			href: `/${User.Account.id}/settings/billing`,
-			icon: CreditCardIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
-		{
-			name: 'Settings & Members',
-			href: `/${User.Account.id}/settings`,
-			icon: Cog8ToothIcon,
-			current: route.path.includes(`/${User.Account.id}/settings`),
-		},
-	];
+	const navigation = {
+		client: [
+			{
+				name: 'Dashboard',
+				href: `/${User.Account.id}/dashboard`,
+				icon: ChartBarIcon,
+				current: route.path.includes`/${User.Account.id}/dashboard`,
+			},
+			{
+				name: 'Plan & Billing',
+				href: `/${User.Account.id}/settings/billing`,
+				icon: CreditCardIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
+			{
+				name: 'Settings & Members',
+				href: `/${User.Account.id}/settings`,
+				icon: Cog8ToothIcon,
+				current: route.path.includes(`/${User.Account.id}/settings`),
+			},
+		],
+		partner: [
+			{
+				name: 'Portfolio',
+				href: `/${User.Account.id}/dashboard`,
+				icon: DocumentChartBarIcon,
+				current: route.path.includes`/${User.Account.id}/dashboard`,
+			},
 
-	const adminNavigation = [
-		{
-			name: 'Client organizations',
-			href: `/${User.Account.id}/clients`,
-			icon: BuildingOfficeIcon,
-			current: route.path.includes(`/${User.Account.id}/clients`),
-		},
+			{
+				name: 'Members & Details',
+				href: `/${User.Account.id}/settings`,
+				icon: UsersIcon,
+				current: route.path.includes(`/${User.Account.id}/settings`),
+			},
+			{
+				name: 'Billing info',
+				href: `/${User.Account.id}/settings/billing`,
+				icon: CreditCardIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
 
-		{
-			name: 'Members & Details',
-			href: `/${User.Account.id}/settings`,
-			icon: UsersIcon,
-			current: route.path.includes(`/${User.Account.id}/settings`),
-		},
-		{
-			name: 'Billing info',
-			href: `/${User.Account.id}/settings/billing`,
-			icon: CreditCardIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
+			{
+				name: 'Partner Central',
+				href: `/${User.Account.id}/documentation/partners`,
+				icon: ArrowTopRightOnSquareIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
+		],
+		super_admin: [
+			{
+				name: 'Client organizations',
+				href: `/${User.Account.id}/clients`,
+				icon: BuildingOfficeIcon,
+				current: route.path.includes(`/${User.Account.id}/clients`),
+			},
 
-		{
-			name: 'Cost reports',
-			href: `/${User.Account.id}/cost-reports`,
-			icon: DocumentChartBarIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
-		{
-			name: 'Partner Central',
-			href: `/${User.Account.id}/documentation/partners`,
-			icon: ArrowTopRightOnSquareIcon,
-			current: route.path.includes(`/${User.Account.id}/settings/billing`),
-		},
-	];
+			{
+				name: 'Members & Details',
+				href: `/${User.Account.id}/settings`,
+				icon: UsersIcon,
+				current: route.path.includes(`/${User.Account.id}/settings`),
+			},
+			{
+				name: 'Billing info',
+				href: `/${User.Account.id}/settings/billing`,
+				icon: CreditCardIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
 
-	if (User.Account.type === 'partner') {
-		adminNavigation[0] = {
-			name: 'Dashboard',
-			href: `/${User.Account.id}/dashboard`,
-			icon: ChartBarIcon,
-			current: route.path.includes`/${User.Account.id}/dashboard`,
-		};
-	}
+			{
+				name: 'Cost reports',
+				href: `/${User.Account.id}/cost-reports`,
+				icon: DocumentChartBarIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
+			{
+				name: 'Partner Central',
+				href: `/${User.Account.id}/documentation/partners`,
+				icon: ArrowTopRightOnSquareIcon,
+				current: route.path.includes(`/${User.Account.id}/settings/billing`),
+			},
+		],
+	};
+
+	
 
 	const sidebarOpen = ref(false);
 </script>

@@ -35,10 +35,7 @@
 														class="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-purple-500 sm:text-sm sm:leading-6"
 													>
 														<option
-															v-for="tab in User.Account.partner_type ===
-															'affiliate'
-																? partnerTabs
-																: tabs"
+															v-for="tab in tabs[User.Account.type]"
 															:key="tab.name"
 															:selected="tab.current"
 														>
@@ -56,10 +53,7 @@
 																referrerpolicy="noreferrer"
 																target="_parent"
 																:href="tab.id"
-																v-for="(tab, idx) in User.Account
-																	.partner_type == 'affiliate'
-																	? partnerTabs
-																	: tabs"
+																v-for="(tab, idx) in tabs[User.Account.type]"
 																:key="tab.name"
 																v-slot="{ selected }"
 																class="whitespace-nowrap py-4 text-sm font-medium outline-none"
@@ -78,10 +72,7 @@
 												</TabList>
 												<TabPanels>
 													<TabPanel
-														v-for="(tab, idx) in User.Account.partner_type ==
-														'affiliate'
-															? partnerTabs
-															: tabs"
+														v-for="(tab, idx) in tabs[User.Account.type]"
 														:key="tab.name"
 														><component :is="tab.component"
 													/></TabPanel>
@@ -149,64 +140,65 @@
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select('systemRole,accountId,Account(name,partner_type)')
+		.select('systemRole,accountId,Account(name,type)')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
 
-	const tabs = [
-		{
-			name: 'Subscription',
-			id: '#subscription',
-			component: orgSubscription,
-			href: `/${User.accountId}/settings/billing`,
-			current: true,
-		},
-		{
-			name: 'Usage',
-			id: '#usage',
-			component: orgCosts,
-			href: `/${User.accountId}/settings/billing/cost-management`,
-			current: false,
-		},
+	const tabs = {
+		client: [
+			{
+				name: 'Subscription',
+				id: '#subscription',
+				component: orgSubscription,
+				href: `/${User.accountId}/settings/billing`,
+				current: true,
+			},
+			{
+				name: 'Usage',
+				id: '#usage',
+				component: orgCosts,
+			},
 
-		{
-			name: 'Invoices',
-			id: '#invoices',
-			component: orgInvoices,
-			href: `/${User.accountId}/settings/billing/invoices`,
-			current: false,
-		},
-	];
+			{
+				name: 'Invoices',
+				id: '#invoices',
+				component: orgInvoices,
+			},
+		],
+		partner: [
+			{
+				name: 'Billing info',
+				id: '#subscription',
+				component: orgSubscription,
+			},
+			{
+				name: 'Payouts',
+				id: '#invoices',
+				component: orgInvoices,
+			},
+		],
+		super_admin : [
+			{
+				name: 'Subscription',
+				id: '#subscription',
+				component: orgSubscription,
+				href: `/${User.accountId}/settings/billing`,
+				current: true,
+			},
+			{
+				name: 'Usage',
+				id: '#usage',
+				component: orgCosts,
+			},
 
-	const partnerTabs = [
-		{
-			name: 'Billing info',
-			id: '#subscription',
-			component: orgSubscription,
-			href: `/${User.accountId}/settings/billing`,
-			current: true,
-		},
-		{
-			name: 'Invoices',
-			id: '#invoices',
-			component: orgInvoices,
-			href: `/${User.accountId}/settings/billing/invoices`,
-			current: false,
-		},
-	];
-
-	console.log(route);
-
-	const selectedTab = ref(
-		tabs.findIndex((o) => o.id === route.hash) !== ''
-			? tabs.findIndex((o) => o.id === route.hash)
-			: 0
-	);
-
-	function changeTab(index) {
-		selectedTab.value = index;
-	}
+			{
+				name: 'Invoices',
+				id: '#invoices',
+				component: orgInvoices,
+			},
+		],
+	};
 
 	const sidebarOpen = ref(false);
 </script>

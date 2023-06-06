@@ -6,14 +6,7 @@ export default defineEventHandler(async (event) => {
 	const currentDate = new Date();
 	const firstDay = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-	const { data: User } = await supabase
-		.from('User')
-		.select('id,Account(trayBearerToken)')
-		.eq('id', user.id);
-
-	const tray_key = User.Account
-		? 'd65c23cd63324565b2541cd6fad80f585510039a5d3d4bd59b3021f7ef97c268'
-		: 'd65c23cd63324565b2541cd6fad80f585510039a5d3d4bd59b3021f7ef97c268';
+	const tray_key = process.env.TRAY_IM_KEY;
 	const { id } = event.context.params;
 	const filters = id !== 'null' ? { workspaces: [id] } : {};
 

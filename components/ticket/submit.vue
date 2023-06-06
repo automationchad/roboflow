@@ -78,106 +78,167 @@
 
 	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
-	const ticketTypes = [
-		{
-			id: 'asap',
-			type: 'engineering',
-			title: 'ASAP 1:1',
-			desc: 'On-demand support. Join waiting room after checkout. Be sure to have a stable connection with Zoom access.',
-		},
-		{
-			id: 'scheduled',
-			type: 'engineering',
-			title: 'Scheduled 1:1',
-			desc: "Book a call up to 2 weeks in advance. If your requested time isn't available, we'll email you with alternate times.",
-		},
-		{
-			id: 'bug',
-			type: 'engineering',
-			title: 'Modify an existing automation',
-			min_plan: 'support',
-			gated: retainer.tier === 'free' || retainer.status === 'paused',
-			desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
-		},
-		{
-			id: 'new',
-			type: 'engineering',
-			title: 'Create a new automation project',
-			min_plan: 'growth',
-			gated:
-				(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-				retainer.status === 'paused',
-			desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
-		},
-		{
-			id: 'dashboard_bug',
-			type: 'engineering',
-			title: 'Dashboard bug',
-			desc: 'Issues with Motis dashboard',
-		},
-		{
-			id: 'performance_issues',
-			type: 'engineering',
-			title: 'Perfomance issues',
-			min_plan: 'enterprise',
-			gated:
-				(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-				retainer.status === 'paused',
-			desc: 'Reporting of performance issues is only available on the Enterprise tier',
-		},
-		{
-			id: 'sales_inquiry',
-			type: 'sales',
-			title: 'Sales enquiry',
-			desc: 'Questions about pricing, paid plans and Enterprise plans.',
-		},
-		{
-			id: 'billing',
-			type: 'sales',
-			title: 'Billing',
-			desc: 'Issues with credit card charges | invoices | overcharging',
-		},
-		{
-			id: 'abuse',
-			type: 'sales',
-			title: 'Abuse report',
-			desc: 'Report abuse of a Motis project or Motis brand',
-		},
-	];
+	const types = {
+		client: [
+			{
+				id: 'asap',
+				type: 'engineering',
+				title: 'ASAP 1:1',
+				desc: 'On-demand support. Join waiting room after checkout. Be sure to have a stable connection with Zoom access.',
+			},
+			{
+				id: 'scheduled',
+				type: 'engineering',
+				title: 'Scheduled 1:1',
+				desc: "Book a call up to 2 weeks in advance. If your requested time isn't available, we'll email you with alternate times.",
+			},
+			{
+				id: 'bug',
+				type: 'engineering',
+				title: 'Modify an existing automation',
+				min_plan: 'support',
+				gated: retainer.tier === 'free' || retainer.status === 'paused',
+				desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
+			},
+			{
+				id: 'new',
+				type: 'engineering',
+				title: 'Create a new automation project',
+				min_plan: 'growth',
+				gated:
+					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
+					retainer.status === 'paused',
+				desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
+			},
+			{
+				id: 'dashboard_bug',
+				type: 'engineering',
+				title: 'Dashboard bug',
+				desc: 'Issues with Motis dashboard',
+			},
+			{
+				id: 'performance_issues',
+				type: 'engineering',
+				title: 'Perfomance issues',
+				min_plan: 'enterprise',
+				gated:
+					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
+					retainer.status === 'paused',
+				desc: 'Reporting of performance issues is only available on the Enterprise tier',
+			},
+			{
+				id: 'sales_inquiry',
+				type: 'sales',
+				title: 'Sales enquiry',
+				desc: 'Questions about pricing, paid plans and Enterprise plans.',
+			},
+			{
+				id: 'billing',
+				type: 'sales',
+				title: 'Billing',
+				desc: 'Issues with credit card charges | invoices | overcharging',
+			},
+			{
+				id: 'abuse',
+				type: 'sales',
+				title: 'Abuse report',
+				desc: 'Report abuse of a Motis project or Motis brand',
+			},
+		],
+		partner: [
+			{
+				id: 'referral',
+				type: 'sales',
+				title: 'New deal registration',
+				desc: "Submit a new referral deal. As a partner, we'll kick back anything you help us close.",
+			},
+			{
+				id: 'sales_inquiry',
+				type: 'sales',
+				title: 'Sales enquiry',
+				desc: 'Questions about pricing, paid plans and Enterprise plans.',
+			},
 
-	const partnerTicketTypes = [
-		{
-			id: 'referral',
-			type: 'sales',
-			title: 'New deal registration',
-			desc: "Submit a new referral deal. As a partner, we'll kick back anything you help us close.",
-		},
-		{
-			id: 'sales_inquiry',
-			type: 'sales',
-			title: 'Sales enquiry',
-			desc: 'Questions about pricing, paid plans and Enterprise plans.',
-		},
-
-		{
-			id: 'billing',
-			type: 'sales',
-			title: 'Billing',
-			desc: 'Issues with credit card charges | invoices | overcharging',
-		},
-		{
-			id: 'dashboard_bug',
-			type: 'engineering',
-			title: 'Dashboard bug',
-			desc: 'Issues with Motis dashboard',
-		},
-		{
-			id: 'abuse',
-			type: 'sales',
-			title: 'Abuse report',
-			desc: 'Report abuse of a Motis project or Motis brand',
-		},
-	];
+			{
+				id: 'billing',
+				type: 'sales',
+				title: 'Billing',
+				desc: 'Issues with credit card charges | invoices | overcharging',
+			},
+			{
+				id: 'dashboard_bug',
+				type: 'engineering',
+				title: 'Dashboard bug',
+				desc: 'Issues with Motis dashboard',
+			},
+			{
+				id: 'abuse',
+				type: 'sales',
+				title: 'Abuse report',
+				desc: 'Report abuse of a Motis project or Motis brand',
+			},
+		],
+		super_admin: [
+			{
+				id: 'bug',
+				type: 'engineering',
+				title: 'Modify an existing automation',
+				min_plan: 'support',
+				gated: retainer.tier === 'free' || retainer.status === 'paused',
+				desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
+			},
+			{
+				id: 'new',
+				type: 'engineering',
+				title: 'Create a new automation project',
+				min_plan: 'growth',
+				gated:
+					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
+					retainer.status === 'paused',
+				desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
+			},
+			{
+				id: 'dashboard_bug',
+				type: 'engineering',
+				title: 'Dashboard bug',
+				desc: 'Issues with Motis dashboard',
+			},
+			{
+				id: 'performance_issues',
+				type: 'engineering',
+				title: 'Perfomance issues',
+				min_plan: 'enterprise',
+				gated:
+					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
+					retainer.status === 'paused',
+				desc: 'Reporting of performance issues is only available on the Enterprise tier',
+			},
+			{
+				id: 'referral',
+				type: 'sales',
+				title: 'New deal registration',
+				desc: "Submit a new referral deal. As a partner, we'll kick back anything you help us close.",
+			},
+			{
+				id: 'sales_inquiry',
+				type: 'sales',
+				title: 'Sales enquiry',
+				desc: 'Questions about pricing, paid plans and Enterprise plans.',
+			},
+			{
+				id: 'billing',
+				type: 'sales',
+				title: 'Billing',
+				desc: 'Issues with credit card charges | invoices | overcharging',
+			},
+			{
+				id: 'abuse',
+				type: 'sales',
+				title: 'Abuse report',
+				desc: 'Report abuse of a Motis project or Motis brand',
+			},
+		],
+	};
 
 	const severityTypes = [
 		{
@@ -218,14 +279,9 @@
 	];
 	const selectedSeverity = severityTypes[0];
 
-	const selectedTicket = ref(
-		User.Account.type === 'partner'
-			? partnerTicketTypes[0]
-			: ticketTypes[0]
-	);
+	const selectedTicket = ref(types[User.Account.type][0]);
 
-	const accountId =
-		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
+	const accountId = route.params.organization;
 	const teamId =
 		User.Account.type === 'super_admin'
 			? User.defaultTeamId
@@ -439,10 +495,7 @@
 													>
 														<ListboxOption
 															as="template"
-															v-for="ticketType in User.Account.type ===
-															'partner'
-																? partnerTicketTypes
-																: ticketTypes"
+															v-for="ticketType in types[User.Account.type]"
 															:key="ticketType.id"
 															:value="ticketType"
 															:disabled="ticketType.gated"
