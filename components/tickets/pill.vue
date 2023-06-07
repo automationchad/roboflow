@@ -1,7 +1,7 @@
 <template>
 	<NuxtLink
 		class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm transition-colors hover:border-gray-400 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
-		:to="ticket.type !== 'asap' ? `/${route.params.team}/tickets/${ticket.id}` : `${ticket.desc}`"
+		:to="ticket.type !== 'asap' ? `/${route.params.organization}/tickets/${ticket.id}` : `${ticket.desc}`"
 		><div class="min-w-0 flex-1">
 			<div class="rounded-xl focus:outline-none">
 				<div class="flex justify-between">

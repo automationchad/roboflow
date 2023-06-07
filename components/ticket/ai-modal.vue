@@ -40,7 +40,7 @@
 	const stored_prompt = ref('');
 	const stored_subtype = ref('');
 	const stored_ai_response = ref(false);
-	const showDiv = ref(false);
+	
 
 	const { data: Ticket, ticketError: error } = await supabase
 		.from('Ticket')
@@ -49,19 +49,7 @@
 		.limit(1)
 		.single();
 
-	function handleKeydown(event) {
-		if (event.ctrlKey) {
-			showDiv.value = !showDiv.value;
-		}
-	}
-
-	onMounted(() => {
-		window.addEventListener('keydown', handleKeydown);
-	});
-
-	onUnmounted(() => {
-		window.removeEventListener('keydown', handleKeydown);
-	});
+	
 
 	async function typewriterEffect() {
 		shouldType.value = true;
@@ -184,15 +172,8 @@
 </script>
 
 <template>
-	<transition
-		enter-active-class="transition ease-out duration-100"
-		enter-from-class="transform opacity-0 scale-95"
-		enter-to-class="transform opacity-100 scale-100"
-		leave-active-class="transition ease-in duration-75"
-		leave-from-class="transform opacity-100 scale-100"
-		leave-to-class="transform opacity-0 scale-95"
-	>
-		<div class="space-y-3" v-if="showDiv">
+	
+		<div class="space-y-3">
 			<transition
 				enter-active-class="transition ease-out duration-100"
 				enter-from-class="transform opacity-0 scale-95"
@@ -1034,7 +1015,7 @@
 				</Menu>
 			</div>
 		</div>
-	</transition>
+	
 </template>
 
 const menuItems = [];

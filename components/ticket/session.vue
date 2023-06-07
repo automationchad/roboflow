@@ -92,11 +92,11 @@
 		.single();
 
 	const accountId =
-		User.Account.type === 'super_admin' ? route.params.team : User.Account.id;
+		User.Account.type === 'super_admin' ? route.params.organization : User.Account.id;
 	const teamId =
 		User.Account.type === 'super_admin'
 			? User.defaultTeamId
-			: route.params.team;
+			: route.params.org;
 
 	const { data: Account, error: accountError } = await supabase
 		.from('Account')
@@ -165,7 +165,6 @@
 					dueDate: due_date.value,
 					accountId: accountId,
 					assignedTo: accountManager.id,
-					teamId: teamId,
 					desc: body.brief,
 				},
 			])

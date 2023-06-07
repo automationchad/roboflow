@@ -282,10 +282,6 @@
 	const selectedTicket = ref(types[User.Account.type][0]);
 
 	const accountId = route.params.organization;
-	const teamId =
-		User.Account.type === 'super_admin'
-			? User.defaultTeamId
-			: route.params.team;
 
 	const { data: Account, error: accountError } = await supabase
 		.from('Account')
@@ -378,7 +374,7 @@
 					dueDate: due_date.value ?? new Date(),
 					accountId: accountId,
 					assignedTo: accountManager.id,
-					teamId: teamId,
+					
 					desc: body.brief,
 				},
 			])

@@ -30,7 +30,7 @@
 			leave-to-class="transform scale-95 opacity-0"
 		>
 			<MenuItems
-				class="absolute bottom-16 mt-2 w-56 origin-bottom-left py-1 divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:divide-slate-700 overflow-hidden dark:bg-slate-800 dark:ring-white dark:ring-opacity-10"
+				class="absolute bottom-16 mt-2 w-56 origin-bottom-left divide-y divide-gray-100 overflow-hidden rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:divide-slate-700 dark:bg-slate-800 dark:ring-white dark:ring-opacity-10"
 			>
 				<div class="space-y-1">
 					<MenuItem v-slot="{ active }">
@@ -121,7 +121,8 @@
 				</div>
 				<div class="space-y-1">
 					<MenuItem v-slot="{ active }">
-						<NuxtLink to="/tickets"
+						<NuxtLink
+							to="/tickets"
 							:class="[
 								active
 									? 'bg-slate-50 text-slate-900 dark:bg-slate-700 dark:text-white'
@@ -147,8 +148,6 @@
 	import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 	import slackmark from '~/assets/images/logos/slackmark.vue';
 	import {
-		ChevronDownIcon,
-		ArchiveIcon,
 		QuestionMarkCircleIcon,
 		ChatBubbleOvalLeftIcon,
 		DocumentTextIcon,

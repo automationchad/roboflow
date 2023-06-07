@@ -56,7 +56,7 @@
 											<NuxtLink
 												v-if="deals.length > 0"
 												v-for="(deal, idx) in deals"
-												:to="`/${deal.teamId}/tickets/${deal.id}`"
+												:to="`/${route.params.organization}/tickets/${deal.id}`"
 												:key="deal.name"
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-white/[2%]"
 											>

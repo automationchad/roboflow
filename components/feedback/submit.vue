@@ -287,8 +287,7 @@
 				status: 'backlog',
 				createdBy: user.value.id,
 				dueDate: due_date,
-				accountId: User.Account.id,
-				teamId: route.params.team,
+				accountId: route.params.organization,
 				desc: body.brief + (link.value ? `\n [Video link](${link.value})` : ''),
 			},
 		]);

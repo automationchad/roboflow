@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<TransitionRoot as="template" :show="sidebarOpen">
+		<div class=""><TransitionRoot as="template" :show="sidebarOpen">
 			<Dialog
 				as="div"
 				class="relative z-50 lg:hidden"
@@ -63,76 +63,15 @@
 									/>
 								</div>
 								<nav class="flex flex-1 flex-col">
-									<ul role="list" class="flex flex-1 flex-col gap-y-7">
-										<li>
-											<ul role="list" class="-mx-2 space-y-1">
-												<li v-for="item in navigation" :key="item.name">
-													<a
-														:href="item.href"
-														:class="[
-															item.current
-																? 'bg-slate-800 text-white'
-																: 'text-slate-400 hover:bg-slate-800 hover:text-white',
-															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-														]"
-													>
-														<component
-															:is="item.icon"
-															class="h-4 w-4 shrink-0"
-															aria-hidden="true"
-														/>
-														{{ item.name }}
-													</a>
-												</li>
-											</ul>
-										</li>
-										<li>
-											<div
-												class="flex justify-between text-xs font-semibold leading-6 text-slate-400"
-											>
-												<div>Workspace</div>
-												<button><PlusIcon class="h-5 w-5 text-white" /></button>
-											</div>
-											<ul role="list" class="-mx-2 mt-2 space-y-1">
-												<li v-for="team in teams" :key="team.name">
-													<NuxtLink
-														to="'/tickets/' + team.id"
-														:class="[
-															route.params.organization == team.id
-																? 'bg-slate-800 text-white'
-																: 'text-slate-400 hover:bg-slate-800 hover:text-white',
-															'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
-														]"
-													>
-														<span
-															class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-[0.625rem] font-medium text-slate-400 group-hover:text-white"
-															>{{ team.initial }}</span
-														>
-														<span class="truncate">{{ team.name }}</span>
-													</NuxtLink>
-												</li>
-											</ul>
-										</li>
-										<li class="mt-auto">
-											<a
-												href="#"
-												class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-slate-400 hover:bg-slate-800 hover:text-white"
-											>
-												<Cog6ToothIcon
-													class="h-6 w-6 shrink-0"
-													aria-hidden="true"
-												/>
-												Settings
-											</a>
-										</li>
-									</ul>
+									
 								</nav>
 							</div>
 						</DialogPanel>
 					</TransitionChild>
 				</div>
 			</Dialog>
-		</TransitionRoot>
+		</TransitionRoot></div>
+		
 
 		<!-- Static sidebar for desktop -->
 		<div
@@ -186,161 +125,73 @@
 						>
 					</div>
 				</div>
-				<nav class="flex flex-1 flex-col">
-					<ul role="list" class="flex flex-1 flex-col gap-y-7">
-						<a
-							:class="[
-								'group -mx-6 flex flex-col items-start justify-between space-y-2 px-4 py-4 text-sm font-semibold leading-6 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-800',
-							]"
+				<div class="px-4 py-12 sm:px-6 lg:px-8">
+			<nav class="flex justify-center" aria-label="Progress">
+				<ol role="list" class="space-y-6">
+					<li v-for="(step, index) in stepSelector" :key="step.name">
+						<button
+							:disabled="index === 0"
+							@click="currentStep = index"
+							v-if="index < currentStep || index === 0"
+							class="group"
 						>
-							<div :class="['flex gap-x-3']">
+							<span class="flex items-start">
 								<span
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-800 text-sm font-medium uppercase text-white dark:border-slate-700"
-									>{{ User.Account.name[0] }}</span
+									class="relative flex h-5 w-5 flex-shrink-0 items-center justify-center"
 								>
-								<div class="">
-									<p
-										class="text-xs font-normal text-slate-600 dark:text-slate-400"
-									>
-										Organization
-									</p>
-									<span class="truncate text-base">{{
-										User.Account.name
-									}}</span>
-								</div>
-							</div>
-						</a>
-
-						<li>
-							<ul role="list" class="-mx-2 space-y-1">
-								<li
-									v-for="item in navigation[User.Account.type]"
-									:key="item.name"
+									<CheckCircleIcon
+										class="h-full w-full text-indigo-600 group-hover:text-indigo-800"
+										aria-hidden="true"
+									/>
+								</span>
+								<span
+									class="ml-3 text-sm font-medium text-gray-500 group-hover:text-gray-900"
+									>{{ step.name }}</span
 								>
-									<NuxtLink
-										:to="item.href"
-										:class="[
-											route.path === item.href
-												? ' text-slate-900 dark:text-white'
-												: 'text-slate-700 hover:text-slate-900 dark:text-slate-400  dark:hover:text-white',
-											'group flex items-center gap-x-3 rounded-md p-1 text-sm font-normal leading-6 transition-colors',
-										]"
-									>
-										<component
-											:is="item.icon"
-											:class="[
-												route.path === item.href
-													? 'text-slate-900 dark:text-indigo-500'
-													: 'text-slate-700',
-												'h-5 w-5 shrink-0',
-											]"
-											aria-hidden="true"
-										/>
-										{{ item.name }}
-									</NuxtLink>
-								</li>
-							</ul>
-						</li>
-						<li
-							v-if="
-								User.Account.type !== 'super_admin' &&
-								User.Account.type !== 'partner'
-							"
+							</span>
+						</button>
+						<button
+							@click="currentStep = index"
+							v-else-if="index === currentStep"
+							class="flex items-start"
+							aria-current="step"
 						>
-							<div
-								class="flex justify-between text-xs font-semibold leading-6 text-slate-400"
+							<span
+								class="relative flex h-5 w-5 flex-shrink-0 items-center justify-center"
+								aria-hidden="true"
 							>
-								<div>Workspaces</div>
-							</div>
-							<ul role="list" class="-ml-2 mt-2 space-y-1">
-								<li v-for="(team, idx) in teams" :key="team.name">
-									<NuxtLink
-										:to="`/${team.accountId}/tickets`"
-										:class="[
-											route.params.organization == team.id
-												? ' dark:text-white'
-												: 'text-slate-600 dark:text-slate-400  dark:hover:text-white',
-											idx === 0
-												? 'border-b border-slate-300 dark:border-slate-800'
-												: '',
-											'group flex items-center justify-between text-sm font-semibold leading-6 ',
-										]"
-									>
-										<div :class="['flex gap-x-3  p-2']">
-											<span
-												:class="[
-													route.params.organization == team.id
-														? 'text-slate-900 dark:text-white'
-														: '',
-													'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-slate-300  text-[0.625rem] font-medium text-slate-400 group-hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:group-hover:text-white',
-												]"
-												>{{ team.name[0] }}</span
-											>
-											<span class="truncate font-normal">{{ team.name }}</span>
-										</div>
-										<div class="flex items-center" v-if="team.Ticket">
-											<div
-												v-if="
-													team.Ticket.filter((o) => o.status !== 'done').length
-												"
-												class="flex items-center text-xs font-normal"
-											>
-												<span
-													class="inline-flex h-min w-min items-center rounded-full bg-rose-700 px-2 text-xs font-medium text-white"
-													>{{
-														team.Ticket.filter((o) => o.status !== 'done')
-															.length
-													}}</span
-												>
-											</div>
-											<span
-												v-if="false"
-												class="ml-auto w-9 min-w-max whitespace-nowrap"
-												><LockClosedIcon class="h-5 w-5 text-slate-200"
-											/></span>
-										</div>
-									</NuxtLink>
-								</li>
-								<button
-									v-if="User.Account.type !== 'super_admin'"
-									:disabled="upgrade_needed"
-									class="group relative flex items-center px-1 py-3 text-sm text-slate-500 disabled:text-slate-300"
+								<span class="absolute h-4 w-4 rounded-full bg-indigo-200" />
+								<span
+									class="relative block h-2 w-2 rounded-full bg-indigo-600"
+								/>
+							</span>
+							<span class="ml-3 text-sm font-medium text-indigo-600">{{
+								step.name
+							}}</span>
+						</button>
+						<button v-else @click="currentStep = index" class="group">
+							<div class="flex items-start">
+								<div
+									class="relative flex h-5 w-5 flex-shrink-0 items-center justify-center"
+									aria-hidden="true"
 								>
-									<PlusIcon class="mr-2 h-4 w-4" />New Workspace
-									<upgrade-access
-										:object="'workspaces'"
-										v-if="upgrade_needed"
+									<div
+										class="h-2 w-2 rounded-full bg-gray-300 group-hover:bg-gray-400"
 									/>
-								</button>
-							</ul>
-						</li>
-
-						<li class="mt-auto space-y-2">
-							<div class="relative">
-								<help />
+								</div>
+								<p
+									class="ml-3 text-sm font-medium text-gray-500 group-hover:text-gray-900"
+								>
+									{{ step.name }}
+								</p>
 							</div>
-
-							<div class="relative">
-								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">
-									<img
-										class="flex h-8 w-8 items-center justify-center rounded-full border object-cover text-xs dark:border-slate-700"
-										alt=""
-										:src="avatarUrl"
-									/>
-									<div></div>
-
-									<span class="hidden lg:flex lg:items-center">
-										<span
-											style="font-weight: 100"
-											class="ml-4 text-sm leading-6 text-slate-900 dark:text-white"
-											aria-hidden="true"
-											>{{ User.firstName }} {{ User.lastName }}</span
-										>
-									</span>
-								</NuxtLink>
-							</div>
-						</li>
-					</ul>
+						</button>
+					</li>
+				</ol>
+			</nav>
+		</div>
+				<nav class="flex flex-1 flex-col">
+					
 				</nav>
 			</div>
 		</div>
@@ -407,8 +258,7 @@
 				 Subscription(*),
 				 Team (
 					id,
-					name,
-					accountId
+					name
 				 ),
 				 Ticket (count)
 			   )

@@ -55,9 +55,9 @@
 		const response =
 			User.Account.type === 'super_admin'
 				? Ticket.sort((a, b) => b['dueDate'] - a['dueDate']).filter(
-						(o) => o.accountId === route.params.team
+						(o) => o.accountId === route.params.organization
 				  )
-				: User.Account.Ticket.filter((o) => o.teamId === route.params.team);
+				: User.Account.Ticket.filter((o) => o.teamId === route.params.organization);
 		tickets.value = response;
 		active_tickets.value = response.filter(
 			(ticket) => ticket.status === 'active'
