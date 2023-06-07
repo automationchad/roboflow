@@ -1,7 +1,7 @@
 <template>
 	<div class="h-screen" v-if="!user">
 		<div
-			class="grid h-full grid-cols-1 items-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24"
+			class="grid h-full grid-cols-1 items-start px-4 pt-24 sm:px-6 lg:px-20 xl:px-24"
 		>
 			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96">
 				<div>
@@ -27,33 +27,6 @@
 				</div>
 
 				<div class="mt-8">
-					<div class="rounded-md bg-green-50 p-4" v-if="is_success">
-						<div class="flex">
-							<div class="flex-shrink-0">
-								<CheckCircleIcon
-									class="h-5 w-5 text-green-400"
-									aria-hidden="true"
-								/>
-							</div>
-							<div class="ml-3">
-								<p class="text-sm text-green-600">
-									Success, check your email for verification link!
-								</p>
-							</div>
-							<div class="ml-auto pl-3">
-								<div class="-mx-1.5 -my-1.5">
-									<button
-										@click="is_success = false"
-										type="button"
-										class="inline-flex rounded-md bg-green-50 p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50"
-									>
-										<span class="sr-only">Dismiss</span>
-										<XMarkIcon class="h-5 w-5" aria-hidden="true" />
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
 					<div class="rounded-md bg-red-50 p-4" v-if="is_error">
 						<div class="flex">
 							<div class="flex-shrink-0">
@@ -66,8 +39,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="mt-6 text-gray-900 dark:text-white">
-						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
+					<div class="mt-6 text-gray-900 dark:text-white" v-if="!is_success">
+						<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
 							<div>
 								<label
 									for="first-name"
@@ -81,7 +54,7 @@
 										name="first-name"
 										id="first-name"
 										autocomplete="given-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -98,7 +71,7 @@
 										name="last-name"
 										id="last-name"
 										autocomplete="family-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -115,7 +88,7 @@
 										name="company"
 										id="company"
 										autocomplete="organization"
-										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -159,7 +132,7 @@
 								<button
 									:disabled="loading"
 									@click="signUp()"
-									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									<svg
 										v-if="loading"
@@ -230,9 +203,33 @@
 							</div>
 						</div>
 					</div>
+					<div class="" v-else>
+						<div>
+							<h2
+								class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
+							>
+								✅ Success! Please confirm your email
+							</h2>
+							<p class="text-gray-800 dark:text-gray-100">
+								In order to login please navigate to your email inbox and
+								confirm the confirmation email 📧 that we have sent you (please
+								check spam too)
+							</p>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal v-if="is_success" @close="is_success = false" :title="'Successfully created profile'" :description="''" />
+		</transition>
 	</div>
 </template>
 
@@ -267,7 +264,7 @@
 	const last_name = ref('');
 
 	const is_error = ref(false);
-	const is_success = ref(false);
+	const is_success = ref(true);
 	const error_message = ref('');
 	const loading = ref(false);
 

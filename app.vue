@@ -1,5 +1,5 @@
 <template>
-	<div class="min-h-screen bg-white dark:bg-[#020014]">
+	<div class="dark:bg-[#020014] min-h-screen bg-white">
 		<NuxtLayout
 			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
 		/></NuxtLayout>
@@ -14,6 +14,18 @@
 		font-smooth: always;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		html {
+			background: #020014;
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		html {
+			background: #fff;
+		}
 	}
 
 	html {
