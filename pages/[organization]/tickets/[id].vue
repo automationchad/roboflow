@@ -45,23 +45,4 @@
 	});
 
 	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
-	   )`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
 </script>

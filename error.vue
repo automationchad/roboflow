@@ -26,13 +26,13 @@
 				>
 					{{ error.message.split(':')[0] }}
 				</h1>
-				<p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
+				<!-- <p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
 					{{
 						error.statusCode === 404
 							? 'Sorry, we couldn’t find the page you’re looking for.'
 							: error
 					}}
-				</p>
+				</p> -->
 				<div class="mt-10">
 					<a href="/" class="text-sm font-semibold leading-7 text-indigo-600"
 						><span aria-hidden="true">&larr;</span> Back to home</a

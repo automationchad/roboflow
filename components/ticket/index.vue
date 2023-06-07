@@ -1,6 +1,6 @@
 <script setup>
-	import { ref } from 'vue';
-
+	// Import all necessary libraries and components
+	import { ref, computed } from 'vue';
 	import {
 		Dialog,
 		DialogPanel,
@@ -22,7 +22,6 @@
 		ComboboxOptions,
 		Switch,
 	} from '@headlessui/vue';
-
 	import {
 		ArchiveBoxIcon,
 		Bars3BottomLeftIcon,
@@ -54,12 +53,14 @@
 		ChevronUpDownIcon,
 		UserCircleIcon as UserCircleIconMini,
 	} from '@heroicons/vue/20/solid';
-
 	import showdown from 'showdown';
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
 
+	// Define all constants and reactive variables
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
+	const route = useRoute();
+	const props = defineProps(['open', 'comments']);
 
 	const publishingOptions = [
 		{
@@ -78,17 +79,12 @@
 
 	const selected = ref(publishingOptions[0]);
 
-	const route = useRoute();
-	const props = defineProps(['open', 'comments']);
-
 	const converter = await new showdown.Converter();
 
 	const loading = ref(true);
 
 	const ticketAvatar = ref(null);
-
 	const currentAvatar = ref(null);
-
 	const assignedToAvatar = ref(null);
 
 	const comments = ref([]);
@@ -170,23 +166,6 @@
 		showImageModal.value = !showImageModal.value;
 	};
 
-	const ticketDate = (timestamp) => {
-		const createdDate = new Date(timestamp);
-		const today = new Date();
-
-		if (
-			createdDate.getDate() === today.getDate() &&
-			createdDate.getMonth() === today.getMonth() &&
-			createdDate.getFullYear() === today.getFullYear()
-		) {
-			// Created date is today
-			return format(createdDate, 'hh:mm aa');
-		} else {
-			// Created date is not today
-			return format(createdDate, 'MMM dd, hh:mm aa');
-		}
-	};
-
 	const styles = {
 		referral:
 			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300  text-pink-900 dark:text-pink-200',
@@ -251,7 +230,14 @@
 		.limit(1)
 		.single();
 
-	let { data: Ticket, error } = await supabase
+	class CustomError extends Error {
+		constructor(code, message) {
+			super(message);
+			this.code = code;
+		}
+	}
+
+	let { data: Ticket, error: ticketError } = await supabase
 		.from('Ticket')
 		.select(
 			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
@@ -260,7 +246,13 @@
 		.limit(1)
 		.single();
 
-	selectedPerson.value = people.find((o) => o.id === Ticket.status);
+	if (!Ticket) {
+		navigateTo('/ticket-not-found');
+		throw new CustomError(404, 'Ticket not found');
+	}
+
+	selectedPerson.value = people.find((o) => o.id === Ticket?.status);
+
 	const filteredPeople = computed(() =>
 		query.value === ''
 			? people
@@ -272,10 +264,6 @@
 	dealSize.value = Ticket.deal_size;
 
 	const input = ref(Ticket.desc);
-
-	if (!Ticket) {
-		navigateTo('/ticket-not-found');
-	}
 
 	const dueDate = computed(() => {
 		return formatDistance(new Date(Ticket.dueDate), new Date(), {
@@ -336,49 +324,79 @@
 		return images;
 	};
 
-	const getAvatarUrl = async (avatar) => {
+	// Define a general function to fetch from Supabase storage
+	const fetchFromStorage = async (storageName, searchParam) => {
 		const {
 			data: [File],
 			error: fileError,
-		} = await supabase.storage.from('avatars').list(`${avatar}`, {
+		} = await supabase.storage.from(storageName).list(`${searchParam}`, {
 			limit: 100,
 			offset: 0,
 			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${avatar}`,
+			search: `${searchParam}`,
 		});
 
 		if (File) {
 			const {
 				data: { publicUrl },
 			} = await supabase.storage
-				.from('avatars')
-				.getPublicUrl(`/${avatar}/${File.name}`);
+				.from(storageName)
+				.getPublicUrl(`/${searchParam}/${File.name}`);
 
 			return publicUrl;
 		} else return '';
 	};
 
-	const getCommentImageUrl = async (id) => {
-		const {
-			data: [File],
-			error: fileError,
-		} = await supabase.storage.from('images').list(`comments`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${id}`,
-		});
+	// Refactor getAvatarUrl, getCommentImageUrl, and getTicketAttachments
+	// to use the general fetchFromStorage function
+	const getAvatarUrl = async (avatar) => fetchFromStorage('avatars', avatar);
+	const getCommentImageUrl = async (id) =>
+		fetchFromStorage('images', `comments/${id}`);
+	// const getTicketAttachments = async (id) => fetchFromStorage('images', `attachments/${id}`);
 
-		if (File) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from('images')
-				.getPublicUrl(`/comments/${File.name}`);
+	// const getAvatarUrl = async (avatar) => {
+	// 	const {
+	// 		data: [File],
+	// 		error: fileError,
+	// 	} = await supabase.storage.from('avatars').list(`${avatar}`, {
+	// 		limit: 100,
+	// 		offset: 0,
+	// 		sortBy: { column: 'updated_at', order: 'desc' },
+	// 		search: `${avatar}`,
+	// 	});
 
-			return publicUrl;
-		} else return '';
-	};
+	// 	if (File) {
+	// 		const {
+	// 			data: { publicUrl },
+	// 		} = await supabase.storage
+	// 			.from('avatars')
+	// 			.getPublicUrl(`/${avatar}/${File.name}`);
+
+	// 		return publicUrl;
+	// 	} else return '';
+	// };
+
+	// const getCommentImageUrl = async (id) => {
+	// 	const {
+	// 		data: [File],
+	// 		error: fileError,
+	// 	} = await supabase.storage.from('images').list(`comments`, {
+	// 		limit: 100,
+	// 		offset: 0,
+	// 		sortBy: { column: 'updated_at', order: 'desc' },
+	// 		search: `${id}`,
+	// 	});
+
+	// 	if (File) {
+	// 		const {
+	// 			data: { publicUrl },
+	// 		} = await supabase.storage
+	// 			.from('images')
+	// 			.getPublicUrl(`/comments/${File.name}`);
+
+	// 		return publicUrl;
+	// 	} else return '';
+	// };
 
 	const fetchComments = async () => {
 		let { data: Ticket, error } = await supabase
