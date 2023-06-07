@@ -67,7 +67,7 @@
 	}
 
 	async function sendAIRequest(subtype, ai_response) {
-		const url = 'http://localhost:3000/api/tray/tracy';
+		const url = '/api/tray/tracy';
 		stored_subtype.value = subtype;
 		stored_ai_response.value = ai_response;
 		const data = {
