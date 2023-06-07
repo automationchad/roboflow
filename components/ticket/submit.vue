@@ -372,9 +372,8 @@
 					type: selectedTicket.value.id,
 					createdBy: user.value.id,
 					dueDate: due_date.value ?? new Date(),
-					accountId: accountId,
+					accountId: route.params.organization,
 					assignedTo: accountManager.id,
-					
 					desc: body.brief,
 				},
 			])

@@ -54,11 +54,24 @@
 												</div>
 											</div>
 											<NuxtLink
-												v-if="deals.length > 0"
-												v-for="(deal, idx) in deals"
+												v-if="
+													props.deals.filter(
+														(o) =>
+															new Date(o.createdOn) >=
+																new Date(props.quarter.start) &&
+															new Date(o.createdOn) <=
+																new Date(props.quarter.end)
+													).length > 0
+												"
+												v-for="(deal, idx) in props.deals.filter(
+													(o) =>
+														new Date(o.createdOn) >=
+															new Date(props.quarter.start) &&
+														new Date(o.createdOn) <= new Date(props.quarter.end)
+												)"
 												:to="`/${route.params.organization}/tickets/${deal.id}`"
 												:key="deal.name"
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-white/[2%]"
+												class="dark:border-panel-border-dark dark:hover:bg-white/[2%] relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200"
 											>
 												<div class="flex w-[40%] items-center gap-3">
 													<span class="text-sm">{{
@@ -88,8 +101,8 @@
 												</div>
 											</NuxtLink>
 											<div
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
 												v-else
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
 											>
 												<div
 													class="flex w-full items-center justify-center gap-3"
@@ -159,6 +172,11 @@
 			type: Object,
 			required: true,
 		},
+		deals: {
+			type: Array,
+			required: true,
+			default: () => [],
+		},
 	});
 
 	const user = useSupabaseUser();
@@ -166,17 +184,6 @@
 	const supabase = useSupabaseClient();
 
 	const route = useRoute();
-
-	const showSubmitModal = ref(false);
-
-	// let { data: User, error: userError } = await supabase
-	// 	.from('User')
-	// 	.select(`systemRole,Account(stripeCustomerId)`)
-	// 	.eq('id', user.value.id)
-	// 	.limit(1)
-	// 	.single();
-
-	const pastDue = () => {};
 
 	const styles = {
 		proposal_submitted:
@@ -213,13 +220,6 @@
 			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
 	};
 
-	const fetchData = async () => {
-		const { data } = await $fetch(
-			`/api/stripe/invoices/${User.Account.stripeCustomerId}`
-		);
-		return data;
-	};
-
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select(
@@ -241,14 +241,7 @@
 		.limit(1)
 		.single();
 
-	let { data: Ticket, error: ticketError } = await supabase
-		.from('Ticket')
-		.select(`*`)
-		.eq('type', 'referral');
-
-	let deals = Ticket.filter(
-		(o) => o.accountId === route.params.organization
-	).filter(
+	const deals = props.deals.filter(
 		(o) =>
 			new Date(o.createdOn) >= new Date(props.quarter.start) &&
 			new Date(o.createdOn) <= new Date(props.quarter.end)
@@ -256,9 +249,9 @@
 	// .gte('createdOn', new Date(props.quarter.start))
 	// .lte('createdOn', new Date (props.quarter.end));
 
-	const pipeline = deals.reduce((a, c) => a + c.deal_size, 0);
+	const pipeline = props.deals.reduce((a, c) => a + c.deal_size, 0);
 
-	const revenue = deals
+	const revenue = props.deals
 		.filter(
 			(o) =>
 				![
@@ -268,47 +261,4 @@
 				].includes(o.status)
 		)
 		.reduce((a, c) => a + c.deal_size, 0);
-
-	const teams = ref([]);
-	const entitlements = await getEntitlements();
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-
-	const entitlement = entitlements[retainer.tier];
-
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
-	).length;
-	const upgrade_needed = ref(false);
-	upgrade_needed.value =
-		totalActive > entitlement.ticket_count &&
-		// retainer.status === 'active' &&
-		User.systemRole !== 'super_admin';
-
-	function moveOrgToFront(arr) {
-		const orgIndex =
-			User.Account.type === 'super_admin'
-				? arr.findIndex((obj) => obj.id === User.Account.id)
-				: arr.findIndex((obj) => obj.name === 'Organization');
-		if (orgIndex > -1) {
-			const orgObj = arr.splice(orgIndex, 1)[0];
-			arr.unshift(orgObj);
-		}
-		return arr;
-	}
-
-	onMounted(async () => {
-		let { data: Account, error: accountError } = await supabase
-			.from('Account')
-			.select('*,Ticket(status,type)');
-		if (User.Account.type === 'super_admin') {
-			teams.value = Account;
-		} else {
-			teams.value = User.Account.Team;
-			const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
-			const item = teams.value.splice(index, 1)[0];
-			teams.value.unshift(item);
-		}
-		teams.value = moveOrgToFront(teams.value);
-	});
 </script>

@@ -1,16 +1,361 @@
+<script setup>
+	const props = defineProps({
+		activityItem: {
+			type: Object,
+			required: true,
+			default: () => ({}),
+		},
+		activityItemIdx: {
+			type: Number,
+			required: true,
+		},
+		comments: {
+			type: Array,
+			required: true,
+			default: () => [],
+		},
+	});
+
+	const emits = defineEmits(['updated']);
+
+	import { ref, computed } from 'vue';
+	import {
+		Dialog,
+		DialogPanel,
+		Disclosure,
+		DisclosureButton,
+		DisclosurePanel,
+		TransitionChild,
+		TransitionRoot,
+		Listbox,
+		ListboxButton,
+		ListboxLabel,
+		ListboxOption,
+		ListboxOptions,
+		Combobox,
+		ComboboxButton,
+		ComboboxInput,
+		ComboboxLabel,
+		ComboboxOption,
+		ComboboxOptions,
+		Switch,
+	} from '@headlessui/vue';
+	import {
+		ArchiveBoxIcon,
+		Bars3BottomLeftIcon,
+		Bars4Icon,
+		ClockIcon,
+		HomeIcon,
+		UserCircleIcon as UserCircleIconOutline,
+		FaceFrownIcon,
+		FaceSmileIcon,
+		FireIcon,
+		HandThumbUpIcon,
+		HeartIcon,
+		PaperClipIcon,
+		XMarkIcon,
+	} from '@heroicons/vue/24/outline';
+	import {
+		BellIcon,
+		CalendarIcon,
+		ChatBubbleLeftEllipsisIcon,
+		CheckCircleIcon,
+		LockOpenIcon,
+		TrashIcon,
+		LockClosedIcon,
+		MagnifyingGlassIcon,
+		PencilIcon,
+		TagIcon,
+		CheckIcon,
+		ChevronDownIcon,
+		ChevronUpDownIcon,
+		UserCircleIcon as UserCircleIconMini,
+	} from '@heroicons/vue/20/solid';
+	import showdown from 'showdown';
+	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
+
+	// Define all constants and reactive variables
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+	const route = useRoute();
+
+	const publishingOptions = [
+		{
+			title: 'AI Enabled',
+			ai: true,
+			description: 'This comment will trigger a reply from Tracy.',
+			current: true,
+		},
+		{
+			title: 'AI Disabled',
+			description: 'This comment will be posted without a reply from tracy.',
+			ai: false,
+			current: false,
+		},
+	];
+
+	const selected = ref(publishingOptions[0]);
+
+	const converter = await new showdown.Converter();
+
+	const loading = ref(true);
+
+	const ticketAvatar = ref(null);
+	const currentAvatar = ref(null);
+	const assignedToAvatar = ref(null);
+
+	const comments = ref([]);
+	const comment_text = ref('');
+	const reply_text = ref('');
+
+	const imageSrc = ref(null);
+	const fileInput = ref(null);
+	const selectedFile = ref(null);
+
+	const ticketAttachments = ref([]);
+	const aiResponse = ref('');
+	const showDiv = ref(false);
+
+	const commentImageId = ref('');
+	const showImageModal = ref(false);
+
+	const query = ref('');
+
+	// const aiEnabled = ref(Ticket.ai_enabled);
+
+	const showImage = (id) => {
+		commentImageId.value = id;
+		showImageModal.value = true;
+	};
+
+	const toggleModal = () => {
+		showImageModal.value = !showImageModal.value;
+	};
+
+	let { data: User, error: userError } = await supabase
+		.from('User')
+		.select(
+			`*,Account (
+	     id,
+		 type,
+		 stripeCustomerId,
+		 Subscription(*),
+		 Team (
+			id,
+			name
+		 )
+	   )`
+		)
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	let { data: Ticket, error: ticketError } = await supabase
+		.from('Ticket')
+		.select(
+			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
+		)
+		.eq('id', route.params.id)
+		.limit(1)
+		.single();
+
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value = URL.createObjectURL(file);
+			selectedFile.value = file;
+		}
+	};
+
+	const removeImage = () => {
+		imageSrc.value = null;
+		selectedFile.value = null;
+		fileInput.value = '';
+	};
+
+	// Define a general function to fetch from Supabase storage
+	const fetchFromStorage = async (storageName, searchParam) => {
+		const {
+			data: [File],
+			error: fileError,
+		} = await supabase.storage.from(storageName).list(`${searchParam}`, {
+			limit: 100,
+			offset: 0,
+			sortBy: { column: 'updated_at', order: 'desc' },
+			search: `${searchParam}`,
+		});
+
+		if (File) {
+			const {
+				data: { publicUrl },
+			} = await supabase.storage
+				.from(storageName)
+				.getPublicUrl(`/${searchParam}/${File.name}`);
+
+			return publicUrl;
+		} else return '';
+	};
+
+	// Refactor getAvatarUrl, getCommentImageUrl, and getTicketAttachments
+	// to use the general fetchFromStorage function
+	const getAvatarUrl = async (avatar) => fetchFromStorage('avatars', avatar);
+
+	const getCommentImageUrl = async (id) =>
+		fetchFromStorage('images', `comments/${id}`);
+	// const getTicketAttachments = async (id) => fetchFromStorage('images', `attachments/${id}`);
+
+	// const getAvatarUrl = async (avatar) => {
+	// 	const {
+	// 		data: [File],
+	// 		error: fileError,
+	// 	} = await supabase.storage.from('avatars').list(`${avatar}`, {
+	// 		limit: 100,
+	// 		offset: 0,
+	// 		sortBy: { column: 'updated_at', order: 'desc' },
+	// 		search: `${avatar}`,
+	// 	});
+
+	// 	if (File) {
+	// 		const {
+	// 			data: { publicUrl },
+	// 		} = await supabase.storage
+	// 			.from('avatars')
+	// 			.getPublicUrl(`/${avatar}/${File.name}`);
+
+	// 		return publicUrl;
+	// 	} else return '';
+	// };
+
+	// const getCommentImageUrl = async (id) => {
+	// 	const {
+	// 		data: [File],
+	// 		error: fileError,
+	// 	} = await supabase.storage.from('images').list(`comments`, {
+	// 		limit: 100,
+	// 		offset: 0,
+	// 		sortBy: { column: 'updated_at', order: 'desc' },
+	// 		search: `${id}`,
+	// 	});
+
+	// 	if (File) {
+	// 		const {
+	// 			data: { publicUrl },
+	// 		} = await supabase.storage
+	// 			.from('images')
+	// 			.getPublicUrl(`/comments/${File.name}`);
+
+	// 		return publicUrl;
+	// 	} else return '';
+	// };
+
+	// ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
+	currentAvatar.value = await getAvatarUrl(user.value.id);
+	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
+
+	const convert = (text) => {
+		const formatted = converter.makeHtml(text);
+		return formatted;
+	};
+
+	const handleCommentAdd = async (thread_id) => {
+		loading.value = true;
+		try {
+			if (selectedFile.value) {
+				const { data, error: insertError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+							attachment: true,
+						},
+					])
+					.select();
+
+				const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
+				const extension = selectedFile.value.name.match(regex);
+				const fileName = `${data[0].id}.${extension[1]}`;
+				const filePath = `comments/${fileName}`;
+				const { error: uploadError } = await supabase.storage
+					.from('images')
+					.upload(filePath, selectedFile.value, { upsert: true });
+
+				if (uploadError) {
+					console.error('Error uploading image:', uploadError);
+					return;
+				}
+				if (insertError) {
+					console.error(
+						'Error inserting comment with attachment:',
+						insertError
+					);
+				} else {
+					console.log('Image uploaded and comment created successfully');
+					removeImage();
+				}
+			} else {
+				const { data, error: insertCommentError } = await supabase
+					.from('Comment')
+					.insert([
+						{
+							text: thread_id !== null ? reply_text.value : comment_text.value,
+							createdBy: user.value.id,
+							ticketId: Ticket.id,
+							threadId: thread_id,
+							ai_enabled: selected.value.ai,
+						},
+					]);
+
+				if (insertCommentError) {
+					console.error('Error inserting comment:', insertCommentError);
+				} else {
+					console.log('Comment created successfully');
+					removeImage();
+				}
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			comment_text.value = '';
+			reply_text.value = '';
+			emits('updated');
+			loading.value = false;
+		}
+	};
+
+	const handleDelete = async (id, arr) => {
+		loading.value = true;
+		try {
+			if (!arr) {
+				const { data, error: deleteError } = await supabase
+					.from('Comment')
+					.delete()
+					.eq('id', id);
+			} else {
+				const { data, error } = await supabase
+					.from('Comment')
+					.update({ text: 'This message was deleted.', deleted: true })
+					.eq('id', id);
+			}
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			emits('updated');
+			loading.value = false;
+		}
+	};
+</script>
+
 <template>
-	<div>
-		<article
-			v-for="(activityItem, activityItemIdx) in comments"
-			:key="activityItem.id"
-			id="parent-comment"
-			class="relative mb-6 rounded-lg bg-white text-base dark:bg-transparent"
-		>
+	<div class="">
+		<article id="parent-comment" class="relative mb-6 rounded-lg text-base">
 			<div
-				v-if="activityItemIdx < comments.length - 1"
+				v-if="props.activityItemIdx < props.comments.length - 1"
 				:class="[
-					activityItemIdx === comments.length ? 'h-6 ' : '-bottom-6',
-					'absolute  left-0 top-0 flex w-6 justify-center',
+					props.activityItemIdx === props.comments.length ? 'h-6' : '-bottom-6',
+					'absolute left-0 top-0 flex w-6 justify-center',
 				]"
 			>
 				<div
@@ -19,16 +364,19 @@
 			</div>
 			<div
 				v-if="
-					activityItem.activity_type === 'user_comment' ||
-					activityItem.activity_type === 'ai_comment'
+					props.activityItem.activity_type === 'user_comment' ||
+					props.activityItem.activity_type === 'ai_comment'
 				"
 			>
 				<div
 					class=""
-					v-if="!activityItem.deleted || activityItem.Comment.length > 0"
+					v-if="
+						!props.activityItem.deleted ||
+						props.activityItem?.Comment.length > 0
+					"
 				>
 					<footer
-						v-if="!activityItem.deleted"
+						v-if="!props.activityItem.deleted"
 						class="mb-2 flex items-center justify-between"
 					>
 						<div class="flex items-center">
@@ -36,9 +384,9 @@
 								class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 							>
 								<img
-									v-if="activityItem.avatarUrl"
-									class="relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#020014]"
-									:src="activityItem.avatarUrl"
+									v-if="props.activityItem.avatarUrl"
+									class="dark:ring-[#020014] relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white"
+									:src="props.activityItem.avatarUrl"
 									alt=""
 								/>
 								<div
@@ -47,12 +395,14 @@
 								>
 									<UserCircleIconMini class="m-0 h-5 w-5" />
 								</div>
+								<NuxtLink :to="'/profile/' + props.activityItem.User.id"
+									>{{ props.activityItem.User.firstName }}
+									{{ props.activityItem.User.lastName }}</NuxtLink
+								>
 
-								{{ activityItem.User.firstName }}
-								{{ activityItem.User.lastName }}
 								<div class="ml-2 mr-1 flex items-center space-x-1">
 									<div
-										v-for="badge in activityItem.User.badges.slice(0, 1)"
+										v-for="badge in props.activityItem.User.badges.slice(0, 1)"
 										:key="badge.id"
 										:class="[
 											badge.id,
@@ -86,24 +436,27 @@
 										>
 									</div>
 									<div
-										v-if="activityItem.User.badges.length - 1"
+										v-if="props.activityItem.User.badges.length - 1"
 										class="badge-extra rounded-md border border-gray-600 px-1.5 leading-4 text-gray-400"
 									>
-										+{{ activityItem.User.badges.length - 1 }}
+										+{{ props.activityItem.User.badges.length - 1 }}
 									</div>
 								</div>
 
 								<span
-									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+									class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
 								>
-									{{ formatDateDistance(activityItem.createdOn) }}
+									{{ formatDateDistance(props.activityItem.createdOn) }}
 								</span>
 							</div>
 						</div>
 
 						<div
 							class="flex space-x-1"
-							v-if="activityItem.createdBy === User.id"
+							v-if="
+								props.activityItem.createdBy === User.id ||
+								User.systemRole === 'super_admin'
+							"
 						>
 							<button
 								class="text-slate-400 transition-colors hover:text-indigo-400"
@@ -126,7 +479,12 @@
 								</svg>
 							</button>
 							<button
-								@click="handleDelete(activityItem.id)"
+								@click="
+									handleDelete(
+										props.activityItem.id,
+										props.activityItem?.Comment
+									)
+								"
 								class="text-slate-400 transition-colors hover:text-rose-400"
 							>
 								<svg
@@ -203,46 +561,47 @@
 					</footer>
 					<div
 						:class="[
-							activityItem.User.id === User.id
-								? 'bg-[#0166C8]'
-								: 'bg-[#1C1B2C]',
-							activityItem.activity_type === 'ai_comment'
+							props.activityItem.User.id === User.id
+								? 'dark:bg-[#0166C8] prose-invert bg-[#4CA2FF] text-white ring-white/5'
+								: 'dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:text-gray-200',
+							props.activityItem.activity_type === 'ai_comment'
 								? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 								: '',
-							activityItem.deleted
-								? 'text-gray-400 dark:text-gray-400'
-								: 'text-gray-900 dark:text-gray-200',
-							'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
+							props.activityItem.deleted
+								? 'dark:text-white/50 text-black/30'
+								: '',
+							'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
 						]"
-						v-html="convert(activityItem.text)"
+						v-html="convert(props.activityItem.text)"
 					></div>
 					<div class="mt-2 pl-8">
-						<NuxtLink
+						<a
 							v-if="
-								activityItem.text.includes('below') &&
-								activityItem.User.systemRole === 'super_admin'
+								props.activityItem.text.includes('below') &&
+								props.activityItem.User.systemRole === 'super_admin'
 							"
-							:to="`https://calendly.com/motis-group/partners?name=${
+							:href="`https://calendly.com/motis-group/partners?name=${
 								Ticket.User.firstName + ' ' + Ticket.User.lastName
 							}&email=${Ticket.User.email}&utm_source=${Ticket.id}`"
+							target="_blank"
 							class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
-							>Schedule a call</NuxtLink
+							>Schedule a call</a
 						>
 					</div>
 					<div
-						v-if="activityItem.attachment && !activityItem.deleted"
+						v-if="props.activityItem.attachment && !props.activityItem.deleted"
 						class="my-3 flex overflow-hidden pl-8"
 					>
 						<button
 							@click="
-								(commentImageId = activityItem.attachment),
+								(commentImageId = props.activityItem.attachment),
 									(showImageModal = true)
 							"
 						>
 							<img
-								v-for="image in activityItem.attachments"
+								v-for="image in props.activityItem.attachments"
 								:src="image"
-								:alt="activityItem.id"
+								:alt="props.activityItem.id"
 								data-test="comment-image"
 								class="max-h-48 max-w-full cursor-pointer rounded-lg"
 							/>
@@ -250,17 +609,19 @@
 					</div>
 				</div>
 
-				<div class="ml-4" v-if="activityItem.Comment.length > 0">
+				<div class="ml-4" v-if="props.activityItem?.Comment">
 					<article
-						v-for="(reply, idx) in activityItem.Comment"
+						v-for="(reply, idx) in props.activityItem?.Comment"
 						id="reply-messages"
 						:key="reply.id"
 						class="relative my-6 pl-2 text-base lg:pl-4"
 					>
 						<div
-							v-if="idx < activityItem.Comment.length - 1"
+							v-if="idx < props.activityItem?.Comment.length - 1"
 							:class="[
-								activityItemIdx === comments.length ? 'h-6 ' : '-bottom-6',
+								props.activityItemIdx === props.comments.length
+									? 'h-6 '
+									: '-bottom-6',
 								'absolute  left-0 top-0 flex w-12 justify-center',
 							]"
 						>
@@ -268,14 +629,14 @@
 								class="w-px bg-gradient-to-b from-slate-300/0 via-slate-300/20 to-slate-300/0"
 							/>
 						</div>
-						<footer class="mb-2 flex items-center justify-between">
+						<header class="mb-2 flex items-center justify-between">
 							<div class="flex items-center">
 								<div
 									class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 								>
 									<div v-if="reply.avatarUrl" class="">
 										<img
-											class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white dark:ring-[#020014]"
+											class="dark:ring-[#020014] relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white"
 											:src="reply.avatarUrl"
 											:alt="reply.User.firstName + ' ' + reply.User.lastName"
 										/>
@@ -285,9 +646,11 @@
 										v-else
 										class="mr-2 h-5 w-5 rounded-full bg-slate-300"
 									></div>
+									<NuxtLink :to="'/profile/' + reply.User.id"
+										>{{ reply.User.firstName }}
+										{{ reply.User.lastName }}</NuxtLink
+									>
 
-									{{ reply.User.firstName }}
-									{{ reply.User.lastName }}
 									<div class="ml-2 mr-1 flex items-center space-x-1">
 										<div
 											v-for="badge in reply.User.badges.slice(0, 1)"
@@ -333,14 +696,21 @@
 									</div>
 
 									<span
-										class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+										class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
 									>
 										{{ formatDateDistance(reply.createdOn) }}
 									</span>
 								</div>
 							</div>
 
-							<div class="flex space-x-1" v-if="reply.createdBy === User.id">
+							<div
+								class="flex space-x-1"
+								v-if="
+									reply.createdBy === User.id ||
+									(User.systemRole === 'super_admin' &&
+										reply.activity_type === 'ai_comment')
+								"
+							>
 								<button
 									class="text-slate-400 transition-colors hover:text-indigo-400"
 								>
@@ -362,7 +732,7 @@
 									</svg>
 								</button>
 								<button
-									@click="handleDelete(reply.id, activityItem.Comment)"
+									@click="handleDelete(reply.id, false)"
 									class="text-slate-400 transition-colors hover:text-rose-400"
 								>
 									<svg
@@ -436,18 +806,21 @@
 									</svg>
 								</button>
 							</div>
-						</footer>
-						<p
+						</header>
+						<div
 							:class="[
-								reply.User.id === User.id ? 'bg-[#0166C8]' : 'bg-[#1C1B2C]',
+								reply.User.id === User.id
+									? ' dark:bg-[#0166C8] bg-[#4CA2FF] text-white ring-white/5'
+									: ' dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] text-gray-700 ring-black/5 dark:text-white',
 								reply.activity_type === 'ai_comment'
-									? 'ai_shadow shadow-inse shadow-[#9643FF]/25'
+									? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 									: '',
-								'prose ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 ring-1 ring-inset ring-white/5 dark:prose-invert',
+								'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4  py-3 text-sm leading-7 ring-1 ring-inset',
 							]"
 						>
 							{{ reply.text }}
-						</p>
+						</div>
+
 						<div class="mt-2 pl-8">
 							<NuxtLink
 								v-if="
@@ -457,6 +830,7 @@
 								:to="`https://calendly.com/motis-group/partners?name=${
 									Ticket.User.firstName + ' ' + Ticket.User.lastName
 								}&email=${Ticket.User.email}&utm_source=${Ticket.id}`"
+								target="_blank"
 								class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
 								>Schedule a call</NuxtLink
 							>
@@ -466,7 +840,7 @@
 				<div
 					id="reply-to-comment"
 					class="mt-2"
-					v-if="!activityItem.deleted || activityItem.Comment.length > 0"
+					v-if="!props.activityItem.deleted || props.activityItem?.Comment"
 				>
 					<Disclosure v-slot="{ open }">
 						<div class="flex items-center justify-start pl-8">
@@ -477,7 +851,7 @@
 							/>
 
 							<DisclosureButton
-								class="ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
+								class="dark:hover:text-[#9382ff] ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white"
 							>
 								<div class="flex items-center">
 									<svg
@@ -503,8 +877,8 @@
 
 						<DisclosurePanel class="mt-3 flex items-start space-x-4 pl-8">
 							<div class="min-w-0 flex-1">
-								<form
-									@submit.prevent="handleCommentAdd(activityItem.id)"
+								<div
+									
 									class="relative"
 								>
 									<div
@@ -515,7 +889,7 @@
 											v-model="reply_text"
 											name="comment"
 											id="comment"
-											class="block w-full resize-none border-0 bg-transparent px-4 py-3 text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-2 sm:leading-6"
+											class="block w-full resize-none border-0 bg-transparent px-4 py-3 text-sm text-gray-900 placeholder:text-slate-400 focus:ring-0 dark:text-white sm:py-2 sm:leading-6"
 											placeholder="Reply..."
 										/>
 
@@ -552,8 +926,9 @@
 													></path>
 												</svg>
 											</DisclosureButton>
-											<button
-												type="submit"
+											<DisclosureButton
+												@click="handleCommentAdd(props.activityItem.id)"
+												:disabled="reply_text.length < 1"
 												class="inline-flex items-center rounded-md border border-indigo-500 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
 											>
 												<svg
@@ -570,10 +945,10 @@
 														stroke-linejoin="round"
 													></path>
 												</svg>
-											</button>
+											</DisclosureButton>
 										</div>
 									</div>
-								</form>
+								</div>
 							</div>
 						</DisclosurePanel>
 					</Disclosure>
@@ -587,9 +962,9 @@
 								class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 							>
 								<img
-									v-if="activityItem.avatarUrl"
-									class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#0A1125]"
-									:src="activityItem.avatarUrl"
+									v-if="props.activityItem.avatarUrl"
+									class="dark:ring-[#020015] z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white"
+									:src="props.activityItem.avatarUrl"
 									alt=""
 								/>
 								<div
@@ -599,36 +974,36 @@
 									<UserCircleIconMini class="m-0 h-5 w-5" />
 								</div>
 								<div class="mr-1 flex items-center space-x-1">
-									{{ activityItem.User.firstName }}
-									{{ activityItem.User.lastName }}
+									{{ props.activityItem.User.firstName }}
+									{{ props.activityItem.User.lastName }}
 								</div>
-								<span class="font-normal text-slate-400">{{
-									activityItem.text
-								}}</span>
+								<div class="font-normal text-slate-400">
+									{{ props.activityItem.text }}
+								</div>
 
 								<span
-									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+									class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
 								>
-									{{ formatDateDistance(activityItem.createdOn) }}
+									{{ formatDateDistance(props.activityItem.createdOn) }}
 								</span>
 							</div>
 						</div>
 					</footer>
 
 					<div
-						v-if="activityItem.attachment && !activityItem.deleted"
+						v-if="props.activityItem.attachment && !props.activityItem.deleted"
 						class="mt-1 flex overflow-hidden"
 					>
 						<button
 							@click="
-								(commentImageId = activityItem.attachment),
+								(commentImageId = props.activityItem.attachment),
 									(showImageModal = true)
 							"
 						>
 							<img
-								v-for="image in activityItem.attachments"
+								v-for="image in props.activityItem.attachments"
 								:src="image"
-								:alt="activityItem.id"
+								:alt="props.activityItem.id"
 								data-test="comment-image"
 								class="max-h-48 max-w-full cursor-pointer rounded-lg"
 							/>
@@ -640,6 +1015,121 @@
 	</div>
 </template>
 
-<script>
-	const props = defineProps({});
-</script>
+<style scoped>
+	.ai_shadow {
+		box-shadow: inset 0px -5px 20px 0 rgba(150, 67, 255, 0.15);
+		border: 1px solid rgba(201, 150, 255, 0.16);
+	}
+	:deep p a {
+		color: #9382ff;
+	}
+	.mg_admin {
+		background: conic-gradient(
+			from 171.52deg at 50% 50%,
+			#f0f1f6 0deg,
+			#a0b9cc 90deg,
+			#dde5f0 180deg,
+			#c5e6f9 234.26deg,
+			#a7b5bb 270deg,
+			#ecf1f4 1turn
+		);
+		border: solid 1px rgba(255, 255, 255, 0.3);
+		color: #000000ab;
+	}
+
+	.badge-extra {
+		font-size: 10px;
+	}
+
+	.mg_admin-text {
+		font-size: 10px;
+	}
+
+	.mg_ai {
+		color: transparent;
+		background: #2a004f;
+		border: 1px solid #aa00eda0;
+
+		transition: 0.3s cubic-bezier(0.6, 0.6, 0, 1) opacity,
+			0.3s cubic-bezier(0.6, 0.6, 0, 1) transform;
+	}
+
+	.mg_ai-text {
+		animation: hue-rotate 3s ease-in-out infinite;
+		background: linear-gradient(135deg, #aa00ed 0%, #2fe3fe 50%, #8900ff 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		background-size: 200% 100%;
+		font-size: 10px;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.mg_ai-button-text {
+		animation: hue-rotate 3s ease-in-out infinite;
+		background: linear-gradient(135deg, #aa00ed 0%, #2fe3fe 50%, #8900ff 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		background-size: 200% 100%;
+
+		-webkit-text-fill-color: transparent;
+	}
+
+	.svg-gradient {
+		width: 24px;
+		height: 24px;
+		background: linear-gradient(to bottom, #7000ff, #00c2ff);
+		-webkit-mask: url(#mask) center / contain no-repeat;
+		mask: url(#mask) center / contain no-repeat;
+	}
+
+	@keyframes hue-rotate {
+		0% {
+			background-position: 0%;
+		}
+		100% {
+			background-position: 200%;
+		}
+	}
+
+	.member {
+		background: linear-gradient(
+			0.311turn,
+			#cf9a8c,
+			#eabcb1 24.38%,
+			#f5c9c0 50%,
+			#eabcb1 77.15%,
+			#cf9a8c
+		);
+		color: #000000ab;
+		border: solid 1px rgba(0, 0, 0, 0.3);
+		font-size: 10px;
+	}
+
+	.mg_officer {
+		background: linear-gradient(
+			0.311turn,
+			#e3bc5a,
+			#e9d8ab 25%,
+			#f4e9c4 50%,
+			#e9d8ab 75%,
+			#e3bc5a
+		);
+		color: #000000ab;
+		border: solid 1px rgba(0, 0, 0, 0.3);
+		font-size: 10px;
+	}
+
+	.partner {
+		background: linear-gradient(
+			0.311turn,
+			#e3bc5a,
+			#e9d8ab 25%,
+			#f4e9c4 50%,
+			#e9d8ab 75%,
+			#e3bc5a
+		);
+		color: #000000ab;
+		border: solid 1px rgba(0, 0, 0, 0.3);
+		font-size: 10px;
+	}
+</style>

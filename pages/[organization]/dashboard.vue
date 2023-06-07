@@ -83,7 +83,9 @@
 					<org-deals
 						v-for="quarter in quarters"
 						:key="quarter"
+						:deals="referralTickets"
 						:quarter="quarter"
+						@updated="updateDeals"
 					/>
 				</div>
 			</div>
@@ -170,6 +172,7 @@
 		<ticket-submit
 			v-show="showSubmitModal"
 			@close-modal="showSubmitModal = false"
+			@ticket-submit="updateDeals"
 		/>
 	</div>
 </template>
@@ -242,6 +245,16 @@
 		.limit(1)
 		.single();
 
+	const referralTickets = ref([]);
+
+	const getDealData = async () => {
+		let { data: referralTickets, error: ticketError } = await supabase
+			.from('Ticket')
+			.select('*')
+			.eq('accountId', route.params.organization);
+		return referralTickets.filter((o) => o.type === 'referral');
+	};
+
 	let hosting =
 		User.Account.type === 'super_admin'
 			? true
@@ -284,4 +297,13 @@
 	}
 
 	const quarters = generateFinancialQuarters('2023-04-01');
+
+	const updateDeals = async () => {
+		referralTickets.value = await getDealData();
+	};
+
+	onMounted(async () => {
+		referralTickets.value = await getDealData();
+		console.log(referralTickets.value);
+	});
 </script>
