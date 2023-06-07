@@ -582,7 +582,7 @@
 	const handleDelete = async (id, arr) => {
 		loading.value = true;
 		try {
-			if (arr) {
+			if (!arr) {
 				const { data, error: deleteError } = await supabase
 					.from('Comment')
 					.delete()
@@ -1965,7 +1965,7 @@
 																						@click="
 																							handleDelete(
 																								reply.id,
-																								activityItem.Comment
+																								false
 																							)
 																						"
 																						class="text-slate-400 transition-colors hover:text-rose-400"
