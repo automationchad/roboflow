@@ -1,9 +1,34 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen text-gray-600 bg-gray-50">
-    <div class="py-16">
-      <h1 class="mb-6 text-3xl font-bold">403 - Not Authorized</h1>
-      <p class="text-xl">Sorry, but you're not authorized to access this page.</p>
-      <nuxt-link class="mt-6 text-blue-500 hover:text-blue-700" to="/">Return Home</nuxt-link>
-    </div>
-  </div>
+	<div class="flex h-screen min-h-full items-center justify-center">
+		<main
+			class="mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:px-8"
+		>
+			<div class="max-w-lg">
+				<p
+					class="text-base font-semibold leading-8 text-indigo-600 dark:text-indigo-400"
+				>
+					403
+				</p>
+				<h1
+					class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl"
+				>
+					Not Authorized
+				</h1>
+				<p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
+					Sorry, but what you're looking for
+				</p>
+				<div class="mt-10">
+					<a href="/" class="text-sm font-semibold leading-7 text-indigo-600"
+						><span aria-hidden="true">&larr;</span> Back to home</a
+					>
+				</div>
+			</div>
+		</main>
+	</div>
 </template>
+
+<script setup>
+	const props = defineProps({
+		error: Object,
+	});
+</script>

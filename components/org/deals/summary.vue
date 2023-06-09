@@ -111,9 +111,11 @@
 			</TabList>
 			<TabPanels
 				><TabPanel
-					><div class="h-84 grid grid-cols-4 grid-rows-2 gap-4">
+					><div
+						v-if="deals.length > 0"
+						class="h-84 grid grid-cols-4 grid-rows-2 gap-4"
+					>
 						<div
-							v-if="deals.length > 0"
 							v-for="(deal, idx) in deals"
 							:key="deal.name"
 							:class="[
@@ -169,14 +171,20 @@
 								</div>
 							</NuxtLink>
 						</div>
+					</div>
+					<div v-else class="h-84 relative grid grid-cols-4 grid-rows-2 gap-4">
 						<div
-							v-else
+							class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-white"
+						>
+							No won deals yet...
+						</div>
+						<div
 							v-for="(deal, idx) in examples"
 							:key="deal.id"
 							:class="[
 								getStyleClass(deal.deal_size).style,
 								idx < 2 ? 'row-span-2' : `row-span-1`,
-								'h-full rounded border border-white/10',
+								'relative h-full rounded border border-white/10 opacity-50 blur-sm',
 							]"
 						>
 							<div class="flex h-full flex-col justify-between p-1">
@@ -224,7 +232,7 @@
 								</div>
 							</div>
 						</div>
-					</div></TabPanel
+					</div> </TabPanel
 				><TabPanel>Test</TabPanel></TabPanels
 			>
 		</TabGroup>

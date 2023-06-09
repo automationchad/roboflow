@@ -10,7 +10,7 @@
 
 	const form_responses = ref({
 		name: '',
-		email: '',
+
 		options: {
 			partner: false,
 		},
@@ -25,7 +25,6 @@
 	const cancelAll = () => {
 		form_responses.value = {
 			name: '',
-			email: '',
 			options: {
 				partner: false,
 			},
@@ -86,35 +85,9 @@
 				}
 			}
 
-			// Sign in with OTP
-			const { data, error } = await supabase.auth.signInWithOtp({
-				email: 'example@email.com',
-				options: {
-					data: {
-						first_name: first_name.value,
-						last_name: last_name.value,
-						company_name: company_name.value,
-						stripe_customer_id: customer.id,
-						stripe_subscription_id: subscription.id,
-						stripe_plan: subscription.plan,
-					},
-				},
-			});
-
-			if (error) {
-				throw new Error(error.message);
-			}
-
 			emit('org-submit');
 			emit('close-modal');
-			form_responses.value = {
-				name: '',
-				email: '',
-				options: {
-					partner: false,
-				},
-			};
-			loading.value = false;
+			cancelAll();
 		} catch (error) {
 			console.log(error);
 			loading.value = false;
@@ -234,7 +207,7 @@
 											<ExclamationCircleIcon class="mr-1 h-4 w-4" />
 											Duplicate name found
 										</p>
-										<div class="relative mt-2 flex items-start">
+										<div class="relative mt-4 flex items-start">
 											<div class="flex h-6 items-center">
 												<input
 													v-model="form_responses.options.partner"
@@ -245,7 +218,7 @@
 													class="focus:ring-[#9382ff] h-4 w-4 rounded border-gray-300 text-[#9382ff] dark:border-slate-700 dark:bg-slate-800"
 												/>
 											</div>
-											<div class="ml-3 text-sm leading-6">
+											<div class="ml-3 text-sm  leading-6">
 												<label
 													for="comments"
 													class="font-medium text-gray-900 dark:text-white"
@@ -261,7 +234,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="sm:col-span-2">
+									<div class="sm:col-span-2" v-if="false">
 										<label
 											for="name"
 											class="block text-sm font-normal leading-6 text-gray-600 dark:text-slate-300"

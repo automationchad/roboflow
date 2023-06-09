@@ -427,7 +427,7 @@
 		const orgIndex =
 			User.Account.type === 'super_admin'
 				? arr.findIndex((obj) => obj.id === User.Account.id)
-				: arr.findIndex((obj) => obj.name === 'Organization');
+				: arr.findIndex((obj) => obj?.name === 'Organization');
 		if (orgIndex > -1) {
 			const orgObj = arr.splice(orgIndex, 1)[0];
 			arr.unshift(orgObj);

@@ -50,12 +50,12 @@
 						</button>
 						<div class="block shadow-sm">
 							<div
-								class="rounded-t-md border-x border-t border-slate-200 bg-slate-50 p-2.5 text-center text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+								class="rounded-t-md border-x border-t border-slate-200 dark:border-slate-700 bg-slate-50 p-2.5 text-center text-slate-600 dark:bg-slate-800 dark:text-slate-400"
 							>
 								<div class="text-xs font-medium">Deal Summary</div>
 							</div>
 							<div
-								class="rounded-b-md border-x border-b p-4 dark:bg-slate-900 dark:text-white"
+								class="rounded-b-md border-x border-b p-4 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
 							>
 								<div class="mb-2">
 									<div class="mb-1.5 text-xs dark:text-slate-400">
@@ -100,8 +100,14 @@
 					<Members v-if="User.Account.type === 'super_admin'" />
 					<org-deals
 						v-for="quarter in quarters"
-						:key="quarter"
-						:deals="referralTickets.all"
+						:key="quarter.id"
+						:deals="
+							referralTickets.filter(
+								(o) =>
+									new Date(o.createdOn) >= new Date(quarter.start) &&
+									new Date(o.createdOn) <= new Date(quarter.end)
+							)
+						"
 						:quarter="quarter"
 						@updated="updateDeals"
 					/>
@@ -258,15 +264,9 @@
 	} from '@heroicons/vue/20/solid';
 
 	definePageMeta({ middleware: ['auth'] });
-	onMounted(() => {
-		watchEffect(() => {
-			if (!user.value) {
-				navigateTo('/');
-			}
-		});
-	});
 
 	const user = useSupabaseUser();
+
 	const supabase = useSupabaseClient();
 
 	const showSubmitModal = ref(false);
@@ -285,6 +285,8 @@
 		.limit(1)
 		.single();
 
+	let hosting = true;
+
 	if (
 		User.Account.type !== 'super_admin' &&
 		route.params.organization !== User.Account.id
@@ -298,8 +300,6 @@
 		.eq('id', route.params.organization)
 		.limit(1)
 		.single();
-
-	const referralTickets = ref([]);
 
 	const getDealData = async () => {
 		let { data: referralTickets, error: ticketError } = await supabase
@@ -322,12 +322,8 @@
 		};
 	};
 
+	const referralTickets = ref([]);
 	const closedDeals = ref([]);
-
-	let hosting =
-		User.Account.type === 'super_admin'
-			? true
-			: User.Account.Subscription.find((o) => o.type === 'hosting');
 
 	const hosting_needed = !hosting;
 
@@ -366,7 +362,6 @@
 				end: quarterEnd.toISOString().split('T')[0],
 			});
 		}
-
 		return quarters.reverse();
 	}
 
@@ -375,13 +370,18 @@
 	const updateDeals = async () => {
 		is_success.value = true;
 		const data = await getDealData();
-		referralTickets.value = data;
+		referralTickets.value = data.all;
 		closedDeals.value = data.closed;
 	};
 
 	onMounted(async () => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo('/');
+			}
+		});
 		const data = await getDealData();
-		referralTickets.value = data;
+		referralTickets.value = data.all;
 		closedDeals.value = data.closed;
 	});
 </script>

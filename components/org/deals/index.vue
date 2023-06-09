@@ -1,8 +1,7 @@
 <template>
 	<div class="">
 		<div class="mt-8 space-y-6 lg:px-0">
-			<loading-spinner v-if="state.loading" />
-			<section aria-labelledby="billing-history-heading" v-else>
+			<section aria-labelledby="deals">
 				<div class="sm:overflow-hidden">
 					<div class="flex max-w-5xl flex-col">
 						<div class="overflow-x-auto">
@@ -12,7 +11,7 @@
 										class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-200 dark:border-slate-800 dark:bg-slate-900"
 									>
 										<div class="bg-panel-body-light dark:bg-panel-body-dark">
-											<div class="flex items-center justify-between px-6 pt-4">
+											<div class="flex items-center justify-between px-6 py-4">
 												<div class="flex items-center">
 													<h3
 														class="text-md mb-0 font-medium dark:text-slate-100"
@@ -32,7 +31,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="mt-2 px-6 pb-4"></div>
+											
 											<div
 												v-if="deals.length > 0"
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 text-slate-500 dark:border-slate-800"
@@ -52,21 +51,11 @@
 												</div>
 											</div>
 											<NuxtLink
-												v-if="
-													props.deals.filter(
-														(o) =>
-															new Date(o.createdOn) >=
-																new Date(props.quarter.start) &&
-															new Date(o.createdOn) <=
-																new Date(props.quarter.end)
-													).length > 0
-												"
-												v-for="(deal, idx) in props.deals.filter(
-													(o) =>
-														new Date(o.createdOn) >=
-															new Date(props.quarter.start) &&
-														new Date(o.createdOn) <= new Date(props.quarter.end)
-												).sort((a,b) => new Date(b.createdOn) - new Date(a.createdOn))"
+												v-if="deals.length > 0"
+												v-for="(deal, idx) in deals.sort(
+													(a, b) =>
+														new Date(b.createdOn) - new Date(a.createdOn)
+												)"
 												:to="`/${route.params.organization}/tickets/${deal.id}`"
 												:key="deal.name"
 												class="dark:border-panel-border-dark dark:hover:bg-white/[2%] relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200"
@@ -98,6 +87,17 @@
 													}}</span>
 												</div>
 											</NuxtLink>
+											<div
+												v-else-if="deals.length === 0 && loading"
+												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
+											>
+												<div
+													class="flex w-full items-center justify-center gap-3"
+												>
+													<loading-spinner />
+												</div>
+											</div>
+
 											<div
 												v-else
 												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -160,11 +160,6 @@
 
 	import { format, formatDistance } from 'date-fns';
 
-	const state = reactive({
-		invoices: [],
-		loading: false,
-	});
-
 	const props = defineProps({
 		quarter: {
 			type: Object,
@@ -173,15 +168,14 @@
 		deals: {
 			type: Array,
 			required: true,
-			default: () => [],
 		},
 	});
 
-	const user = useSupabaseUser();
-
-	const supabase = useSupabaseClient();
-
 	const route = useRoute();
+
+	const loading = ref(true);
+	let pipeline = ref(0);
+	let revenue = ref(0);
 
 	const stageType = {
 		initial_review:
@@ -228,47 +222,32 @@
 			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
 	};
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,
-			Account (
-			     id,
-				 name,
-				 type,
-				 Subscription(*),
-				 Team (
-					id,
-					name
-				 ),
-				 Ticket (count)
-			   )
-			 `
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	const deals = props.deals.filter(
-		(o) =>
-			new Date(o.createdOn) >= new Date(props.quarter.start) &&
-			new Date(o.createdOn) <= new Date(props.quarter.end)
-	);
 	// .gte('createdOn', new Date(props.quarter.start))
 	// .lte('createdOn', new Date (props.quarter.end));
 
-	const pipeline = props.deals.reduce((a, c) => a + c.deal_size, 0);
+	onMounted(async () => {
+		loading.value = false;
+	});
 
-	const revenue = props.deals
-		.filter(
-			(o) =>
-				![
-					'initial_review',
-					'requirements_gathering',
-					'proposal_submitted',
-					'contract_pending',
-					'invoice_pending',
-				].includes(o.status)
-		)
-		.reduce((a, c) => a + c.deal_size, 0);
+	watch(
+		() => props.deals,
+		(newDeals, oldDeals) => {
+			if (newDeals) {
+				pipeline.value = newDeals.reduce((a, c) => a + c.deal_size, 0);
+				revenue.value = newDeals
+					.filter(
+						(o) =>
+							![
+								'initial_review',
+								'requirements_gathering',
+								'proposal_submitted',
+								'contract_pending',
+								'invoice_pending',
+							].includes(o.status)
+					)
+					.reduce((a, c) => a + c.deal_size, 0);
+			}
+		},
+		{ immediate: true } // This option ensures the handler is run immediately after the watcher is created, with the current value of the watched source
+	);
 </script>
