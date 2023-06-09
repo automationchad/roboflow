@@ -166,7 +166,7 @@
 
 	const supabase = useSupabaseClient();
 
-	onMounted(() => {
+	onMounted(async() => {
 		watchEffect(() => {
 			if (!user.value) {
 				navigateTo(`/login`);

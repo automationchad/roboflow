@@ -23,7 +23,7 @@
 		ExclamationCircleIcon,
 	} from '@heroicons/vue/20/solid';
 	import { CheckIcon } from '@heroicons/vue/24/outline';
-	const emit = defineEmits(['close-modal', 'ticket-submit']);
+	const emit = defineEmits(['close-modal', 'ticket-submit', 'ticket-error']);
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 	const open = ref(true);
@@ -34,37 +34,12 @@
 	const due_date = ref('');
 
 	const loading = ref(false);
-	const error_occurred = ref(false);
+
 	const route = useRoute();
 
 	const imageSrc = ref([]);
 	const fileInput = ref(null);
 	const selectedFiles = ref([]);
-
-	const uploadImage = (event) => {
-		const file = event.target.files[0];
-		if (file) {
-			imageSrc.value.push(URL.createObjectURL(file));
-			selectedFiles.value.push(file);
-		}
-	};
-
-	const removeImage = (idx) => {
-		imageSrc.value.splice(idx, 1);
-		selectedFiles.value.splice(idx, 1);
-		fileInput.value = '';
-	};
-
-	const cancelAll = () => {
-		name.value = '';
-		brief.value = null;
-		imageSrc.value = [];
-		selectedFiles.value = [];
-		link.value = '';
-		type.value = '';
-		loading.value = false;
-		fileInput.value = '';
-	};
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -75,8 +50,6 @@
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
 
 	const types = {
 		client: [
@@ -97,7 +70,8 @@
 				type: 'engineering',
 				title: 'Modify an existing automation',
 				min_plan: 'support',
-				gated: retainer.tier === 'free' || retainer.status === 'paused',
+				gated:
+					User.Account.type !== 'client' || User.Account.status === 'paused',
 				desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
 			},
 			{
@@ -106,8 +80,7 @@
 				title: 'Create a new automation project',
 				min_plan: 'growth',
 				gated:
-					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-					retainer.status === 'paused',
+					User.Account.type !== 'client' || User.Account.status === 'paused',
 				desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 			},
 			{
@@ -122,8 +95,7 @@
 				title: 'Perfomance issues',
 				min_plan: 'enterprise',
 				gated:
-					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-					retainer.status === 'paused',
+					User.Account.type !== 'client' || User.Account.status === 'paused',
 				desc: 'Reporting of performance issues is only available on the Enterprise tier',
 			},
 			{
@@ -184,7 +156,7 @@
 				type: 'engineering',
 				title: 'Modify an existing automation',
 				min_plan: 'support',
-				gated: retainer.tier === 'free' || retainer.status === 'paused',
+				gated: false,
 				desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
 			},
 			{
@@ -192,9 +164,7 @@
 				type: 'engineering',
 				title: 'Create a new automation project',
 				min_plan: 'growth',
-				gated:
-					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-					retainer.status === 'paused',
+				gated: false,
 				desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
 			},
 			{
@@ -208,9 +178,7 @@
 				type: 'engineering',
 				title: 'Perfomance issues',
 				min_plan: 'enterprise',
-				gated:
-					(retainer.tier !== 'growth' && retainer.tier !== 'enterprise') ||
-					retainer.status === 'paused',
+				gated: false,
 				desc: 'Reporting of performance issues is only available on the Enterprise tier',
 			},
 			{
@@ -243,45 +211,66 @@
 	const severityTypes = [
 		{
 			id: 'low',
-			type: 'engineering',
+
 			title: 'Low',
 			desc: 'General guidance',
 		},
 		{
-			id: 'scheduled',
-			type: 'engineering',
+			id: 'normal',
+
 			title: 'Normal',
 			desc: 'System impaired',
 		},
 		{
-			id: 'bug',
-			type: 'engineering',
+			id: 'high',
+
 			title: 'High',
 			min_plan: 'support',
 
 			desc: 'Production system impaired',
 		},
 		{
-			id: 'new',
-			type: 'engineering',
-			title: 'Urgent',
+			id: 'urgent',
 
+			title: 'Urgent',
 			desc: 'Production system down',
 		},
 		{
-			id: 'dashboard_bug',
-			type: 'engineering',
+			id: 'critical',
+
 			title: 'Critical',
-			min_plan: 'enterprise',
-			gated: retainer.tier !== 'enterprise',
 			desc: 'Business-critical system down',
 		},
 	];
+
+	const uploadImage = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			imageSrc.value.push(URL.createObjectURL(file));
+			selectedFiles.value.push(file);
+		}
+	};
+
+	const removeImage = (idx) => {
+		imageSrc.value.splice(idx, 1);
+		selectedFiles.value.splice(idx, 1);
+		fileInput.value = '';
+	};
+
+	const cancelAll = () => {
+		name.value = '';
+		brief.value = null;
+		imageSrc.value = [];
+		selectedFiles.value = [];
+		link.value = '';
+		type.value = '';
+		loading.value = false;
+		fileInput.value = '';
+	};
+
 	const selectedSeverity = severityTypes[0];
 
 	const selectedTicket = ref(types[User.Account.type][0]);
-
-	const accountId = route.params.organization;
 
 	const { data: Account, error: accountError } = await supabase
 		.from('Account')
@@ -290,121 +279,130 @@
 		.limit(1)
 		.single();
 
-	const handleCheckout = async (product, type, customer) => {
-		const { url } = await $fetch('/api/stripe/checkout', {
-			method: 'post',
-			body: {
-				product,
-				type,
-				customer,
-				account: User.Account,
-				description: `${name.value} - ${brief.value}`,
-			},
-		});
-		return url;
-	};
-
 	const handleSubmit = async (body) => {
-		loading.value = true;
-		let accountManager = null;
-		if (selectedTicket.value.id === 'asap') {
-			location.href = await handleCheckout(
-				{ id: 'asap' },
-				'asap',
-				User.Account.stripeCustomerId
-			);
-			emit('ticket-submit');
-			emit('close-modal');
-			loading.value = false;
-			return;
-		}
-		if (selectedTicket.value.type === 'engineering') {
-			const accountManagers = await Promise.all(
-				Account.User.filter((o) => {
-					const badges = o.badges;
-					return badges.filter((o) => o.id === 'mg_officer').length;
-				}).map(async (o) => {
-					const { data: Ticket, error: ticketError } = await supabase
-						.from('Ticket')
-						.select('count')
-						.eq('assignedTo', o.id)
-						.single();
+		try {
+			loading.value = true;
+			let accountManager = null;
+			if (selectedTicket.value.id === 'asap') {
+				location.href = await handleCheckout(
+					{ id: 'asap' },
+					'asap',
+					User.Account.stripeCustomerId
+				);
+				emit('ticket-submit');
+				emit('close-modal');
+				loading.value = false;
+				return;
+			}
+			if (selectedTicket.value.type === 'engineering') {
+				const accountManagers = await Promise.all(
+					Account.User.filter((o) => {
+						const badges = o.badges;
+						return badges.filter((o) => o.id === 'mg_officer').length;
+					}).map(async (o) => {
+						try {
+							const { data: Ticket, error: ticketError } = await supabase
+								.from('Ticket')
+								.select('count')
+								.eq('assignedTo', o.id)
+								.single();
+							if (ticketError) {
+								throw ticketError;
+							}
+							return {
+								...o,
+								ticket_count: Ticket.count,
+							};
+						} catch (error) {
+							console.error('Error getting ticket count:', error);
+							throw error;
+						}
+					})
+				);
 
-					return {
-						...o,
-						ticket_count: Ticket.count,
-					};
-				})
-			);
+				// First, sort the account managers by ticket count
+				accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
 
-			// First, sort the account managers by ticket count
-			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+				// Then, find the account manager with the lowest ticket count
+				accountManager = accountManagers[0];
+			} else if (selectedTicket.value.type === 'sales') {
+				const accountManagers = await Promise.all(
+					Account.User.filter((o) => {
+						const badges = o.badges;
+						return badges.filter((o) => o.id === 'mg_sales').length;
+					}).map(async (o) => {
+						try {
+							const { data: Ticket, error: ticketError } = await supabase
+								.from('Ticket')
+								.select('count')
+								.eq('assignedTo', o.id)
+								.single();
+							if (ticketError) {
+								throw ticketError;
+							}
+							return {
+								...o,
+								ticket_count: Ticket.count,
+							};
+						} catch (error) {
+							console.error('Error getting ticket count:', error);
+							throw error;
+						}
+					})
+				);
+				accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+				accountManager = accountManagers[0];
+			}
 
-			// Then, find the account manager with the lowest ticket count
-			accountManager = accountManagers[0];
-		} else if (selectedTicket.value.type === 'sales') {
-			const accountManagers = await Promise.all(
-				Account.User.filter((o) => {
-					const badges = o.badges;
-					return badges.filter((o) => o.id === 'mg_sales').length;
-				}).map(async (o) => {
-					const { data: Ticket, error: ticketError } = await supabase
-						.from('Ticket')
-						.select('count')
-						.eq('assignedTo', o.id)
-						.single();
+			const { data, error } = await supabase
+				.from('Ticket')
+				.insert([
+					{
+						name: body.name,
+						type: selectedTicket.value.id,
+						createdBy: user.value.id,
+						dueDate: due_date.value ?? new Date(),
+						accountId: route.params.organization,
+						assignedTo: accountManager.id,
+						desc: body.brief,
+					},
+				])
+				.select();
+			if (error) {
+				throw error;
+			}
 
-					return {
-						...o,
-						ticket_count: Ticket.count,
-					};
-				})
-			);
-			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
-			accountManager = accountManagers[0];
-		}
-
-		const { data, error } = await supabase
-			.from('Ticket')
-			.insert([
-				{
-					name: body.name,
-					type: selectedTicket.value.id,
-					createdBy: user.value.id,
-					dueDate: due_date.value ?? new Date(),
-					accountId: route.params.organization,
-					assignedTo: accountManager.id,
-					desc: body.brief,
-				},
-			])
-			.select();
-
-		if (selectedFiles.value.length > 0) {
-			for (const file of selectedFiles.value) {
-				const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
-				const extension = file.name.match(regex);
-				const fileName = `${data[0].id}.${extension[1]}`;
-				const filePath = `attachments/${fileName}`;
-				const { error: uploadError } = await supabase.storage
-					.from('images')
-					.upload(filePath, file, { upsert: true });
-
-				if (uploadError) {
-					console.error('Error uploading image:', uploadError);
-					return;
+			if (selectedFiles.value.length > 0) {
+				for (const file of selectedFiles.value) {
+					try {
+						const regex = /[^\\&?]+\.(jpg|jpeg|gif|png|webp)$/i;
+						const extension = file.name.match(regex);
+						const fileName = `${data[0].id}.${extension[1]}`;
+						const filePath = `attachments/${fileName}`;
+						const { error: uploadError } = await supabase.storage
+							.from('images')
+							.upload(filePath, file, { upsert: true });
+						if (uploadError) {
+							throw uploadError;
+						}
+					} catch (error) {
+						console.error('Error uploading image:', error);
+						throw error;
+					}
 				}
 			}
+			emit('ticket-submit');
+			emit('close-modal');
+			name.value = '';
+			brief.value = null;
+			link.value = '';
+			type.value = '';
+			loading.value = false;
+		} catch (error) {
+			console.error('Error submitting ticket:', error);
+			emit('ticket-error', error);
 		}
-
-		emit('ticket-submit');
-		emit('close-modal');
-		name.value = '';
-		brief.value = null;
-		link.value = '';
-		type.value = '';
-		loading.value = false;
 	};
-
 	// Fetch User data
 </script>
 
@@ -414,7 +412,7 @@
 	>
 		<div
 			@click="$emit('close-modal'), (error_message = '')"
-			class="fixed inset-0 left-0 top-0 h-full w-full bg-gray-500/25 backdrop-blur-md transition-opacity duration-700 dark:bg-black/25"
+			class="dark:bg-black/25 fixed inset-0 left-0 top-0 h-full w-full bg-gray-500/25 backdrop-blur-md transition-opacity duration-700"
 		></div>
 		<div class="flex h-full w-full items-start justify-center overflow-y-auto">
 			<div class="mt-12">
@@ -700,7 +698,7 @@
 											v-if="!User.Account.type"
 										>
 											You are on the
-											<span class="capitalize">{{ retainer.tier }}</span> tier
+											<span class="capitalize">{{ 'Free' }}</span> tier
 										</p>
 										<p v-else class="mt-1 text-sm text-slate-500">
 											You are on the

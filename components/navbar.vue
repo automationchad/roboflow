@@ -164,7 +164,7 @@
 							>Account has exceeded usage limits</NuxtLink
 						>
 						<NuxtLink
-							v-else-if="retainer.tier === 'free'"
+							v-else
 							to="/settings/billing#usage"
 							class="inline-flex w-full items-center justify-center space-x-1 rounded-full border border-yellow-200 bg-yellow-100 px-2 py-0.5 text-center text-xs font-normal text-yellow-700 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-300"
 							><svg
@@ -419,20 +419,9 @@
 		.single();
 
 	const teams = ref([]);
-	const entitlements = await getEntitlements();
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-
-	const entitlement = entitlements[retainer.tier];
-
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
-	).length;
+	
 	const upgrade_needed = ref(false);
-	upgrade_needed.value =
-		totalActive > entitlement.ticket_count &&
-		// retainer.status === 'active' &&
-		User.systemRole !== 'super_admin';
+	
 
 	function moveOrgToFront(arr) {
 		const orgIndex =

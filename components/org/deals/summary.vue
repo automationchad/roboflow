@@ -3,6 +3,14 @@
 
 	import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 
+	const props = defineProps({
+		deals: {
+			type: Array,
+			required: true,
+			default: () => [],
+		},
+	});
+
 	let getStyleClass = (number) => {
 		if (number < 10000) {
 			return { style: 'bronze', 'row-span': '1' };
@@ -38,45 +46,63 @@
 		.select(
 			`*,
 	Account(
-		id
+		id,type
 		)`
 		)
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
 
+	console.log(User);
+
 	let deals = Ticket.filter((o) => o.Account.id === route.params.organization)
 		.filter(
 			(o) =>
 				![
-					'proposal_submitted',
+					'initial_review',
 					'requirements_gathering',
-					'contract_sent',
+					'proposal_submitted',
+					'contract_pending',
+					'invoice_pending',
 				].includes(o.status)
 		)
 		.sort((a, b) => b.deal_size - a.deal_size)
 		.slice(0, 6);
+
+	const examples = Array.from({ length: 6 }, (_, i) => ({
+		id: i,
+		name: `Example ${i}`,
+		deal_size: generateHighVariance(5000, 100000),
+		close_date: generateRandomDate(
+			new Date('2022-01-01'),
+			new Date('2022-12-31')
+		),
+	})).sort((a, b) => b.deal_size - a.deal_size);
 </script>
 
 <template>
 	<div class="mb-8">
 		<TabGroup>
 			<TabList class="flex space-x-3">
-				<Tab v-slot="{ selected }">
+				<Tab v-slot="{ selected }" class="outline-none">
 					<h2
 						:class="[
-							selected ? 'border-b border-indigo-400 font-medium bg-white/5' : '',
-							'mb-2 p-4 text-sm text-white rounded-t-md',
+							selected
+								? 'dark:bg-white/5 border-b border-indigo-400 bg-black/5  font-medium'
+								: '',
+							'mb-2 rounded-t-md p-4 text-sm dark:text-white',
 						]"
 					>
 						Top deals
 					</h2>
 				</Tab>
-				<Tab v-slot="{ selected }"
+				<Tab v-slot="{ selected }" class="outline-none"
 					><h2
 						:class="[
-							selected ? 'border-b border-indigo-400 font-medium bg-white/5' : '',
-							'mb-2 p-4 text-sm text-white rounded-t-md',
+							selected
+								? 'dark:bg-white/5 border-b border-indigo-400 bg-black/5 font-medium'
+								: '',
+							'mb-2 rounded-t-md p-4 text-sm dark:text-white',
 						]"
 					>
 						Graphs
@@ -105,7 +131,7 @@
 										'flex justify-end px-2 py-2 text-xs',
 									]"
 								>
-									{{ format(new Date(deal.close_date), 'MMM') }}
+									{{ format(new Date(deal.close_date), 'MMM, yy') }}
 								</div>
 								<div class="flex flex-1 flex-col justify-center p-2">
 									<h2
@@ -114,7 +140,7 @@
 											'text-3xl font-semibold ',
 										]"
 									>
-										{{ abbreviatedNumber(deal.deal_size) }}
+										{{ abbreviatedNumber(deal.deal_size, false) }}
 									</h2>
 									<p
 										:class="[
@@ -145,14 +171,56 @@
 						</div>
 						<div
 							v-else
-							class="col-span-4 row-span-2 h-full rounded border border-white/10"
+							v-for="(deal, idx) in examples"
+							:key="deal.id"
+							:class="[
+								getStyleClass(deal.deal_size).style,
+								idx < 2 ? 'row-span-2' : `row-span-1`,
+								'h-full rounded border border-white/10',
+							]"
 						>
 							<div class="flex h-full flex-col justify-between p-1">
+								<div
+									:class="[
+										getStyleClass(deal.deal_size).style + '-month',
+										'flex justify-end px-2 py-2 text-xs',
+									]"
+								>
+									{{ format(new Date(deal.close_date), 'MMM, yy') }}
+								</div>
 								<div class="flex flex-1 flex-col justify-center p-2">
-									<h2 :class="['text-3xl font-semibold text-white']">
-										No deals
+									<h2
+										:class="[
+											getStyleClass(deal.deal_size).style + '-text',
+											'text-3xl font-semibold ',
+										]"
+									>
+										{{ abbreviatedNumber(deal.deal_size, false) }}
 									</h2>
-									<p :class="['text-xs']">Test</p>
+									<p
+										:class="[
+											getStyleClass(deal.deal_size).style + '-month',
+											'text-xs',
+										]"
+									>
+										{{ deal.name }}
+									</p>
+								</div>
+								<div class="">
+									<div
+										:class="[
+											getStyleClass(deal.deal_size).style + '-border',
+											'border-t',
+										]"
+									></div>
+									<div
+										:class="[
+											getStyleClass(deal.deal_size).style + '-button',
+											'mt-3 rounded-sm p-2 text-xs text-white',
+										]"
+									>
+										Add deal story
+									</div>
 								</div>
 							</div>
 						</div>

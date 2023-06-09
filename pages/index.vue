@@ -27,20 +27,11 @@
 				</div>
 
 				<div class="mt-8">
-					<div class="rounded-md bg-red-50 p-4" v-if="is_error">
-						<div class="flex">
-							<div class="flex-shrink-0">
-								<XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
-							</div>
-							<div class="ml-3">
-								<h3 class="text-sm font-medium text-red-800">
-									{{ error_message }}
-								</h3>
-							</div>
-						</div>
-					</div>
 					<div class="mt-6 text-gray-900 dark:text-white" v-if="!is_success">
-						<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+						<form
+							@submit.prevent="signUp()"
+							class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2"
+						>
 							<div>
 								<label
 									for="first-name"
@@ -50,6 +41,7 @@
 								<div class="mt-2.5">
 									<input
 										v-model="first_name"
+										required
 										type="text"
 										name="first-name"
 										id="first-name"
@@ -68,6 +60,7 @@
 									<input
 										v-model="last_name"
 										type="text"
+										required
 										name="last-name"
 										id="last-name"
 										autocomplete="family-name"
@@ -85,6 +78,7 @@
 									<input
 										v-model="company_name"
 										type="text"
+										required
 										name="company"
 										id="company"
 										autocomplete="organization"
@@ -100,10 +94,10 @@
 									<input
 										v-model="email"
 										id="email"
+										required
 										name="email"
 										type="email"
 										autocomplete="email"
-										required=""
 										class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
@@ -131,7 +125,7 @@
 							<div class="sm:col-span-2">
 								<button
 									:disabled="loading"
-									@click="signUp()"
+									type="submit"
 									class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									<svg
@@ -201,7 +195,7 @@
 									{{ loading ? 'Loading' : 'Sign up' }}
 								</button>
 							</div>
-						</div>
+						</form>
 					</div>
 					<div class="" v-else>
 						<div>
@@ -228,7 +222,27 @@
 			leave-from-class="transform opacity-100 scale-100"
 			leave-to-class="transform opacity-0 scale-95"
 		>
-			<SuccessModal v-if="is_success" @close="is_success = false" :title="'Successfully created profile'" :description="''" />
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="'Successfully created profile'"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
 		</transition>
 	</div>
 </template>
@@ -264,7 +278,7 @@
 	const last_name = ref('');
 
 	const is_error = ref(false);
-	const is_success = ref(true);
+	const is_success = ref(false);
 	const error_message = ref('');
 	const loading = ref(false);
 
@@ -283,51 +297,72 @@
 	});
 
 	const signUp = async () => {
-		loading.value = true;
-		const customer = await $fetch('/api/stripe/customer/create', {
-			method: 'post',
-			body: {
-				email: email.value,
-				company_name: company_name.value,
-			},
-		});
+		try {
+			loading.value = true;
 
-		const subscription = await $fetch('/api/stripe/subscription/create', {
-			method: 'post',
-			body: {
-				customer,
-			},
-		});
-
-		const { user, error } = await supabase.auth.signUp({
-			email: email.value,
-			password: password.value,
-			options: {
-				data: {
-					first_name: first_name.value,
-					last_name: last_name.value,
+			const customer = await $fetch('/api/stripe/customer/create', {
+				method: 'post',
+				body: {
+					email: email.value,
 					company_name: company_name.value,
-					stripe_customer_id: customer.id,
-					stripe_subscription_id: subscription.id,
-					stripe_plan: subscription.plan,
 				},
-			},
-		});
-		if (error) {
+			});
+
+			if (!customer || customer.error) {
+				throw new Error(
+					customer.error ? customer.error : 'Error creating customer'
+				);
+			}
+
+			const subscription = await $fetch('/api/stripe/subscription/create', {
+				method: 'post',
+				body: {
+					customer,
+				},
+			});
+
+			if (!subscription || subscription.error) {
+				throw new Error(
+					subscription.error
+						? subscription.error
+						: 'Error creating subscription'
+				);
+			}
+
+			const { user, error } = await supabase.auth.signUp({
+				email: email.value,
+				password: password.value,
+				options: {
+					data: {
+						first_name: first_name.value,
+						last_name: last_name.value,
+						company_name: company_name.value,
+						stripe_customer_id: customer.id,
+						stripe_subscription_id: subscription.id,
+						stripe_plan: subscription.plan,
+					},
+				},
+			});
+
+			if (error) {
+				throw new Error(error);
+			} else {
+				loading.value = false;
+				is_success.value = true;
+			}
+		} catch (err) {
+			console.error(err);
 			is_error.value = true;
-			error_message.value = error;
-			alert(error);
-		} else {
+			error_message.value = err.message;
+			alert(err.message);
 			loading.value = false;
-			is_success.value = true;
+		} finally {
+			email.value = '';
+			password.value = '';
+			company_name.value = '';
+			first_name.value = '';
+			last_name.value = '';
 		}
-		email.value = '';
-		password.value = '';
-		company_name.value = '';
-		first_name.value = '';
-		last_name.value = '';
-		console.log('user', user);
-		console.log('error', error);
 	};
 
 	const linkAccounts = async () => {

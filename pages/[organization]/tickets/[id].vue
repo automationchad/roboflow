@@ -110,8 +110,9 @@
 
 	const shouldDisable = (id, index) => {
 		if (
-			(index < 4 && selectedIndex.value > index) ||
-			(selectedIndex.value < 3 && index > selectedIndex.value + 1)
+			(index < 5 && selectedIndex.value > index) ||
+			(selectedIndex.value < 4 && index > selectedIndex.value + 1) ||
+			index === 5
 		) {
 			return true;
 		}
@@ -140,18 +141,26 @@
 	};
 
 	const stageType = {
+		initial_review:
+			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
+		requirements_gathering:
+			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
 		proposal_submitted:
 			'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300 text-purple-900 dark:text-purple-200',
-		requirements_gathering:
-			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
-		solution_design:
-			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
-		in_development:
-			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
-		unit_testing:
+		contract_pending:
+			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
+		invoice_pending:
 			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
-		integration_testing:
+		invoice_paid:
+			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
+		solution_design:
+			'bg-teal-100 dark:bg-teal-700 dark:ring-teal-500 ring-teal-300 text-teal-900 dark:text-teal-200',
+		in_development:
+			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 text-lime-900 dark:text-lime-200',
+		unit_testing:
 			'bg-indigo-100 dark:bg-indigo-700 dark:ring-indigo-500 ring-indigo-300 text-indigo-900 dark:text-indigo-200',
+		integration_testing:
+			'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300 text-amber-900 dark:text-amber-200',
 		user_acceptance_testing:
 			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300 text-pink-900 dark:text-pink-200',
 		bug_fixing:
@@ -159,15 +168,17 @@
 		deployment_preparation:
 			'bg-gray-100 dark:bg-gray-700 dark:ring-gray-500 ring-gray-300 text-gray-900 dark:text-gray-200',
 		in_deployment:
-			'bg-teal-100 dark:bg-teal-700 dark:ring-teal-500 ring-teal-300 text-teal-900 dark:text-teal-200',
+			'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300 text-sky-900 dark:text-sky-200',
 		post_deployment_review:
 			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
 		maintenance_mode:
-			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
-		upgrades_and_enhancements:
-			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
-		project_on_hold:
 			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
+		upgrades_and_enhancements:
+			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 text-lime-900 dark:text-lime-200',
+		project_on_hold:
+			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
+		project_rejected:
+			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
 		project_cancelled:
 			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
 		project_completed:
@@ -175,9 +186,11 @@
 	};
 
 	const people = [
-		{ id: 'proposal_submitted', name: 'Proposal Submitted' },
+		{ id: 'initial_review', name: 'Initial Review' },
 		{ id: 'requirements_gathering', name: 'Requirements Gathering' },
-		{ id: 'contract_sent', name: 'Contract Sent' },
+		{ id: 'proposal_submitted', name: 'Proposal Submitted' },
+		{ id: 'contract_pending', name: 'Contract Sent' },
+		{ id: 'invoice_pending', name: 'Invoice Sent' },
 		{ id: 'invoice_paid', name: 'Invoice Paid' },
 		{ id: 'solution_design', name: 'Solution Design' },
 		{ id: 'in_development', name: 'In Development' },
@@ -1045,11 +1058,11 @@
 									</div>
 									<div class="mt-4 flex space-x-2 text-white">
 										<div
-											class="flex items-center space-x-2 rounded border border-white/20 px-2 py-1"
+											class="dark:border-white/20 flex items-center space-x-2 rounded border border-black/20 px-2 py-1"
 										>
 											<div class="flex items-center">
 												<button
-													class="hover:text-white/60 text-white/30 transition-colors"
+													class="dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500"
 												>
 													<svg
 														class="h-5 w-5"
@@ -1067,10 +1080,10 @@
 													</svg>
 												</button>
 											</div>
-											<div class="text-sm">{{ Ticket.votes }}</div>
+											<div class="text-sm dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500">{{ Ticket.votes }}</div>
 											<div class="flex items-center">
 												<button
-													class="hover:text-white/60 text-white/30 transition-colors"
+													class="dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500"
 												>
 													<svg
 														class="h-5 w-5"
@@ -1091,10 +1104,10 @@
 										</div>
 										<div class="">
 											<div
-												class="flex items-center rounded border border-white/20 px-2 py-1"
+												class="dark:border-white/20 flex items-center rounded border border-black/20 px-2 py-1"
 											>
 												<button
-													class="flex items-center text-sm text-gray-400 transition-colors hover:text-gray-200"
+													class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-200"
 												>
 													<svg
 														class="mr-1 h-5 w-5"
@@ -1150,13 +1163,13 @@
 									<div class="divide-gray-200 dark:divide-slate-800">
 										<div class="space-y-3 pb-4">
 											<div class="flex justify-between">
-												<div class="flex items-center text-slate-300">
+												<div class="flex items-center dark:text-slate-300">
 													{{ Ticket.Comment.length }} comment{{
 														Ticket.Comment.length > 0 ? 's' : ''
 													}}
 												</div>
 												<div
-													class="flex items-center rounded-full border border-[#423455] bg-[#1A1B2C] pl-2 pr-3 text-sm text-white"
+													class="dark:border-[#423455] dark:bg-[#1A1B2C] flex items-center rounded-full border border-gray-300 pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:text-white"
 												>
 													<svg
 														class="mr-0.5 h-5 w-5"
@@ -1836,6 +1849,7 @@
 										>Due in <span>{{ dueDate }}</span></span
 									>
 								</div>
+								<div class=""><OrgDealsInvoice /></div>
 							</div>
 							<div
 								class="mt-6 space-y-8 border-t border-gray-200 py-6 dark:border-slate-700"

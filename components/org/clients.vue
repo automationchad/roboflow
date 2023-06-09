@@ -1,9 +1,7 @@
 <template>
 	<div class="">
 		<div class="mt-8 space-y-6 lg:px-0">
-			<loading-spinner v-if="state.loading" />
-			<!-- Billing history -->
-			<section aria-labelledby="billing-history-heading" v-else>
+			<section aria-labelledby="clients">
 				<div class="sm:overflow-hidden">
 					<div class="flex max-w-5xl flex-col">
 						<div class="overflow-x-auto">
@@ -51,7 +49,7 @@
 												v-for="(team, idx) in teams"
 												:to="`/${team.id}/dashboard`"
 												:key="team.name"
-												class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors hover:bg-white/[2%] dark:border-slate-800 dark:text-slate-200"
+												class="dark:border-panel-border-dark hover:bg-white/[2%] relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors dark:border-slate-800 dark:text-slate-200"
 											>
 												<div class="flex w-[40%] items-center gap-3">
 													<span class="text-sm">{{
@@ -102,62 +100,13 @@
 </template>
 
 <script setup>
-	import { reactive, onMounted, ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		ExclamationTriangleIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
-
-	import { format, formatDistance } from 'date-fns';
-
-	const state = reactive({
-		invoices: [],
-		loading: false,
-	});
+	
 
 	const showSubmitModal = ref(false);
 
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
-
-	// let { data: User, error: userError } = await supabase
-	// 	.from('User')
-	// 	.select(`systemRole,Account(stripeCustomerId)`)
-	// 	.eq('id', user.value.id)
-	// 	.limit(1)
-	// 	.single();
-
-	const pastDue = () => {};
 
 	const styles = {
 		active:
@@ -173,7 +122,6 @@
 		delinquent:
 			'bg-rose-100 dark:bg-rose-700 dark:ring-rose-500 ring-rose-300 text-rose-900 dark:text-rose-200',
 	};
-	
 
 	let { data: User, error: userError } = await supabase
 		.from('User')
@@ -196,47 +144,12 @@
 		.limit(1)
 		.single();
 
-	const teams = ref([]);
-	const entitlements = await getEntitlements();
-
-	const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-
-	const entitlement = entitlements[retainer.tier];
-
-	const totalActive = User.Account.Ticket.filter(
-		(o) => o.status !== 'done' && entitlement.ticket_types.includes(o.type)
-	).length;
-	const upgrade_needed = ref(false);
-	upgrade_needed.value =
-		totalActive > entitlement.ticket_count &&
-		// retainer.status === 'active' &&
-		User.systemRole !== 'super_admin';
-
-	function moveOrgToFront(arr) {
-		const orgIndex =
-			User.Account.type === 'super_admin'
-				? arr.findIndex((obj) => obj.id === User.Account.id)
-				: arr.findIndex((obj) => obj.name === 'Organization');
-		if (orgIndex > -1) {
-			const orgObj = arr.splice(orgIndex, 1)[0];
-			arr.unshift(orgObj);
-		}
-		return arr;
-	}
-
 	const getData = async () => {
-		let { data: Account, error: accountError } = await supabase
+		const { data: Account, error: accountError } = await supabase
 			.from('Account')
 			.select('*,Ticket(count)');
-		if (User.Account.type === 'super_admin') {
-			teams.value = Account;
-		} else {
-			teams.value = User.Account.Team;
-			const index = teams.value.indexOf((o) => User.defaultTeamId === o.id);
-			const item = teams.value.splice(index, 1)[0];
-			teams.value.unshift(item);
-		}
-		teams.value = moveOrgToFront(teams.value);
+		teams.value = Account;
+		// teams.value = moveOrgToFront(teams.value);
 	};
 
 	onMounted(async () => {

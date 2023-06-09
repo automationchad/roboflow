@@ -119,6 +119,34 @@
 	const commentImageId = ref('');
 	const showImageModal = ref(false);
 
+	const waveSurferOption = {
+		height: 50,
+		progressColor: '#ffffff',
+		waveColor: '#fffffab3',
+		cursorWidth: 0,
+		barWidth: 2,
+		hideScrollbar: true,
+		mediaControls: false,
+		backend: 'MediaElement',
+		scrollParent: true,
+		xhr: {
+			mode: 'no-cors',
+		},
+	};
+	const refWaveSurfer = ref(null);
+
+	const playing = ref(false);
+
+	function play() {
+		playing.value = true;
+		refWaveSurfer.value.waveSurfer.play();
+	}
+
+	function pause() {
+		playing.value = false;
+		refWaveSurfer.value.waveSurfer.pause();
+	}
+
 	const query = ref('');
 
 	// const aiEnabled = ref(Ticket.ai_enabled);
@@ -328,15 +356,15 @@
 	const handleDelete = async (id, arr) => {
 		loading.value = true;
 		try {
-			if (!arr) {
-				const { data, error: deleteError } = await supabase
-					.from('Comment')
-					.delete()
-					.eq('id', id);
-			} else {
+			if (arr) {
 				const { data, error } = await supabase
 					.from('Comment')
 					.update({ text: 'This message was deleted.', deleted: true })
+					.eq('id', id);
+			} else {
+				const { data, error: deleteError } = await supabase
+					.from('Comment')
+					.delete()
 					.eq('id', id);
 			}
 		} catch (error) {
@@ -482,7 +510,7 @@
 								@click="
 									handleDelete(
 										props.activityItem.id,
-										props.activityItem?.Comment
+										props.activityItem.Comment.length > 0
 									)
 								"
 								class="text-slate-400 transition-colors hover:text-rose-400"
@@ -732,7 +760,7 @@
 									</svg>
 								</button>
 								<button
-									@click="handleDelete(reply.id, false)"
+									@click="handleDelete(reply.id, reply.Comment.length > 0)"
 									class="text-slate-400 transition-colors hover:text-rose-400"
 								>
 									<svg
@@ -877,10 +905,7 @@
 
 						<DisclosurePanel class="mt-3 flex items-start space-x-4 pl-8">
 							<div class="min-w-0 flex-1">
-								<div
-									
-									class="relative"
-								>
+								<div class="relative">
 									<div
 										class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
 									>
@@ -952,6 +977,33 @@
 							</div>
 						</DisclosurePanel>
 					</Disclosure>
+				</div>
+			</div>
+			<div
+				class=""
+				v-else-if="props.activityItem.activity_type === 'audio_comment'"
+			>
+				<div
+					:class="[
+						props.activityItem.User.id === User.id
+							? 'dark:bg-[#0166C8] prose-invert bg-[#4CA2FF] text-white ring-white/5'
+							: 'dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:text-gray-200',
+						props.activityItem.activity_type === 'ai_comment'
+							? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
+							: '',
+						props.activityItem.deleted
+							? 'dark:text-white/50 text-black/30'
+							: '',
+						'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
+					]"
+				>
+					<div class="flex items-center space-x-2">
+						<WaveSurfer
+							ref="refWaveSurfer"
+							src="/demo.mp3"
+							:options="waveSurferOption"
+						/>
+					</div>
 				</div>
 			</div>
 			<div v-else>

@@ -48,30 +48,47 @@
 
 							<span class="truncate">New referral</span>
 						</button>
-						<div class="block">
+						<div class="block shadow-sm">
 							<div
-								class="rounded-t-md bg-slate-800 p-2.5 text-center text-slate-400"
+								class="rounded-t-md border-x border-t border-slate-200 bg-slate-50 p-2.5 text-center text-slate-600 dark:bg-slate-800 dark:text-slate-400"
 							>
 								<div class="text-xs font-medium">Deal Summary</div>
 							</div>
-							<div class="rounded-b-md bg-slate-900 p-4 text-white">
+							<div
+								class="rounded-b-md border-x border-b p-4 dark:bg-slate-900 dark:text-white"
+							>
 								<div class="mb-2">
-									<div class="mb-1.5 text-xs text-slate-400">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
 										Lifetime revenue
 									</div>
-									<div class="text-sm text-slate-200">484.8k</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{
+											abbreviatedNumber(
+												closedDeals.reduce((a, c) => a + c.deal_size, 0)
+											)
+										}}
+									</div>
 								</div>
 								<div class="mb-2">
-									<div class="mb-1.5 text-xs text-slate-400">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
 										Number of deals
 									</div>
-									<div class="text-sm text-slate-200">20</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{ closedDeals.length }}
+									</div>
 								</div>
 								<div class="mb-2">
-									<div class="mb-1.5 text-xs text-slate-400">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
 										Average deal size
 									</div>
-									<div class="text-sm text-slate-200">24.2k</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{
+											abbreviatedNumber(
+												closedDeals.reduce((a, c) => a + c.deal_size, 0) /
+													closedDeals.length || 0
+											)
+										}}
+									</div>
 								</div>
 							</div>
 						</div>
@@ -80,10 +97,11 @@
 			</div>
 			<div class="">
 				<div class="">
+					<Members v-if="User.Account.type === 'super_admin'" />
 					<org-deals
 						v-for="quarter in quarters"
 						:key="quarter"
-						:deals="referralTickets"
+						:deals="referralTickets.all"
 						:quarter="quarter"
 						@updated="updateDeals"
 					/>
@@ -173,7 +191,38 @@
 			v-show="showSubmitModal"
 			@close-modal="showSubmitModal = false"
 			@ticket-submit="updateDeals"
+			@ticket-error="handleError"
 		/>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="success_message"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
+		</transition>
 	</div>
 </template>
 
@@ -224,6 +273,11 @@
 
 	const route = useRoute();
 
+	const is_error = ref(false);
+	const error_message = ref('');
+	const is_success = ref(false);
+	const success_message = ref('Ticket submitted successfully!');
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
 		.select('Account(*,Subscription(*),Ticket(count))')
@@ -251,9 +305,24 @@
 		let { data: referralTickets, error: ticketError } = await supabase
 			.from('Ticket')
 			.select('*')
-			.eq('accountId', route.params.organization);
-		return referralTickets.filter((o) => o.type === 'referral');
+			.eq('accountId', route.params.organization)
+			.eq('type', 'referral');
+		return {
+			all: referralTickets.filter((o) => o.type === 'referral'),
+			closed: referralTickets.filter(
+				(o) =>
+					![
+						'initial_review',
+						'requirements_gathering',
+						'proposal_submitted',
+						'contract_pending',
+						'invoice_pending',
+					].includes(o.status)
+			),
+		};
 	};
+
+	const closedDeals = ref([]);
 
 	let hosting =
 		User.Account.type === 'super_admin'
@@ -261,6 +330,11 @@
 			: User.Account.Subscription.find((o) => o.type === 'hosting');
 
 	const hosting_needed = !hosting;
+
+	const handleError = (msg) => {
+		error_message.value = msg;
+		is_error.value = true;
+	};
 
 	function generateFinancialQuarters(startDate) {
 		let start = new Date(startDate);
@@ -299,11 +373,15 @@
 	const quarters = generateFinancialQuarters('2023-04-01');
 
 	const updateDeals = async () => {
-		referralTickets.value = await getDealData();
+		is_success.value = true;
+		const data = await getDealData();
+		referralTickets.value = data;
+		closedDeals.value = data.closed;
 	};
 
 	onMounted(async () => {
-		referralTickets.value = await getDealData();
-		console.log(referralTickets.value);
+		const data = await getDealData();
+		referralTickets.value = data;
+		closedDeals.value = data.closed;
 	});
 </script>

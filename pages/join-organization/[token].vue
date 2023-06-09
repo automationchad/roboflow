@@ -1,7 +1,7 @@
 <template>
 	<div class="h-screen">
 		<div
-			class="grid h-full grid-cols-1 items-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24"
+			class="grid h-full grid-cols-1 items-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24"
 		>
 			<div class="col-span-1 mx-auto w-full max-w-sm lg:w-96" v-if="!loading">
 				<div>
@@ -70,7 +70,7 @@
 
 				<div class="mt-8">
 					<div class="mt-6">
-						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
+						<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
 							<div class="dark:text-white">
 								<label
 									for="first-name"
@@ -84,7 +84,7 @@
 										name="first-name"
 										id="first-name"
 										autocomplete="given-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -101,7 +101,7 @@
 										name="last-name"
 										id="last-name"
 										autocomplete="family-name"
-										class="block w-full rounded-md border-0 py-2 px-3.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
+										class="block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-slate-800 dark:ring-slate-700 sm:text-sm sm:leading-6"
 									/>
 								</div>
 							</div>
@@ -154,7 +154,7 @@
 									:disabled="loading"
 									@keyup.enter="signUp()"
 									@click="signUp()"
-									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									{{ loading ? 'Loading' : 'Create' }}
 								</button>
@@ -167,6 +167,36 @@
 				<LoadingIcon />
 			</div>
 		</div>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="success_message"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
+		</transition>
 	</div>
 </template>
 
@@ -174,9 +204,6 @@
 	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 	const route = useRoute();
 	const user = useSupabaseUser();
-	if (user.value) {
-		navigateTo('/invitation-not-found');
-	}
 
 	const supabase = useSupabaseClient();
 	const invitation = ref(null);
@@ -188,30 +215,39 @@
 	const is_success = ref(false);
 	const is_error = ref(false);
 	const error_message = ref('');
+	const success_message = ref('');
 	const loading = ref(false);
 
 	onMounted(async () => {
-		const token = route.params.token;
-		if (!token) {
+		try {
+			const token = route.params.token;
+			if (!token) {
+				navigateTo('/invitation-not-found');
+				return;
+			}
+			const { data, error } = await supabase
+				.from('Invitation')
+				.select('*')
+				.eq('token', token)
+				.single();
+			if (error) {
+				console.error(error);
+				navigateTo('/invitation-not-found');
+				return;
+			}
+			if (
+				!data ||
+				data.status !== 'pending' ||
+				data.expires < new Date(Date.now())
+			) {
+				navigateTo('/invitation-not-found');
+				return;
+			}
+			invitation.value = data;
+		} catch (err) {
+			console.error(err);
 			navigateTo('/invitation-not-found');
 		}
-		const { data, error } = await supabase
-			.from('Invitation')
-			.select('*')
-			.eq('token', token)
-			.single();
-		if (error) {
-			console.error(error);
-			navigateTo('/invitation-not-found');
-		}
-		if (
-			!data ||
-			data.status !== 'pending' ||
-			data.expires < new Date(Date.now())
-		) {
-			navigateTo('/invitation-not-found');
-		}
-		invitation.value = data;
 	});
 
 	onMounted(() => {
@@ -223,36 +259,47 @@
 	});
 
 	const signUp = async () => {
-		const { user, error } = await supabase.auth.signUp({
-			email: invitation.value.email,
-			password: password.value,
-			options: {
-				data: {
-					first_name: first_name.value,
-					last_name: last_name.value,
-					token: invitation.value.token,
-					account_id: invitation.value.account,
-					team_id: invitation.value.workspaceId,
+		try {
+			const { user, error } = await supabase.auth.signUp({
+				email: invitation.value.email,
+				password: password.value,
+				options: {
+					data: {
+						first_name: first_name.value,
+						last_name: last_name.value,
+						token: invitation.value.token,
+						account_id: invitation.value.account,
+						team_id: invitation.value.workspaceId,
+					},
 				},
-			},
-		});
-		if (error) {
-			is_error.value = true;
-			error_message.value = error;
-			alert(error);
-		} else {
+			});
+
+			if (error) {
+				is_error.value = true;
+				error_message.value = error.message;
+				alert(error.message);
+				return;
+			}
+
 			loading.value = false;
 			is_success.value = true;
+			success_message.value = 'Account created successfully!';
+
 			const { error: updateError } = await supabase
 				.from('Invitation')
 				.delete()
 				.eq('id', invitation.value.id);
+
 			if (updateError) {
 				is_error.value = true;
-				error_message.value = updateError;
+				error_message.value = updateError.message;
 				console.error(updateError);
 				return;
 			}
+		} catch (err) {
+			console.error(err);
+			is_error.value = true;
+			error_message.value = err.message;
 		}
 	};
 </script>

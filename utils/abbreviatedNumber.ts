@@ -1,4 +1,4 @@
-export default function (number) {
+export default function (number, includeDecimals = true) {
 	const SI_SYMBOL = ['', 'k', 'M', 'B', 'T', 'P', 'E'];
 	const tier = (Math.log10(Math.abs(number)) / 3) | 0;
 	if (tier === 0) {
@@ -10,10 +10,17 @@ export default function (number) {
 	const suffix = SI_SYMBOL[tier];
 	const scale = 10 ** (tier * 3);
 	const scaled = number / scale;
-	const fixedTwo = scaled.toFixed(2);
-	const fixedOne = scaled.toFixed(1);
-	const integer = Math.floor(scaled);
-	const precision = fixedTwo != fixedOne ? 2 : fixedOne != integer ? 1 : 0;
-	const result = scaled.toFixed(precision);
+
+	let result;
+	if (includeDecimals) {
+		const fixedTwo = scaled.toFixed(2);
+		const fixedOne = scaled.toFixed(1);
+		const integer = Math.floor(scaled);
+		const precision = fixedTwo !== fixedOne ? 2 : fixedOne !== integer ? 1 : 0;
+		result = scaled.toFixed(precision);
+	} else {
+		result = Math.floor(scaled);
+	}
+
 	return parseFloat(result) + suffix;
 }
