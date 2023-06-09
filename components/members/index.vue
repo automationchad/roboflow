@@ -43,7 +43,7 @@
 															:disabled="isAddingDisabled"
 															v-if="!open"
 															type="button"
-															class="flex items-center rounded-md border border-slate-300 px-3 py-1 text-center text-xs font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 dark:border-green-600 dark:bg-green-700 dark:text-green-50"
+															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
 														>
 															<svg
 																class="mr-2 h-4 w-4"
@@ -100,16 +100,47 @@
 																<DisclosureButton
 																	:disabled="loading"
 																	v-if="open"
+																	@click="inviteeEmail = ''"
 																	class="mr-2 flex h-6 w-6 items-center justify-center rounded-md border border-slate-300 text-center text-sm font-normal shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
 																	><XMarkIcon class="h-4 w-4"
 																/></DisclosureButton>
-																<DisclosureButton
+																<button
 																	:disabled="loading"
 																	@click="sendInvitation()"
 																	class="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-600 text-white"
 																>
-																	<CheckIcon class="h-4 w-4" />
-																</DisclosureButton>
+																	<svg
+																		v-if="loading"
+																		xmlns="http://www.w3.org/2000/svg"
+																		class="h-5 w-5 animate-spin"
+																		fill="none"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			stroke="currentColor"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																			stroke-width="1.5"
+																			d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+																		></path>
+																	</svg>
+
+																	<svg
+																		v-else
+																		class="h-5 w-5"
+																		viewBox="0 0 24 24"
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg"
+																	>
+																		<path
+																			d="M7.75 12.75L10 15.25L16.25 8.75"
+																			stroke="currentColor"
+																			stroke-width="1.5"
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																		></path>
+																	</svg>
+																</button>
 															</div>
 														</DisclosurePanel>
 													</div>
@@ -471,6 +502,8 @@
 	const is_success = ref(false);
 	const success_message = ref('');
 
+	const inviteeEmail = ref('');
+
 	const loading = ref(false);
 
 	let selectedRoles = reactive({});
@@ -598,7 +631,7 @@
 
 		if (
 			selectedUser.systemRole === 'owner' &&
-			accountData.User.filter((o) => o.systemRole === 'owner').length <= 1
+			accountData.User.concat(Invitation).filter((o) => o.systemRole === 'owner').length === 1
 		)
 			return true;
 
@@ -620,8 +653,6 @@
 		}
 		return arr;
 	}
-
-	const inviteeEmail = ref('');
 
 	const copyToClipboard = (text) => {
 		navigator.clipboard
@@ -716,12 +747,21 @@
 		try {
 			loading.value = true;
 			// Try to insert the invitation
+			const { data: userData, error: userError } = await supabase
+				.from('User')
+				.select('email')
+				.eq('email', inviteeEmail.value);
+
+			if (userData.length > 0) {
+				inviteeEmail.value = '';
+				throw new Error('User already exists');
+			}
 			const { data: invitation, error } = await supabase
 				.from('Invitation')
 				.insert([
 					{
 						email: inviteeEmail.value,
-						systemRole: 'contributor',
+						systemRole: accountData.User.length === 0 ? 'owner' : 'contributor',
 						createdBy: user.value.id,
 						expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
 						account: route.params.organization,
@@ -730,12 +770,7 @@
 				.select('*');
 			// If there was an error inserting the invitation, log the error and alert the user
 			if (error) {
-				is_success.value = false;
-				error_message.value = error.message || error.toString();
-				is_error.value = true;
-				inviteeEmail.value = '';
-				console.error('Error inserting invitation:', error);
-				return;
+				throw new Error(error.message || error.toString());
 			} else {
 				// Update the local invitations data as well
 				users.value.push(invitation[0]);
@@ -743,7 +778,6 @@
 				inviteeEmail.value = '';
 				success_message.value = 'Invitation sent successfully';
 				is_success.value = true;
-				console.log('Invitation sent successfully');
 			}
 
 			// Create the invitation link and email body
@@ -755,9 +789,8 @@
 			// Catch any unexpected errors and log them
 			is_success.value = false;
 			is_error.value = true;
-			error_message.value =
-				'An unexpected error occurred:' + error.message || error.toString();
-			console.error('An unexpected error occurred:', error);
+			error_message.value = error.message || error.toString();
+			loading.value = false;
 		}
 	};
 

@@ -69,7 +69,7 @@
 												<TabPanels>
 													<TabPanel><org-settings /></TabPanel>
 													<TabPanel><org-integrations /></TabPanel>
-													<TabPanel class="pt-12"><members /></TabPanel>
+													<TabPanel><members /></TabPanel>
 												</TabPanels>
 
 												<!-- Description list with inline editing -->

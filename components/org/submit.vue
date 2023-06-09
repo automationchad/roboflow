@@ -10,7 +10,6 @@
 
 	const form_responses = ref({
 		name: '',
-
 		options: {
 			partner: false,
 		},
