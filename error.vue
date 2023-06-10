@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="grid h-screen min-h-full grid-cols-1 grid-rows-[1fr,auto,1fr] bg-black lg:grid-cols-[max(50%,36rem),1fr]"
+		class="grid h-screen min-h-full bg-white grid-cols-1 grid-rows-[1fr,auto,1fr] dark:bg-black lg:grid-cols-[max(50%,36rem),1fr]"
 	>
 		<header
 			class="mx-auto w-full max-w-7xl px-6 pt-6 sm:pt-10 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:px-8"
@@ -34,7 +34,7 @@
 					}}
 				</p>
 				<div class="mt-10">
-					<a href="/" class="text-sm font-semibold leading-7 text-indigo-600"
+					<a href="/dashboard/projects" class="text-sm font-semibold leading-7 text-indigo-600"
 						><span aria-hidden="true">&larr;</span> Back to home</a
 					>
 				</div>

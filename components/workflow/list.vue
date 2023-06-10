@@ -213,7 +213,7 @@
 		.limit(1)
 		.single();
 	const workspaceId =
-		User.Account.type === 'super_admin' ? User.Account.trayWorkspaceId : null;
+		User.Account.type === 'super_admin' ? null : User.Account.trayWorkspaceId;
 
 	async function fetchData() {
 		const { elements: data } = await $fetch(

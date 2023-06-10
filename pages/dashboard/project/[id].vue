@@ -1169,7 +1169,7 @@
 													}}
 												</div>
 												<div
-													class="dark:border-[#423455] dark:bg-[#1A1B2C] flex items-center rounded-full border border-gray-300 pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:text-white"
+													class="dark:border-[#423455] dark:bg-[#1A1B2C] flex items-center bg-white rounded-full border border-gray-300 pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:text-white"
 												>
 													<svg
 														class="mr-0.5 h-5 w-5"

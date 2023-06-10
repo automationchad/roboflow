@@ -1,5 +1,5 @@
 <template>
-	<div class="dark:bg-[#020014] min-h-screen bg-white">
+	<div class="dark:bg-[#020014] min-h-screen bg-[#F8F8FB]">
 		<NuxtLayout
 			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
 		/></NuxtLayout>
@@ -24,7 +24,7 @@
 
 	@media (prefers-color-scheme: light) {
 		html {
-			background: #fff;
+			background: #F8F8FB;
 		}
 	}
 
@@ -32,4 +32,6 @@
 		scroll-behavior: smooth;
 		line-height: 1.5;
 	}
+
+	
 </style>

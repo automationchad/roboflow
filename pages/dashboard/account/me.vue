@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<Head>
-            <Title>Motis Group | Org Settings</Title>
+            <Title>Motis Group | Profile Settings</Title>
          </Head>
-		<div>
+		<div >
 			<!-- Your content -->
 			<div>
 				<div class="">
@@ -12,13 +12,45 @@
 							<main class="max-w-7xl flex-1">
 								<div class="relative mx-auto">
 									<div class="pt-10 pb-16">
-										<div class="px-4 sm:px-6 lg:px-0">
-											<p class="text-xs text-white">{{ User.Account.name }}</p>
+										<div class="flex justify-between px-4 sm:px-6 lg:px-0">
 											<h1
 												class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
 											>
-												Organization settings
+												Account settings
 											</h1>
+											<button
+												@click="signOut"
+												class="flex items-center rounded-lg border border-gray-200 px-4 py-1 dark:border-transparent dark:bg-slate-800 dark:text-white"
+											>
+												<svg
+													class="mr-1 h-6 w-6"
+													fill="none"
+													viewBox="0 0 24 24"
+												>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M15.75 8.75L19.25 12L15.75 15.25"
+													></path>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M19 12H10.75"
+													></path>
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M15.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H15.25"
+													></path>
+												</svg>
+												Log out
+											</button>
 										</div>
 										<div class="px-4 sm:px-6 lg:px-0">
 											<TabGroup class="py-6" as="div">
@@ -56,20 +88,26 @@
 																><a
 																	:class="[
 																		selected
-																			? 'border-purple-500'
+																			? 'border-indigo-500'
 																			: 'border-transparent',
-																		'cursor-pointer whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
+																		'cursor-pointer items-center whitespace-nowrap border-b py-4 px-1 text-sm font-normal text-gray-500 outline-none dark:text-white',
 																	]"
-																	>{{ tab.name }}</a
+																	>{{ tab.name
+																	}}<span
+																		v-if="tab.count !== undefined"
+																		class="ml-2 rounded-full bg-red-200 px-2 text-xs font-semibold text-red-800"
+																		>{{ tab.count }}</span
+																	></a
 																></Tab
 															>
 														</nav>
 													</div>
 												</TabList>
 												<TabPanels>
-													<TabPanel><org-settings /></TabPanel>
-													<TabPanel><org-integrations /></TabPanel>
-													<TabPanel><members /></TabPanel>
+													<TabPanel><profile-settings /></TabPanel>
+													<TabPanel><org-invitations /></TabPanel>
+													<!-- <TabPanel><profile-preferences /></TabPanel>
+															<TabPanel><profile-credentials /></TabPanel> -->
 												</TabPanels>
 
 												<!-- Description list with inline editing -->
@@ -122,50 +160,58 @@
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
-	const route = useRoute();
+	definePageMeta({ middleware: ['auth'], layout: 'settings' });
 
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
 
+	onMounted(async() => {
+		watchEffect(() => {
+			if (!user.value) {
+				navigateTo(`/login`);
+			}
+		});
+	});
+
+	const signOut = async () => {
+		await supabase.auth.signOut();
+	};
+
 	let { data: User, error: userError } = await supabase
 		.from('User')
-		.select(
-			`*,
-		Account (
-	     id,
-		 name,
-		 Team (
-			id,
-			name
-		 ),
-		 Ticket (
-			count
-		 )
-	   )
-	 `
-		)
+		.select('accountId')
 		.eq('id', user.value.id)
 		.limit(1)
 		.single();
 
+	let { data: Invitation, error: InvitationError } = await supabase
+		.from('Invitation')
+		.select('count')
+		.eq('account', User.accountId)
+		.single();
+
 	const tabs = [
 		{
-			name: 'Settings',
-			href: `/${User.Account.id}/settings`,
+			name: 'Profile',
+			href: `/${User.accountId}/settings`,
 			current: true,
 		},
 		{
-			name: 'Integrations',
-			href: `/${User.Account.id}/settings`,
-			current: false,
+			name: 'Invitations',
+			href: `/${User.accountId}/settings`,
+			count: Invitation.count,
+			current: true,
 		},
-		{
-			name: 'Members',
-			href: `/${User.Account.id}/settings/billing/billing-info`,
-			current: false,
-		},
+		// {
+		// 	name: 'Preferences',
+		// 	href: `/${User.Account.id}/settings/billing/billing-info`,
+		// 	current: false,
+		// },
+		// {
+		// 	name: 'Access Credentials',
+		// 	href: `/${User.Account.id}/settings/billing/billing-info`,
+		// 	current: false,
+		// },
 	];
-
-	const sidebarOpen = ref(false);
 </script>

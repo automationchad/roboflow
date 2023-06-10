@@ -125,30 +125,6 @@
 								</div>
 							</div>
 
-							<div class="flex items-center justify-between sm:col-span-2">
-								<div class="flex items-center">
-									<input
-										id="remember-me"
-										name="remember-me"
-										type="checkbox"
-										class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-800"
-									/>
-									<label
-										for="remember-me"
-										class="ml-2 block text-sm text-gray-900 dark:text-gray-300"
-										>Remember me</label
-									>
-								</div>
-
-								<div class="text-sm">
-									<a
-										href="/password"
-										class="font-medium text-indigo-600 hover:text-indigo-500"
-										>Forgot your password?</a
-									>
-								</div>
-							</div>
-
 							<div class="sm:col-span-2">
 								<button
 									:disabled="loading"
@@ -218,13 +194,14 @@
 	const success_message = ref('');
 	const loading = ref(false);
 
+	const token = route.params.token;
+
+	if (!token) {
+		navigateTo('/invitation-not-found');
+	}
+
 	onMounted(async () => {
 		try {
-			const token = route.params.token;
-			if (!token) {
-				navigateTo('/invitation-not-found');
-				return;
-			}
 			const { data, error } = await supabase
 				.from('Invitation')
 				.select('*')

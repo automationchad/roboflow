@@ -174,7 +174,7 @@
 					</div>
 					<div v-else class="h-84 relative grid grid-cols-4 grid-rows-2 gap-4">
 						<div
-							class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-white"
+							class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 dark:text-white"
 						>
 							No won deals yet...
 						</div>

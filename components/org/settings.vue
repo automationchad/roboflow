@@ -1,145 +1,215 @@
 <template>
-	<div class="h-full">
-		<div
-			class="mt-4 rounded-md bg-yellow-50 p-4"
-			v-if="User.systemRole !== 'owner' && User.systemRole !== 'super_admin'"
-		>
-			<div class="flex">
-				<div class="flex-shrink-0">
-					<ExclamationTriangleIcon
-						class="h-5 w-5 text-yellow-400"
-						aria-hidden="true"
-					/>
-				</div>
-				<div class="ml-3">
-					<h3 class="text-sm font-medium text-yellow-800">
-						You currently don't have access to change org settings
-					</h3>
-				</div>
-			</div>
-		</div>
-		<div class="mt-4 space-y-6 lg:px-0">
-			<!-- Plan -->
-			<section aria-labelledby="plan-heading">
-				<fieldset
-					:disabled="
-						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
-					"
-					class="disabled:opacity-60"
+	<div class="mb-8">
+		<div class="container my-4 max-w-4xl space-y-8">
+			<form id="org-general-settings">
+				<div
+					class="bg-scale-100 dark:bg-scale-300 border-scale-400 overflow-hidden rounded-md border shadow"
 				>
-					<div class="sm:overflow-hidden">
-						<div role="tabpanel" class="mt-4">
-							<div class="space-y-8">
-								<div class="dark:text-white" id="profile">
-									<div class="">
-										<div class="mb-4 flex border-b border-slate-300 py-8">
-											<h4 class="font-semibold">Organization</h4>
+					<div class="divide-scale-400 flex flex-col gap-0 divide-y">
+						<div
+							class="undefined block grid grid-cols-12 gap-6 px-8 py-8 opacity-100"
+						>
+							<label class="text-scale-1200 col-span-12 text-sm lg:col-span-5"
+								>General settings</label
+							>
+							<div
+								class="undefined undefined relative col-span-12 flex flex-col gap-6 lg:col-span-7"
+							>
+								<div
+									class="grid gap-2 text-sm leading-4 md:grid md:grid-cols-12"
+								>
+									<div
+										class="col-span-12 flex flex-row justify-between space-x-2"
+									>
+										<label
+											class="text-scale-1100 block text-sm leading-4"
+											for="name"
+											>Organization name</label
+										>
+									</div>
+									<div class="col-span-12">
+										<div class="">
+											<div class="relative">
+												<input
+													id="name"
+													name=""
+													type="text"
+													class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-3 py-2 text-sm leading-4 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+													value="automationchad's Org"
+												/>
+											</div>
 										</div>
-
-										<ul class="space-y-4">
-											<li class="flex items-center justify-between">
-												<div class="">
-													<div class="flex flex-col">
-														<small>Name</small>{{ User.Account.name }}
-													</div>
-												</div>
-												<div class="ml-2">
-													<button class="p-2">
-														<PencilIcon class="h-5 w-5" />
-													</button>
-												</div>
-											</li>
-											<li class="flex items-center justify-between">
-												<div class="">
-													<div class="flex flex-col">
-														<small>Organization ID</small>{{ User.Account.id }}
-													</div>
-												</div>
-												<div class="ml-2">
-													<button class="p-2">
-														<PencilIcon class="h-5 w-5" />
-													</button>
-												</div>
-											</li>
-										</ul>
+										<p
+											data-state="hide"
+											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm leading-4 text-red-900 transition-all"
+										></p>
 									</div>
 								</div>
-								<div id="danger" v-if="User.Account.type !== 'super_admin'">
-									<div>
+								<div class="mt-4">
+									<div class="flex flex-row gap-6 text-sm leading-4">
+										<div class="">
+											<button
+												type="button"
+												id="isOptedIntoAi"
+												name="isOptedIntoAi"
+												class="focus:ring-scale-400 bg-scale-500 hover:bg-scale-700 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent p-0 outline-none transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-current"
+											>
+												<span
+													aria-hidden="true"
+													class="bg-scale-100 dark:bg-scale-900 inline-block !h-5 h-5 !w-5 w-5 rounded-full shadow ring-0 transition duration-200 ease-in-out"
+												></span>
+											</button>
+										</div>
+										<div class="order-2 col-span-4 flex flex-col space-y-2">
+											<label
+												class="text-scale-1100 block text-sm leading-4"
+												for="isOptedIntoAi"
+												>Opt-in to sending anonymous data to OpenAI</label
+											>
+											<p
+												class="text-scale-900 mt-2 text-sm leading-4 leading-normal"
+												id="isOptedIntoAi-description"
+											>
+												By opting into sending anonymous data, Supabase AI can
+												improve the answers it shows you
+											</p>
+											<p
+												data-state="hide"
+												class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm leading-4 text-red-900 transition-all"
+											></p>
+										</div>
+									</div>
+									<div data-state="closed">
 										<div
-											class="mb-4 flex border-b border-slate-300 py-8 dark:text-white"
+											class="ml-16 flex cursor-pointer items-center space-x-2"
+											type="button"
+											aria-controls="radix-175"
+											aria-expanded="false"
+											data-state="closed"
 										>
-											<h4 class="font-semibold">Danger zone</h4>
-										</div>
-
-										<div class="flex items-center justify-between">
-											<div class="flex flex-col dark:text-white">
-												Delete organization<small class="text-slate-600"
-													>Delete the organization and all data associated with
-													it. This action cannot be reverted.</small
-												>
-											</div>
-
-											<div class="ml-2">
-												<button
-													disabled
-													class="group rounded-lg bg-red-100 p-1 disabled:bg-slate-700 dark:bg-red-800"
-												>
-													<TrashIcon
-														class="h-5 w-5 text-red-600 group-disabled:text-slate-300 dark:text-red-200"
-													/>
-												</button>
-											</div>
-										</div>
-										<div class="mt-4 flex items-center justify-between">
-											<div class="flex flex-col dark:text-white">
-												Leave organization<small class="text-slate-600"
-													>Are you sure you want to leave this
-													organization?</small
-												>
-											</div>
-
-											<div class="ml-2">
-												<button
-													disabled
-													class="group rounded-lg bg-red-100 p-1 disabled:bg-slate-700 dark:bg-red-800"
-												>
-													<UserMinusIcon
-														class="h-5 w-5 text-red-600 group-disabled:text-slate-300 dark:text-red-200"
-													/>
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="text-slate-500" v-if="User.Account.type !== 'super_admin'">
-									<div class="flex flex-col">
-										<small
-											>Motis Group<a
-												href="https://robocorp.com/terms-of-use"
-												target="_blank"
-												rel="noreferrer"
-												class="text-indigo-500"
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												class="sbui-icon transition-all"
 											>
-												terms of use</a
-											>
-											and<a
-												href="https://robocorp.com/privacy-policy"
-												target="_blank"
-												rel="noreferrer"
-												class="text-indigo-500"
-											>
-												privacy policy</a
-											></small
-										>
+												<polyline points="9 18 15 12 9 6"></polyline>
+											</svg>
+											<p class="text-scale-1000 text-sm underline">
+												Important information regarding opting in
+											</p>
+										</div>
+										<div
+											data-state="closed"
+											id="radix-175"
+											class="data-open:animate-slide-down-normal data-closed:animate-slide-up-normal"
+											style="
+												--radix-collapsible-content-height: 532px;
+												--radix-collapsible-content-width: 474.171875px;
+											"
+											hidden=""
+										></div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</fieldset>
-			</section>
-			<!-- Add Ons -->
+					<div class="border-scale-400 border-t"></div>
+					<div class="flex px-8 py-4">
+						<div class="flex w-full items-center justify-end gap-2">
+							<div class="flex items-center gap-2">
+								<button
+									class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+									disabled=""
+									type="reset"
+								>
+									<span class="truncate">Cancel</span></button
+								><button
+									form="org-general-settings"
+									class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+									disabled=""
+									type="submit"
+								>
+									<span class="truncate">Save</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="relative">
+				<div class="transition-opacity duration-300">
+					<div
+						class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+					>
+						<div
+							class="bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light dark:border-panel-border-dark border-b"
+						>
+							<div class="flex items-center px-6 py-4">
+								<p class="uppercase">Danger Zone</p>
+							</div>
+						</div>
+						<div class="bg-panel-body-light dark:bg-panel-body-dark">
+							<div class="px-6 py-4">
+								<div
+									class="btext-red-1200 relative flex items-start space-x-4 rounded-md border border-red-700 bg-red-200 px-6 py-4 dark:bg-red-100"
+								>
+									<div class="text-red-900">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="18"
+											height="18"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="sbui-icon"
+										>
+											<polygon
+												points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"
+											></polygon>
+											<line x1="12" y1="8" x2="12" y2="12"></line>
+											<line x1="12" y1="16" x2="12.01" y2="16"></line>
+										</svg>
+									</div>
+									<div class="flex flex-1 items-center justify-between">
+										<div>
+											<h3 class="text-red-1200 mb-1 block text-sm font-normal">
+												<span class="text-red-900"
+													>Deleting this organization will also remove its
+													projects</span
+												>
+											</h3>
+											<div class="text-red-1100 text-xs">
+												<p class="text-red-900">
+													Make sure you have made a backup if you want to keep
+													your data
+												</p>
+												<div class="mt-2">
+													<button
+														class="font-regular text-red-1100 bordershadow-red-700 hover:bordershadow-red-900 hover:text-lo-contrast relative inline-flex cursor-pointer items-center space-x-2 rounded bg-red-200 px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-red-900 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-red-700"
+														type="button"
+													>
+														<span class="truncate">Delete organization</span>
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>

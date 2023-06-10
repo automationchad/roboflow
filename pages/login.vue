@@ -58,7 +58,7 @@
 								<div>
 									<button
 										@click="handleLoginProvider('google')"
-										class="inline-flex w-full justify-center dark:bg-slate-900 dark:text-white dark:ring-slate-700 rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors focus:outline-offset-0"
+										class="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50 focus:outline-offset-0 dark:bg-slate-900 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800"
 									>
 										<span class="sr-only">Sign in with Google</span>
 										<svg
@@ -98,7 +98,7 @@
 								<div>
 									<button
 										@click="handleLoginProvider('github')"
-										class="inline-flex dark:bg-slate-900 dark:text-white dark:ring-slate-700 w-full justify-center rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+										class="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
 									>
 										<span class="sr-only">Sign in with GitHub</span>
 										<svg
@@ -123,10 +123,13 @@
 								class="absolute inset-0 flex items-center"
 								aria-hidden="true"
 							>
-								<div class="w-full border-t border-gray-300 dark:border-slate-600" />
+								<div
+									class="w-full border-t border-gray-300 dark:border-slate-600"
+								/>
 							</div>
 							<div class="relative flex justify-center text-sm">
-								<span class="bg-white px-2 text-gray-500 dark:text-white dark:bg-[#020014]"
+								<span
+									class="bg-white px-2 text-gray-500 dark:bg-[#020014] dark:text-white"
 									>Or continue with</span
 								>
 							</div>
@@ -283,7 +286,7 @@
 <script setup>
 	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 
-	definePageMeta({ middleware: ['auth'] });
+	definePageMeta({ middleware: ['auth'], layout: 'public' });
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
@@ -323,7 +326,7 @@
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider,
 			options: {
-				redirectTo: 'http://localhost:3000/login',
+				redirectTo: 'http://localhost:3000/dashboard/projects',
 			},
 		});
 		if (error != null) {
@@ -334,16 +337,10 @@
 		console.log('error', error);
 	};
 
-	onMounted(async () => {
-		watchEffect(async () => {
+	onMounted(() => {
+		watchEffect(() => {
 			if (user.value) {
-				let { data: User, error: userError } = await supabase
-					.from('User')
-					.select('accountId')
-					.eq('id', user.value.id)
-					.limit(1)
-					.single();
-				navigateTo(`/${User.accountId}/dashboard`);
+				navigateTo(`/dashboard/projects`);
 			}
 		});
 	});

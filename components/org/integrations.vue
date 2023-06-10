@@ -1,139 +1,256 @@
 <template>
-	<div>
-		<main class="py-10">
-			<div class="">
-				<div class="p-6 dark:bg-slate-900">
-					<div class="border-b border-slate-300 pb-4 dark:border-slate-700">
-						<div class="flex items-center">
-							<div class="flex-auto">
-								<h1
-									class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+	<div class="mb-8">
+		<div class="container my-4 max-w-4xl space-y-8">
+			<div class="flex justify-between">
+				<div class="grid gap-2 text-sm leading-4 md:grid md:grid-cols-12">
+					<div class="col-span-12">
+						<div class="">
+							<div class="relative">
+								<input
+									id="email"
+									name="email"
+									placeholder="Filter members"
+									type="text"
+									class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-3 py-2 pl-10 text-sm leading-4 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+									value=""
+								/>
+								<div
+									class="text-scale-1100 pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
 								>
-									Integrations
-								</h1>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="sbui-icon"
+									>
+										<circle cx="11" cy="11" r="8"></circle>
+										<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+									</svg>
+								</div>
+								<div
+									data-lastpass-icon-root="true"
+									style="
+										position: relative !important;
+										height: 0px !important;
+										width: 0px !important;
+										float: left !important;
+									"
+								></div>
 							</div>
 						</div>
+						<p
+							data-state="hide"
+							class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm leading-4 text-red-900 transition-all"
+						></p>
 					</div>
-
-					<div class="mt-8">
-						<ul class="space-y-4">
-							<li
-								v-for="person in moveUserToFront(
-									User.Account.User.concat(Invitation)
-								)"
-								:key="person.email"
-								class="flex items-center justify-between"
+				</div>
+				<div class="flex items-center space-x-4">
+					<div>
+						<button data-state="closed">
+							<button
+								class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+								type="button"
 							>
-								<div class="flex items-center">
-									<img
-										class="h-10 w-10 rounded-full"
-										src="https://lh3.googleusercontent.com/a-/ACB-R5TTqPhkUP-vcn7xt5m8mvEJT_VcGEgyESDLBtw3sujEXNMq_mTUPz4201MRcwHhlkXtuoCRoTSuZ9AZlo5JsYOoIpwfsKfwXXcZw4E9gf4ig_TMomyB-YgySd0yVAqQr4-D8Pty1bnr_6crM7OcBY6vGp9LMN8DB7pF0K7RgoiGoJ0_txrgF_UzqCHs34xqM-hRj4iPZBhCTFOFnbXIsaGfLMyfElVKBAluaY75C1tSP3NkxSbzSsWRIGRGXcz-poVxKQjR4_dwvCLi97DSKM1Yzw4Qt13aSLsSHPxXT49oa3gM7lBjX5ARYy0hUKlV7VyUAJKHjO-_be4vJBhMPW_Nt7I5b5BSqX3IEDfjSVdlQue_CU2t-plxLiPmfVl9wuB6vsroGsoOnOjK4HZCMkGOoHxE40rx0einTiVJHkqDRg2aWQhNXRv2-x8kGaFk9pTesQOPtUE04uPqsd-f_Dg-nXfMBVMV4LDschhSorO5NoBnSAIBiX4Ccz5o7rlC_gFIh5FizoO2c0u6gW90WlYkA3kOlgKhocF5IxBpAhCTnrl4juZPDsSSugT_xVEeXQoGn18aPhNtnGtgDWsFKOjwPfK0HQFrBPj2p8jaTwoUNBqvfmsjqLhTuh1ncYwToTs9r6QKkIhk2LlcLXe5S3Qcy225BLRVnemLOSARC60xe62RjFC4_YlpXznL10XhKVXdmnM5CjZsEzHXrl721pZy4g68ozcgTbMGgectfzNA7Sx3WnaThqsHXFaA0pB0AdbffdLRqCi8j909_uTvGMCDOuktY9DZuQLtbGv9kgvEpn0JxcI6ODtEXejTxjftRbHJRWtgIpqPgtmGusCNHrtzXhF7wRR66L0kshqP3i1KRjhI_uSAVv1NKWsnMCXMruinTjVSvN5KI5P_fkO1aGFv5E-68XZS8gy-6UAVHCLufrmCm0ieE1ioZEaZ=s96-c"
-										alt=""
-									/>
-								</div>
-								<div class="ml-4 flex-grow">
-									<div
-										class="flex flex-col space-x-2 dark:text-white"
-										v-if="!person.token"
-									>
-										{{ person.firstName }} {{ person.lastName }}
-										{{ person.id === user.id ? '(You)' : ''
-										}}<small class="text-gray-700 dark:text-slate-300">{{
-											person.email
-										}}</small>
-									</div>
-									<div class="dark:text-white" v-else>{{ person.email }}</div>
-								</div>
-								<div class="flex flex-grow-0 items-center space-x-4 pl-8">
-									<div class="flex items-center space-x-4" v-if="person.token">
-										<div class="text-slate-400">Invite pending</div>
-										<button @click="copyToClipboard(person.confirm_url)">
-											<LinkIcon class="h-5 w-5 text-slate-400" />
-										</button>
-									</div>
-
-									<Listbox
-										as="div"
-										:disabled="isEditRoleDisabled(person)"
-										class="w-[160px]"
-									>
-										<div class="relative">
-											<ListboxButton
-												class="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-transparent dark:text-slate-400 dark:ring-slate-700 dark:disabled:bg-slate-600 sm:text-sm sm:leading-6"
-											>
-												<span class="block truncate capitalize">{{
-													person.systemRole
-												}}</span>
-												<span
-													class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-												>
-													<ChevronDownIcon
-														class="h-5 w-5 text-gray-400"
-														aria-hidden="true"
-													/>
-												</span>
-											</ListboxButton>
-
-											<transition
-												leave-active-class="transition ease-in duration-100"
-												leave-from-class="opacity-100"
-												leave-to-class="opacity-0"
-											>
-												<ListboxOptions
-													class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-												>
-													<ListboxOption
-														as="template"
-														v-for="role in roles"
-														:key="role.id"
-														v-slot="{ active }"
-													>
-														<li
-															:class="[
-																active
-																	? 'bg-indigo-600 text-white'
-																	: 'text-gray-900',
-																'relative cursor-default select-none py-2 pl-3 pr-9',
-															]"
-														>
-															<span
-																:class="[
-																	person.systemRole === role.id
-																		? 'font-semibold'
-																		: 'font-normal',
-																	'block truncate',
-																]"
-																>{{ role.name }}</span
-															>
-
-															<span
-																v-if="person.systemRole === role.id"
-																:class="[
-																	active ? 'text-white' : 'text-indigo-600',
-																	'absolute inset-y-0 right-0 flex items-center pr-4',
-																]"
-															>
-																<CheckIcon class="h-5 w-5" aria-hidden="true" />
-															</span>
-														</li>
-													</ListboxOption>
-												</ListboxOptions>
-											</transition>
-										</div>
-									</Listbox>
-									<button
-										class="rounded-lg p-2 text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-600 dark:bg-slate-700 dark:text-slate-400 dark:disabled:bg-slate-800"
-										:disabled="isDeleteDisabled(person)"
-									>
-										<TrashIcon class="h-5 w-5" />
-									</button>
-								</div>
-							</li>
-						</ul>
+								<span class="truncate">Invite</span>
+							</button>
+						</button>
+					</div>
+					<div>
+						<button data-state="closed">
+							<button
+								class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+								disabled=""
+								type="button"
+							>
+								<span class="truncate">Leave team</span>
+							</button>
+						</button>
 					</div>
 				</div>
 			</div>
-		</main>
+		</div>
+		<div class="container my-4 max-w-4xl space-y-8">
+			<div class="rounded">
+				<div class="relative">
+					<div class="transition-opacity duration-300">
+						<div class="table-container">
+							<table class="table">
+								<thead>
+									<tr>
+										<th class="p-3 px-4 text-left">User</th>
+										<th class="p-3 px-4 text-left"></th>
+										<th class="flex items-center space-x-2 p-3 px-4 text-left">
+											<span>Role</span
+											><svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												class="sbui-icon hover:text-scale-1200 cursor-pointer transition"
+											>
+												<circle cx="12" cy="12" r="10"></circle>
+												<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+												<line x1="12" y1="17" x2="12.01" y2="17"></line>
+											</svg>
+										</th>
+										<th class="p-3 px-4 text-left"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="">
+										<td>
+											<div class="flex items-center space-x-4">
+												<div>
+													<span
+														style="
+															box-sizing: border-box;
+															display: inline-block;
+															overflow: hidden;
+															width: initial;
+															height: initial;
+															background: none;
+															opacity: 1;
+															border: 0px;
+															margin: 0px;
+															padding: 0px;
+															position: relative;
+															max-width: 100%;
+														"
+														><span
+															style="
+																box-sizing: border-box;
+																display: block;
+																width: initial;
+																height: initial;
+																background: none;
+																opacity: 1;
+																border: 0px;
+																margin: 0px;
+																padding: 0px;
+																max-width: 100%;
+															"
+															><img
+																alt=""
+																aria-hidden="true"
+																src="data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2740%27%20height=%2740%27/%3e"
+																style="
+																	display: block;
+																	max-width: 100%;
+																	width: initial;
+																	height: initial;
+																	background: none;
+																	opacity: 1;
+																	border: 0px;
+																	margin: 0px;
+																	padding: 0px;
+																" /></span
+														><img
+															srcset="
+																/dashboard/_next/image?url=https%3A%2F%2Fgithub.com%2Fautomationchad.png%3Fsize%3D80&amp;w=48&amp;q=75 1x,
+																/dashboard/_next/image?url=https%3A%2F%2Fgithub.com%2Fautomationchad.png%3Fsize%3D80&amp;w=96&amp;q=75 2x
+															"
+															src="/dashboard/_next/image?url=https%3A%2F%2Fgithub.com%2Fautomationchad.png%3Fsize%3D80&amp;w=96&amp;q=75"
+															decoding="async"
+															data-nimg="intrinsic"
+															class="rounded-full border"
+															style="
+																position: absolute;
+																inset: 0px;
+																box-sizing: border-box;
+																padding: 0px;
+																border: none;
+																margin: auto;
+																display: block;
+																width: 0px;
+																height: 0px;
+																min-width: 100%;
+																max-width: 100%;
+																min-height: 100%;
+																max-height: 100%;
+															"
+													/></span>
+												</div>
+												<div>
+													<p class="text-scale-1200">automationchad</p>
+													<p class="text-scale-1100">will.marzella@tray.io</p>
+												</div>
+											</div>
+										</td>
+										<td></td>
+										<td>
+											<button
+												data-state="delayed-open"
+												class="w-[140px]"
+												aria-describedby="radix-199"
+											>
+												<div
+													class="pointer-events-none grid gap-2 text-sm md:grid md:grid-cols-12"
+												>
+													<div class="col-span-12">
+														<div class="">
+															<button
+																class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2 indent-px text-sm opacity-50 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current aria-expanded:ring-2"
+																name=""
+																id=""
+																type="button"
+																aria-haspopup="menu"
+																aria-expanded="false"
+																data-state="closed"
+																data-disabled=""
+																disabled=""
+															>
+																<span
+																	class="flex w-full flex-row items-center space-x-3"
+																	><span class="truncate">Owner</span></span
+																><span
+																	class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+																	><svg
+																		class="text-scale-600 h-5 w-5"
+																		xmlns="http://www.w3.org/2000/svg"
+																		viewBox="0 0 20 20"
+																		fill="currentColor"
+																		aria-hidden="true"
+																	>
+																		<path
+																			fill-rule="evenodd"
+																			d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+																			clip-rule="evenodd"
+																		></path></svg
+																></span>
+															</button>
+														</div>
+														<p
+															data-state="hide"
+															class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+														></p>
+													</div>
+												</div>
+											</button>
+										</td>
+										<td></td>
+									</tr>
+									<tr
+										class="bg-panel-secondary-light dark:bg-panel-secondary-dark"
+									>
+										<td colspan="4"><p class="text-scale-1100">1 user</p></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 

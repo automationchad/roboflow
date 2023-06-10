@@ -19,6 +19,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 				return navigateTo('/error');
 			}
 
+			if (to.path.includes('/join-organization')) {
+				return navigateTo(`/dashboard/projects`);
+			}
+
 			if (
 				userData?.Account.type !== 'super_admin' &&
 				to.params.organization !== undefined &&
@@ -41,7 +45,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 				userData.Account.hasCompletedOnboarding
 			) {
 				// If the user has completed onboarding, redirect them to the dashboard
-				return navigateTo(`/${org_id}/dashboard`);
+				return navigateTo(`/dashboard/projects`);
 			}
 		}
 	} catch (error) {

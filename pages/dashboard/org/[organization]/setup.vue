@@ -1,5 +1,5 @@
 <script setup>
-	definePageMeta({ layout: 'onboarding' });
+	definePageMeta({ layout: 'public' });
 
 	import { CheckCircleIcon } from '@heroicons/vue/20/solid';
 	import { ref } from 'vue';

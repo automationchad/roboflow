@@ -316,9 +316,7 @@
 						</li>
 
 						<li class="mt-auto space-y-2">
-							<div class="relative">
-								<help />
-							</div>
+							
 
 							<div class="relative">
 								<NuxtLink class="-m-1.5 flex items-center p-1.5" to="/settings">

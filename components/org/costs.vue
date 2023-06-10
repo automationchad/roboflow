@@ -39,20 +39,24 @@ import { format, addDays } from 'date-fns';
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 
-const state = reactive({
-	kpis: { 'Task Runs': 0 },
-	workflows: { count: 0, runs: { count: 0 } },
-	loading: true,
-});
+const route = useRoute();
 
-let { data: User, error: userError } = await supabase
-	.from('User')
-	.select('*,Account(type,Subscription(*),Ticket(*),User(*))')
-	.eq('id', user.value.id)
-	.limit(1)
-	.single();
+let activeUsers = ref(0);
+let openTickets = ref(0);
 
-const super_admin = User.Account.type === 'super_admin';
+let kpis = ref({'Task Runs': 0});
+let workflows =  ref({count: 0, runs: {count: 0}});
+let loading = ref(true);
+
+
+let { data: accountData, error: accountError} = await supabase.from('Account').select('type,trayWorkspaceId,User(count),Ticket(count),Subscription(*)').eq('id', route.params.organization).limit(1).single();
+
+activeUsers.value = accountData.User[0].count;
+
+openTickets.value = accountData.Ticket[0].count;
+
+
+
 
 const plans = [
 	{
@@ -117,48 +121,37 @@ const plans = [
 
 const entitlements = getEntitlements();
 
-const hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
+const hosting = accountData.type !== 'partner';
 
 let retainer = {};
-retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
+retainer = accountData.Subscription.find((o) => o.type === 'retainer');
 
 var date = new Date(Date.now());
 var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
 
 const monthly_sum = Math.round(
-	User.Account.Subscription.reduce((acc, item) => {
+	accountData.Subscription.reduce((acc, item) => {
 		return acc + item.amount;
 	}, 0) / 100
 );
 
-const workspaceId =
-	User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
-
 async function fetchData() {
-	const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
-	let workflows = {};
-	workflows.runs = await $fetch(`/api/tray/workflows/runs/${workspaceId}`);
-	workflows.count = kpis['Active Workflows'];
-	const data = { kpis, workflows };
-	return data;
+	const data = await $fetch(`/api/tray/kpis/${accountData.trayWorkspaceId}`);
+	kpis.value['Task Runs'] = data['Task Runs'];
+	workflows.value.runs = await $fetch(`/api/tray/workflows/runs/${accountData.trayWorkspaceId}`);
+	workflows.value.count = data['Active Workflows'];
+	loading.value = false;
 }
 
-const kpis = ref(state.kpis);
-const workflows = ref(state.workflows);
-const loading = ref(state.loading);
+fetchData();
+
 
 const upgrade_needed = ref(false);
 
-upgrade_needed.value = entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length < 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0
+upgrade_needed.value = entitlements[retainer.tier].ticket_count - accountData.Ticket[0].count < 0 || entitlements[retainer.tier].user_count - accountData.User[0].count < 0
 
 const freePlan = retainer.tier === 'free';
 
-onMounted(async () => {
-	const { kpis, workflows } = await fetchData();
-	state.kpis = kpis;
-	state.workflows = workflows;
-	loading.value = false;
-});
 </script>
 
 <template>
@@ -332,9 +325,7 @@ onMounted(async () => {
 												{{ entitlements[retainer.tier]
 													.ticket_count === 0 ? '-' :
 													`${formatAccounting(
-														(User.Account.Ticket.filter(
-															(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
-														).length /
+														(openTickets /
 															entitlements[retainer.tier]
 																.ticket_count) *
 														100
@@ -361,9 +352,7 @@ onMounted(async () => {
 															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
 														>
 															{{
-																User.Account.Ticket.filter(
-																	(o) => entitlements[retainer.tier].ticket_types.includes(o.type) && o.status !== 'done'
-																).length
+																openTickets
 															}}
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -375,18 +364,14 @@ onMounted(async () => {
 													>
 														<div
 															:class="[
-																User.Account.Ticket.filter(
-																	(o) => o.status !== 'done'
-																).length /
+																openTickets /
 																	entitlements[retainer.tier].ticket_count <
 																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${(User.Account.Ticket.filter(
-																(o) => o.status !== 'done'
-															).length /
+															:style="`width: ${(openTickets /
 																entitlements[retainer.tier].ticket_count) *
 																100
 																}%`"
@@ -556,7 +541,7 @@ onMounted(async () => {
 											>
 												{{
 													formatAccounting(
-														(User.Account.User.length /
+														(activeUsers /
 															entitlements[retainer.tier].user_count) *
 														100
 													)
@@ -571,7 +556,7 @@ onMounted(async () => {
 														<p
 															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
 														>
-															{{ User.Account.User.length.toLocaleString() }}
+															{{ activeUsers.toLocaleString() }}
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
 															{{
@@ -586,14 +571,14 @@ onMounted(async () => {
 													>
 														<div
 															:class="[
-																User.Account.User.length /
+																activeUsers /
 																	entitlements[retainer.tier].user_count <
 																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${(User.Account.User.length /
+															:style="`width: ${(activeUsers /
 																entitlements[retainer.tier].user_count) *
 																100
 																}%`"
@@ -676,7 +661,7 @@ onMounted(async () => {
 											>
 												{{ hosting ?
 													`${formatAccounting(
-														(state.workflows.count /
+														(workflows.count /
 															entitlements[retainer.tier].workflow_count) *
 														100
 													)} %` : '-'
@@ -763,7 +748,7 @@ onMounted(async () => {
 			></path></svg
 		></span>
 														
-														<span v-else>{{ state.workflows.count.toLocaleString() }}</span>
+														<span v-else>{{ workflows.count.toLocaleString() }}</span>
 															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -779,14 +764,14 @@ onMounted(async () => {
 													>
 														<div
 															:class="[
-																state.workflows.count /
+																workflows.count /
 																	entitlements[retainer.tier].workflow_count <
 																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${(state.workflows.count /
+															:style="`width: ${loading ? 0 : (workflows.count /
 																entitlements[retainer.tier].workflow_count) *
 																100
 																}%`"
@@ -823,7 +808,7 @@ onMounted(async () => {
 											>
 												{{ hosting ?
 													`${formatAccounting(
-														(state.workflows.runs.count /
+														(workflows.runs.count /
 															entitlements[retainer.tier].workflow_runs) *
 														100
 													)} %` : '-'
@@ -908,7 +893,7 @@ onMounted(async () => {
 				stroke-linejoin="round"
 			></path></svg
 		></span>
-															<span v-else>{{ state.workflows.runs.count.toLocaleString() }}</span>
+															<span v-else>{{ workflows.runs.count.toLocaleString() }}</span>
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
 															{{
@@ -923,14 +908,14 @@ onMounted(async () => {
 													>
 														<div
 															:class="[
-																state.workflows.runs.count /
+																workflows.runs.count /
 																	entitlements[retainer.tier].workflow_runs <
 																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${(state.workflows.runs.count /
+															:style="`width: ${loading ? 0 : (workflows.runs.count /
 																entitlements[retainer.tier].workflow_runs) *
 																100
 																}%`"
@@ -1011,7 +996,7 @@ onMounted(async () => {
 												
 												{{ hosting ?
 													`${formatAccounting(
-														(state.kpis['Task Runs'] /
+														(kpis['Task Runs'] /
 															entitlements[retainer.tier].execution_count) *
 														100
 													)} %` : '-'
@@ -1094,7 +1079,7 @@ onMounted(async () => {
 				stroke-linecap="round"
 				stroke-linejoin="round"
 			></path></svg
-		></span><span v-else>{{ state.kpis['Task Runs'].toLocaleString() }} </span><span class="text-xs ml-2 text-rose-400">${{ formatAccounting(trayCost(state.kpis['Task Runs'])) }}</span>
+		></span><span v-else>{{ kpis['Task Runs'].toLocaleString() }} </span><span class="text-xs ml-2 text-rose-400">${{ formatAccounting(trayCost(kpis['Task Runs'])) }}</span>
 															
 														</p>
 														<p class="text-scale-1100 text-sm tabular-nums">
@@ -1110,14 +1095,14 @@ onMounted(async () => {
 													>
 														<div
 															:class="[
-																state.kpis['Task Runs'] /
+																kpis['Task Runs'] /
 																	entitlements[retainer.tier].execution_count <
 																	1
 																	? 'bg-lime-500'
 																	: 'bg-rose-700',
 																'absolute inset-x-0 bottom-0 h-1 rounded transition-all',
 															]"
-															:style="`width: ${(state.kpis['Task Runs'] /
+															:style="`width: ${loading ? 0 : (kpis['Task Runs'] /
 																entitlements[retainer.tier].execution_count) *
 																100
 																}%`"
@@ -1126,64 +1111,7 @@ onMounted(async () => {
 												</div>
 											</td>
 										</tr>
-										<tr
-											v-if="false"
-											class="border-t border-slate-200 dark:border-slate-800"
-										>
-											<td
-												class="text-scale-1200 whitespace-nowrap px-6 py-3 text-sm"
-											>
-												Realtime Concurrent Peak Connections<button
-													data-state="closed"
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														width="14"
-														height="14"
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														stroke-width="2"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														class="sbui-icon ml-2"
-													>
-														<circle cx="12" cy="12" r="10"></circle>
-														<line x1="12" y1="16" x2="12" y2="12"></line>
-														<line x1="12" y1="8" x2="12.01" y2="8"></line>
-													</svg>
-												</button>
-											</td>
-											<td
-												class="text-scale-1200 hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell"
-											>
-												0.00 %
-											</td>
-											<td class="text-scale-1200 px-6 py-3 text-sm">
-												<div class="flex w-full flex-col">
-													<div
-														class="flex justify-between space-x-8 pb-1 align-baseline"
-													>
-														<p
-															class="text-scale-1200 capitalize-sentence max-w-[75%] truncate text-sm"
-														>
-															0
-														</p>
-														<p class="text-scale-1100 text-sm tabular-nums">
-															200
-														</p>
-													</div>
-													<div
-														class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-100 p-0 dark:bg-slate-700"
-													>
-														<div
-															class="bg-brand-900 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
-															style="width: 0%"
-														></div>
-													</div>
-												</div>
-											</td>
-										</tr>
+										
 									</tbody>
 								</table>
 							</div>
@@ -1376,189 +1304,12 @@ onMounted(async () => {
 								</table>
 							</div>
 						</div>
-						<!-- <div v-else><loading-spinner /></div> -->
+						
 					</div>
 				</div>
 			</div>
 		</div>
-		<div role="tabpanel" v-if="false">
-			<div class="mt-8" v-if="!loading">
-				<div class="block">
-					<div class="">
-						<div class="flex w-full">
-							<div class="w-1/3">
-								<p
-									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
-								>
-									Base
-								</p>
-								<h3 class="my-8 text-2xl font-semibold dark:text-white">
-									{{ formatAccounting(monthly_sum) }}
-								</h3>
-							</div>
-							<div class="w-1/3">
-								<p
-									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
-								>
-									Tasks
-								</p>
-								<h3
-									:class="[
-										super_admin
-											? 'text-rose-800 dark:text-rose-600'
-											: 'text-gray-900 dark:text-white',
-										'my-8 flex items-center text-2xl font-semibold ',
-									]"
-								>
-									{{
-										hosting
-										? super_admin
-											? `(${formatAccounting(trayCost(kpis['Task Runs']))})`
-											: formatAccounting(taskPrice(kpis['Task Runs']))
-										: formatAccounting(0)
-									}}
-									<div v-if="User.Account.type === 'super_admin'" class="">
-										<!-- <p class="text-xs font-semibold text-rose-700">
-											({{ formatAccounting(trayCost(kpis['Task Runs'])) }})
-										</p> -->
-										<p class="ml-1 text-xs font-semibold text-lime-700">
-											{{
-												formatAccounting(
-													taskPrice(kpis['Task Runs']) -
-													trayCost(kpis['Task Runs'])
-												)
-											}}
-										</p>
-									</div>
-								</h3>
-							</div>
-
-							<div class="w-1/3">
-								<p
-									class="sc-kLLXSd text-base font-medium text-slate-600 dark:text-slate-200"
-								>
-									Total cost
-								</p>
-								<h3 class="my-8 text-2xl font-semibold dark:text-white">
-									{{
-										formatAccounting(
-											(hosting
-												? super_admin
-													? trayCost(kpis['Task Runs'])
-													: taskPrice(kpis['Task Runs'])
-												: 0) + monthly_sum
-										)
-									}}
-								</h3>
-							</div>
-						</div>
-						<div class="mb-4 dark:text-white">
-							{{
-								format(firstDay, 'MMM d') +
-								' - ' +
-								format(addDays(firstDay, 30), 'MMM d yyyy')
-							}}
-						</div>
-					</div>
-				</div>
-				<div class="grid grid-cols-2 gap-8">
-					<div class="gwIZYl bg-gray-50 p-6 dark:bg-slate-800">
-						<div class="">
-							<div
-								class="border-b border-gray-300 pb-3 dark:border-slate-600"
-							>
-								<h4 class="bOtoTi text-base font-semibold dark:text-white">
-									Task Runs
-								</h4>
-								<div class="sc-TRNrF iPuFes"></div>
-							</div>
-
-							<div
-								class="my-4 text-slate-600 dark:text-slate-300"
-								v-if="hosting"
-							>
-								<div class="flex">
-									<div>
-										<div>
-											<p
-												class="text-3xl font-semibold text-slate-800 dark:text-white"
-											>
-												{{ kpis['Task Runs'].toLocaleString() }}/{{
-													abbreviatedNumber(task_entitlement)
-												}}
-											</p>
-										</div>
-										<div>
-											<p class="text-sm">Plan tasks used</p>
-										</div>
-									</div>
-								</div>
-								<div class="mt-2">
-									<div class="">
-										<div class="">
-											<progress
-												id="file"
-												:value="(kpis['Task Runs'] / task_entitlement) * 100"
-												max="100"
-											>
-												{{ (kpis['Task Runs'] / task_entitlement) * 100 }}%
-											</progress>
-										</div>
-									</div>
-									<div class="flex">
-										<p class="text-sm">
-											{{
-												Math.round(
-													(kpis['Task Runs'] * 0.7) / 60 > 60
-														? (kpis['Task Runs'] * 0.7) / 3600
-														: (kpis['Task Runs'] * 0.7) / 60
-												)
-											}}
-											Self-hosted
-											{{
-												(kpis['Task Runs'] * 0.7) / 60 > 60
-												? 'hours'
-												: 'minutes'
-											}}
-										</p>
-									</div>
-								</div>
-							</div>
-							<div
-								v-else
-								class="my-10 text-sm text-slate-600 dark:text-slate-300"
-							>
-								You'll need to
-								<a
-									:href="`/${User.Account.id}/settings/billing`"
-									class="font-semibold text-indigo-500"
-									>upgrade your hosting</a
-								>
-								to see tasks
-							</div>
-						</div>
-					</div>
-					<div class="bg-gray-50 p-6 dark:bg-slate-800">
-						<div class="">
-							<div
-								display="flex"
-								class="border-b border-gray-300 pb-3 dark:border-slate-600"
-							>
-								<h4 class="text-md font-semibold dark:text-white">
-									Assistant user seats
-								</h4>
-							</div>
-
-							<div class="my-4 text-sm text-slate-600 dark:text-slate-300">
-								<p class="">Assistant seat pricing is not active yet.</p>
-								<p>Assistant use won't be charged for the time being.</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div v-else class="mt-8"><loading-spinner /></div>
-		</div>
+		
 	</div>
 </template>
 
