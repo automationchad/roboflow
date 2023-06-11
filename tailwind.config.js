@@ -13,7 +13,11 @@ module.exports = {
 			sans: ['circular', 'sans-serif'],
 			mono: ['Dank Mono', 'monospace'],
 		},
-		extend: {},
+		extend: {
+			transitionProperty: {
+				width: 'width',
+			},
+		},
 	},
 	plugins: [
 		require('@tailwindcss/typography'),

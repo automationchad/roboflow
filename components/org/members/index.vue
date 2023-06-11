@@ -40,6 +40,7 @@
 		LinkIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+	import { is } from 'date-fns/locale';
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
@@ -56,6 +57,8 @@
 	const userToDelete = ref(null);
 	const inviteeEmail = ref('');
 	const loading = ref(true);
+
+	const currentUser = ref(null);
 
 	const is_error = ref(false);
 	const error_message = ref('');
@@ -112,9 +115,9 @@
 			.select('*')
 			.eq('account', route.params.organization);
 
-		const userPromise = supabase
+		const { data: userData, error: userError } = await supabase
 			.from('User')
-			.select(`*, Account (id, User(*))`)
+			.select(`*`)
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
@@ -128,6 +131,7 @@
 
 		account.value = accountData;
 		users.value = accountData.User.concat(invitationData);
+		currentUser.value = userData;
 
 		const promises = [];
 		for (const user of users.value) {
@@ -178,7 +182,7 @@
 		// if (!currentUserScopes.includes('users:create')) return true;
 
 		// Check if the current user is a viewer
-		if (User.systemRole === 'viewer') return true;
+		if (user.systemRole === 'viewer') return true;
 
 		return false;
 	});
@@ -201,7 +205,10 @@
 			return true;
 
 		// Check if the current user is an admin and the selected user is an owner
-		if (User.systemRole === 'admin' && selectedUser.systemRole === 'owner')
+		if (
+			currentUser.systemRole === 'admin' &&
+			selectedUser.systemRole === 'owner'
+		)
 			return true;
 
 		// Check if the current user is a contributor or viewer
@@ -211,8 +218,6 @@
 	};
 
 	const isDeleteDisabled = (selectedUser) => {
-		if (selectedUser.status === 'pending') return false;
-
 		// const currentUserScopes = Scopes.scopes.split(',');
 
 		// // Check if the current user has the 'users:delete' scope
@@ -221,17 +226,32 @@
 		// Check if the current user is trying to delete their own account
 		if (user.value.id === selectedUser.id) return true;
 
-		if (accountData.User.concat(Invitation).length === 1) return true;
+		if (users.value.length <= 1) return true;
+
+		if (
+			users.value.length ===
+			users.value.filter((o) => o.systemRole === 'owner').length
+		)
+			return true;
+
+		if (
+			users.value.filter((o) => o.systemRole === 'owner').length === 1 &&
+			selectedUser.systemRole === 'owner'
+		)
+			return true;
 
 		if (
 			selectedUser.systemRole === 'owner' &&
 			selectedUser.status !== 'pending' &&
-			accountData.User.filter((o) => o.systemRole === 'owner').length === 1
+			users.value.filter((o) => o.systemRole === 'owner').length === 1
 		)
 			return true;
 
 		// Check if the current user is an admin and the selected user is an owner
-		if (User.systemRole === 'admin' && selectedUser.systemRole === 'owner')
+		if (
+			currentUser.systemRole === 'admin' &&
+			selectedUser.systemRole === 'owner'
+		)
 			return true;
 
 		// Check if the current user is a contributor or viewer
@@ -258,6 +278,9 @@
 			.catch((err) => {
 				console.error('Error copying text to clipboard: ', err); // log an error message if there was an error copying the text
 			});
+		is_success.value = true;
+		is_error.value = false;
+		success_message.value = 'Copied invite link to clipboard';
 	};
 
 	// Function to edit user role
@@ -582,7 +605,7 @@
 									<td>
 										<span
 											v-if="user.status === 'pending'"
-											class="text-yellow-1100 inline-flex items-center rounded-full border border-yellow-700 bg-yellow-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium"
+											class="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:border-yellow-700"
 											>Invited</span
 										>
 									</td>
@@ -704,26 +727,56 @@
 														<circle cx="5" cy="12" r="1"></circle></svg></span
 											></MenuButton>
 											<MenuItems
-												class="data-open:animate-dropdown-content-show data-closed:animate-dropdown-content-hide absolute right-2 top-6 z-40 w-48 min-w-fit rounded border bg-white py-1.5 shadow-lg"
+												class="absolute right-2 top-6 z-40 w-48 min-w-fit rounded border bg-white py-1.5 shadow-lg"
 											>
 												<MenuItem
 													v-slot="{ active }"
+													:disabled="isDeleteDisabled(user)"
 													:class="[
 														active ? 'bg-slate-100' : '',
-														'text-body-light focus:bg-selection focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+														'text-body-light focus:bg-selection focus:text-body flex items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
 													]"
 												>
 													<button
 														@click="deleteUser(user)"
+														:disabled="isDeleteDisabled(user)"
 														:class="[
 															active ? 'bg-slate-100' : '',
-															'flex w-full items-center space-x-2 border-none px-4 py-1.5 text-left text-sm transition transition-colors focus:outline-none',
+															isDeleteDisabled(user)
+																? 'cursor-not-allowed opacity-50'
+																: '',
+															'flex w-full items-center space-x-2 border-none px-4 py-1.5 text-left text-sm transition transition-colors focus:outline-none disabled:cursor-not-allowed',
 														]"
 													>
 														<div class="flex flex-col">
 															<p>Cancel invitation</p>
 															<p class="block opacity-50">
 																Revoke this invitation.
+															</p>
+														</div>
+													</button>
+												</MenuItem>
+												<MenuItem
+													v-if="user.confirm_url"
+													v-slot="{ active }"
+													:class="[
+														active ? 'bg-slate-100' : '',
+														'text-body-light focus:bg-selection focus:text-body flex items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+													]"
+												>
+													<button
+														@click="copyToClipboard(user.confirm_url)"
+														:class="[
+															active
+																? 'bg-slate-100'
+																: 'disabled:cursor-not-allowed',
+															'flex w-full items-center space-x-2 border-none px-4 py-1.5 text-left text-sm transition transition-colors focus:outline-none disabled:cursor-not-allowed',
+														]"
+													>
+														<div class="flex flex-col">
+															<p>Copy link</p>
+															<p class="block opacity-50">
+																Copy link to this invite.
 															</p>
 														</div>
 													</button>

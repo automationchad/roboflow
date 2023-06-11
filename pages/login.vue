@@ -298,7 +298,7 @@
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
-		navigateTo(`/${User.accountId}/dashboard`);
+		navigateTo(`/dashboard/projects`);
 	}
 
 	const email = ref('');
