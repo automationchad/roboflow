@@ -11,6 +11,9 @@
 	const title = ref(null);
 	const description = ref(null);
 
+	const orgButtonDisabled = ref(true);
+	const projectButtonDisabled = ref(true);
+
 	const accountId = ref(null);
 
 	const admin = ref(false);
@@ -27,7 +30,12 @@
 
 		admin.value = userData.Account.type === 'super_admin';
 
-		if (userData.Account.type === 'super_admin') {
+		// if (admin.value) {
+		// 	orgButtonDisabled.value = false;
+		// 	projectButtonDisabled.value = false;
+		// }
+
+		if (admin.value) {
 			const { data: accountData, error: accountError } = await supabase
 				.from('Account')
 				.select('*,Ticket(status,type)')
@@ -51,12 +59,13 @@
 			title.value = accountData.name;
 			description.value = ticketData.name;
 			accountId.value = ticketData.accountId;
-		}
-
-		if (route.path.includes('/dashboard/projects')) {
-			description.value = 'Projects';
+		} else if (route.path.includes('/dashboard/projects') && !route.params.id) {
 			title.value = 'Motis Group';
-		} else {
+			description.value = 'Projects';
+		} else if (
+			route.path.includes('/dashboard/org') &&
+			route.params.organization
+		) {
 			title.value = 'Motis Group';
 			description.value = 'Settings';
 		}
@@ -97,17 +106,17 @@
 
 <template>
 	<div
-		class="border-scale-500 sticky top-0 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
+		class="border-scale-500 sticky top-0 z-10 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
 	>
 		<div class="-ml-2 flex items-center text-sm">
 			<Menu as="div"
 				><MenuButton
-					:disabled="!admin"
+					:disabled="!admin && orgButtonDisabled"
 					v-if="route.params.id"
 					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all hover:bg-gray-50 focus:outline-4"
 				>
 					<span
-						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
 						><span class="truncate">{{ title }}</span></span
 					></MenuButton
 				>
@@ -196,26 +205,15 @@
 
 			<Menu as="div"
 				><MenuButton
-					v-if="description !== 'Projects'"
-					:disabled="!admin"
+					:disabled="!admin || projectButtonDisabled"
 					as="button"
-					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all hover:bg-gray-50 focus:outline-4 dark:hover:bg-white/5"
+					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 text-slate-700 outline-none outline-offset-1 transition-all hover:bg-gray-50 focus:outline-4 disabled:pointer-events-none disabled:text-slate-500 dark:hover:bg-white/5"
 				>
 					<span
-						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
 						><span class="truncate">{{ description }}</span></span
 					></MenuButton
 				>
-
-				<div
-					v-else
-					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
-				>
-					<span
-						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
-						><span class="truncate">{{ description }}</span></span
-					>
-				</div>
 
 				<MenuItems
 					class="fixed left-0 top-0 z-[500] min-w-max"
@@ -223,17 +221,18 @@
 				>
 					<div
 						class="z-40 w-64 min-w-fit rounded border bg-white py-1.5 shadow-lg"
-						style="outline: none; pointer-events: auto"
 					>
-						<MenuItem as="div" v-slot="{ active }">
-							<div
+						<MenuItem as="div" v-slot="{ active, selected }">
+							<NuxtLink
+								:to="`${route.path}`"
 								:class="[
-									active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
+									active ? 'bg-gray-100 text-gray-800' : '',
+									selected ? 'bg-red-500' : '',
 									'text-body-light focus:bg-selection focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
 								]"
 							>
 								<span>{{ description }}</span>
-							</div>
+							</NuxtLink>
 						</MenuItem>
 						<div
 							role="separator"
@@ -279,7 +278,7 @@
 				class="focus:outline-scale-600 flex rounded bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
 			>
 				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded border-none px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded border-none px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -303,10 +302,10 @@
 				aria-expanded="false"
 				aria-controls="radix-463"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-white dark:bg-white/10 p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
 			>
 				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -332,12 +331,12 @@
 				aria-expanded="false"
 				aria-controls="radix-464"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-white dark:bg-white/10 p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
 			>
 				<div class="relative flex" data-state="closed">
 					<span
 						id="notification-button"
-						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
 						><svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="16"

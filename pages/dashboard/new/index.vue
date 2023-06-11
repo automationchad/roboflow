@@ -66,12 +66,22 @@
 			}
 			loading.value = true;
 			// Insert account data
+
+			// Create Stripe customer
+			const customer = await $fetch('/api/stripe/customer/create', {
+				method: 'post',
+				body: {
+					company_name: body.name,
+				},
+			});
+
 			const { data: accountData, error: accountError } = await supabase
 				.from('Account')
 				.insert([
 					{
 						name: body.name,
 						type: selectedOption.value.id,
+						stripeCustomerId: customer.id,
 						status: 'active',
 					},
 				])
@@ -81,15 +91,6 @@
 				throw new Error(accountError.message);
 			}
 
-			// Create Stripe customer
-			const customer = await $fetch('/api/stripe/customer/create', {
-				method: 'post',
-				body: {
-					email: body.email,
-					company_name: body.name,
-				},
-			});
-
 			if (!customer || customer.error) {
 				throw new Error(
 					customer.error ? customer.error : 'Error creating customer'
@@ -97,23 +98,24 @@
 			}
 
 			// Create Stripe subscription
-			if (!body.options.partner) {
-				const subscription = await $fetch('/api/stripe/subscription/create', {
-					method: 'post',
-					body: {
-						customer,
-					},
-				});
+			// if (!body.options.partner) {
+			// 	const subscription = await $fetch('/api/stripe/subscription/create', {
+			// 		method: 'post',
+			// 		body: {
+			// 			customer,
+			// 		},
+			// 	});
 
-				if (!subscription || subscription.error) {
-					throw new Error(
-						subscription.error
-							? subscription.error
-							: 'Error creating subscription'
-					);
-				}
-			}
+			// 	if (!subscription || subscription.error) {
+			// 		throw new Error(
+			// 			subscription.error
+			// 				? subscription.error
+			// 				: 'Error creating subscription'
+			// 		);
+			// 	}
+			// }
 			navigateTo(`/dashboard/new/${accountData[0].id}`);
+			
 		} catch (error) {
 			console.log(error);
 			loading.value = false;

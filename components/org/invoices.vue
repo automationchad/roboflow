@@ -1,50 +1,48 @@
 <template>
 	<div class="">
-		<warning-access :role="User.systemRole" />
+		
 		<div class="mt-8 space-y-6 lg:px-0">
 			<loading-spinner v-if="state.loading" />
 			<!-- Billing history -->
 			<section aria-labelledby="billing-history-heading" v-else>
 				<div class="sm:overflow-hidden">
-					<div class="flex flex-col bg-white dark:bg-slate-900 border border-slate-100 max-w-4xl rounded dark:border-slate-800">
+					<div
+						class="flex max-w-4xl flex-col rounded border border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900"
+					>
 						<div class="overflow-x-auto">
 							<div class="inline-block min-w-full pt-2 align-middle">
 								<div class="overflow-hidden">
-									<table
-										class="w-full"
-									>
+									<table class="w-full">
 										<thead class="bg-gray-50 dark:bg-transparent">
 											<tr class="border-b border-slate-800">
 												<th
 													scope="col"
-													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="w-1/5 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													Date
 												</th>
 												<th
 													scope="col"
-													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="w-1/5 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													Invoice number
 												</th>
 												<th
 													scope="col"
-													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="w-1/5 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													Amount due
 												</th>
 												<th
 													scope="col"
-													class="px-6 w-1/5 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
+													class="w-1/5 px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-slate-400"
 												>
 													Status
 												</th>
 												<th
 													scope="col"
-													class="px-6 w-1/5 py-3 text-right text-sm font-medium text-gray-900 dark:text-slate-400"
-												>
-													
-												</th>
+													class="w-1/5 px-6 py-3 text-right text-sm font-medium text-gray-900 dark:text-slate-400"
+												></th>
 												<!--
                               `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
                             -->
@@ -204,14 +202,15 @@
 													>
 												</td>
 												<td
-													class="whitespace-nowrap px-6 py-2 text-sm text-right font-medium"
+													class="whitespace-nowrap px-6 py-2 text-right text-sm font-medium"
 												>
-													<a v-if="invoice.invoice_pdf"
+													<a
+														v-if="invoice.invoice_pdf"
 														:href="invoice.invoice_pdf"
 														download
 														class="flex items-center justify-end text-indigo-600 hover:text-indigo-900 dark:text-indigo-100 dark:hover:text-indigo-50"
 														><div
-															class="rounded border border-indigo-400 dark:bg-indigo-600 bg-indigo-100"
+															class="rounded border border-indigo-400 bg-indigo-100 dark:bg-indigo-600"
 														>
 															<svg
 																class="h-5 w-5"
@@ -299,18 +298,18 @@
 		loading: false,
 	});
 
+	const route = useRoute();
+
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(`systemRole,Account(stripeCustomerId)`)
-		.eq('id', user.value.id)
+	let { data: accountData, error: accountError } = await supabase
+		.from('Account')
+		.select(`id, stripeCustomerId`)
+		.eq('id', route.params.organization)
 		.limit(1)
 		.single();
-
-	const pastDue = () => {};
 
 	const styles = {
 		uncollectible:
@@ -320,8 +319,9 @@
 		void: 'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300  text-purple-900 dark:text-purple-200',
 	};
 	const fetchData = async () => {
+		console.log(accountData);
 		const { data } = await $fetch(
-			`/api/stripe/invoices/${User.Account.stripeCustomerId}`
+			`/api/stripe/invoices/${accountData.stripeCustomerId}`
 		);
 		return data;
 	};

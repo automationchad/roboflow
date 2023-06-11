@@ -77,10 +77,10 @@
 			</div>
 			<TabPanels class="mb-8"
 				><TabPanel><org-settings /></TabPanel>
-				<TabPanel><members /></TabPanel>
+				<TabPanel><org-members /></TabPanel>
 				<TabPanel><org-billing /></TabPanel>
 				<TabPanel><org-costs /></TabPanel>
-				<TabPanel><org-invoices /></TabPanel
+				<TabPanel><org-invoices2 /></TabPanel
 			></TabPanels>
 		</TabGroup>
 	</div>

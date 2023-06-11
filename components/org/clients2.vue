@@ -164,7 +164,7 @@
 							:key="project.id"
 							v-if="account.Ticket.length > 0"
 						>
-							<NuxtLink :to="`/dashboard/project/${project.id}`">
+							<NuxtLink :to="`/dashboard/projects/${project.id}`">
 								<div
 									class="bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light dark:border-panel-border-dark hover:bg-panel-border-light dark:hover:bg-panel-border-dark hover:border-panel-border-hover-light dark:hover:border-panel-border-hover-dark group relative flex h-32 cursor-pointer flex-row rounded-md border px-6 py-4 text-left transition duration-150 ease-in-out hover:border-gray-300"
 								>

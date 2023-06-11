@@ -2,6 +2,10 @@ import Stripe from 'stripe';
 const stripe = Stripe(process.env.STRIPE_KEY);
 
 export default defineEventHandler(async (event) => {
+	if (!event.context.params.id) {
+		return { data: [] };
+	}
+	
 	let { data: invoices } = await stripe.invoices.list({
 		customer: `${event.context.params.id}`,
 	});

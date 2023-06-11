@@ -40,7 +40,7 @@
 			const fetchUserData = supabase
 				.from('User')
 				.select(
-					`*, 
+					`*,
 					Account(
 					type
 					)`
@@ -49,7 +49,9 @@
 				.limit(1)
 				.single();
 
-			const fetchAccountData = supabase.from('Account').select('*');
+			const fetchAccountData = supabase
+				.from('Account')
+				.select('*, User(count)');
 			// .neq('type', 'super_admin');
 
 			const [
@@ -71,7 +73,7 @@
 				const { data: singleAccountData, error: singleAccountError } =
 					await supabase
 						.from('Account')
-						.select('*')
+						.select('*,User(count)')
 						.eq('id', route.params.organization);
 
 				if (singleAccountError)
@@ -100,7 +102,7 @@
 
 			selectedSeverity.value = severity[0];
 			selectedTicket.value = category[0];
-			
+
 			page_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
@@ -159,6 +161,13 @@
 		return new Date(today.setDate(today.getDate() + selectedOption.sla_days));
 	}
 
+	const generateExample = () => {
+		projectName.value =
+			'[DEMO] Nailey Belson - BambooHR and ADP WFN Integration';
+		projectSummary.value =
+			"Need help to link BambooHR and ADP WFN for easier payroll. No team to do this, and not planning to buy a Tray license. Want simple link between the two systems. Plan is to finish in a few months, before many new hires in Canada. Finance Director also checking this. No time to use our own team for this project. We're also working on setting a budget for this project.";
+	};
+
 	const handleSubmit = async () => {
 		try {
 			submit_loading.value = true;
@@ -186,7 +195,9 @@
 			await uploadImages(ticketData[0].id, selectedFiles.value);
 			is_success.value = true;
 			success_message.value = 'Successfully created project';
-			navigateTo(`/dashboard/project/${ticketData[0].id}`);
+			if (selectedAccount.value.User[0].count === 0) {
+				navigateTo(`/dashboard/new/${route.params.organization}/invite`);
+			} else navigateTo(`/dashboard/project/${ticketData[0].id}`);
 			submit_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
@@ -228,10 +239,7 @@
 		selectedSeverity.value = severities.value[0];
 		selectedFiles.value = [];
 	}
-
-
 </script>
-
 
 <template>
 	<div class="">
@@ -318,10 +326,10 @@
 						</div>
 						<div class="bg-panel-body-light dark:bg-panel-body-dark">
 							<div class="px-6 py-4 pb-6 pt-0">
-								<p class="text-scale-900 text-sm">
-									Your project will have its own dedicated instance and full
-									postgres database.<br />An API will be set up so you can
-									easily interact with your new database.<br />
+								<p class="text-sm text-slate-500">
+									Your project will have its own dedicated account manager.<br />An
+									AI will initially respond so you can easily convey information with
+									support.<br />
 								</p>
 							</div>
 							<div
@@ -498,14 +506,15 @@
 										></p>
 
 										<p
-											class="text-scale-900 mt-2 text-sm leading-normal"
+											@click="generateExample"
+											class="mt-2 text-sm leading-normal text-slate-500"
 											id="password-description"
 										>
-											This is the password to your postgres database, so it must
-											be a strong password and hard to guess.
+											Please briefly describe your issue or case here. Include
+											key details for better assistance.
 											<span
-												class="text-brand-800 hover:text-brand-900 cursor-pointer underline transition"
-												>Generate a password</span
+												class="hover:text-brand-900 cursor-pointer text-indigo-500 underline transition"
+												>Generate an example</span
 											>
 										</p>
 									</div>

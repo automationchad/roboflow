@@ -133,7 +133,7 @@
 				throw new Error('User already exists in this organization');
 			}
 
-			const { data: invitation, error } = await supabase
+			const { data: invitation, error: invitationError } = await supabase
 				.from('Invitation')
 				.insert([
 					{
@@ -146,22 +146,16 @@
 				])
 				.select('*');
 			// If there was an error inserting the invitation, log the error and alert the user
-			if (error) {
-				throw new Error(error.message || error.toString());
+			if (invitationError) {
+				inviteeEmail.value = '';
+				throw new Error(invitationError.message || invitationError.toString());
 			} else {
 				// Update the local invitations data as well
 				is_error.value = false;
-				inviteeEmail.value = '';
 				success_message.value = 'Invitation sent successfully';
 				is_success.value = true;
 			}
-
-			// Create the invitation link and email body
-			const invitationLink = `https://example.com/signup?token=${invitation.token}`;
-			const emailBody = `You've been invited to join our Supabase account! Click this link to sign up: ${invitationLink}`;
-			submit_loading.value = false;
-            navigateTo('/')
-			// Send email using your preferred email service or library
+			navigateTo('/dashboard/projects');
 		} catch (error) {
 			// Catch any unexpected errors and log them
 			is_success.value = false;
@@ -464,11 +458,27 @@
 							<div class="px-5">
 								<div class="pb-3 pt-2">
 									<button
-                                    :disabled="invalid_email"
+										:disabled="invalid_email || submit_loading"
 										@click="sendInvitation()"
-										class="font-regular bg-brand-fixed-1100 disabled:opacity-50 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded bg-indigo-500 px-4 py-2 text-center text-sm text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+										class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded bg-indigo-500 px-4 py-2 text-center text-sm text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:opacity-50 disabled:opacity-60"
 										type="submit"
 									>
+										<svg
+											v-if="submit_loading"
+											class="h-5 w-5 animate-spin"
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="1.5"
+												d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+											></path>
+										</svg>
+
 										<span class="truncate">Invite new member</span>
 									</button>
 								</div>
