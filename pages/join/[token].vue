@@ -206,8 +206,10 @@
 								</p>
 								<p class="text-scale-900">
 									To accept this invitation, you will need to
-									<button class="text-indigo-500 cursor-pointer">sign out</button> and then
-									create a new account.
+									<button class="cursor-pointer text-indigo-500">
+										sign out
+									</button>
+									and then create a new account.
 								</p>
 							</div>
 							<div class="flex flex-col gap-3">
@@ -281,8 +283,8 @@
 	>
 		<a class="flex items-center justify-center gap-4" href="/projects"
 			><img
-				src="/img/supabase-logo.svg"
-				alt="Supabase"
+				src="~/assets/images/logo.png"
+				alt="Motis Group"
 				class="block h-[24px] cursor-pointer rounded"
 		/></a>
 		<div

@@ -551,27 +551,7 @@
 																margin: 0px;
 																padding: 0px;
 															" /></span
-													><img
-														src="/dashboard/_next/image?url=https%3A%2F%2Fgithub.com%2Fautomationchad.png%3Fsize%3D80&amp;w=96&amp;q=75"
-														decoding="async"
-														data-nimg="intrinsic"
-														class="rounded-full border"
-														style="
-															position: absolute;
-															inset: 0px;
-															box-sizing: border-box;
-															padding: 0px;
-															border: none;
-															margin: auto;
-															display: block;
-															width: 0px;
-															height: 0px;
-															min-width: 100%;
-															max-width: 100%;
-															min-height: 100%;
-															max-height: 100%;
-														"
-												/></span>
+												></span>
 											</div>
 											<div v-else>
 												<span
