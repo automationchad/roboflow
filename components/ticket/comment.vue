@@ -378,7 +378,7 @@
 
 <template>
 	<div class="">
-		<article id="parent-comment" class="relative rounded-lg text-base bg-[#F8F8FB]">
+		<article id="parent-comment" class="relative rounded-lg text-base bg-[#F8F8FB] dark:bg-[#020014]">
 			<div
 				v-if="props.activityItemIdx < props.comments.length - 1"
 				:class="[

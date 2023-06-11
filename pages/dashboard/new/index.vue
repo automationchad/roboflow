@@ -23,7 +23,17 @@
 	const emit = defineEmits(['close-modal', 'org-submit', 'error']);
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
-	const open = ref(true);
+
+	const { data: userData, error: userError } = await supabase
+		.from('User')
+		.select('id,Account(type)')
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	if (userData.Account.type !== 'super_admin') {
+		navigateTo(`/dashboard/new/${userData.Account.id}`);
+	}
 
 	const form_responses = ref({
 		name: '',
@@ -191,7 +201,7 @@
 											>
 												<div class="relative">
 													<ListboxButton
-													:disabled="loading"
+														:disabled="loading"
 														:class="[
 															open
 																? 'border-slate-500 shadow-md ring-2 ring-slate-300'
@@ -307,7 +317,7 @@
 											:disabled="loading"
 											@click="handleSubmit(form_responses)"
 											:class="[
-												'font-regular focus-visible:outline-brand-600 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 relative inline-flex disabled:pointer-events-none items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1 disabled:opacity-50',
+												'font-regular focus-visible:outline-brand-600 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 relative inline-flex items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50',
 											]"
 											type="button"
 										>
@@ -367,7 +377,6 @@
 				:description="error_message"
 			/>
 		</transition>
-		
 	</div>
 </template>
 

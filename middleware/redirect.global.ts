@@ -29,7 +29,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 				to.params.organization !== userData?.Account.id
 			) {
 				// If the user is not a super admin, redirect them to a "not authorized" page
-				return navigateTo('/not-authorized');
+				return navigateTo('/dashboard/projects');
 			}
 
 			const org_id = userData.Account.id;

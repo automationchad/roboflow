@@ -88,7 +88,7 @@
 					<h2
 						:class="[
 							selected
-								? 'dark:bg-white/5 border-b border-indigo-400 bg-black/5  font-medium'
+								? 'border-b border-indigo-400 bg-black/5 font-medium  dark:bg-white/5'
 								: '',
 							'mb-2 rounded-t-md p-4 text-sm dark:text-white',
 						]"
@@ -100,7 +100,7 @@
 					><h2
 						:class="[
 							selected
-								? 'dark:bg-white/5 border-b border-indigo-400 bg-black/5 font-medium'
+								? 'border-b border-indigo-400 bg-black/5 font-medium dark:bg-white/5'
 								: '',
 							'mb-2 rounded-t-md p-4 text-sm dark:text-white',
 						]"
@@ -110,124 +110,173 @@
 				>
 			</TabList>
 			<TabPanels
-				><TabPanel
-					><div
-						v-if="deals.length > 0"
-						class="h-84 grid grid-cols-4 grid-rows-2 gap-4"
-					>
+				><TabPanel class="w-full">
+					<div class="grid grid-cols-5 max-w-5xl gap-4">
 						<div
-							v-for="(deal, idx) in deals"
-							:key="deal.name"
-							:class="[
-								getStyleClass(deal.deal_size).style,
-								idx < 2 ? 'row-span-2' : `row-span-1`,
-								'h-full rounded border border-white/10',
-							]"
+							v-if="deals.length > 0"
+							class="h-84 col-span-4 grid grid-cols-4 grid-rows-2 gap-4"
 						>
-							<NuxtLink
-								class="flex h-full flex-col justify-between p-1"
-								:to="`/${route.params.organization}/tickets/${deal.id}`"
-								><div
-									:class="[
-										getStyleClass(deal.deal_size).style + '-month',
-										'flex justify-end px-2 py-2 text-xs',
-									]"
-								>
-									{{ format(new Date(deal.close_date), 'MMM, yy') }}
-								</div>
-								<div class="flex flex-1 flex-col justify-center p-2">
-									<h2
-										:class="[
-											getStyleClass(deal.deal_size).style + '-text',
-											'text-3xl font-semibold ',
-										]"
-									>
-										{{ abbreviatedNumber(deal.deal_size, false) }}
-									</h2>
-									<p
+							<div
+								v-for="(deal, idx) in deals"
+								:key="deal.name"
+								:class="[
+									getStyleClass(deal.deal_size).style,
+									idx < 2 ? 'row-span-2' : `row-span-1`,
+									'h-full rounded border border-white/10',
+								]"
+							>
+								<NuxtLink
+									class="flex h-full flex-col justify-between p-1"
+									:to="`/${route.params.organization}/tickets/${deal.id}`"
+									><div
 										:class="[
 											getStyleClass(deal.deal_size).style + '-month',
-											'text-xs',
+											'flex justify-end px-2 py-2 text-xs',
 										]"
 									>
-										{{ deal.name }}
-									</p>
-								</div>
-								<div class="">
+										{{ format(new Date(deal.close_date), 'MMM, yy') }}
+									</div>
+									<div class="flex flex-1 flex-col justify-center p-2">
+										<h2
+											:class="[
+												getStyleClass(deal.deal_size).style + '-text',
+												'text-3xl font-semibold ',
+											]"
+										>
+											{{ abbreviatedNumber(deal.deal_size, false) }}
+										</h2>
+										<p
+											:class="[
+												getStyleClass(deal.deal_size).style + '-month',
+												'text-xs',
+											]"
+										>
+											{{ deal.name }}
+										</p>
+									</div>
+									<div class="">
+										<div
+											:class="[
+												getStyleClass(deal.deal_size).style + '-border',
+												'border-t',
+											]"
+										></div>
+										<div
+											:class="[
+												getStyleClass(deal.deal_size).style + '-button',
+												'mt-3 rounded-sm p-2 text-xs text-white',
+											]"
+										>
+											Add deal story
+										</div>
+									</div>
+								</NuxtLink>
+							</div>
+						</div>
+						<div
+							v-else
+							class="h-84 col-span-4 relative grid grid-cols-4 grid-rows-2 gap-4"
+						>
+							<div
+								class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 dark:text-white"
+							>
+								No won deals yet...
+							</div>
+							<div
+								v-for="(deal, idx) in examples"
+								:key="deal.id"
+								:class="[
+									getStyleClass(deal.deal_size).style,
+									idx < 2 ? 'row-span-2' : `row-span-1`,
+									'relative h-full rounded border border-white/10 opacity-50 blur-sm',
+								]"
+							>
+								<div class="flex h-full flex-col justify-between p-1">
 									<div
 										:class="[
-											getStyleClass(deal.deal_size).style + '-border',
-											'border-t',
-										]"
-									></div>
-									<div
-										:class="[
-											getStyleClass(deal.deal_size).style + '-button',
-											'mt-3 rounded-sm p-2 text-xs text-white',
+											getStyleClass(deal.deal_size).style + '-month',
+											'flex justify-end px-2 py-2 text-xs',
 										]"
 									>
-										Add deal story
+										{{ format(new Date(deal.close_date), 'MMM, yy') }}
+									</div>
+									<div class="flex flex-1 flex-col justify-center p-2">
+										<h2
+											:class="[
+												getStyleClass(deal.deal_size).style + '-text',
+												'text-3xl font-semibold ',
+											]"
+										>
+											{{ abbreviatedNumber(deal.deal_size, false) }}
+										</h2>
+										<p
+											:class="[
+												getStyleClass(deal.deal_size).style + '-month',
+												'text-xs',
+											]"
+										>
+											{{ deal.name }}
+										</p>
+									</div>
+									<div class="">
+										<div
+											:class="[
+												getStyleClass(deal.deal_size).style + '-border',
+												'border-t',
+											]"
+										></div>
+										<div
+											:class="[
+												getStyleClass(deal.deal_size).style + '-button',
+												'mt-3 rounded-sm p-2 text-xs text-white',
+											]"
+										>
+											Add deal story
+										</div>
 									</div>
 								</div>
-							</NuxtLink>
+							</div>
 						</div>
-					</div>
-					<div v-else class="h-84 relative grid grid-cols-4 grid-rows-2 gap-4">
-						<div
-							class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 dark:text-white"
-						>
-							No won deals yet...
-						</div>
-						<div
-							v-for="(deal, idx) in examples"
-							:key="deal.id"
-							:class="[
-								getStyleClass(deal.deal_size).style,
-								idx < 2 ? 'row-span-2' : `row-span-1`,
-								'relative h-full rounded border border-white/10 opacity-50 blur-sm',
-							]"
-						>
-							<div class="flex h-full flex-col justify-between p-1">
-								<div
-									:class="[
-										getStyleClass(deal.deal_size).style + '-month',
-										'flex justify-end px-2 py-2 text-xs',
-									]"
-								>
-									{{ format(new Date(deal.close_date), 'MMM, yy') }}
+						<div class="col-span-1 block">
+							<div
+								class="rounded-t-md border-x border-t border-slate-200 bg-slate-50 p-2.5 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+							>
+								<div class="text-xs font-medium">Deal Summary</div>
+							</div>
+							<div
+								class="rounded-b-md border-x border-b p-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+							>
+								<div class="mb-2">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
+										Lifetime revenue
+									</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{
+											abbreviatedNumber(
+												deals.reduce((a, c) => a + c.deal_size, 0)
+											)
+										}}
+									</div>
 								</div>
-								<div class="flex flex-1 flex-col justify-center p-2">
-									<h2
-										:class="[
-											getStyleClass(deal.deal_size).style + '-text',
-											'text-3xl font-semibold ',
-										]"
-									>
-										{{ abbreviatedNumber(deal.deal_size, false) }}
-									</h2>
-									<p
-										:class="[
-											getStyleClass(deal.deal_size).style + '-month',
-											'text-xs',
-										]"
-									>
-										{{ deal.name }}
-									</p>
+								<div class="mb-2">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
+										Number of deals
+									</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{ deals.length }}
+									</div>
 								</div>
-								<div class="">
-									<div
-										:class="[
-											getStyleClass(deal.deal_size).style + '-border',
-											'border-t',
-										]"
-									></div>
-									<div
-										:class="[
-											getStyleClass(deal.deal_size).style + '-button',
-											'mt-3 rounded-sm p-2 text-xs text-white',
-										]"
-									>
-										Add deal story
+								<div class="mb-2">
+									<div class="mb-1.5 text-xs dark:text-slate-400">
+										Average deal size
+									</div>
+									<div class="text-sm text-slate-700 dark:text-slate-200">
+										{{
+											abbreviatedNumber(
+												deals.reduce((a, c) => a + c.deal_size, 0) /
+													deals.length || 0
+											)
+										}}
 									</div>
 								</div>
 							</div>

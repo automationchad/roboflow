@@ -1,104 +1,537 @@
 <template>
-	<div class="mx-auto w-full">
-		<div
-			class="max-w-4xl rounded border border-slate-200  dark:border-slate-800 dark:bg-slate-900"
-		>
-			<warning-access :role="User.systemRole" />
-
-			<div class="mt-8 space-y-6 px-6">
-				<loading-spinner v-if="state.loading" />
-				<section v-else aria-labelledby="payment-details-heading">
-					<fieldset
-						:disabled="
-							User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
-						"
-						class="disabled:opacity-60"
-					>
-						<div class="sm:overflow-hidden sm:rounded-md">
-							<div class="pb-6">
-								<!-- <div>
-								<h2
-									id="payment-details-heading"
-									class="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+	<div class="mb-8">
+		<article class="container my-4 max-w-4xl space-y-8">
+			<div class="space-y-8">
+				<div class="space-y-2">
+					<h4>Projects at a glance</h4>
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+							>
+								<div
+									class="bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light dark:border-panel-border-dark border-b"
 								>
-									Billing information
-								</h2>
-							</div> -->
-								<label
-									for="email-address"
-									class="mb-2 block text-sm font-medium leading-6 text-gray-900 dark:text-white"
-									>Billing email</label
-								>
-								<Disclosure
-									as="li"
-									v-slot="{ open }"
-									class="flex items-start justify-between"
-								>
-									<div class="w-full" v-if="!open">
-										<div
-											class="block rounded-md border-0 bg-slate-100 px-3 py-1.5 text-slate-600 ring-1 ring-inset ring-slate-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 sm:text-sm sm:leading-6"
-										>
-											{{ state.email }}
+									<div class="flex items-center px-6 py-4">
+										<div class="flex w-full items-center">
+											<div class="w-[25%]">
+												<p class="text-sm opacity-50">Name</p>
+											</div>
+											<div class="w-[20%]">
+												<p class="text-sm opacity-50">Plan</p>
+											</div>
+											<div class="w-[40%]">
+												<p class="text-sm opacity-50">Billing cycle</p>
+											</div>
+											<div class="w-[15%]"></div>
 										</div>
 									</div>
-
-									<DisclosurePanel
-										class="flex flex-grow items-center justify-between text-sm text-gray-500"
-									>
-										<div class="w-full">
-											<div class="flex items-center justify-between">
-												<div
-													class="mr-2 block w-full rounded-md border-0 bg-white px-3 py-1.5 text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+								</div>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<div class="flex w-full items-center px-6 py-3">
+										<div class="w-[25%]">
+											<p class="text-sm">motis-group</p>
+										</div>
+										<div class="w-[20%]"><p class="text-sm">Free plan</p></div>
+										<div class="flex w-[40%] items-center space-x-2">
+											<p class="text-sm">May 27, 2023</p>
+											<p class="text-sm">-</p>
+											<p class="text-sm">Jun 27, 2023</p>
+										</div>
+										<div class="flex w-[15%] items-center justify-end">
+											<a
+												class="group flex items-center space-x-2"
+												href="/dashboard/project/nsfipxnlucvgchlkqvqw/settings/billing/subscription"
+												><p
+													class="text-xs opacity-0 transition group-hover:opacity-100"
 												>
-													<input
-														v-model="state.email"
-														type="text"
-														name="email-address"
-														id="email-address"
-														autocomplete="email"
-														class="w-full border-none bg-transparent p-0 text-sm focus:ring-0"
-													/>
+													View details
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="21"
+													height="21"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline></svg
+											></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="flex items-center justify-between">
+					<div class="space-y-1">
+						<div class="flex items-center space-x-2">
+							<h4>Credit balance</h4>
+						</div>
+						<p class="text-sm opacity-50">
+							Charges will be deducted from your balance first
+						</p>
+					</div>
+					<div class="flex items-end space-x-1">
+						<h4 class="opacity-50">$</h4>
+						<h2 class="text-4xl">0</h2>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<div>
+						<h4>Payment methods</h4>
+						<p class="text-sm opacity-50">
+							When adding a new payment method, either remove the old one or go
+							to your projects' subscription to explicitly update the payment
+							method. Marking a payment method as "default" is only relevant for
+							new projects or if there are no other payment methods on your
+							account.
+						</p>
+					</div>
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+							>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<div class="px-6 py-4">
+										<div class="flex items-center space-x-2 opacity-50">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="21"
+												height="21"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												class="sbui-icon"
+											>
+												<rect
+													x="1"
+													y="4"
+													width="22"
+													height="16"
+													rx="2"
+													ry="2"
+												></rect>
+												<line x1="1" y1="10" x2="23" y2="10"></line>
+											</svg>
+											<p class="text-sm">No payment methods</p>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-panel-border-interior-light bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark border-t"
+								>
+									<div class="flex h-12 items-center px-6">
+										<div class="flex w-full justify-between">
+											<div></div>
+											<div>
+												<button
+													class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													type="button"
+												>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<line x1="12" y1="5" x2="12" y2="19"></line>
+														<line x1="5" y1="12" x2="19" y2="12"></line></svg
+													><span class="truncate">Add new card</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<iframe
+						src="https://newassets.hcaptcha.com/captcha/v1/2220dfa/static/hcaptcha.html#frame=checkbox&amp;id=139akizzbmj3&amp;host=supabase.com&amp;sentry=true&amp;reportapi=https%3A%2F%2Faccounts.hcaptcha.com&amp;recaptchacompat=true&amp;custom=false&amp;hl=en&amp;tplinks=on&amp;sitekey=4ca1fdb9-c9c9-4495-ba50-c85fc0e7ec1f&amp;size=invisible&amp;theme=light&amp;origin=https%3A%2F%2Fsupabase.com"
+						tabindex="0"
+						frameborder="0"
+						scrolling="no"
+						title="Widget containing checkbox for hCaptcha security challenge"
+						aria-hidden="true"
+						data-hcaptcha-widget-id="139akizzbmj3"
+						data-hcaptcha-response=""
+						style="display: none"
+					></iframe
+					><textarea
+						id="g-recaptcha-response-139akizzbmj3"
+						name="g-recaptcha-response"
+						style="display: none"
+					></textarea
+					><textarea
+						id="h-captcha-response-139akizzbmj3"
+						name="h-captcha-response"
+						style="display: none"
+					></textarea>
+				</div>
+				<div class="container my-4 max-w-4xl">
+					<h4>Billing email</h4>
+					<p class="text-sm opacity-50">
+						All billing correspondence will go to this email
+					</p>
+					<div class="mt-3">
+						<form id="org-billing-email">
+							<div
+								class="bg-scale-100 dark:bg-scale-300 border-scale-400 overflow-hidden rounded-md border shadow"
+							>
+								<div class="divide-scale-400 flex flex-col gap-0 divide-y">
+									<div
+										class="-mx-2 block grid grid-cols-12 gap-6 px-8 py-8 opacity-100"
+									>
+										<div
+											class="undefined undefined relative col-span-12 flex flex-col gap-6 lg:col-span-7"
+										>
+											<div
+												class="grid gap-2 text-sm leading-4 md:grid md:grid-cols-12"
+											>
+												<div
+													class="col-span-12 flex flex-row justify-between space-x-2"
+												>
+													<label
+														class="text-scale-1100 block text-sm leading-4"
+														for="billing_email"
+														>Email address</label
+													>
 												</div>
-												<div class="flex items-center space-x-2">
-													<DisclosureButton
-														@click="handleReset()"
-														class="rounded-md border border-indigo-600 bg-white p-2 text-indigo-600"
-													>
-														<XMarkIcon class="h-5 w-5" />
-													</DisclosureButton>
-													<DisclosureButton
-														@click="
-															handleUpdateStripe(
-																User.Account.stripeCustomerId,
-																{
-																	email: state.email,
-																}
-															)
-														"
-														:disabled="loading"
-														class="rounded-md bg-indigo-600 p-2 text-white"
-													>
-														<CheckIcon class="h-5 w-5" />
-													</DisclosureButton>
+												<div class="col-span-12">
+													<div class="">
+														<div class="relative">
+															<input
+																id="billing_email"
+																name=""
+																type="text"
+																class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-3 py-2 text-sm leading-4 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																value="will.marzella@tray.io"
+															/>
+														</div>
+													</div>
+													<p
+														data-state="hide"
+														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm leading-4 text-red-900 transition-all"
+													></p>
 												</div>
 											</div>
 										</div>
-									</DisclosurePanel>
-									<div class="ml-2">
-										<DisclosureButton class="p-2" v-if="!open">
-											<PencilIcon class="h-4 w-4 dark:text-slate-400" />
-										</DisclosureButton>
 									</div>
-								</Disclosure>
-								<p class="mt-2 text-xs text-slate-600 dark:text-slate-500">
-									The invoices will be sent to this email
-								</p>
+								</div>
+								<div class="border-scale-400 border-t"></div>
+								<div class="flex px-8 py-4">
+									<div class="flex w-full items-center justify-end gap-2">
+										<div class="flex items-center gap-2">
+											<button
+												class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+												disabled=""
+												type="reset"
+											>
+												<span class="truncate">Cancel</span></button
+											><button
+												form="org-billing-email"
+												class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+												disabled=""
+												type="submit"
+											>
+												<span class="truncate">Save</span>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<div>
+						<h4>Billing address</h4>
+						<p class="text-sm opacity-50">
+							This will be reflected in every invoice
+						</p>
+					</div>
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+							>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<form>
+										<div class="w-3/5 space-y-2 px-6 py-4">
+											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
+												<div class="col-span-12">
+													<div class="">
+														<div class="relative">
+															<input
+																id="line1"
+																name="line1"
+																placeholder="Address line 1"
+																type="text"
+																class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																value=""
+															/>
+															<div
+																data-lastpass-icon-root="true"
+																style="
+																	position: relative !important;
+																	height: 0px !important;
+																	width: 0px !important;
+																	float: left !important;
+																"
+															></div>
+														</div>
+													</div>
+													<p
+														data-state="hide"
+														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+													></p>
+												</div>
+											</div>
+											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
+												<div class="col-span-12">
+													<div class="">
+														<div class="relative">
+															<input
+																id="line2"
+																name="line2"
+																placeholder="Address line 2"
+																type="text"
+																class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																value=""
+															/>
+														</div>
+													</div>
+													<p
+														data-state="hide"
+														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+													></p>
+												</div>
+											</div>
+											<div class="flex items-center space-x-2">
+												<div
+													class="grid w-full gap-2 text-sm md:grid md:grid-cols-12"
+												>
+													<div class="col-span-12">
+														<div class="">
+															<button
+																class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2 indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current aria-expanded:ring-2"
+																name="country"
+																id="country"
+																type="button"
+																aria-haspopup="menu"
+																aria-expanded="false"
+																data-state="closed"
+															>
+																<span
+																	class="flex w-full flex-row items-center space-x-3"
+																	><span class="truncate">---</span></span
+																><span
+																	class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+																	><svg
+																		class="text-scale-600 h-5 w-5"
+																		xmlns="http://www.w3.org/2000/svg"
+																		viewBox="0 0 20 20"
+																		fill="currentColor"
+																		aria-hidden="true"
+																	>
+																		<path
+																			fill-rule="evenodd"
+																			d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+																			clip-rule="evenodd"
+																		></path></svg
+																></span>
+															</button>
+														</div>
+														<p
+															data-state="hide"
+															class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+														></p>
+													</div>
+												</div>
+												<div
+													class="grid w-full gap-2 text-sm md:grid md:grid-cols-12"
+												>
+													<div class="col-span-12">
+														<div class="">
+															<div class="relative">
+																<input
+																	id="postal_code"
+																	name="postal_code"
+																	placeholder="Postal code"
+																	type="text"
+																	class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																	value=""
+																/>
+															</div>
+														</div>
+														<p
+															data-state="hide"
+															class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+														></p>
+													</div>
+												</div>
+											</div>
+											<div class="flex items-center space-x-2">
+												<div
+													class="grid w-full gap-2 text-sm md:grid md:grid-cols-12"
+												>
+													<div class="col-span-12">
+														<div class="">
+															<div class="relative">
+																<input
+																	id="city"
+																	name="city"
+																	placeholder="City"
+																	type="text"
+																	class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																	value=""
+																/>
+															</div>
+														</div>
+														<p
+															data-state="hide"
+															class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+														></p>
+													</div>
+												</div>
+												<div
+													class="grid w-full gap-2 text-sm md:grid md:grid-cols-12"
+												>
+													<div class="col-span-12">
+														<div class="">
+															<div class="relative">
+																<input
+																	id="state"
+																	name="state"
+																	placeholder="State"
+																	type="text"
+																	class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+																	value=""
+																/>
+															</div>
+														</div>
+														<p
+															data-state="hide"
+															class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+														></p>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="border-scale-400 border-t"></div>
+										<div class="flex justify-between px-6 py-4">
+											<div></div>
+											<div class="flex items-center space-x-2">
+												<button
+													class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													disabled=""
+													type="reset"
+												>
+													<span class="truncate">Cancel</span></button
+												><button
+													class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													disabled=""
+													type="submit"
+												>
+													<span class="truncate">Save</span>
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
 							</div>
 						</div>
-					</fieldset>
-				</section>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<div>
+						<h4>Tax ID</h4>
+						<p class="text-sm opacity-50">
+							If you would like to include specific tax ID(s) to your invoices.
+							<br />Make sure the tax ID looks exactly like the placeholder
+							text.
+						</p>
+					</div>
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+							>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<div class="w-8/12 space-y-4 px-6 py-4">
+										<div>
+											<p
+												class="text-scale-900 flex items-center space-x-2 text-sm"
+											>
+												No tax IDs
+											</p>
+										</div>
+										<div
+											class="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="14"
+												height="14"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												class="sbui-icon"
+											>
+												<line x1="12" y1="5" x2="12" y2="19"></line>
+												<line x1="5" y1="12" x2="19" y2="12"></line>
+											</svg>
+											<p class="text-sm">Add another ID</p>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-panel-border-interior-light bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark border-t"
+								>
+									<div class="flex h-12 items-center px-6">
+										<div class="flex w-full justify-between">
+											<div></div>
+											<div class="flex items-center space-x-2">
+												<button
+													class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													disabled=""
+													type="reset"
+												>
+													<span class="truncate">Cancel</span></button
+												><button
+													class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													disabled=""
+													type="submit"
+												>
+													<span class="truncate">Save</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
+		</article>
 	</div>
 </template>
 

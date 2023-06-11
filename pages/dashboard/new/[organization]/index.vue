@@ -16,7 +16,7 @@
 	const route = useRoute();
 	const router = useRouter();
 	const accounts = ref([]);
-	const selectedAccount = ref({});
+	const selectedAccount = ref({ name: '' });
 
 	const submit_loading = ref(false);
 	const page_loading = ref(true);
@@ -35,20 +35,22 @@
 	const projectName = ref('');
 	const projectSummary = ref('');
 
-	async function fetchAccountData() {
+	async function fetchData() {
 		try {
-			const { id } = user.value;
 			const fetchUserData = supabase
 				.from('User')
-				.select('*,Account(type)')
-				.eq('id', id)
+				.select(
+					`*, 
+					Account(
+					type
+					)`
+				)
+				.eq('id', user.value.id)
 				.limit(1)
 				.single();
 
-			const fetchAccountData = supabase
-				.from('Account')
-				.select('*')
-				.neq('type', 'super_admin');
+			const fetchAccountData = supabase.from('Account').select('*');
+			// .neq('type', 'super_admin');
 
 			const [
 				{ data: userData, error: userError },
@@ -60,7 +62,7 @@
 			if (accountError)
 				throw new Error(`Error fetching account data: ${accountError.message}`);
 
-			if (userData.Account.type === 'super_admin') {
+			if (userData.Account && userData.Account.type === 'super_admin') {
 				accounts.value = accountData;
 				selectedAccount.value = accountData.find(
 					(o) => o.id === route.params.organization
@@ -70,9 +72,7 @@
 					await supabase
 						.from('Account')
 						.select('*')
-						.eq('id', route.params.organization)
-						.limit(1)
-						.single();
+						.eq('id', route.params.organization);
 
 				if (singleAccountError)
 					throw new Error(
@@ -87,7 +87,7 @@
 				category,
 				severity,
 				error: getTicketTypesError,
-			} = await getTicketTypes(selectedAccount.value.type, 'active');
+			} = getTicketTypes(userData.Account.type, 'active');
 
 			if (getTicketTypesError)
 				throw new Error(
@@ -100,15 +100,16 @@
 
 			selectedSeverity.value = severity[0];
 			selectedTicket.value = category[0];
+			
 			page_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
 			error_message.value = error;
-			console.error('Error fetching severity data:', error);
+			console.error('Error data:', error);
 		}
 	}
 
-	await fetchAccountData();
+	await fetchData();
 
 	watch(selectedAccount, (newAccount) => {
 		if (newAccount) {
@@ -132,7 +133,7 @@
 			const { data: accountManagerData, error: accountManagerError } =
 				await supabase
 					.from('Account')
-					.select('User(badges)')
+					.select('id, User(id, badges)')
 					.eq('id', '49c1e675-9c3b-4517-86e6-436f558c2966')
 					.limit(1)
 					.single();
@@ -161,7 +162,8 @@
 	const handleSubmit = async () => {
 		try {
 			submit_loading.value = true;
-			const accountManager = getAccountManager(selectedTicket.type);
+			const accountManager = await getAccountManager(selectedTicket.value.type);
+			console.log('accountManager:', accountManager);
 
 			const { data: ticketData, error } = await supabase
 				.from('Ticket')
@@ -226,45 +228,10 @@
 		selectedSeverity.value = severities.value[0];
 		selectedFiles.value = [];
 	}
+
+
 </script>
 
-<script>
-	import { format, addDays } from 'date-fns';
-
-	// Move getAccountManager and uploadImages functions here
-	function getAccountManager(type, Account) {
-		const badgeId = type === 'engineering' ? 'mg_officer' : 'mg_sales';
-		const accountManagers = Account.User.filter((o) => {
-			return o.badges.some((badge) => badge.id === badgeId);
-		});
-		accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
-		return accountManagers[0];
-	}
-
-	async function uploadImages(ticketId, files, supabase) {
-		if (files.length === 0) {
-			return;
-		}
-		for (const file of files) {
-			try {
-				const extension = file.name.match(/[^\&?]+\.(jpg|jpeg|gif|png|webp)$/i);
-				const fileName = `${ticketId}.${extension[1]}`;
-				const filePath = `attachments/${fileName}`;
-				const { error } = await supabase.storage
-					.from('images')
-					.upload(filePath, file, { upsert: true });
-				if (error) {
-					throw error;
-				}
-			} catch (error) {
-				console.error('Error uploading image:', error);
-				throw error;
-			}
-		}
-	}
-
-	export { getAccountManager, uploadImages };
-</script>
 
 <template>
 	<div class="">
@@ -778,7 +745,7 @@
 										<span class="truncate">Cancel</span>
 									</NuxtLink>
 									<div class="items-center space-x-3">
-										<span class="text-slate-500 text-xs"
+										<span class="text-xs text-slate-500"
 											>You can rename your project later</span
 										><button
 											@click="handleSubmit()"

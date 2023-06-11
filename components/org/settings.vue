@@ -3,7 +3,7 @@
 		<div class="container my-4 max-w-4xl space-y-8">
 			<form id="org-general-settings">
 				<div
-					class="bg-scale-100 dark:bg-scale-300 border-scale-400 overflow-hidden rounded-md border shadow"
+					class="bg-scale-100 dark:bg-white/5 dark:border-white/5 border-scale-400 overflow-hidden rounded-md border shadow"
 				>
 					<div class="divide-scale-400 flex flex-col gap-0 divide-y">
 						<div
