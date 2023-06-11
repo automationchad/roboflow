@@ -276,10 +276,10 @@
 				aria-expanded="false"
 				aria-controls="radix-462"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
 			>
 				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded border-none px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -303,10 +303,10 @@
 				aria-expanded="false"
 				aria-controls="radix-463"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white dark:bg-white/10 p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -332,12 +332,12 @@
 				aria-expanded="false"
 				aria-controls="radix-464"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white dark:bg-white/10 p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<div class="relative flex" data-state="closed">
 					<span
 						id="notification-button"
-						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 dark:text-slate-300 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 						><svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="16"
@@ -348,7 +348,7 @@
 							stroke-width="1.5"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							class="sbui-icon text-slate-700"
+							class="sbui-icon text-slate-700 dark:text-slate-300"
 						>
 							<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
 							<path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg
@@ -357,10 +357,10 @@
 						class="absolute -right-1 -top-1 z-50 flex h-3 w-3 items-center justify-center"
 					>
 						<div
-							class="h-full w-full animate-ping rounded-full bg-rose-500 opacity-60 dark:bg-rose-800"
+							class="h-full w-full animate-ping rounded-full bg-rose-500 opacity-60 dark:bg-rose-700"
 						></div>
 						<div
-							class="z-60 absolute right-0 top-0 h-full w-full rounded-full bg-rose-600 opacity-80 dark:bg-rose-900"
+							class="z-60 absolute right-0 top-0 h-full w-full rounded-full bg-rose-600 opacity-80 dark:bg-rose-800"
 						></div>
 					</div>
 				</div>
@@ -370,11 +370,22 @@
 </template>
 
 <style scoped>
-	.bordershadow-scale-600 {
-		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
-			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgb(64 68 82/8%) 0 2px 5px 0;
+	@media (prefers-color-scheme: dark) {
+		bordershadow-scale-600 {
+			box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+				rgba(0, 0, 0, 0.22) 0 1px 1px 0, #828c90 0 0 0 1px,
+				rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+				rgb(64 68 82/8%) 0 2px 5px 0;
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		.bordershadow-scale-600 {
+			box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+				rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
+				rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+				rgb(64 68 82/8%) 0 2px 5px 0;
+		}
 	}
 
 	.bordershadow-brand-fixed-1000 {
