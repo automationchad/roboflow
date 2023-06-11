@@ -1,5 +1,5 @@
 <template>
-	<div class="h-screen">
+	<div class="h-screen" v-if="false">
 		<div
 			class="grid h-full grid-cols-1 items-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24"
 		>
@@ -173,6 +173,113 @@
 				:description="error_message"
 			/>
 		</transition>
+	</div>
+
+	<div v-else-if="true"
+		class="bg-scale-200 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5"
+	>
+		<a class="flex items-center justify-center gap-4" href="/projects"
+			><img
+				src="/img/supabase-logo.svg"
+				alt="Supabase"
+				class="block h-[24px] cursor-pointer rounded"
+		/></a>
+		<div
+			class="border-scale-400 bg-scale-100 mx-auto overflow-hidden rounded-md border text-center shadow md:w-[400px]"
+		>
+			<div class="relative">
+				<div class="transition-opacity duration-300">
+					<div class="flex flex-col gap-2 px-6 py-8">
+						<p class="text-scale-1200 text-sm">You have been invited to join</p>
+						<p class="text-scale-1200 text-3xl">an organization</p>
+						<p class="text-scale-900 text-xs">
+							organization slug: gujvascqmaqhbcsazlwd
+						</p>
+					</div>
+					<div class="border-scale-400 bg-scale-100 border-t">
+						<div class="flex flex-col gap-4 px-6 py-4">
+							<div
+								class="text-scale-1100 flex flex-col items-center justify-center gap-3 text-sm"
+							>
+								<p>
+									There was an error requesting details for this invitation.
+								</p>
+							</div>
+							<div class="flex flex-col gap-3">
+								<p class="text-scale-900 text-xs">
+									You will need to sign in to accept this invitation
+								</p>
+								<div class="flex justify-center gap-3">
+									<a
+										href="/?returnTo=%2Fjoin%3Ftoken%3Dyfckp-kublo-oxrso-pjxxx%26slug%3Dgujvascqmaqhbcsazlwd"
+										><button
+											class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+											type="button"
+										>
+											<span class="truncate">Sign in</span>
+										</button></a
+									><a
+										href="/?returnTo=%2Fjoin%3Ftoken%3Dyfckp-kublo-oxrso-pjxxx%26slug%3Dgujvascqmaqhbcsazlwd"
+										><button
+											class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+											type="button"
+										>
+											<span class="truncate">Create an account</span>
+										</button></a
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div
+		v-else
+		class="bg-scale-200 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5"
+	>
+		<a class="flex items-center justify-center gap-4" href="/projects"
+			><img
+				src="/img/supabase-logo.svg"
+				alt="Supabase"
+				class="block h-[24px] cursor-pointer rounded"
+		/></a>
+		<div
+			class="border-scale-400 bg-scale-100 mx-auto overflow-hidden rounded-md border text-center shadow md:w-[400px]"
+		>
+			<div class="relative">
+				<div class="transition-opacity duration-300">
+					<div class="flex flex-col gap-2 px-6 py-8">
+						<p class="text-scale-1200 text-sm">You have been invited to join</p>
+						<p class="text-scale-1200 text-3xl">automationchad</p>
+						<p class="text-scale-900 text-sm">an organization on Supabase</p>
+						<p class="text-scale-900 text-xs">
+							organization slug: gujvascqmaqhbcsazlwd
+						</p>
+					</div>
+					<div class="border-scale-400 bg-scale-100 border-t">
+						<div class="flex flex-col gap-4 px-6 py-4">
+							<div
+								class="text-scale-1100 flex flex-col items-center justify-center gap-3 text-sm"
+							>
+								<p>
+									Your email address will.marzella@tray.io does not match the
+									email address this invitation was sent to.
+								</p>
+								<p class="text-scale-900">
+									To accept this invitation, you will need to
+									<a class="text-brand-900 cursor-pointer">sign out</a> and then
+									sign in or create a new account using the same email address
+									used in the invitation.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="fixed right-10 top-10">
+	<div class="fixed right-10 top-20 z-10">
 		<div
 			class="flex max-w-sm justify-between space-x-4 rounded-md bg-white px-4 py-2 shadow-md ring-1 ring-gray-300 dark:bg-gray-900 dark:ring-gray-800"
 		>

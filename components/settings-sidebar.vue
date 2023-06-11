@@ -32,7 +32,7 @@
 								>
 									<span
 										title="All projects"
-										class="w-full truncate text-sm text-slate-300/90 transition group-hover:text-slate-200"
+										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-200 dark:text-slate-300/90"
 										>All projects</span
 									>
 								</button></NuxtLink
@@ -41,7 +41,9 @@
 					</div>
 					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-400">Organizations</span>
+							<span class="w-full text-sm text-slate-400 dark:text-slate-400"
+								>Organizations</span
+							>
 						</div>
 						<ul class="space-y-1">
 							<NuxtLink
@@ -51,11 +53,11 @@
 								@click="(title = team.name), (teams = teams)"
 								:to="`/dashboard/org/${team.id}`"
 								><button
-									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-300 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500"
+									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-400 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500 dark:text-slate-300"
 								>
 									<span
 										:title="team.name"
-										class="w-full truncate text-sm text-slate-300/90 transition group-hover:text-slate-200"
+										class="w-full truncate text-sm text-slate-300/90 text-slate-500 transition group-hover:text-slate-700 dark:group-hover:text-slate-200"
 										>{{ team.name }}</span
 									>
 								</button></NuxtLink
@@ -64,7 +66,9 @@
 					</div>
 					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-300">Account</span>
+							<span class="w-full text-sm text-slate-400 dark:text-slate-300"
+								>Account</span
+							>
 						</div>
 						<ul class="space-y-1">
 							<a class="block" target="_self" href="/dashboard/account/me"
@@ -73,18 +77,8 @@
 								>
 									<span
 										title="Preferences"
-										class="w-full truncate text-sm text-slate-300 transition group-hover:text-slate-200"
+										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 										>Preferences</span
-									>
-								</button></a
-							><a class="block" target="_self" href="/dashboard/account/tokens"
-								><button
-									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-300 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500"
-								>
-									<span
-										title="Access Tokens"
-										class="w-full truncate text-sm text-slate-300 transition group-hover:text-slate-200"
-										>Access Tokens</span
 									>
 								</button></a
 							>
@@ -92,7 +86,9 @@
 					</div>
 					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-300">Documentation</span>
+							<span class="w-full text-sm text-slate-400 dark:text-slate-300"
+								>Documentation</span
+							>
 						</div>
 						<ul class="space-y-1">
 							<a class="block" target="_blank" href="https://supabase.com/docs"
@@ -100,7 +96,7 @@
 									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-300 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500"
 								>
 									<span
-										class="truncate text-sm text-slate-300 transition group-hover:text-slate-200"
+										class="truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 										><svg
 											xmlns="http://www.w3.org/2000/svg"
 											width="14"
@@ -110,42 +106,14 @@
 											stroke="currentColor"
 											stroke-linecap="round"
 											stroke-linejoin="round"
-											class="sbui-icon text-slate-300 group-hover:text-slate-200"
+											class="sbui-icon text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 										>
 											<line x1="7" y1="17" x2="17" y2="7"></line>
 											<polyline points="7 7 17 7 17 17"></polyline></svg></span
 									><span
 										title="Guides"
-										class="w-full truncate text-sm text-slate-300 transition group-hover:text-slate-200"
+										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 										>Guides</span
-									>
-								</button></a
-							><a
-								class="block"
-								target="_blank"
-								href="https://supabase.com/docs/guides/api"
-								><button
-									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-300 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500"
-								>
-									<span
-										class="truncate text-sm text-slate-300 transition group-hover:text-slate-200"
-										><svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="14"
-											height="14"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="sbui-icon text-slate-300 group-hover:text-slate-200"
-										>
-											<line x1="7" y1="17" x2="17" y2="7"></line>
-											<polyline points="7 7 17 7 17 17"></polyline></svg></span
-									><span
-										title="API Reference"
-										class="w-full truncate text-sm text-slate-300 transition group-hover:text-slate-200"
-										>API Reference</span
 									>
 								</button></a
 							>
@@ -160,7 +128,7 @@
 									style="margin-left: 0rem"
 								>
 									<div
-										class="min-w-fit truncate text-sm text-slate-300 transition group-hover:text-slate-200"
+										class="min-w-fit truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +139,7 @@
 											stroke="currentColor"
 											stroke-linecap="round"
 											stroke-linejoin="round"
-											class="sbui-icon text-slate-300 group-hover:text-slate-200"
+											class="sbui-icon text-slate-500 transition dark:text-slate-300"
 										>
 											<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
 											<polyline points="16 17 21 12 16 7"></polyline>
@@ -179,7 +147,7 @@
 										</svg>
 									</div>
 									<span
-										class="w-full truncate text-sm text-slate-300 transition group-hover:text-slate-200"
+										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
 										>Logout</span
 									>
 								</button>

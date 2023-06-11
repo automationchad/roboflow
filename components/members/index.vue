@@ -1,5 +1,6 @@
 <template>
 	<div class="">
+		
 		<div class="mt-8 space-y-6 lg:px-0">
 			<section aria-labelledby="deals">
 				<div class="">
@@ -39,7 +40,8 @@
 																>" you don't have permissions to send invites.
 															</span>
 														</div>
-														<DisclosureButton
+														<button
+															@click="showInvite = true"
 															:disabled="isAddingDisabled"
 															v-if="!open"
 															type="button"
@@ -83,7 +85,7 @@
 															</svg>
 
 															Add
-														</DisclosureButton>
+														</button>
 														<DisclosurePanel
 															class="flex flex-grow items-center justify-between text-sm text-gray-500"
 														>
@@ -188,7 +190,11 @@
 																class="flex items-center space-x-4"
 																v-if="person.token"
 															>
-																<div class="text-slate-400">Invite pending</div>
+																<div
+																	class="rounded-full border border-yellow-600 bg-yellow-100 px-2 text-xs font-medium text-yellow-700"
+																>
+																	Invited
+																</div>
 																<button
 																	@click="copyToClipboard(person.confirm_url)"
 																>
@@ -440,9 +446,23 @@
 			><deleteConfirm
 				v-if="showDelete"
 				@cancel="showDelete = false"
-				@confirm="deleteUser(userToDelete)"
+				@confirm="deleteUser(userToDelete), (showDelete = false)"
 				:command="deleteCommand"
 				:description="deleteDescription"
+		/></transition>
+
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+			><MembersInviteModal
+				v-if="showInvite"
+				@invite-sent="getMembers(), handleSuccess"
+				@error="handleError"
+				@close="showInvite = false"
 		/></transition>
 	</div>
 </template>
@@ -497,14 +517,28 @@
 	const deleteCommand = ref('');
 	const deleteDescription = ref('');
 
+	const users = ref([]);
+
+	const showInvite = ref(false);
+
 	const is_error = ref(false);
 	const error_message = ref('');
 	const is_success = ref(false);
 	const success_message = ref('');
 
+	const handleError = (msg) => {
+		error_message.value = msg;
+		is_error.value = true;
+	};
+
+	const handleSuccess = (msg) => {
+		success_message.value = msg;
+		is_success.value = true;
+	};
+
 	const inviteeEmail = ref('');
 
-	const loading = ref(false);
+	const loading = ref(true);
 
 	let selectedRoles = reactive({});
 
@@ -538,7 +572,27 @@
 				: 'delete the selected user';
 	};
 
-	const users = ref(moveUserToFront(accountData.User.concat(Invitation)));
+	const getMembers = async () => {
+		const { data: accountData, error: accountError } = await supabase
+			.from('Account')
+			.select(
+				`id, User(
+			*
+			)`
+			)
+			.eq('id', route.params.organization)
+			.limit(1)
+			.single();
+		let { data: Invitation, error: InvitationError } = await supabase
+			.from('Invitation')
+			.select('*')
+			.eq('account', route.params.organization);
+
+		users.value = moveUserToFront(accountData.User.concat(Invitation));
+		loading.value = false;
+	};
+
+	await getMembers();
 
 	for (let user of users.value) {
 		selectedRoles[user.id] = ref(user.systemRole);
@@ -608,6 +662,12 @@
 		// Check if the current user is trying to edit their own role
 		if (user.value.id === selectedUser.id) return true;
 
+		if (
+			selectedUser.systemRole === 'owner' &&
+			accountData.User.filter((o) => o.systemRole === 'owner').length === 1
+		)
+			return true;
+
 		// Check if the current user is an admin and the selected user is an owner
 		if (User.systemRole === 'admin' && selectedUser.systemRole === 'owner')
 			return true;
@@ -631,7 +691,8 @@
 
 		if (
 			selectedUser.systemRole === 'owner' &&
-			accountData.User.concat(Invitation).filter((o) => o.systemRole === 'owner').length === 1
+			selectedUser.status !== 'pending' &&
+			accountData.User.filter((o) => o.systemRole === 'owner').length === 1
 		)
 			return true;
 
@@ -724,6 +785,7 @@
 		} else {
 			// Update the local user data as well
 			users.value = users.value.filter((u) => u.id !== person.id);
+
 			is_success.value = true;
 			success_message.value = 'User deleted successfully';
 			console.log('User deleted successfully');

@@ -53,9 +53,13 @@
 			accountId.value = ticketData.accountId;
 		}
 
-		// if (route.path.includes('/projects')) {
-		// 	description.value = 'Projects';
-		// } else description.value = 'Settings';
+		if (route.path.includes('/dashboard/projects')) {
+			description.value = 'Projects';
+			title.value = 'Motis Group';
+		} else {
+			title.value = 'Motis Group';
+			description.value = 'Settings';
+		}
 	}
 
 	await fetchUserData();
@@ -64,7 +68,7 @@
 		() => route.params.id,
 		async (newId, oldId) => {
 			if (newId) {
-				fetchUserData();
+				await fetchUserData();
 			}
 		},
 		{ immediate: true }
@@ -74,7 +78,17 @@
 		() => route.params.organization,
 		async (newId, oldId) => {
 			if (newId) {
-				fetchUserData();
+				await fetchUserData();
+			}
+		},
+		{ immediate: true }
+	);
+
+	watch(
+		() => route.path,
+		async (newId, oldId) => {
+			if (newId) {
+				await fetchUserData();
 			}
 		},
 		{ immediate: true }
@@ -83,7 +97,7 @@
 
 <template>
 	<div
-		class="border-scale-500 sticky top-0 z-50 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
+		class="border-scale-500 sticky top-0 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
 	>
 		<div class="-ml-2 flex items-center text-sm">
 			<Menu as="div"

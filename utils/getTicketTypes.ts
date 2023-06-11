@@ -153,6 +153,13 @@ export default function (type: string, status: string) {
 		],
 	};
 
+	const role = [
+		{ id: 'owner', name: 'Owner' },
+		{ id: 'admin', name: 'Admin' },
+		{ id: 'contributor', name: 'Contributor' },
+		{ id: 'viewer', name: 'Viewer' },
+	];
+
 	const severity = [
 		{
 			id: 'low',
@@ -187,5 +194,5 @@ export default function (type: string, status: string) {
 		},
 	];
 
-	return { category: category[type], severity };
+	return { category: category[type], role, severity };
 }
