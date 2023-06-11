@@ -608,9 +608,9 @@
 	<div class="flex min-h-full">
 		<div class="flex w-0 flex-1 flex-col">
 			<main class="flex-1">
-				<div class="py-8 xl:py-10">
+				<div class="px-5 py-5">
 					<div
-						class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 xl:grid xl:max-w-7xl xl:grid-cols-3"
+						class="mx-auto xl:grid xl:grid-cols-3"
 					>
 						<div
 							class="dark:border-slate-800 xl:col-span-2 xl:border-gray-200 xl:pr-8"

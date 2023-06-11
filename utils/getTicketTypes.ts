@@ -156,35 +156,34 @@ export default function (type: string, status: string) {
 	const severity = [
 		{
 			id: 'low',
-
 			title: 'Low',
 			desc: 'General guidance',
+			sla_days: 7,
 		},
 		{
 			id: 'normal',
-
 			title: 'Normal',
 			desc: 'System impaired',
+			sla_days: 5,
 		},
 		{
 			id: 'high',
-
 			title: 'High',
 			min_plan: 'support',
-
 			desc: 'Production system impaired',
+			sla_days: 3,
 		},
 		{
 			id: 'urgent',
-
 			title: 'Urgent',
 			desc: 'Production system down',
+			sla_days: 2,
 		},
 		{
 			id: 'critical',
-
 			title: 'Critical',
 			desc: 'Business-critical system down',
+			sla_days: 1,
 		},
 	];
 

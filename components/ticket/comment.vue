@@ -378,7 +378,7 @@
 
 <template>
 	<div class="">
-		<article id="parent-comment" class="relative mb-6 rounded-lg text-base">
+		<article id="parent-comment" class="relative rounded-lg text-base bg-[#F8F8FB]">
 			<div
 				v-if="props.activityItemIdx < props.comments.length - 1"
 				:class="[
@@ -413,7 +413,7 @@
 							>
 								<img
 									v-if="props.activityItem.avatarUrl"
-									class="dark:ring-[#020014] relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white"
+									class="dark:ring-[#020014] relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB]"
 									:src="props.activityItem.avatarUrl"
 									alt=""
 								/>
@@ -664,7 +664,7 @@
 								>
 									<div v-if="reply.avatarUrl" class="">
 										<img
-											class="dark:ring-[#020014] relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-white"
+											class="dark:ring-[#020014] relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB]"
 											:src="reply.avatarUrl"
 											:alt="reply.User.firstName + ' ' + reply.User.lastName"
 										/>

@@ -8,7 +8,7 @@
 	const supabase = useSupabaseClient();
 
 	const route = useRoute();
-	const title = ref('Motis Group');
+	const title = ref(null);
 	const description = ref(null);
 
 	const accountId = ref(null);
@@ -24,8 +24,6 @@
 			.eq('id', user.value.id)
 			.limit(1)
 			.single();
-
-		title.value = userData.Account.name;
 
 		admin.value = userData.Account.type === 'super_admin';
 
@@ -55,12 +53,12 @@
 			accountId.value = ticketData.accountId;
 		}
 
-		if (route.path.includes('/projects')) {
-			description.value = 'Projects';
-		} else description.value = 'Settings';
+		// if (route.path.includes('/projects')) {
+		// 	description.value = 'Projects';
+		// } else description.value = 'Settings';
 	}
 
-	fetchUserData();
+	await fetchUserData();
 
 	watch(
 		() => route.params.id,
@@ -85,7 +83,7 @@
 
 <template>
 	<div
-		class="border-scale-500 sticky top-0 z-50 flex h-12 max-h-12 items-center justify-between border-b px-5 py-2 dark:border-white/10 dark:bg-transparent"
+		class="border-scale-500 sticky top-0 z-50 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
 	>
 		<div class="-ml-2 flex items-center text-sm">
 			<Menu as="div"
@@ -95,7 +93,7 @@
 					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all hover:bg-gray-50 focus:outline-4"
 				>
 					<span
-						class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
 						><span class="truncate">{{ title }}</span></span
 					></MenuButton
 				>
@@ -106,7 +104,7 @@
 					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 				>
 					<span
-						class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white"
 						><span class="truncate">{{ title }}</span></span
 					></NuxtLink
 				>
@@ -190,7 +188,7 @@
 					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all hover:bg-gray-50 focus:outline-4 dark:hover:bg-white/5"
 				>
 					<span
-						class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
 						><span class="truncate">{{ description }}</span></span
 					></MenuButton
 				>
@@ -200,7 +198,7 @@
 					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 				>
 					<span
-						class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
+						class="font-regular hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-white/60"
 						><span class="truncate">{{ description }}</span></span
 					>
 				</div>
@@ -257,16 +255,17 @@
 			</Menu>
 		</div>
 		<div class="flex items-center space-x-2 dark:text-white">
-			<button
+			<NuxtLink
+				:to="'https://motisgroup.helpkit.so'"
 				type="button"
 				aria-haspopup="dialog"
 				aria-expanded="false"
 				aria-controls="radix-462"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<span
-					class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -283,17 +282,17 @@
 						<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
 						<line x1="12" y1="17" x2="12.01" y2="17"></line></svg
 					><span class="truncate">Help</span>
-				</span></button
+				</span></NuxtLink
 			><button
 				type="button"
 				aria-haspopup="dialog"
 				aria-expanded="false"
 				aria-controls="radix-463"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<span
-					class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -319,12 +318,12 @@
 				aria-expanded="false"
 				aria-controls="radix-464"
 				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<div class="relative flex" data-state="closed">
 					<span
 						id="notification-button"
-						class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 						><svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="16"
@@ -335,7 +334,7 @@
 							stroke-width="1.5"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							class="sbui-icon text-scale-1200"
+							class="sbui-icon text-slate-700"
 						>
 							<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
 							<path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg
@@ -355,3 +354,19 @@
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	.bordershadow-scale-600 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
+	}
+
+	.bordershadow-brand-fixed-1000 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #7375ed 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
+	}
+</style>

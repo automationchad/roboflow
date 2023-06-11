@@ -18,12 +18,22 @@
 	const accounts = ref([]);
 	const selectedAccount = ref({});
 
-	const loading = ref(false);
+	const submit_loading = ref(false);
+	const page_loading = ref(true);
+
+	const is_success = ref(false);
+	const success_message = ref('');
+	const is_error = ref(false);
+	const error_message = ref('');
 
 	const severities = ref([]);
 	const categories = ref([]);
 	const selectedSeverity = ref({ title: null });
 	const selectedTicket = ref({ title: null });
+	const selectedFiles = ref([]);
+
+	const projectName = ref('');
+	const projectSummary = ref('');
 
 	async function fetchAccountData() {
 		try {
@@ -45,6 +55,11 @@
 				{ data: accountData, error: accountError },
 			] = await Promise.all([fetchUserData, fetchAccountData]);
 
+			if (userError)
+				throw new Error(`Error fetching user data: ${userError.message}`);
+			if (accountError)
+				throw new Error(`Error fetching account data: ${accountError.message}`);
+
 			if (userData.Account.type === 'super_admin') {
 				accounts.value = accountData;
 				selectedAccount.value = accountData.find(
@@ -55,16 +70,29 @@
 					await supabase
 						.from('Account')
 						.select('*')
-						.eq('id', route.params.organization);
+						.eq('id', route.params.organization)
+						.limit(1)
+						.single();
+
+				if (singleAccountError)
+					throw new Error(
+						`Error fetching single account data: ${singleAccountError.message}`
+					);
 
 				accounts.value = singleAccountData;
 				selectedAccount.value = singleAccountData[0];
 			}
 
-			const { category, severity } = await getTicketTypes(
-				selectedAccount.value.type,
-				'active'
-			);
+			const {
+				category,
+				severity,
+				error: getTicketTypesError,
+			} = await getTicketTypes(selectedAccount.value.type, 'active');
+
+			if (getTicketTypesError)
+				throw new Error(
+					`Error fetching ticket types: ${getTicketTypesError.message}`
+				);
 
 			categories.value = category;
 
@@ -72,7 +100,10 @@
 
 			selectedSeverity.value = severity[0];
 			selectedTicket.value = category[0];
+			page_loading.value = false;
 		} catch (error) {
+			is_error.value = true;
+			error_message.value = error;
 			console.error('Error fetching severity data:', error);
 		}
 	}
@@ -85,77 +116,114 @@
 		}
 	});
 
-	const handleSubmit = async (body) => {
-		try {
-			loading.value = true;
+	const isDisabled = computed(() => {
+		return (
+			!projectName.value ||
+			!projectSummary.value ||
+			!selectedSeverity.value ||
+			!selectedTicket.value ||
+			submit_loading.value
+		);
+	});
 
+	async function getAccountManager(type) {
+		try {
+			const badgeId = type === 'engineering' ? 'mg_officer' : 'mg_sales';
+			const { data: accountManagerData, error: accountManagerError } =
+				await supabase
+					.from('Account')
+					.select('User(badges)')
+					.eq('id', '49c1e675-9c3b-4517-86e6-436f558c2966')
+					.limit(1)
+					.single();
+
+			if (accountManagerError)
+				throw new Error(
+					`Error fetching account manager data: ${accountManagerError.message}`
+				);
+
+			const accountManagers = accountManagerData.User.filter((o) => {
+				return o.badges.some((badge) => badge.id === badgeId);
+			});
+			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
+			return accountManagers[0];
+		} catch (error) {
+			console.error('Error getting account manager:', error);
+			throw error;
+		}
+	}
+
+	function generateDueDate(selectedOption) {
+		const today = new Date();
+		return new Date(today.setDate(today.getDate() + selectedOption.sla_days));
+	}
+
+	const handleSubmit = async () => {
+		try {
+			submit_loading.value = true;
 			const accountManager = getAccountManager(selectedTicket.type);
 
-			const { data, error } = await supabase
+			const { data: ticketData, error } = await supabase
 				.from('Ticket')
 				.insert([
 					{
-						name: body.name,
+						name: projectName.value,
 						type: selectedTicket.value.id,
 						createdBy: user.value.id,
-						dueDate: due_date.value ?? new Date(),
+						dueDate: generateDueDate(selectedSeverity.value),
 						accountId: route.params.organization,
 						assignedTo: accountManager.id,
-						desc: body.brief,
+						desc: projectSummary.value,
 					},
 				])
 				.select();
 			if (error) {
-				throw error;
+				throw new Error(`Error inserting ticket: ${error.message}`);
 			}
 
-			await uploadImages(data[0].id, selectedFiles.value);
-
-			resetFields();
-			loading.value = false;
+			await uploadImages(ticketData[0].id, selectedFiles.value);
+			is_success.value = true;
+			success_message.value = 'Successfully created project';
+			navigateTo(`/dashboard/project/${ticketData[0].id}`);
+			submit_loading.value = false;
 		} catch (error) {
+			is_error.value = true;
+			error_message.value = error;
 			console.error('Error submitting ticket:', error);
-			emit('ticket-error', error);
 		}
 	};
 
-	function getAccountManager(type) {
-		const badgeId = type === 'engineering' ? 'mg_officer' : 'mg_sales';
-		const accountManagers = Account.User.filter((o) => {
-			return o.badges.some((badge) => badge.id === badgeId);
-		});
-		accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
-		return accountManagers[0];
-	}
-
 	async function uploadImages(ticketId, files) {
-		const promises = files.map(async (file) => {
-			try {
+		try {
+			const promises = files.map(async (file) => {
 				const extension = file.name.match(/[^\&?]+\.(jpg|jpeg|gif|png|webp)$/i);
 				const fileName = `${ticketId}.${extension[1]}`;
 				const filePath = `attachments/${fileName}`;
-				return supabase.storage
+				const { error: uploadError } = await supabase.storage
 					.from('images')
 					.upload(filePath, file, { upsert: true });
-			} catch (error) {
-				console.error('Error uploading image:', error);
-				throw error;
-			}
-		});
 
-		const results = await Promise.all(promises);
-		results.forEach(({ error }) => {
-			if (error) {
-				throw error;
-			}
-		});
+				if (uploadError)
+					throw new Error(`Error uploading image: ${uploadError.message}`);
+			});
+
+			const results = await Promise.all(promises);
+			results.forEach(({ error }) => {
+				if (error) {
+					throw new Error(`Error processing image uploads: ${error.message}`);
+				}
+			});
+		} catch (error) {
+			console.error('Error uploading images:', error);
+			throw error;
+		}
 	}
 
 	function resetFields() {
-		name.value = '';
-		brief.value = null;
-		link.value = '';
-		type.value = '';
+		projectName.value = '';
+		projectSummary.value = '';
+		selectedTicket.value = categories.value[0];
+		selectedSeverity.value = severities.value[0];
 		selectedFiles.value = [];
 	}
 </script>
@@ -200,7 +268,77 @@
 
 <template>
 	<div class="">
-		<section class="has-slide-in slide-in mx-auto my-10 max-w-2xl">
+		<section class="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
+			<div
+				v-if="page_loading"
+				class="absolute inset-0 z-[200] flex h-full w-full items-center justify-center bg-white/70 text-indigo-600"
+			>
+				<svg
+					class="h-7 w-7 animate-spin"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M12 4.75V6.25"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M17.1266 6.87347L16.0659 7.93413"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M19.25 12L17.75 12"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M17.1266 17.1265L16.0659 16.0659"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M12 17.75V19.25"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M7.9342 16.0659L6.87354 17.1265"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M6.25 12L4.75 12"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+					<path
+						d="M7.9342 7.93413L6.87354 6.87347"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+				</svg>
+			</div>
 			<div class="">
 				<div class="transition-opacity duration-300">
 					<div
@@ -351,12 +489,10 @@
 											<div class="relative">
 												<input
 													id="project-name"
-													name=""
+													v-model="projectName"
 													placeholder="Project name"
 													type="text"
 													class="box-border block w-full rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm placeholder-slate-300 shadow-sm outline-none transition-all focus:border-slate-500 focus:shadow-md focus:ring-2 focus:ring-current focus:ring-slate-300"
-													value=""
-													push::1.36.4::listener="1"
 												/>
 											</div>
 										</div>
@@ -381,26 +517,16 @@
 											<div class="relative">
 												<textarea
 													required
-													name="message"
+													v-model="projectSummary"
 													id="message"
 													rows="4"
 													max="5000"
 													placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
 													class="box-border block w-full rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm placeholder-slate-300 shadow-sm outline-none transition-all focus:border-slate-500 focus:shadow-md focus:ring-2 focus:ring-current focus:ring-slate-300"
 												/>
-												<div
-													data-lastpass-icon-root="true"
-													style="
-														position: relative !important;
-														height: 0px !important;
-														width: 0px !important;
-														float: left !important;
-													"
-												></div>
 											</div>
 										</div>
 										<p
-											data-state="hide"
 											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
 										></p>
 
@@ -517,7 +643,7 @@
 											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
 										></p>
 										<p
-											class="text-slate-500 mt-2 text-sm leading-normal"
+											class="mt-2 text-sm leading-normal text-slate-500"
 											id="-description"
 										>
 											Select the category that best describes your project.
@@ -624,7 +750,7 @@
 											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
 										></p>
 										<p
-											class="text-slate-500 mt-2 text-sm leading-normal"
+											class="mt-2 text-sm leading-normal text-slate-500"
 											id="-description"
 										>
 											<!-- Select the urgency of this project.&nbsp;<a
@@ -652,13 +778,12 @@
 										<span class="truncate">Cancel</span>
 									</NuxtLink>
 									<div class="items-center space-x-3">
-										<span class="text-scale-900 text-xs"
+										<span class="text-slate-500 text-xs"
 											>You can rename your project later</span
 										><button
-											class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-											disabled=""
-											type="button"
-											push::1.36.4::listener="1"
+											@click="handleSubmit()"
+											class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+											:disabled="isDisabled"
 										>
 											<span class="truncate">Create new project</span>
 										</button>
@@ -670,6 +795,36 @@
 				</div>
 			</div>
 		</section>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="success_message"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
+		</transition>
 	</div>
 </template>
 

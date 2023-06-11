@@ -367,7 +367,7 @@
 				:description="error_message"
 			/>
 		</transition>
-		<TicketSubmit />
+		
 	</div>
 </template>
 

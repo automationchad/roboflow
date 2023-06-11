@@ -10,9 +10,9 @@
 					alt="Supabase"
 					class="mx-auto h-[40px] w-auto cursor-pointer rounded" /></a
 			><button data-state="closed">
-				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 bg-scale-500 text-scale-1200 flex h-10 w-10 items-center justify-center rounded shadow-sm transition-colors duration-200"
-					href="/dashboard/project/nsfipxnlucvgchlkqvqw"
+				<NuxtLink
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 bg-slate-200 text-scale-1200 flex h-10 w-10 items-center justify-center rounded shadow-sm transition-colors duration-200"
+					to="/dashboard/projects"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="18"
@@ -27,12 +27,12 @@
 					>
 						<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
 						<polyline points="9 22 9 12 15 12 15 22"></polyline></svg
-				></a>
+				></NuxtLink>
 			</button>
-			<div class="bg-scale-500 h-px w-full"></div>
+			<div class="bg-slate-200 h-px w-full"></div>
 			<button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/editor"
 					><svg
 						class="text-color-inherit m-auto"
@@ -78,7 +78,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/sql"
 					><svg
 						class="text-color-inherit m-auto"
@@ -113,10 +113,10 @@
 						</g></svg
 				></a>
 			</button>
-			<div class="bg-scale-500 h-px w-full"></div>
+			<div class="bg-slate-200 h-px w-full"></div>
 			<button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/database/tables"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +136,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/auth/users"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/storage/buckets"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +177,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/functions"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -195,10 +195,10 @@
 						<polyline points="8 6 2 12 8 18"></polyline></svg
 				></a>
 			</button>
-			<div class="bg-scale-500 h-px w-full"></div>
+			<div class="bg-slate-200 h-px w-full"></div>
 			<button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/reports"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +218,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/logs/explorer"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +241,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/api"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -265,7 +265,7 @@
 				></a></button
 			><button data-state="closed">
 				<a
-					class="bg-scale-200 hover:bg-scale-500 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					href="/dashboard/project/nsfipxnlucvgchlkqvqw/settings/general"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -289,7 +289,7 @@
 		<ul class="flex flex-col items-center space-y-4">
 			<button data-state="closed">
 				<span
-					class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular text-scale-1200 hover:bg-slate-200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><span class="truncate"
 						><div class="py-1">
 							<svg
@@ -317,7 +317,7 @@
 				class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 			>
 				<span
-					class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular text-scale-1200 hover:bg-slate-200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 					><span class="truncate"
 						><div class="py-1">
 							<svg

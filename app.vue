@@ -1,10 +1,23 @@
 <template>
-	<div class="dark:bg-[#020014] min-h-screen bg-[#F8F8FB]">
+	<div class="min-h-screen bg-[#F8F8FB] dark:bg-[#020014]">
 		<NuxtLayout
 			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
 		/></NuxtLayout>
 	</div>
 </template>
+
+<script setup>
+	import { onMounted } from 'vue';
+
+	onMounted(() => {
+		let script = document.createElement('script');
+		script.src = 'https://www.helpkit.so/widget/script.js';
+		script.async = true;
+		script.id = 'helpkit-widget';
+		script.dataset.projectId = 'motisgroup';
+		document.body.appendChild(script);
+	});
+</script>
 
 <style>
 	* {
@@ -24,7 +37,7 @@
 
 	@media (prefers-color-scheme: light) {
 		html {
-			background: #F8F8FB;
+			background: #f8f8fb;
 		}
 	}
 
@@ -32,6 +45,4 @@
 		scroll-behavior: smooth;
 		line-height: 1.5;
 	}
-
-	
 </style>
