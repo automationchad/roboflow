@@ -415,7 +415,7 @@
 		let { data: Ticket, error } = await supabase
 			.from('Ticket')
 			.select(
-				'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*,Account(id,name))'
+				'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,badges))), User(*,Account(id,name))'
 			)
 			.eq('id', route.params.id)
 			.limit(1)
