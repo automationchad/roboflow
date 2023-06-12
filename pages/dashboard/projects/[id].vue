@@ -232,11 +232,7 @@
 	     id,
 		 type,
 		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
+		 Subscription(*)
 	   )`
 		)
 		.eq('id', user.value.id)
@@ -253,7 +249,7 @@
 	let { data: Ticket, error: ticketError } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*, Account(id,name))'
+			'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*, Account(id,name))'
 		)
 		.eq('id', route.params.id)
 		.limit(1)

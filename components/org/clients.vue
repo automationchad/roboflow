@@ -15,7 +15,8 @@
 	if (userData.Account.type === 'super_admin') {
 		const { data: accountData, error: accountError } = await supabase
 			.from('Account')
-			.select('id,name,Ticket(*,User(*))').neq('type', 'super_admin');
+			.select('id,name,Ticket(*,User(*))')
+			.neq('type', 'super_admin');
 		accounts.value = accountData;
 	} else {
 		const { data: accountData, error: accountError } = await supabase
@@ -178,9 +179,15 @@
 										</h5>
 										<div class="w-full">
 											<div class="flex items-end justify-between">
-												<span class="text-scale-1000 text-sm capitalize"
-													>{{ project.type }} | {{ project.User.firstName }}
-													{{ project.User.lastName }}</span
+												<span class="text-scale-1000 text-sm"
+													>{{ project.type }} |
+													{{
+														!project.User?.firstName || !project.User?.lastName
+															? project.User.email
+															: project.User?.firstName +
+															  ' ' +
+															  project.User?.lastName
+													}}</span
 												>
 												<div class="grow text-right">
 													<span

@@ -4,9 +4,9 @@
 			<Title>Motis Group | Dashboard</Title>
 		</Head>
 
-		<OrgOnboardingOverlay v-if="!userData.hasCompletedOnboarding" />
-		<org-deals v-else-if="account.type === 'partner'" />
-		<org-clients v-else />
+		<OrgOnboardingOverlay v-if="!userData.hasCompletedOnboarding && !loading" />
+		<org-deals v-else-if="account.type === 'partner' && !loading" />
+		<org-clients v-else-if="!loading" />
 
 		<transition
 			enter-active-class="transition ease-out duration-100"
@@ -79,11 +79,13 @@
 
 	const showSubmitModal = ref(false);
 
+	const loading = ref(true);
+
 	const is_error = ref(false);
 	const error_message = ref('');
 	const is_success = ref(false);
 
-	const account = ref({type: 'client'});
+	const account = ref({ type: 'client' });
 
 	if (!user.value) {
 		navigateTo('/login');
@@ -110,6 +112,7 @@
 			.single();
 
 		account.value = accountData;
+		loading.value = false;
 	}
 
 	onMounted(async () => {
