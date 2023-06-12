@@ -58,12 +58,7 @@
 			.select(
 				`*,Account (
 			     id,
-				 name,
-				 Subscription(*),
-				 Team (
-					id,
-					name
-				 )
+				 name
 			   )`
 			)
 			.eq('id', user.value.id)
@@ -82,7 +77,11 @@
 	const updatedPhoto = ref(false);
 
 	const showSave = computed(() => {
-		if (firstName.value !== originalFirstName.value || lastName.value !== originalLastName.value || updatedPhoto.value)
+		if (
+			firstName.value !== originalFirstName.value ||
+			lastName.value !== originalLastName.value ||
+			updatedPhoto.value
+		)
 			return true;
 		else return false;
 	});
@@ -456,7 +455,7 @@
 								<div class="form-group w-full">
 									<label for="uniforms-0002-0001" class="">Avatar</label>
 									<div
-										class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all text-xs pl-3"
+										class="whitespace-wrap mt-2 flex items-center gap-x-3 break-all pl-3 text-xs"
 									>
 										<div class="relative h-14 w-14">
 											<div
