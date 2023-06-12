@@ -108,6 +108,23 @@
 				throw new Error('No token provided');
 			}
 
+			if (user.value) {
+				const { data: userData, error: userError } = await supabase
+					.from('User')
+					.select('accountId')
+					.eq('id', user.value.id)
+					.limit(1)
+					.single();
+
+				if (userError) {
+					throw new Error(userError.message || userError.toString());
+				}
+
+				if (userData.accountId !== null) {
+					router.push('/dashboard/projects');
+				}
+			}
+
 			const { data: invitationData, error: invitationError } = await supabase
 				.from('Invitation')
 				.select('*,Account(name),User(email)')
@@ -160,8 +177,6 @@
 		}
 	};
 
-	await getData();
-
 	watch(
 		() => user.value,
 		async (newValue, oldValue) => {
@@ -178,40 +193,9 @@
 		await supabase.auth.signOut();
 	};
 
-	// onMounted(async () => {
-	// 	try {
-	// 		const { data, error } = await supabase
-	// 			.from('Invitation')
-	// 			.select('*')
-	// 			.eq('token', token)
-	// 			.single();
-	// 		if (error) {
-	// 			console.error(error);
-	// 			navigateTo('/invitation-not-found');
-	// 			return;
-	// 		}
-	// 		if (
-	// 			!data ||
-	// 			data.status !== 'pending' ||
-	// 			data.expires < new Date(Date.now())
-	// 		) {
-	// 			navigateTo('/invitation-not-found');
-	// 			return;
-	// 		}
-	// 		invitation.value = data;
-	// 	} catch (err) {
-	// 		console.error(err);
-	// 		navigateTo('/invitation-not-found');
-	// 	}
-	// });
-
-	// onMounted(() => {
-	// 	watchEffect(async () => {
-	// 		if (user.value) {
-	// 			navigateTo(`/invitation-not-found`);
-	// 		}
-	// 	});
-	// });
+	onMounted(async () => {
+		await getData();
+	});
 </script>
 
 <template>
