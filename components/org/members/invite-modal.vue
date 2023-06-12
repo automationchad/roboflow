@@ -122,7 +122,7 @@
 						email: inviteeEmail.value,
 						systemRole: selectedRole.value.id,
 						createdBy: user.value.id,
-						expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+						expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
 						account: route.params.organization,
 					},
 				])

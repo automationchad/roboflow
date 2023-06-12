@@ -56,7 +56,7 @@
 													(a, b) =>
 														new Date(b.createdOn) - new Date(a.createdOn)
 												)"
-												:to="`/${route.params.organization}/tickets/${deal.id}`"
+												:to="`/dashboard/projects/${deal.id}`"
 												:key="deal.name"
 												class="dark:border-panel-border-dark dark:hover:bg-white/[2%] relative flex items-center border-t border-slate-100 px-6 py-3 transition-colors duration-300 dark:border-slate-800 dark:text-slate-200"
 											>

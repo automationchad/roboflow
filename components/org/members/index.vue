@@ -576,7 +576,8 @@
 											</div>
 											<div>
 												<p class="text-slate-900">
-													{{ user.firstName }} {{ user.lastName }} {{ user.id === currentUser.id ? '(You)' : '' }}
+													{{ user.firstName }} {{ user.lastName }}
+													{{ user.id === currentUser.id ? '(You)' : '' }}
 												</p>
 												<p class="text-slate-500">{{ user.email }}</p>
 											</div>
@@ -584,13 +585,26 @@
 									</td>
 									<td>
 										<span
-											v-if="user.status === 'pending'"
+											v-if="
+												user.expires &&
+												new Date(user.expires) > new Date() &&
+												user.status === 'pending'
+											"
 											class="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:border-yellow-700"
 											>Invited</span
 										>
+										<span
+											v-else-if="
+												user.expires &&
+												new Date(user.expires) < new Date() &&
+												user.status === 'pending'
+											"
+											class="inline-flex items-center rounded-full border border-red-400 bg-red-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:border-red-700"
+											>Expired</span
+										>
 									</td>
 									<td class="">
-										<div class="w-[140px]">
+										<div class="relative w-[140px]">
 											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
 												<div class="group col-span-12">
 													<Listbox as="div" v-model="selectedRoles[user.id]">
@@ -707,7 +721,7 @@
 														<circle cx="5" cy="12" r="1"></circle></svg></span
 											></MenuButton>
 											<MenuItems
-												class="absolute right-2 top-6 z-40 w-48 min-w-fit rounded border bg-white py-1.5 shadow-lg"
+												class="absolute right-2 top-6 z-40 w-48 min-w-fit space-y-3 divide-y divide-gray-200 rounded border bg-white py-1.5 shadow-lg focus:outline-none"
 											>
 												<MenuItem
 													v-slot="{ active }"
@@ -736,8 +750,15 @@
 														</div>
 													</button>
 												</MenuItem>
+												<div
+													
+													class="my-2 w-full h-px"
+												></div>
 												<MenuItem
-													v-if="user.confirm_url"
+													v-if="
+														user.confirm_url &&
+														new Date(user.expires) > new Date()
+													"
 													v-slot="{ active }"
 													:class="[
 														active ? 'bg-slate-100' : '',
@@ -757,6 +778,31 @@
 															<p>Copy link</p>
 															<p class="block opacity-50">
 																Copy link to this invite.
+															</p>
+														</div>
+													</button>
+												</MenuItem>
+												<MenuItem
+													v-else
+													v-slot="{ active }"
+													:class="[
+														active ? 'bg-slate-100' : '',
+														'text-body-light focus:bg-selection focus:text-body flex items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+													]"
+												>
+													<button
+														@click="copyToClipboard(user.confirm_url)"
+														:class="[
+															active
+																? 'bg-slate-100'
+																: 'disabled:cursor-not-allowed',
+															'flex w-full items-center space-x-2 border-none px-4 py-1.5 text-left text-sm transition transition-colors focus:outline-none disabled:cursor-not-allowed',
+														]"
+													>
+														<div class="flex flex-col">
+															<p>Resend invitation</p>
+															<p class="block opacity-50">
+																Invites expire after 24 hours.
 															</p>
 														</div>
 													</button>

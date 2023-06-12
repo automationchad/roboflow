@@ -709,7 +709,7 @@
 												{{ Ticket.Account.name }} {{ Ticket.type }}
 											</div>
 											<h1
-												class="text-2xl font-semibold text-gray-900 dark:text-white"
+												class="max-w-5xl text-2xl font-semibold text-gray-900 dark:text-white"
 											>
 												<div class="" v-if="Ticket.type === 'referral'">
 													{{ Ticket.User.firstName }}
@@ -980,12 +980,15 @@
 													</div>
 												</div>
 											</DisclosurePanel>
-											<div class="my-4 flex justify-between">
-												<div
-													class="prose mr-auto w-full dark:prose-invert"
-													v-html="convert(input)"
-												></div>
-												<div class="">
+											<div class="my-4 grid grid-cols-8 max-w-5xl pr-4">
+												<div class="col-span-8">
+													<article
+														class="prose max-w-none dark:prose-invert"
+														v-html="convert(input)"
+													></article>
+												</div>
+
+												<div class="col-span-1" v-if="false">
 													<DisclosureButton
 														v-if="
 															(!open && Ticket.createdBy === user.id) ||
@@ -993,11 +996,7 @@
 														"
 														class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
 													>
-														<div
-															data-v-164b91a0=""
-															data-test="open-reply-button"
-															class="flex items-center"
-														>
+														<div class="flex items-center">
 															<svg
 																class="h-5 w-5"
 																fill="none"
@@ -1018,6 +1017,7 @@
 																	d="M19.25 19.25H13.75"
 																></path>
 															</svg>
+															EDIT
 														</div>
 													</DisclosureButton>
 												</div>
