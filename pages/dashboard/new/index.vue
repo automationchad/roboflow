@@ -23,8 +23,6 @@
 	const emit = defineEmits(['close-modal', 'org-submit', 'error']);
 	const user = useSupabaseUser();
 
-	console.log(user.value);
-
 	const supabase = await useSupabaseClient();
 
 	// if (userData.accountId) {

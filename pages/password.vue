@@ -1,7 +1,7 @@
 <template>
 	<div class="h-screen">
 		<div
-			class="flex h-full flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+			class="flex h-full flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
 		>
 			<div class="mx-auto w-full max-w-sm lg:w-96">
 				<div>
@@ -56,7 +56,7 @@
 				</div>
 				<form class="mt-8" @submit.prevent="forgotPassword()">
 					<div class="mt-6">
-						<div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
+						<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
 							<div class="sm:col-span-2">
 								<label
 									for="email"
@@ -80,7 +80,7 @@
 								<button
 									:disabled="loading"
 									type="submit"
-									class="flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+									class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 								>
 									{{ loading ? 'Loading' : 'Send reset link' }}
 								</button>
@@ -145,7 +145,7 @@
 		}
 		email.value = '';
 		loading.value = false;
-		console.log('data', data);
+
 		console.log('error', error);
 	};
 

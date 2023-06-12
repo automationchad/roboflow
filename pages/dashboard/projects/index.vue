@@ -6,7 +6,7 @@
 
 		<OrgOnboardingOverlay v-if="!User.hasCompletedOnboarding"/>
 		<org-deals v-else-if="User.Account.type === 'partner'" />
-		<org-clients2 v-else/>
+		<org-clients v-else/>
 
 		<ticket-submit
 			v-show="showSubmitModal"

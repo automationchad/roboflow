@@ -300,7 +300,7 @@
 	const route = useRoute();
 
 	const redirectTo =
-		route.query.redirectTo || 'http://localhost:3000/dashboard/projects';
+		route.query.redirectTo || 'https://app.motis.group/dashboard/projects';
 
 	const login = async () => {
 		loading.value = true;
@@ -316,7 +316,6 @@
 			is_error.value = true;
 			error_message.value = error;
 		}
-		console.log('user', user);
 		console.log('error', error);
 	};
 
@@ -331,7 +330,6 @@
 			is_error.value = true;
 			error_message.value = error;
 		}
-		console.log('user', data);
 		console.log('error', error);
 	};
 

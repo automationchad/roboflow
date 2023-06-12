@@ -228,9 +228,15 @@
 	} from '@heroicons/vue/20/solid';
 	const route = useRoute();
 
+	const base_url = 'https://app.motis.group';
+
+	const test_url = 'http://localhost:3000';
+
+	const test = false;
+
 	const redirectTo = route.query.returnTo
-		? `http://localhost:3000/join/${route.query.returnTo}`
-		: 'http://localhost:3000/dashboard/projects';
+		? `${test ? test_url : base_url}/join/${route.query.returnTo}`
+		: `${test ? test_url : base_url}/dashboard/projects`;
 
 	console.log(redirectTo);
 
