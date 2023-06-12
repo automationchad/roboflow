@@ -166,12 +166,7 @@
 			`*,Account (
 	     id,
 		 type,
-		 stripeCustomerId,
-		 Subscription(*),
-		 Team (
-			id,
-			name
-		 )
+		 stripeCustomerId
 	   )`
 		)
 		.eq('id', user.value.id)
@@ -181,7 +176,7 @@
 	let { data: Ticket, error: ticketError } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Team(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*)'
+			'*, Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*)'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
@@ -378,7 +373,10 @@
 
 <template>
 	<div class="">
-		<article id="parent-comment" class="relative rounded-lg text-base bg-[#F8F8FB] dark:bg-[#020014]">
+		<article
+			id="parent-comment"
+			class="relative rounded-lg bg-[#F8F8FB] text-base dark:bg-[#020014]"
+		>
 			<div
 				v-if="props.activityItemIdx < props.comments.length - 1"
 				:class="[
@@ -413,7 +411,7 @@
 							>
 								<img
 									v-if="props.activityItem.avatarUrl"
-									class="dark:ring-[#020014] relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB]"
+									class="relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB] dark:ring-[#020014]"
 									:src="props.activityItem.avatarUrl"
 									alt=""
 								/>
@@ -424,8 +422,16 @@
 									<UserCircleIconMini class="m-0 h-5 w-5" />
 								</div>
 								<NuxtLink :to="'/profile/' + props.activityItem.User.id"
-									>{{ props.activityItem.User.firstName }}
-									{{ props.activityItem.User.lastName }}</NuxtLink
+									>{{
+										props.activityItem.User.firstName
+											? props.activityItem.User.firstName
+											: props.activityItem.User.email
+									}}
+									{{
+										props.activityItem.User.lastName
+											? props.activityItem.User.lastName
+											: ''
+									}}</NuxtLink
 								>
 
 								<div class="ml-2 mr-1 flex items-center space-x-1">
@@ -472,7 +478,7 @@
 								</div>
 
 								<span
-									class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
+									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 								>
 									{{ formatDateDistance(props.activityItem.createdOn) }}
 								</span>
@@ -590,13 +596,13 @@
 					<div
 						:class="[
 							props.activityItem.User.id === User.id
-								? 'dark:bg-[#0166C8] prose-invert bg-[#4CA2FF] text-white ring-white/5'
-								: 'dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:text-gray-200',
+								? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
+								: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
 							props.activityItem.activity_type === 'ai_comment'
 								? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 								: '',
 							props.activityItem.deleted
-								? 'dark:text-white/50 text-black/30'
+								? 'text-black/30 dark:text-white/50'
 								: '',
 							'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
 						]"
@@ -664,7 +670,7 @@
 								>
 									<div v-if="reply.avatarUrl" class="">
 										<img
-											class="dark:ring-[#020014] relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB]"
+											class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB] dark:ring-[#020014]"
 											:src="reply.avatarUrl"
 											:alt="reply.User.firstName + ' ' + reply.User.lastName"
 										/>
@@ -724,7 +730,7 @@
 									</div>
 
 									<span
-										class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
+										class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 									>
 										{{ formatDateDistance(reply.createdOn) }}
 									</span>
@@ -838,8 +844,8 @@
 						<div
 							:class="[
 								reply.User.id === User.id
-									? ' dark:bg-[#0166C8] bg-[#4CA2FF] text-white ring-white/5'
-									: ' dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] text-gray-700 ring-black/5 dark:text-white',
+									? ' bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
+									: ' bg-[#E6E5EB] text-gray-700 ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
 								reply.activity_type === 'ai_comment'
 									? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 									: '',
@@ -872,14 +878,15 @@
 				>
 					<Disclosure v-slot="{ open }">
 						<div class="flex items-center justify-start pl-8">
-							<img
+							<img v-if="currentAvator"
 								:src="currentAvatar"
 								alt=""
 								class="h-5 w-5 rounded-full object-cover"
 							/>
+							<div v-else class="h-5 w-5 rounded-full bg-gray-500 text-xs text-center flex justify-center items-center text-white">{{User.email[0]}}</div>		
 
 							<DisclosureButton
-								class="dark:hover:text-[#9382ff] ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white"
+								class="ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
 							>
 								<div class="flex items-center">
 									<svg
@@ -897,7 +904,8 @@
 										></path></svg
 									><span>Comment as &nbsp;</span
 									><span class="font-medium"
-										>{{ User.firstName }} {{ User.lastName }}</span
+										>{{ User.firstName ? User.firstName : User.email }}
+										{{ User.lastName ? User.lastName : '' }}</span
 									>
 								</div>
 							</DisclosureButton>
@@ -986,13 +994,13 @@
 				<div
 					:class="[
 						props.activityItem.User.id === User.id
-							? 'dark:bg-[#0166C8] prose-invert bg-[#4CA2FF] text-white ring-white/5'
-							: 'dark:bg-[#1C1B2C] dark:ring-white/5 bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:text-gray-200',
+							? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
+							: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
 						props.activityItem.activity_type === 'ai_comment'
 							? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 							: '',
 						props.activityItem.deleted
-							? 'dark:text-white/50 text-black/30'
+							? 'text-black/30 dark:text-white/50'
 							: '',
 						'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
 					]"
@@ -1015,7 +1023,7 @@
 							>
 								<img
 									v-if="props.activityItem.avatarUrl"
-									class="dark:ring-[#020015] z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white"
+									class="z-10 mr-2 h-5 w-5 rounded-full object-cover ring-8 ring-white dark:ring-[#020015]"
 									:src="props.activityItem.avatarUrl"
 									alt=""
 								/>
@@ -1034,7 +1042,7 @@
 								</div>
 
 								<span
-									class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
+									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 								>
 									{{ formatDateDistance(props.activityItem.createdOn) }}
 								</span>

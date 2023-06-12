@@ -58,6 +58,7 @@
 
 	// Define all constants and reactive variables
 	const user = useSupabaseUser();
+
 	const supabase = useSupabaseClient();
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
@@ -249,7 +250,7 @@
 	let { data: Ticket, error: ticketError } = await supabase
 		.from('Ticket')
 		.select(
-			'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,country,jobTitle,badges))), User(*, Account(id,name))'
+			'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))'
 		)
 		.eq('id', route.params.id)
 		.limit(1)
@@ -708,7 +709,7 @@
 												class="max-w-5xl text-2xl font-semibold text-gray-900 dark:text-white"
 											>
 												<div class="" v-if="Ticket.type === 'referral'">
-													{{ Ticket.User.firstName }}
+													{{ Ticket.User.firstName ? Ticket.User.firstName : Ticket.User.email }}
 													<span class="text-slate-400">referred</span>
 													{{ Ticket.name }}
 													<span class="text-slate-400">for a</span>
@@ -976,7 +977,7 @@
 													</div>
 												</div>
 											</DisclosurePanel>
-											<div class="my-4 grid grid-cols-8 max-w-5xl pr-4">
+											<div class="my-4 grid max-w-5xl grid-cols-8 pr-4">
 												<div class="col-span-8">
 													<article
 														class="prose max-w-none dark:prose-invert"
@@ -1241,7 +1242,7 @@
 																	v-else
 																	class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-800 object-cover text-xs text-white"
 																>
-																	{{ User.email[0] }}
+																	{{ user.email[0].toUpperCase() }}
 																</div>
 															</div>
 														</div>
@@ -1890,13 +1891,21 @@
 														v-else
 														class="flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-center text-xs text-slate-400"
 													>
-														{{ AssignedTo.firstName[0] }}
+														{{
+															AssignedTo.firstName
+																? AssignedTo.firstName.charAt(0)
+																: AssignedTo.email.charAt(0)
+														}}
 													</div>
 												</div>
 												<div
 													class="text-sm font-medium text-gray-900 dark:text-slate-100"
 												>
-													{{ AssignedTo.firstName }} {{ AssignedTo.lastName }}
+													{{
+														AssignedTo.firstName && AssignedTo.lastName
+															? AssignedTo.firstName + ' ' + AssignedTo.lastName
+															: AssignedTo.email
+													}}
 												</div>
 											</a>
 										</li>
