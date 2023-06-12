@@ -813,7 +813,11 @@
 													]"
 												>
 													<button
-														@click="copyToClipboard(user.confirm_url)"
+														@click="
+															copyToClipboard(
+																`https://app.motis.group/join/${user.token}`
+															)
+														"
 														:class="[
 															active
 																? 'bg-slate-100'
