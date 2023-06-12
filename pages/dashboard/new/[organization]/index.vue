@@ -89,7 +89,7 @@
 				category,
 				severity,
 				error: getTicketTypesError,
-			} = getTicketTypes(userData.Account.type, 'active');
+			} = getTicketTypes(selectedAccount.value.type, 'active');
 
 			if (getTicketTypesError)
 				throw new Error(
@@ -148,6 +148,7 @@
 			const accountManagers = accountManagerData.User.filter((o) => {
 				return o.badges.some((badge) => badge.id === badgeId);
 			});
+
 			accountManagers.sort((a, b) => a.ticket_count - b.ticket_count);
 			return accountManagers[0];
 		} catch (error) {
@@ -171,8 +172,8 @@
 	const handleSubmit = async () => {
 		try {
 			submit_loading.value = true;
+
 			const accountManager = await getAccountManager(selectedTicket.value.type);
-			console.log('accountManager:', accountManager);
 
 			const { data: ticketData, error } = await supabase
 				.from('Ticket')
@@ -192,12 +193,15 @@
 				throw new Error(`Error inserting ticket: ${error.message}`);
 			}
 
-			await uploadImages(ticketData[0].id, selectedFiles.value);
+			if (selectedFiles.value.length > 0) {
+				await uploadImages(ticketData[0].id, selectedFiles.value);
+			}
+
 			is_success.value = true;
 			success_message.value = 'Successfully created project';
 			if (selectedAccount.value.User[0].count === 0) {
-				navigateTo(`/dashboard/new/${route.params.organization}/invite`);
-			} else navigateTo(`/dashboard/projects/${ticketData[0].id}`);
+				router.push(`/dashboard/new/${route.params.organization}/invite`);
+			} else router.push(`/dashboard/projects/${ticketData[0].id}`);
 			submit_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
@@ -231,6 +235,10 @@
 			throw error;
 		}
 	}
+
+	onMounted(async () => {
+		await fetchData();
+	});
 
 	function resetFields() {
 		projectName.value = '';
@@ -328,8 +336,8 @@
 							<div class="px-6 py-4 pb-6 pt-0">
 								<p class="text-sm text-slate-500">
 									Your project will have its own dedicated account manager.<br />An
-									AI will initially respond so you can easily convey information with
-									support.<br />
+									AI will initially respond so you can easily convey information
+									with support.<br />
 								</p>
 							</div>
 							<div

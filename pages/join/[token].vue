@@ -32,19 +32,21 @@
 	// 	});
 	// };
 
-	const { data: userData, error: userError } = await supabase
-		.from('User')
-		.select('accountId')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	if (user.value) {
+		const { data: userData, error: userError } = await supabase
+			.from('User')
+			.select('accountId')
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
 
-	if (userError) {
-		throw new Error(userError.message || userError.toString());
-	}
+		if (userError) {
+			throw new Error(userError.message || userError.toString());
+		}
 
-	if (userData.accountId !== null) {
-		router.push('/dashboard/projects');
+		if (userData.accountId !== null) {
+			router.push('/dashboard/projects');
+		}
 	}
 
 	const acceptInvite = async () => {
@@ -246,7 +248,7 @@
 								<p v-else>
 									There was an error requesting details for this invitation.
 								</p>
-								<p class="text-scale-900">
+								<p class="text-scale-900" v-if="!sameEmail && user">
 									To accept this invitation, you will need to
 									<button
 										@click="signOut"

@@ -196,7 +196,9 @@
 		// Check if the current user has the 'users:edit' scope
 		if (!currentUserScopes.includes('users:edit')) return true;
 
-		if (selectedUser.status === 'pending') return true;
+		if(!currentUserScopes.includes('users:edit:owner')) return false;
+
+		// if (selectedUser.status === 'pending') return true;
 
 		// Check if the current user is trying to edit their own role
 		if (user.value.id === selectedUser.id) return true;

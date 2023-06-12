@@ -244,7 +244,7 @@
 		}
 	}
 
-	fetchUserData();
+	await fetchUserData();
 
 	watch(
 		() => route.params.organization,

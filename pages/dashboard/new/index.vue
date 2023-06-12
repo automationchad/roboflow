@@ -42,7 +42,7 @@
 	const is_error = ref(false);
 	const error_message = ref('');
 	const duped_name = ref('');
-	const route = useRoute();
+	const router = useRouter();
 
 	const cancelAll = () => {
 		form_responses.value = {
@@ -125,7 +125,7 @@
 			// 		);
 			// 	}
 			// }
-			navigateTo(`/dashboard/new/${accountData[0].id}`);
+			router.push(`/dashboard/new/${accountData[0].id}`);
 		} catch (error) {
 			console.log(error);
 			loading.value = false;
