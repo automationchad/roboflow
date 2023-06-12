@@ -232,7 +232,7 @@
 
 	const test_url = 'http://localhost:3000';
 
-	const test = false;
+	const test = true;
 
 	const redirectTo = route.query.returnTo
 		? `${test ? test_url : base_url}/join/${route.query.returnTo}`

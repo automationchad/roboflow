@@ -5,7 +5,20 @@
 
 	const user = useSupabaseUser();
 
+	const router = useRouter();
+
 	const supabase = useSupabaseClient();
+
+	const { data: userInitial, error: userErrorInitial } = await supabase
+		.from('User')
+		.select('accountId')
+		.eq('id', user.value.id)
+		.limit(1)
+		.single();
+
+	if (!userInitial.accountId) {
+		router.push('/dashboard/new');
+	}
 
 	const route = useRoute();
 	const title = ref(null);
@@ -21,6 +34,18 @@
 	const accounts = ref([]);
 
 	async function fetchUserData() {
+		const { data: userInitial, error: userErrorInitial } = await supabase
+			.from('User')
+			.select('accountId')
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+
+		if (!userInitial.accountId) {
+			router.push('/dashboard/new');
+			return;
+		}
+
 		const { data: userData, error: userError } = await supabase
 			.from('User')
 			.select(`*,Account(type, name, id)`)

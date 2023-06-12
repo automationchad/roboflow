@@ -15,7 +15,7 @@
 			</div>
 			<div class="px-5">
 				<p class="py-4 text-sm dark:text-slate-300">
-					Are you sure you want to {{ description }}? This action cannot be
+					This is permanent! Are you sure you want to {{ description }}? This action cannot be
 					undone.
 				</p>
 			</div>

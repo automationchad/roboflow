@@ -299,8 +299,15 @@
 
 	const route = useRoute();
 
-	const redirectTo =
-		route.query.redirectTo || 'https://app.motis.group/dashboard/projects';
+	const base_url = 'https://app.motis.group';
+
+	const test_url = 'http://localhost:3000';
+
+	const test = true;
+
+	const redirectTo = route.query.returnTo
+		? `${test ? test_url : base_url}/join/${route.query.returnTo}`
+		: `${test ? test_url : base_url}/dashboard/projects`;
 
 	const login = async () => {
 		loading.value = true;

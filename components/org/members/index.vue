@@ -67,6 +67,8 @@
 
 	const account = ref(null);
 
+	const scopes = ref({});
+
 	const handleError = (msg) => {
 		error_message.value = msg;
 		is_error.value = true;
@@ -122,14 +124,15 @@
 			.limit(1)
 			.single();
 
-		// <!-- Scopes = await supabase
-		// 	.from('Scopes')
-		// 	.select('*')
-		// 	.eq('systemRole', User.systemRole)
-		// 	.limit(1)
-		// 	.single(); -->
+		const { data: scopesData, error: scopesError } = await supabase
+			.from('Scopes')
+			.select('*')
+			.eq('systemRole', userData.systemRole)
+			.limit(1)
+			.single();
 
 		account.value = accountData;
+		scopes.value = scopesData;
 		users.value = accountData.User.concat(invitationData);
 		currentUser.value = userData;
 
@@ -177,9 +180,9 @@
 	};
 
 	const isAddingDisabled = computed(() => {
-		// const currentUserScopes = Scopes.scopes.split(',');
-		// // Check if the current user has the 'users:add' scope
-		// if (!currentUserScopes.includes('users:create')) return true;
+		const currentUserScopes = scopes.value.scopes.split(',');
+		// Check if the current user has the 'users:add' scope
+		if (!currentUserScopes.includes('users:create')) return true;
 
 		// Check if the current user is a viewer
 		if (user.systemRole === 'viewer') return true;
@@ -188,10 +191,10 @@
 	});
 
 	const isEditRoleDisabled = (selectedUser) => {
-		// const currentUserScopes = Scopes.scopes.split(',');
+		const currentUserScopes = scopes.value.scopes.split(',');
 
-		// // Check if the current user has the 'users:edit' scope
-		// if (!currentUserScopes.includes('users:edit')) return true;
+		// Check if the current user has the 'users:edit' scope
+		if (!currentUserScopes.includes('users:edit')) return true;
 
 		if (selectedUser.status === 'pending') return true;
 
@@ -218,10 +221,10 @@
 	};
 
 	const isDeleteDisabled = (selectedUser) => {
-		// const currentUserScopes = Scopes.scopes.split(',');
+		const currentUserScopes = scopes.value.scopes.split(',');
 
-		// // Check if the current user has the 'users:delete' scope
-		// if (!currentUserScopes.includes('users:delete')) return true;
+		// Check if the current user has the 'users:delete' scope
+		if (!currentUserScopes.includes('users:delete')) return true;
 
 		// Check if the current user is trying to delete their own account
 		if (user.value.id === selectedUser.id) return true;
@@ -314,34 +317,43 @@
 
 	// Function to delete user
 	async function deleteUser(person) {
-		loading.value = true;
-		if (isDeleteDisabled(person)) {
-			console.error('User is not allowed to be deleted');
-			return;
-		}
+		try {
+			loading.value = true;
+			if (isDeleteDisabled(person)) {
+				throw new Error('User is not allowed to be deleted');
+			}
 
-		let error;
+			if (person.status === 'pending') {
+				const { error: inviteDeleteError } = await supabase
+					.from('Invitation')
+					.delete()
+					.eq('id', person.id);
+				if (inviteDeleteError) {
+					throw new Error(
+						inviteDeleteError.message || inviteDeleteError.toString()
+					);
+				}
+			} else {
+				const { error: userDeleteError } = await supabase
+					.from('User')
+					.delete()
+					.eq('id', person.id);
 
-		if (person.status === 'pending') {
-			const response = await supabase
-				.from('Invitation')
-				.delete()
-				.eq('id', person.id);
-
-			error = response.error;
-		} else {
-			const response = await supabase.from('User').delete().eq('id', person.id);
-
-			error = response.error;
-		}
-
-		if (error) {
+				if (userDeleteError) {
+					throw new Error(
+						userDeleteError.message || userDeleteError.toString()
+					);
+				}
+			}
+		} catch (error) {
 			is_success.value = false;
 			is_error.value = true;
 			error_message.value = error.message || error.toString();
-			console.error('Error deleting user:', error);
-		} else {
-			// Update the local user data as well
+
+			console.error(error);
+		} finally {
+			loading.value = false;
+			showDelete.value = false;
 			users.value = users.value.filter((u) => u.id !== person.id);
 
 			is_success.value = true;
@@ -446,9 +458,9 @@
 			</div>
 			<div class="flex items-center space-x-4">
 				<div>
-					<button @click="showInvite = true">
+					<button @click="showInvite = true" :disabled="isAddingDisabled">
 						<div
-							class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1"
+							class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1"
 							type="button"
 						>
 							<span class="truncate">Invite</span>
@@ -458,7 +470,7 @@
 				<div>
 					<button data-state="closed">
 						<div
-							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 pointer-events-none relative inline-flex items-center space-x-2 rounded px-2.5 py-1 text-center text-xs opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 							disabled=""
 							type="button"
 						>
@@ -699,7 +711,7 @@
 										<Menu
 											as="div"
 											class="relative flex items-center justify-end"
-											v-if="user.status === 'pending'"
+											v-if="!isEditRoleDisabled(user)"
 										>
 											<MenuButton
 												class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
@@ -725,6 +737,44 @@
 											>
 												<MenuItem
 													v-slot="{ active }"
+													v-if="user.status === 'active'"
+													:disabled="isDeleteDisabled(user)"
+													:class="[
+														active ? 'bg-slate-100' : '',
+														'text-body-light focus:bg-selection focus:text-body flex items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+													]"
+												>
+													<button
+														@click="handleDeleteConfirm(user)"
+														:class="[
+															active ? 'bg-slate-100' : '',
+															isDeleteDisabled(user)
+																? 'cursor-not-allowed opacity-50'
+																: '',
+															'flex w-full items-center space-x-2 border-none px-4 py-1.5 text-left text-sm transition transition-colors focus:outline-none disabled:cursor-not-allowed',
+														]"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															width="16"
+															height="16"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															class="sbui-icon"
+														>
+															<polyline points="3 6 5 6 21 6"></polyline>
+															<path
+																d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+															></path></svg
+														><span><p>Remove member</p></span>
+													</button>
+												</MenuItem>
+												<MenuItem
+													v-slot="{ active }"
+													v-if="user.status === 'pending'"
 													:disabled="isDeleteDisabled(user)"
 													:class="[
 														active ? 'bg-slate-100' : '',
@@ -750,10 +800,7 @@
 														</div>
 													</button>
 												</MenuItem>
-												<div
-													
-													class="my-2 w-full h-px"
-												></div>
+
 												<MenuItem
 													v-if="
 														user.confirm_url &&
@@ -782,8 +829,12 @@
 														</div>
 													</button>
 												</MenuItem>
+
 												<MenuItem
-													v-else
+													v-else-if="
+														user.confirm_url &&
+														new Date(user.expires) < new Date()
+													"
 													v-slot="{ active }"
 													:class="[
 														active ? 'bg-slate-100' : '',
@@ -833,6 +884,13 @@
 		@invite-sent="handleSuccess"
 	/>
 	<MembersScopesModal v-if="false" />
+	<DeleteConfirm
+		v-if="showDelete"
+		@cancel="showDelete = false"
+		@confirm="deleteUser(userToDelete)"
+		:command="deleteCommand"
+		:description="deleteDescription"
+	/>
 
 	<transition
 		enter-active-class="transition ease-out duration-100"

@@ -106,7 +106,7 @@
 		XMarkIcon,
 		XCircleIcon,
 	} from '@heroicons/vue/20/solid';
-	definePageMeta({ middleware: ['auth'] });
+	definePageMeta({ middleware: ['auth'], layout: 'public' });
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
 	const email = ref('');
@@ -116,14 +116,8 @@
 	const error_message = ref('');
 
 	if (user.value) {
-		let { data: User, error: userError } = await supabase
-			.from('User')
-			.select(`accountId`)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
 
-		navigateTo(`/${User.accountId}/dashboard`);
+		navigateTo(`/dashboard/projects`);
 	}
 
 	const forgotPassword = async () => {
@@ -152,7 +146,7 @@
 	onMounted(() => {
 		watchEffect(() => {
 			if (user.value) {
-				navigateTo(`/${User.accountId}/dashboard`);
+				navigateTo(`/dashboard/projects`);
 			}
 		});
 	});

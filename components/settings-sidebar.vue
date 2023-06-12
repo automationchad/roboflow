@@ -228,7 +228,6 @@
 			const { data: accountData, error: accountError } = await supabase
 				.from('Account')
 				.select('*,Ticket(status,type)')
-				.neq('type', 'super_admin');
 			teams.value = accountData;
 		} else teams.value = [userData.Account];
 
