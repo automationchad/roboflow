@@ -509,7 +509,7 @@
 								>
 									<td>
 										<div class="flex items-center space-x-4">
-											<div v-if="user.status !== 'pending' || user.avatarUrl">
+											<div v-if="user.avatarUrl">
 												<span
 													style="
 														box-sizing: border-box;
@@ -542,7 +542,7 @@
 															alt=""
 															aria-hidden="true"
 															:src="user.avatarUrl"
-															class="h-10 w-10 rounded-full"
+															class="h-10 w-10 rounded-full object-cover"
 															style="
 																display: block;
 																background: none;
@@ -575,10 +575,10 @@
 												></span>
 											</div>
 											<div>
-												<p class="text-scale-1200">
-													{{ user.firstName }} {{ user.lastName }}
+												<p class="text-slate-900">
+													{{ user.firstName }} {{ user.lastName }} {{ user.id === currentUser.id ? '(You)' : '' }}
 												</p>
-												<p class="text-scale-1100">{{ user.email }}</p>
+												<p class="text-slate-500">{{ user.email }}</p>
 											</div>
 										</div>
 									</td>

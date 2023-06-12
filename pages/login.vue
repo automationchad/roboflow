@@ -286,20 +286,10 @@
 <script setup>
 	import { XCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 
-	definePageMeta({ middleware: ['auth'], layout: 'public' });
+	definePageMeta({ layout: 'public', middleware: ['auth'] });
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
-
-	if (user.value) {
-		let { data: User, error: userError } = await supabase
-			.from('User')
-			.select('accountId')
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-		navigateTo(`/dashboard/projects`);
-	}
 
 	const email = ref('');
 	const password = ref('');
@@ -307,11 +297,19 @@
 	const loading = ref(false);
 	const error_message = ref('');
 
+	const route = useRoute();
+
+	const redirectTo =
+		route.query.redirectTo || 'http://localhost:3000/dashboard/projects';
+
 	const login = async () => {
 		loading.value = true;
 		const { user, error } = await supabase.auth.signInWithPassword({
 			email: email.value,
 			password: password.value,
+			options: {
+				emailRedirectTo: redirectTo,
+			},
 		});
 		if (error != null) {
 			loading.value = false;
@@ -326,7 +324,7 @@
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider,
 			options: {
-				redirectTo: 'http://localhost:3000/dashboard/projects',
+				redirectTo: redirectTo,
 			},
 		});
 		if (error != null) {
@@ -338,9 +336,22 @@
 	};
 
 	onMounted(() => {
-		watchEffect(() => {
+		watchEffect(async () => {
 			if (user.value) {
-				navigateTo(`/dashboard/projects`);
+				const { data: user_data, error } = await supabase
+					.from('User')
+					.select('accountId')
+					.eq('id', user.value.id)
+					.limit(1)
+					.single();
+				if (error) {
+					console.log(error);
+					return;
+				} else if (user_data.accountId) {
+					navigateTo(`/dashboard/projects`);
+				} else {
+					navigateTo(`/dashboard/new`);
+				}
 			}
 		});
 	});

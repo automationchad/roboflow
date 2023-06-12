@@ -25,11 +25,14 @@
 					Invalid invite
 				</h1>
 				<p class="mt-6 text-base leading-7 text-gray-600 dark:text-slate-400">
-					This invite may have expired, or you might not have permission to join.
+					This invite may have expired, or you might not have permission to
+					join.
 				</p>
 				<div class="mt-10">
-					<a href="/" class="text-sm font-semibold leading-7 text-indigo-600 dark:text-indigo-400"
-						><span aria-hidden="true">&larr;</span> Go back home</a
+					<NuxtLink
+						to="/dashboard/projects"
+						class="text-sm font-semibold leading-7 text-indigo-600 dark:text-indigo-400"
+						><span aria-hidden="true">&larr;</span> Go back home</NuxtLink
 					>
 				</div>
 			</div>
@@ -61,3 +64,7 @@
 		</footer> -->
 	</div>
 </template>
+
+<script setup>
+	definePageMeta({ layout: 'public' });
+</script>

@@ -1,5 +1,5 @@
 <script setup>
-	definePageMeta({ layout: 'project', middleware: ['auth'] });
+	definePageMeta({ layout: 'project' });
 
 	import { ref } from 'vue';
 
@@ -22,18 +22,14 @@
 
 	const emit = defineEmits(['close-modal', 'org-submit', 'error']);
 	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
 
-	const { data: userData, error: userError } = await supabase
-		.from('User')
-		.select('id,Account(type)')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	console.log(user.value);
 
-	if (userData.Account.type !== 'super_admin') {
-		navigateTo(`/dashboard/new/${userData.Account.id}`);
-	}
+	const supabase = await useSupabaseClient();
+
+	// if (userData.accountId) {
+	// 	navigateTo(`/dashboard/new/${userData.accountId}`);
+	// }
 
 	const form_responses = ref({
 		name: '',
@@ -87,6 +83,23 @@
 				])
 				.select();
 
+			const { data: userData, error: userError } = await supabase
+				.from('User')
+				.select('accountId')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
+
+			if (!userData.accountId) {
+				const { error: userUpdateError } = await supabase
+					.from('User')
+					.update({ accountId: accountData[0].id })
+					.eq('id', user.value.id);
+				if (userUpdateError) {
+					throw new Error(userUpdateError.message);
+				}
+			}
+
 			if (accountError) {
 				throw new Error(accountError.message);
 			}
@@ -115,7 +128,6 @@
 			// 	}
 			// }
 			navigateTo(`/dashboard/new/${accountData[0].id}`);
-			
 		} catch (error) {
 			console.log(error);
 			loading.value = false;

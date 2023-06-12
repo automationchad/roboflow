@@ -197,7 +197,7 @@
 			success_message.value = 'Successfully created project';
 			if (selectedAccount.value.User[0].count === 0) {
 				navigateTo(`/dashboard/new/${route.params.organization}/invite`);
-			} else navigateTo(`/dashboard/project/${ticketData[0].id}`);
+			} else navigateTo(`/dashboard/projects/${ticketData[0].id}`);
 			submit_loading.value = false;
 		} catch (error) {
 			is_error.value = true;

@@ -609,9 +609,7 @@
 		<div class="flex w-0 flex-1 flex-col">
 			<main class="flex-1">
 				<div class="px-5 py-5">
-					<div
-						class="mx-auto xl:grid xl:grid-cols-3"
-					>
+					<div class="mx-auto xl:grid xl:grid-cols-3">
 						<div
 							class="dark:border-slate-800 xl:col-span-2 xl:border-gray-200 xl:pr-8"
 						>
@@ -639,10 +637,23 @@
 													v-else
 													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-800"
 												>
-													<div class="text-white">
-														{{ Ticket.User.firstName[0]
-														}}{{ Ticket.User.lastName[0] }}
-													</div>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="20"
+														height="20"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+														></path>
+														<circle cx="12" cy="7" r="4"></circle>
+													</svg>
 												</div>
 
 												<div class="">
@@ -651,12 +662,17 @@
 															:to="`/profile/${Ticket.User.id}`"
 															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 														>
-															{{ Ticket.User.firstName }}
-															{{ Ticket.User.lastName }}
+															{{
+																Ticket.User.firstName && Ticket.User.lastName
+																	? Ticket.User.firstName +
+																	  ' ' +
+																	  Ticket.User.lastName
+																	: Ticket.User.email.split('@')[0]
+															}}
 														</NuxtLink>
 
 														<span
-															class="before:h-[2px] before:w-[2px] before:content-[''] relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:bg-slate-400 dark:text-slate-400"
+															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
 															{{ formatDateDistance(Ticket.createdOn) }}
 															<!-- {{ Ticket.User.jobTitle }} -->
@@ -668,7 +684,7 @@
 															:key="badge.id"
 															:class="[
 																badge.id,
-																'py-0.25 dark:text-black/70 rounded-md border border-gray-900/10 px-1 text-xs',
+																'py-0.25 rounded-md border border-gray-900/10 px-1 text-xs dark:text-black/70',
 															]"
 															><span :class="`${badge.id}-text`">{{
 																badge.text
@@ -769,7 +785,7 @@
 
 														<ComboboxOptions
 															v-if="filteredPeople.length > 0"
-															class="dark:ring-white/20 absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 sm:text-sm"
+															class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
 														>
 															<ComboboxOption
 																@click="handleTicketEdit(person.id, idx)"
@@ -896,7 +912,7 @@
 																@input="update"
 																name="comment"
 																id="comment"
-																class="h-content sm:py-1.5 w-full max-w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:leading-6"
+																class="h-content w-full max-w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
 																placeholder="Reply..."
 															></textarea>
 
@@ -1058,11 +1074,11 @@
 									</div>
 									<div class="mt-4 flex space-x-2 text-white">
 										<div
-											class="dark:border-white/20 flex items-center space-x-2 rounded border border-black/20 px-2 py-1"
+											class="flex items-center space-x-2 rounded border border-black/20 px-2 py-1 dark:border-white/20"
 										>
 											<div class="flex items-center">
 												<button
-													class="dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500"
+													class="text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
 												>
 													<svg
 														class="h-5 w-5"
@@ -1080,10 +1096,14 @@
 													</svg>
 												</button>
 											</div>
-											<div class="text-sm dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500">{{ Ticket.votes }}</div>
+											<div
+												class="text-sm text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
+											>
+												{{ Ticket.votes }}
+											</div>
 											<div class="flex items-center">
 												<button
-													class="dark:hover:text-white/60 text-black/30 dark:text-white/30 transition-colors hover:text-gray-500"
+													class="text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
 												>
 													<svg
 														class="h-5 w-5"
@@ -1104,7 +1124,7 @@
 										</div>
 										<div class="">
 											<div
-												class="dark:border-white/20 flex items-center rounded border border-black/20 px-2 py-1"
+												class="flex items-center rounded border border-black/20 px-2 py-1 dark:border-white/20"
 											>
 												<button
 													class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-200"
@@ -1169,7 +1189,7 @@
 													}}
 												</div>
 												<div
-													class="dark:border-[#423455] dark:bg-[#1A1B2C] flex items-center bg-white rounded-full border border-gray-300 pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:text-white"
+													class="flex items-center rounded-full border border-gray-300 bg-white pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:border-[#423455] dark:bg-[#1A1B2C] dark:text-white"
 												>
 													<svg
 														class="mr-0.5 h-5 w-5"
@@ -1225,7 +1245,7 @@
 																	v-else
 																	class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-800 object-cover text-xs text-white"
 																>
-																	{{ User.firstName[0] }}
+																	{{ User.email[0] }}
 																</div>
 															</div>
 														</div>
@@ -1243,7 +1263,7 @@
 																		id="comment"
 																		name="comment"
 																		rows="3"
-																		class="placeholder:text-white/30 sm:py-1.5 block w-full resize-none border-0 bg-transparent text-gray-900 focus:ring-0 dark:text-white sm:text-sm sm:leading-6"
+																		class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-white/30 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
 																		placeholder="Add a comment"
 																	/>
 																</div>
@@ -1316,7 +1336,7 @@
 																				leave-to-class="opacity-0"
 																			>
 																				<ListboxOptions
-																					class="dark:ring-white/10 absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900"
+																					class="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/10"
 																				>
 																					<ListboxOption
 																						as="template"
@@ -1607,7 +1627,7 @@
 
 											<ComboboxOptions
 												v-if="filteredPeople.length > 0"
-												class="dark:ring-white/20 absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 sm:text-sm"
+												class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
 											>
 												<ComboboxOption
 													@click="handleTicketEdit(person.id, idx)"
@@ -1719,7 +1739,7 @@
 											v-model="dealSize"
 											name="price"
 											id="price"
-											class="dark:ring-white/10 w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white sm:text-sm sm:leading-6"
+											class="w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
 											placeholder="0.00"
 											aria-describedby="price-currency"
 										/>
