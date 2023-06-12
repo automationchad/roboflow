@@ -77,11 +77,11 @@
 				.single();
 			const { data: ticketData, error: ticketError } = await supabase
 				.from('Ticket')
-				.select('name,accountId')
+				.select('name,accountId,Account(name)')
 				.eq('id', route.params.id)
 				.limit(1)
 				.single();
-			title.value = accountData.name;
+			title.value = ticketData.Account.name;
 			description.value = ticketData.name;
 			accountId.value = ticketData.accountId;
 		} else if (route.path.includes('/dashboard/projects') && !route.params.id) {
