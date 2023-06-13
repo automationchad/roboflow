@@ -163,10 +163,68 @@
 	}
 
 	const generateExample = () => {
-		projectName.value =
-			'[DEMO] Nailey Belson - BambooHR and ADP WFN Integration';
-		projectSummary.value =
-			"Need help to link BambooHR and ADP WFN for easier payroll. No team to do this, and not planning to buy a Tray license. Want simple link between the two systems. Plan is to finish in a few months, before many new hires in Canada. Finance Director also checking this. No time to use our own team for this project. We're also working on setting a budget for this project.";
+		const projects = [
+			{
+				title: 'Salesforce-HubSpot Integration',
+				description:
+					"Looking for guidance to integrate Salesforce with HubSpot for streamlined customer relationship management. No dedicated team available for this task, and there are no plans to purchase a Zapier subscription. Desire a straightforward connection between both platforms. The goal is to complete within the next quarter, ahead of the forthcoming sales drive in Europe. The Sales Operations Manager will also be overseeing the process. Unfortunately, our in-house resources are tied up with other commitments, hence we can't spare them for this undertaking. We have set a budget of $18,000 for this project.",
+			},
+			{
+				title: 'QuickBooks-Shopify Synchronization',
+				description:
+					"Require assistance to synchronize QuickBooks and Shopify for enhanced inventory control. Don't have a designated team for the task, and buying a Unify subscription isn't in the plan. Aiming for an easy integration of the two services. The objective is to get everything in place before the upcoming product launch in Australia. Our Operations Manager will also keep an eye on this. Due to other priorities, our team is unable to take up this project. A budget of $15,000 has been allocated for this endeavor.",
+			},
+			{
+				title: 'Jira-Confluence Connection',
+				description:
+					"Need support to connect Jira and Confluence for improved project management. There's no internal team to tackle this, and we aren't looking to invest in a Trello license. We prefer a direct link between these two platforms. The aim is to accomplish this before the start of the new project in Asia. Our Project Manager will also monitor the progress. Our team is preoccupied with other tasks, so they can't be assigned to this project. A budget of $20,000 has been set aside for this operation.",
+			},
+			{
+				title: 'Slack-Google Workspace Integration',
+				description:
+					"Seeking help to integrate Slack with Google Workspace for better team collaboration. We don't have a team to spare for this, and no plans to acquire a Workato license. We want a clear-cut integration of the two systems. The completion deadline is set for the coming semester, before our recruitment drive in the United States. The IT Director will be involved in this project as well. Our team's schedule doesn't allow them to take on this integration project. A budget of $16,000 has been planned for this project.",
+			},
+			{
+				title: 'Microsoft Teams-Asana Unification',
+				description:
+					"Assistance needed to marry Microsoft Teams with Asana for efficient task management. We don't have a team for this and we're not considering a Microsoft Power Automate license. A smooth link between the two systems is what we're looking for. The goal is to have everything set up before the next fiscal year, ahead of the new branch opening in the Middle East. Our Department Head will also review this. Current team obligations prevent us from using in-house resources for this initiative. We've outlined a budget of $22,000 for this project.",
+			},
+			{
+				title: 'BambooHR and ADP WFN Integration',
+				description:
+					"Need help to link BambooHR and ADP WFN for easier payroll. No team to do this, and not planning to buy a Tray license. Want simple link between the two systems. Plan is to finish in a few months, before many new hires in Canada. Finance Director also checking this. No time to use our own team for this project. We're also working on setting a budget for this project.",
+			},
+			{
+				title: 'Dropbox-Box Integration',
+				description:
+					"Seeking advice to synchronize Dropbox and Box for easier file sharing and storage management. No team in place for this, and not intending to get a MuleSoft license. Want a clear-cut link between these two systems. The plan is to wrap up within a couple of months, before we onboard new teams in South America. The Chief Technology Officer will be overlooking this. With our team engaged in other key projects, we don't have bandwidth for this currently. We have allocated a budget of $15,000 for this project.",
+			},
+			{
+				title: 'Zendesk-Freshdesk Connection',
+				description:
+					"Need assistance to integrate Zendesk and Freshdesk for better customer service management. We lack a dedicated team for this and are not considering an Integrately subscription. Hoping for a straightforward bridge between both platforms. Aiming to finish before the start of the new service campaign in Africa. The Customer Service Manager will be supervising the project. Our team is tied up with other tasks and can't be delegated for this project. The budget for this project has been set at $10,000.",
+			},
+			{
+				title: 'Airtable-Trello Link',
+				description:
+					"Help required to connect Airtable and Trello for improved task tracking. No team assigned to this task, and we're not planning to buy an Automate.io license. Desire a direct connection between these two platforms. The objective is to complete this ahead of the new workflow implementation in Asia. The Product Manager will also keep an eye on this. Our team is preoccupied with other tasks, hence they can't be spared for this project. The budget set aside for this operation is $20,000.",
+			},
+			{
+				title: 'GitHub-GitLab Synchronization',
+				description:
+					"Looking for support to integrate GitHub and GitLab for effective version control. Don't have a team available for the task, and there's no plan to purchase a Jenkins license. Want a smooth integration of the two platforms. The plan is to have everything ready before the next coding sprint in Europe. Our Development Manager will also be monitoring this. Our team's schedule doesn't permit them to take on this integration project. The budget allocated for this project is $25,000.",
+			},
+			{
+				title: 'MailChimp-Constant Contact Integration',
+				description:
+					"Assistance needed to link MailChimp and Constant Contact for optimized email marketing. We lack a team for this and are not considering a Piesync license. A straightforward link between both systems is the target. The goal is to wrap up before the start of the new marketing campaign in the US. The Marketing Head will also review this. With current team commitments, we can't delegate our in-house resources for this project. A budget of $30,000 has been defined for this initiative.",
+			},
+		];
+
+		const random = projects[Math.floor(Math.random() * projects.length)];
+
+		projectName.value = random.title;
+		projectSummary.value = random.description;
 	};
 
 	const handleSubmit = async () => {
@@ -181,6 +239,7 @@
 					{
 						name: projectName.value,
 						type: selectedTicket.value.id,
+						
 						createdBy: user.value.id,
 						dueDate: generateDueDate(selectedSeverity.value),
 						accountId: route.params.organization,
@@ -504,7 +563,7 @@
 													id="message"
 													rows="4"
 													max="5000"
-													placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
+													placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible. Include key details for better assistance."
 													class="box-border block w-full rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm placeholder-slate-300 shadow-sm outline-none transition-all focus:border-slate-500 focus:shadow-md focus:ring-2 focus:ring-current focus:ring-slate-300"
 												/>
 											</div>
@@ -518,8 +577,8 @@
 											class="mt-2 text-sm leading-normal text-slate-500"
 											id="password-description"
 										>
-											Please briefly describe your issue or case here. Include
-											key details for better assistance.
+											Need some inspiration or don't know what a good use case
+											looks like?
 											<span
 												class="hover:text-brand-900 cursor-pointer text-indigo-500 underline transition"
 												>Generate an example</span

@@ -704,7 +704,7 @@
 
 												<div
 													v-else
-													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full dark:text-white dark:border-white border border-slate-700  dark:bg-slate-800"
+													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 dark:border-white dark:bg-slate-800 dark:text-white"
 												>
 													<svg
 														xmlns="http://www.w3.org/2000/svg"
@@ -986,7 +986,8 @@
 														Ticket.Comment.length > 0 ? 's' : ''
 													}}
 												</div>
-												<div
+												<button
+													@click="showDiv = !showDiv"
 													class="flex items-center rounded-full border border-gray-300 bg-white pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:border-[#423455] dark:bg-[#1A1B2C] dark:text-white"
 												>
 													<svg
@@ -1017,7 +1018,7 @@
 													</svg>
 
 													#ask-motis
-												</div>
+												</button>
 											</div>
 											<transition
 												enter-active-class="transition ease-out duration-100"
@@ -1081,6 +1082,7 @@
 																		as="div"
 																		v-model="selected"
 																		class="-ml-10"
+																		v-slot="{ open }"
 																	>
 																		<ListboxLabel class="sr-only"
 																			>Change published status</ListboxLabel
@@ -1094,7 +1096,7 @@
 																						selected.ai
 																							? 'mg_ai'
 																							: 'border border-white/10 bg-white/5 text-white',
-																						'inline-flex items-center gap-x-1.5 rounded-md  px-3 py-2 shadow-sm',
+																						'inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-1 shadow-sm',
 																					]"
 																				>
 																					<svg
@@ -1126,13 +1128,16 @@
 																							selected.ai
 																								? 'mg_ai-button-text text-sm'
 																								: '',
-																							'text-sm font-semibold',
+																							'text-xs',
 																						]"
 																					>
 																						{{ selected.title }}
 																					</p>
 																					<ChevronDownIcon
-																						class="h-5 w-5 text-white"
+																						:class="[
+																							open ? 'rotate-180' : '',
+																							'h-4 w-4 text-[#8900ff] transition-transform',
+																						]"
 																					/>
 																				</div>
 																			</ListboxButton>
@@ -1204,14 +1209,18 @@
 																			</transition>
 																		</div>
 																	</Listbox>
-																	<div class="flex space-x-4">
+																	<div
+																		class="flex items-center justify-end space-x-4"
+																	>
 																		<div
 																			v-if="!imageSrc"
-																			class="relative ml-auto flex h-10 w-10 cursor-pointer items-center justify-center p-2 text-slate-900 dark:text-slate-200"
+																			class="relative ml-auto flex cursor-pointer items-center justify-center rounded-md border px-2.5 py-1 text-slate-900 dark:border-white/5 dark:bg-white/5 dark:text-slate-200"
 																		>
-																			<span class="cursor-pointer"
-																				><svg
-																					class="h-6 w-6"
+																			<div
+																				class="flex cursor-pointer items-center text-xs"
+																			>
+																				<svg
+																					class="h-4 w-4"
 																					viewBox="0 0 24 24"
 																					fill="none"
 																					xmlns="http://www.w3.org/2000/svg"
@@ -1238,7 +1247,10 @@
 																						stroke-linejoin="round"
 																					></path>
 																				</svg>
-																			</span>
+																				<span class="ml-1 truncate"
+																					>Add image</span
+																				>
+																			</div>
 
 																			<input
 																				type="file"
@@ -1284,10 +1296,10 @@
 																		<button
 																			:disabled="comment_text === ''"
 																			type="submit"
-																			class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 p-2 text-sm font-semibold text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+																			class="inline-flex items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 px-2.5 py-1 text-xs font-normal text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
 																		>
 																			<svg
-																				class="h-5 w-5"
+																				class="h-4 w-4"
 																				viewBox="0 0 24 24"
 																				fill="none"
 																				xmlns="http://www.w3.org/2000/svg"
@@ -1300,13 +1312,15 @@
 																					stroke-linejoin="round"
 																				></path>
 																			</svg>
+																			<span class="ml-1 truncate">Comment</span>
 																		</button>
 																	</div>
 																</div>
 															</form>
 														</div>
-													</div></div
-											></transition>
+													</div>
+												</div></transition
+											>
 										</div>
 
 										<div class="pt-6">
@@ -1316,22 +1330,22 @@
 													v-if="comments.length <= 0"
 													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
 												>
-													No activity yet
+													No comments yet
 												</div>
 
 												<section
-													class="w-full bg-white dark:bg-transparent"
+													class="w-full bg-slate-50 dark:bg-transparent"
 													v-else
 												>
-													<div class="mx-auto">
+													<div class="mx-auto space-y-6">
 														<ticket-comment
 															v-for="(
 																activityItem, activityItemIdx
-															) in comments"
+															) in comments.filter(o => o.activity_type !== 'event')"
 															:key="activityItem.id"
 															:activity-item="activityItem"
 															:activity-item-idx="activityItemIdx"
-															:comments="comments"
+															:comments="comments.filter(o => o.activity_type !== 'event')"
 															@updated="refreshData"
 														/>
 													</div>
@@ -1353,151 +1367,11 @@
 						<aside class="hidden w-full xl:block xl:pl-8">
 							<h2 class="sr-only">Details</h2>
 							<div class="space-y-3">
-								<div
-									class="flex items-center space-x-2 dark:text-white"
-									v-if="User.Account.type === 'super_admin'"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-6 w-6"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="1.5"
-											d="M19.25 12.25v-3.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v6.5a2 2 0 0 0 2 2h12.5m0 0-1.5-1.5m1.5 1.5L17.75 19m-3.5-7c0 1.795-1.007 3.25-2.25 3.25S9.75 13.795 9.75 12 10.757 8.75 12 8.75s2.25 1.455 2.25 3.25Z"
-										></path>
-									</svg>
-									<div class="relative w-full rounded-md shadow-sm">
-										<div
-											class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-										>
-											<span class="text-gray-500 sm:text-sm">$</span>
-										</div>
-										<input
-											:disabled="User.Account.type !== 'super_admin'"
-											type="text"
-											v-model="dealSize"
-											name="price"
-											id="price"
-											class="w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
-											placeholder="0.00"
-											aria-describedby="price-currency"
-										/>
-										<div
-											class="absolute inset-y-0 right-0 flex items-center pr-3"
-										>
-											<button
-												:disabled="User.Account.type !== 'super_admin'"
-												class="relative disabled:opacity-60"
-												@click="handleDealSizeUpdate()"
-											>
-												<svg
-													v-if="!loading"
-													class="h-4 w-4"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M12 10V15.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M9.75 11.25L12 9L14.25 11.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-												</svg>
-												<svg
-													v-else
-													class="h-4 w-4 animate-spin"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M12 4.75V6.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M17.1266 6.87347L16.0659 7.93413"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M19.25 12L17.75 12"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M17.1266 17.1265L16.0659 16.0659"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M12 17.75V19.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M7.9342 16.0659L6.87354 17.1265"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M6.25 12L4.75 12"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M7.9342 7.93413L6.87354 6.87347"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-												</svg>
-											</button>
-										</div>
-									</div>
-								</div>
-
 								<div class="" id="partner-summary">
 									<div class="lg:col-start-3 lg:row-end-1">
 										<h2 class="sr-only">Summary</h2>
 										<div
-											class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5"
+											class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-inset ring-gray-900/5 dark:bg-white/5 dark:ring-white/5"
 										>
 											<dl class="flex flex-wrap">
 												<div class="flex-auto pl-6 pt-6">
@@ -1507,12 +1381,14 @@
 														Payout Bonus
 													</dt>
 													<dd
-														class="mt-1 text-base font-semibold leading-6 text-gray-900"
+														class="mt-1 text-base font-semibold leading-6 text-gray-900 dark:text-white"
 													>
 														{{
 															!Ticket.partner_payout_amount
 																? 'Pending'
-																: `$${formatAccounting(Ticket.partner_payout_amount)}`
+																: `$${formatAccounting(
+																		Ticket.partner_payout_amount
+																  )}`
 														}}
 													</dd>
 												</div>
@@ -1528,7 +1404,7 @@
 													</dd>
 												</div>
 												<div
-													class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6"
+													class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6 dark:border-white/5"
 												>
 													<dt class="flex-none">
 														<span class="sr-only">Client</span>
@@ -1546,7 +1422,7 @@
 														/>
 													</dt>
 													<dd
-														class="text-sm font-medium leading-6 text-gray-900"
+														class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
 													>
 														{{
 															Ticket.User.firstName && Ticket.User.lastName
@@ -1629,9 +1505,7 @@
 
 												<dt
 													class="mt-10 text-sm font-medium leading-6 text-gray-900"
-												>
-													Attachments
-												</dt>
+												></dt>
 												<dd
 													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
 												>
@@ -1703,7 +1577,7 @@
 															<div class="ml-4 flex-shrink-0">
 																<a
 																	href="#"
-																	class="font-medium text-indigo-600 hover:text-indigo-500"
+																	class="text-xs font-medium text-indigo-600 hover:text-indigo-500"
 																	>Download</a
 																>
 															</div>
@@ -1741,7 +1615,7 @@
 															<div class="ml-4 flex-shrink-0">
 																<a
 																	href="#"
-																	class="font-medium text-indigo-600 hover:text-indigo-500"
+																	class="text-xs font-medium text-indigo-600 hover:text-indigo-500"
 																	>Download</a
 																>
 															</div>
@@ -1760,7 +1634,9 @@
 									</h2>
 									<ul role="list" class="mt-6 space-y-6">
 										<li
-											v-for="(activityItem, activityItemIdx) in activity"
+											v-for="(activityItem, activityItemIdx) in comments.filter(
+												(o) => o.activity_type === 'event'
+											)"
 											:key="activityItem.id"
 											class="relative flex gap-x-4"
 										>
@@ -1778,7 +1654,7 @@
 												<img
 													:src="activityItem.person.imageUrl"
 													alt=""
-													class="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
+													class="relative mt-3 h-6 w-6 flex-none rounded-full bg-slate-50"
 												/>
 												<div
 													class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200"
@@ -1803,7 +1679,7 @@
 											</template>
 											<template v-else>
 												<div
-													class="relative flex h-6 w-6 flex-none items-center justify-center bg-white"
+													class="relative flex h-6 w-6 flex-none items-center justify-center bg-slate-50"
 												>
 													<CheckCircleIcon
 														v-if="activityItem.type === 'paid'"
@@ -1819,14 +1695,18 @@
 													class="flex-auto py-0.5 text-xs leading-5 text-gray-500"
 												>
 													<span class="font-medium text-gray-900">{{
-														activityItem.person.name
+														activityItem.User.firstName +
+														' ' +
+														activityItem.User.lastName
 													}}</span>
-													{{ activityItem.type }} the invoice.
+													{{ activityItem.text }}
 												</p>
-												<time
+												<span
 													:datetime="activityItem.dateTime"
 													class="flex-none py-0.5 text-xs leading-5 text-gray-500"
-													>{{ activityItem.date }}</time
+													>{{
+														formatDateDistance(activityItem.createdOn) + ' ago'
+													}}</span
 												>
 											</template>
 										</li>
@@ -1987,6 +1867,145 @@
 											</ComboboxOptions>
 										</div>
 									</Combobox>
+								</div>
+								<div
+									class="flex items-center space-x-2 dark:text-white"
+									v-if="User.Account.type === 'super_admin'"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M19.25 12.25v-3.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v6.5a2 2 0 0 0 2 2h12.5m0 0-1.5-1.5m1.5 1.5L17.75 19m-3.5-7c0 1.795-1.007 3.25-2.25 3.25S9.75 13.795 9.75 12 10.757 8.75 12 8.75s2.25 1.455 2.25 3.25Z"
+										></path>
+									</svg>
+									<div class="relative w-full rounded-md shadow-sm">
+										<div
+											class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+										>
+											<span class="text-gray-500 sm:text-sm">$</span>
+										</div>
+										<input
+											:disabled="User.Account.type !== 'super_admin'"
+											type="text"
+											v-model="dealSize"
+											name="price"
+											id="price"
+											class="w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
+											placeholder="0.00"
+											aria-describedby="price-currency"
+										/>
+										<div
+											class="absolute inset-y-0 right-0 flex items-center pr-3"
+										>
+											<button
+												:disabled="User.Account.type !== 'super_admin'"
+												class="relative disabled:opacity-60"
+												@click="handleDealSizeUpdate()"
+											>
+												<svg
+													v-if="!loading"
+													class="h-4 w-4"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M12 10V15.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M9.75 11.25L12 9L14.25 11.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+												</svg>
+												<svg
+													v-else
+													class="h-4 w-4 animate-spin"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M12 4.75V6.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M17.1266 6.87347L16.0659 7.93413"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M19.25 12L17.75 12"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M17.1266 17.1265L16.0659 16.0659"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M12 17.75V19.25"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M7.9342 16.0659L6.87354 17.1265"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M6.25 12L4.75 12"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+													<path
+														d="M7.9342 7.93413L6.87354 6.87347"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													></path>
+												</svg>
+											</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</aside>
