@@ -138,6 +138,7 @@
 					desc: input.value,
 					deal_size: parseInt(dealSize.value),
 					updatedOn: new Date(),
+					lastUpdatedBy: user.value.id,
 				})
 				.eq('id', route.params.id);
 			if (error) {
