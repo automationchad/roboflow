@@ -982,8 +982,8 @@
 										<div class="space-y-3 pb-4">
 											<div class="flex justify-between">
 												<div class="flex items-center dark:text-slate-300">
-													{{ Ticket.Comment.length }} comment{{
-														Ticket.Comment.length > 0 ? 's' : ''
+													{{ Ticket.Comment.filter(o => o.activity_type !== 'event').length }} comment{{
+														Ticket.Comment.filter(o => o.activity_type !== 'event').length > 0 ? 's' : ''
 													}}
 												</div>
 												<button

@@ -878,7 +878,7 @@
 				>
 					<Disclosure v-slot="{ open }">
 						<div class="flex items-center justify-start pl-8">
-							<img v-if="currentAvator"
+							<img v-if="currentAvatar"
 								:src="currentAvatar"
 								alt=""
 								class="h-5 w-5 rounded-full object-cover"
@@ -902,7 +902,7 @@
 											stroke-linecap="round"
 											stroke-linejoin="round"
 										></path></svg
-									><span>Comment as &nbsp;</span
+									><span>Reply as &nbsp;</span
 									><span class="font-medium"
 										>{{ User.firstName ? User.firstName : User.email }}
 										{{ User.lastName ? User.lastName : '' }}</span
