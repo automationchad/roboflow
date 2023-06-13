@@ -29,6 +29,8 @@
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
 
+	import { format } from 'date-fns';
+
 	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
@@ -133,7 +135,7 @@
 		let currentYear = start.getFullYear();
 
 		// generate 4 quarters in the past and 1 quarter into the future
-		for (let i = -4; i <= 1; i++) {
+		for (let i = -1; i <= 0; i++) {
 			let quarter = (currentQuarter + i) % 4;
 			let year = currentYear + Math.floor((currentQuarter + i) / 4);
 
@@ -157,7 +159,7 @@
 		return quarters.reverse();
 	}
 
-	const quarters = generateFinancialQuarters('2023-04-01');
+	const quarters = generateFinancialQuarters(format(new Date(), 'yyyy-MM-dd'));
 
 	const updateDeals = async () => {
 		is_success.value = true;
@@ -183,19 +185,19 @@
 	<div class="px-5 py-4">
 		<div class="my-2">
 			<div class="flex">
-				<Menu as="div"
+				<Menu as="div" class="relative"
 					><MenuButton
 						class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 					>
 						<span
-							class="font-regular focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-600 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 ring-1 ring-inset ring-indigo-500 transition transition-all duration-200 ease-out hover:bg-indigo-500 hover:ring-indigo-300 focus-visible:outline-4 focus-visible:outline-offset-1"
+							class="font-regular focus-visible:outline-brand-600 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 ring-1 ring-inset transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1"
 							><span class="truncate">New project</span></span
 						></MenuButton
 					>
 
 					<MenuItems
-						class="fixed left-0 top-0 z-[500] min-w-max"
-						style="transform: translate3d(191px, 102px, 0px)"
+						class="absolute inset-x-0 top-8 z-[500] min-w-max"
+						style=""
 					>
 						<div
 							class="bg origin-dropdown data-open:animate-dropdown-content-show data-closed:animate-dropdown-content-hide z-40 w-64 min-w-fit rounded border bg-white py-1.5 shadow-lg"
@@ -239,7 +241,7 @@
 									@click="navigateTo('/dashboard/new')"
 									:class="[
 										active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
-										'text-body-light focus:text-body group relative flex cursor-pointer disabled:cursor-not-allowed items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+										'text-body-light w-full focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none disabled:cursor-not-allowed',
 									]"
 								>
 									<svg
@@ -269,7 +271,6 @@
 				class="grid max-w-5xl grid-flow-col grid-cols-5 gap-8"
 			>
 				<org-deals-summary class="col-span-5" />
-			
 			</div>
 			<div class="">
 				<div class="">
@@ -291,3 +292,26 @@
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	.bordershadow-scale-600 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
+	}
+
+	.bordershadow-brand-fixed-1000 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #7375ed 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
+	}
+
+	.bordershadow-brand-fixed-900 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #e59fe9 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
+	}
+</style>

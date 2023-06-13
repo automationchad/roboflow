@@ -76,7 +76,7 @@
 	<div class="px-5 py-4">
 		<div class="my-2">
 			<div class="flex">
-				<Menu as="div"
+				<Menu as="div" class="relative"
 					><MenuButton
 						class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 					>
@@ -86,10 +86,7 @@
 						></MenuButton
 					>
 
-					<MenuItems
-						class="fixed left-0 top-0 z-[500] min-w-max"
-						style="transform: translate3d(191px, 102px, 0px)"
-					>
+					<MenuItems class="absolute top-8 z-10 min-w-max">
 						<div
 							class="bg origin-dropdown data-open:animate-dropdown-content-show data-closed:animate-dropdown-content-hide z-40 w-64 min-w-fit rounded border bg-white py-1.5 shadow-lg"
 							style="outline: none; pointer-events: auto"
@@ -126,7 +123,7 @@
 									to="/dashboard/new"
 									:class="[
 										active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
-										'text-body-light focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+										'text-body-light focus:text-body group relative flex w-full cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
 									]"
 								>
 									<svg

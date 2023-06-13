@@ -1,7 +1,7 @@
 <template>
 	<div
 		id="with-sidebar"
-		class="hide-scrollbar h-full w-64 overflow-auto border-r border-black/10 dark:border-white/10"
+		class="hide-scrollbar h-full w-64 z-0 overflow-auto border-r border-black/10 dark:border-white/10"
 		style="height: 100vh; max-height: 100vh"
 	>
 		<div class="mb-2">
