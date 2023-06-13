@@ -30,6 +30,8 @@ for (const annotation of annotationsFile.annotations) {
 	}
 }
 
+console.log(annotationsMap);
+
 // Make request for each image
 fs.readdir(imgDir, async (err, files) => {
 	console.log('Running inference on test images...\n');
@@ -49,7 +51,7 @@ fs.readdir(imgDir, async (err, files) => {
 		let trueCount = annotationsMap.get(imageId)
 			? annotationsMap.get(imageId).length
 			: 0;
-
+	
 		return axios({
 			method: 'POST',
 			url,
