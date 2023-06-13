@@ -93,6 +93,9 @@
 		) {
 			title.value = 'Motis Group';
 			description.value = 'Settings';
+		} else if (route.path.includes('/dashboard/account/me')) {
+			title.value = 'Motis Group';
+			description.value = 'Preferences';
 		}
 	}
 
