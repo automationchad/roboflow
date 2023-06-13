@@ -40,7 +40,7 @@
 													<p class="text-scale-900 text-xs">Name</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
-													<p class="text-scale-900 text-xs">Size, $</p>
+													<p class="text-scale-900 text-xs">Payout, $</p>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<p class="text-scale-900 text-xs">Status</p>
@@ -68,16 +68,16 @@
 
 												<div class="flex w-[20%] justify-end">
 													<span class="text-sm font-medium">{{
-														abbreviatedNumber(deal.deal_size)
+														abbreviatedNumber(deal.partner_payout_amount || 0)
 													}}</span>
 												</div>
 												<div class="flex w-[20%] justify-end">
 													<span
 														:class="[
-															stageType[deal.status],
-															'rounded-full px-2 text-xs capitalize ring-1 ',
+															partnerStages[deal.partner_status].styles,
+															'rounded-full px-2 text-xs capitalize ring-1 ring-inset',
 														]"
-														>{{ deal.status.replace(/_/g, ' ') }}</span
+														>{{ partnerStages[deal.partner_status].name }}</span
 													>
 												</div>
 
@@ -176,6 +176,39 @@
 	const loading = ref(true);
 	let pipeline = ref(0);
 	let revenue = ref(0);
+
+	const partnerStages = {
+		use_case_review: {
+			id: 'use_case_review',
+			name: 'Use Case Review',
+			styles: 'bg-blue-100 text-blue-600 ring-blue-400/20',
+		},
+		sow_sent: {
+			id: 'sow_sent',
+			name: 'SOW Sent',
+			styles: 'bg-green-100 text-green-400 ring-green-100',
+		},
+		closed_won: {
+			id: 'closed_won',
+			name: 'Closed Won',
+			styles: 'bg-teal-100 text-teal-400 ring-teal-100',
+		},
+		closed_lost: {
+			id: 'closed_lost',
+			name: 'Closed Lost',
+			styles: 'bg-red-100 text-white ring-red-100',
+		},
+		payout_pending: {
+			id: 'payout_pending',
+			name: 'Payout Pending',
+			styles: 'bg-yellow-100 text-black ring-yellow-100',
+		},
+		payout_paid: {
+			id: 'payout_paid',
+			name: 'Payout Paid',
+			styles: 'bg-purple-100 text-white ring-purple-100',
+		},
+	};
 
 	const stageType = {
 		initial_review:

@@ -55,29 +55,20 @@
 
 	console.log(User);
 
-	let deals = Ticket.filter((o) => o.Account.id === route.params.organization)
-		.filter(
-			(o) =>
-				![
-					'initial_review',
-					'requirements_gathering',
-					'proposal_submitted',
-					'contract_pending',
-					'invoice_pending',
-				].includes(o.status)
-		)
-		.sort((a, b) => b.deal_size - a.deal_size)
+	let deals = Ticket.filter((o) => o.Account.id === User.Account.id)
+		.filter((o) => ['payout_pending', 'payout_paid'].includes(o.partner_status))
+		// .sort((a, b) => b.partner_payout_amount - a.partner_payout_amount)
 		.slice(0, 6);
 
 	const examples = Array.from({ length: 6 }, (_, i) => ({
 		id: i,
 		name: `Example ${i}`,
-		deal_size: generateHighVariance(5000, 100000),
+		partner_payout_amount: generateHighVariance(5000, 100000),
 		close_date: generateRandomDate(
 			new Date('2022-01-01'),
 			new Date('2022-12-31')
 		),
-	})).sort((a, b) => b.deal_size - a.deal_size);
+	})).sort((a, b) => b.partner_payout_amount - a.partner_payout_amount);
 </script>
 
 <template>
@@ -111,7 +102,7 @@
 			</TabList>
 			<TabPanels
 				><TabPanel class="w-full">
-					<div class="grid grid-cols-5 max-w-5xl gap-4">
+					<div class="grid max-w-5xl grid-cols-5 gap-4">
 						<div
 							v-if="deals.length > 0"
 							class="h-84 col-span-4 grid grid-cols-4 grid-rows-2 gap-4"
@@ -120,17 +111,18 @@
 								v-for="(deal, idx) in deals"
 								:key="deal.name"
 								:class="[
-									getStyleClass(deal.deal_size).style,
+									getStyleClass(deal.partner_payout_amount).style,
 									idx < 2 ? 'row-span-2' : `row-span-1`,
 									'h-full rounded border border-white/10',
 								]"
 							>
 								<NuxtLink
 									class="flex h-full flex-col justify-between p-1"
-									:to="`/${route.params.organization}/tickets/${deal.id}`"
+									:to="`/dashboard/projects/${deal.id}`"
 									><div
 										:class="[
-											getStyleClass(deal.deal_size).style + '-month',
+											getStyleClass(deal.partner_payout_amount).style +
+												'-month',
 											'flex justify-end px-2 py-2 text-xs',
 										]"
 									>
@@ -139,15 +131,17 @@
 									<div class="flex flex-1 flex-col justify-center p-2">
 										<h2
 											:class="[
-												getStyleClass(deal.deal_size).style + '-text',
+												getStyleClass(deal.partner_payout_amount).style +
+													'-text',
 												'text-3xl font-semibold ',
 											]"
 										>
-											{{ abbreviatedNumber(deal.deal_size, false) }}
+											{{ abbreviatedNumber(deal.partner_payout_amount, false) }}
 										</h2>
 										<p
 											:class="[
-												getStyleClass(deal.deal_size).style + '-month',
+												getStyleClass(deal.partner_payout_amount).style +
+													'-month',
 												'text-xs',
 											]"
 										>
@@ -157,13 +151,15 @@
 									<div class="">
 										<div
 											:class="[
-												getStyleClass(deal.deal_size).style + '-border',
+												getStyleClass(deal.partner_payout_amount).style +
+													'-border',
 												'border-t',
 											]"
 										></div>
 										<div
 											:class="[
-												getStyleClass(deal.deal_size).style + '-button',
+												getStyleClass(deal.partner_payout_amount).style +
+													'-button',
 												'mt-3 rounded-sm p-2 text-xs text-white',
 											]"
 										>
@@ -175,7 +171,7 @@
 						</div>
 						<div
 							v-else
-							class="h-84 col-span-4 relative grid grid-cols-4 grid-rows-2 gap-4"
+							class="h-84 relative col-span-4 grid grid-cols-4 grid-rows-2 gap-4"
 						>
 							<div
 								class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 dark:text-white"
@@ -186,7 +182,7 @@
 								v-for="(deal, idx) in examples"
 								:key="deal.id"
 								:class="[
-									getStyleClass(deal.deal_size).style,
+									getStyleClass(deal.partner_payout_amount).style,
 									idx < 2 ? 'row-span-2' : `row-span-1`,
 									'relative h-full rounded border border-white/10 opacity-50 blur-sm',
 								]"
@@ -194,7 +190,7 @@
 								<div class="flex h-full flex-col justify-between p-1">
 									<div
 										:class="[
-											getStyleClass(deal.deal_size).style + '-month',
+											getStyleClass(deal.partner_payout_amount).style + '-month',
 											'flex justify-end px-2 py-2 text-xs',
 										]"
 									>
@@ -203,15 +199,15 @@
 									<div class="flex flex-1 flex-col justify-center p-2">
 										<h2
 											:class="[
-												getStyleClass(deal.deal_size).style + '-text',
+												getStyleClass(deal.partner_payout_amount).style + '-text',
 												'text-3xl font-semibold ',
 											]"
 										>
-											{{ abbreviatedNumber(deal.deal_size, false) }}
+											{{ abbreviatedNumber(deal.partner_payout_amount, false) }}
 										</h2>
 										<p
 											:class="[
-												getStyleClass(deal.deal_size).style + '-month',
+												getStyleClass(deal.partner_payout_amount).style + '-month',
 												'text-xs',
 											]"
 										>
@@ -221,13 +217,13 @@
 									<div class="">
 										<div
 											:class="[
-												getStyleClass(deal.deal_size).style + '-border',
+												getStyleClass(deal.partner_payout_amount).style + '-border',
 												'border-t',
 											]"
 										></div>
 										<div
 											:class="[
-												getStyleClass(deal.deal_size).style + '-button',
+												getStyleClass(deal.partner_payout_amount).style + '-button',
 												'mt-3 rounded-sm p-2 text-xs text-white',
 											]"
 										>
@@ -253,7 +249,7 @@
 									<div class="text-sm text-slate-700 dark:text-slate-200">
 										{{
 											abbreviatedNumber(
-												deals.reduce((a, c) => a + c.deal_size, 0)
+												deals.reduce((a, c) => a + c.partner_payout_amount, 0)
 											)
 										}}
 									</div>
@@ -268,12 +264,12 @@
 								</div>
 								<div class="mb-2">
 									<div class="mb-1.5 text-xs dark:text-slate-400">
-										Average deal size
+										Average payout size
 									</div>
 									<div class="text-sm text-slate-700 dark:text-slate-200">
 										{{
 											abbreviatedNumber(
-												deals.reduce((a, c) => a + c.deal_size, 0) /
+												deals.reduce((a, c) => a + c.partner_payout_amount, 0) /
 													deals.length || 0
 											)
 										}}

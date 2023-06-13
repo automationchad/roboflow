@@ -186,6 +186,39 @@
 			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
 	};
 
+	const partnerStages = {
+		use_case_review: {
+			id: 'use_case_review',
+			name: 'Use Case Review',
+			styles: 'bg-blue-100 text-blue-600 ring-blue-400/20',
+		},
+		sow_sent: {
+			id: 'sow_sent',
+			name: 'SOW Sent',
+			styles: 'bg-green-100 text-green-400 ring-green-100',
+		},
+		closed_won: {
+			id: 'closed_won',
+			name: 'Closed Won',
+			styles: 'bg-teal-100 text-teal-400 ring-teal-100',
+		},
+		closed_lost: {
+			id: 'closed_lost',
+			name: 'Closed Lost',
+			styles: 'bg-red-100 text-white ring-red-100',
+		},
+		payout_pending: {
+			id: 'payout_pending',
+			name: 'Payout Pending',
+			styles: 'bg-yellow-100 text-black ring-yellow-100',
+		},
+		payout_paid: {
+			id: 'payout_paid',
+			name: 'Payout Paid',
+			styles: 'bg-purple-100 text-white ring-purple-100',
+		},
+	};
+
 	const people = [
 		{ id: 'initial_review', name: 'Initial Review' },
 		{ id: 'requirements_gathering', name: 'Requirements Gathering' },
@@ -232,8 +265,7 @@
 			`*,Account (
 	     id,
 		 type,
-		 stripeCustomerId,
-		 Subscription(*)
+		 stripeCustomerId
 	   )`
 		)
 		.eq('id', user.value.id)
@@ -407,6 +439,46 @@
 	// 		return publicUrl;
 	// 	} else return '';
 	// };
+
+	const activity = [
+		{
+			id: 1,
+			type: 'created',
+			object: 'project',
+			person: { name: 'Chelsea Hagon' },
+			date: '7d ago',
+			dateTime: '2023-01-23T10:32',
+		},
+		{
+			id: 2,
+			type: 'edited',
+			person: { name: 'Chelsea Hagon' },
+			date: '6d ago',
+			dateTime: '2023-01-23T11:03',
+		},
+		{
+			id: 3,
+			type: 'sent',
+			person: { name: 'Chelsea Hagon' },
+			date: '6d ago',
+			dateTime: '2023-01-23T11:24',
+		},
+
+		{
+			id: 5,
+			type: 'viewed',
+			person: { name: 'Alex Curren' },
+			date: '2d ago',
+			dateTime: '2023-01-24T09:12',
+		},
+		{
+			id: 6,
+			type: 'paid',
+			person: { name: 'Alex Curren' },
+			date: '1d ago',
+			dateTime: '2023-01-24T09:20',
+		},
+	];
 
 	const fetchComments = async () => {
 		let { data: Ticket, error } = await supabase
@@ -690,7 +762,7 @@
 													</div>
 												</div>
 											</header>
-											<div
+											<!-- <div
 												class="mb-2 mt-5 flex items-center space-x-2 text-xs text-sky-400"
 											>
 												<svg class="h-3 w-3" fill="none" viewBox="0 0 24 24">
@@ -704,193 +776,25 @@
 												</svg>
 
 												{{ Ticket.Account.name }} {{ Ticket.type }}
-											</div>
+											</div> -->
 											<h1
 												class="max-w-5xl text-2xl font-semibold text-gray-900 dark:text-white"
 											>
 												<div class="" v-if="Ticket.type === 'referral'">
-													{{ Ticket.User.firstName ? Ticket.User.firstName : Ticket.User.email }}
+													{{
+														Ticket.User.firstName
+															? Ticket.User.firstName
+															: Ticket.User.email
+													}}
 													<span class="text-slate-400">referred</span>
 													{{ Ticket.name }}
-													<span class="text-slate-400">for a</span>
-													${{ abbreviatedNumber(dealSize) }}
-													<span class="text-slate-400">deal</span>
-													<span
-														v-if="Ticket.User.Account.id !== Ticket.Account.id"
-														><span class="text-slate-400"> on behalf of</span>
-														{{ Ticket.Account.name }}</span
-													>
 												</div>
 												<div class="" v-else>{{ Ticket.name }}</div>
 											</h1>
 										</div>
 									</div>
 									<!-- Aside for smaller screens -->
-									<aside class="mt-8 xl:hidden">
-										<h2 class="sr-only">Details</h2>
-										<div class="space-y-5">
-											<div class="flex items-center space-x-2">
-												<svg
-													class="h-5 w-5 text-white"
-													aria-hidden="true"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M16.0753 17.7902C15.4999 16.5 13.6564 15.75 12 15.75C10.3436 15.75 8.49988 16.5 7.92468 17.7902"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M11.75 12.25L14.25 9.75"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-												</svg>
 
-												<Combobox v-if="User.Account.type === 'super_admin'">
-													as="div" v-model="selectedPerson" class="group w-full"
-													:disabled="User.Account.type !== 'super_admin'" >
-													<div class="relative">
-														<ComboboxInput
-															:disabled="User.Account.type !== 'super_admin'"
-															class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
-															@change="query = $event.target.value"
-															:display-value="(person) => person?.name"
-														/>
-														<ComboboxButton
-															:disabled="User.Account.type !== 'super_admin'"
-															class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
-														>
-															<ChevronUpDownIcon
-																class="h-5 w-5 text-gray-400"
-																aria-hidden="true"
-															/>
-														</ComboboxButton>
-
-														<ComboboxOptions
-															v-if="filteredPeople.length > 0"
-															class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
-														>
-															<ComboboxOption
-																@click="handleTicketEdit(person.id, idx)"
-																v-for="(person, idx) in filteredPeople"
-																:key="person.id"
-																:value="person"
-																:disabled="
-																	shouldDisable(selectedPerson.id, idx)
-																"
-																as="template"
-																v-slot="{ active, selected }"
-															>
-																<li
-																	:class="[
-																		shouldDisable(selectedPerson.id, idx)
-																			? 'cursor-not-allowed opacity-50'
-																			: 'pl-8',
-																		'relative flex cursor-default select-none py-2 pr-4',
-																		active
-																			? 'bg-indigo-600 text-white dark:text-white'
-																			: 'text-gray-900 dark:text-slate-300',
-																	]"
-																>
-																	<span
-																		:class="[
-																			'block truncate',
-																			selected && 'font-semibold',
-																		]"
-																	>
-																		{{ person.name }}
-																	</span>
-
-																	<span
-																		v-if="selected"
-																		:class="[
-																			'absolute inset-y-0 left-0 flex items-center pl-1.5',
-																			active
-																				? 'text-white dark:text-white'
-																				: 'text-indigo-600',
-																		]"
-																	>
-																		<svg
-																			v-if="
-																				shouldDisable(selectedPerson.id, idx)
-																			"
-																			class="h-5 w-5"
-																			viewBox="0 0 24 24"
-																			fill="none"
-																			xmlns="http://www.w3.org/2000/svg"
-																		>
-																			<path
-																				d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																			<path
-																				d="M7 7L17 17"
-																				stroke="currentColor"
-																				stroke-width="1.5"
-																				stroke-linecap="round"
-																				stroke-linejoin="round"
-																			></path>
-																		</svg>
-																		<CheckIcon
-																			class="h-5 w-5"
-																			aria-hidden="true"
-																		/>
-																	</span>
-																</li>
-															</ComboboxOption>
-														</ComboboxOptions>
-													</div>
-												</Combobox>
-											</div>
-										</div>
-										<div
-											class="mt-6 space-y-8 border-b border-t border-gray-200 py-6 dark:border-slate-800"
-										>
-											<div>
-												<h2
-													class="text-sm font-normal text-gray-500 dark:text-white"
-												>
-													Assignees
-												</h2>
-												<ul role="list" class="mt-3 space-y-3">
-													<li class="flex justify-start">
-														<a href="#" class="flex items-center space-x-3">
-															<div class="flex-shrink-0">
-																<img
-																	class="h-5 w-5 rounded-full object-cover"
-																	:src="assignedToAvatar"
-																	alt=""
-																/>
-															</div>
-															<div
-																class="text-sm font-medium text-gray-900 dark:text-white"
-															>
-																{{ AssignedTo.firstName }}
-																{{ AssignedTo.lastName }}
-															</div>
-														</a>
-													</li>
-												</ul>
-											</div>
-										</div>
-									</aside>
 									<div class="xl:pb-0">
 										<h2 class="sr-only">Description</h2>
 
@@ -985,7 +889,7 @@
 													></article>
 												</div>
 
-												<div class="col-span-1" v-if="false">
+												<div class="col-span-1">
 													<DisclosureButton
 														v-if="
 															(!open && Ticket.createdBy === user.id) ||
@@ -1021,6 +925,7 @@
 											</div>
 										</Disclosure>
 									</div>
+
 									<div class="mt-6" v-if="ticketAttachments.length > 0">
 										<div class="mb-2">
 											<svg
@@ -1069,110 +974,6 @@
 											>{{ Ticket.type }}</NuxtLink
 										>
 									</div>
-									<div class="mt-4 flex space-x-2 text-white">
-										<div
-											class="flex items-center space-x-2 rounded border border-black/20 px-2 py-1 dark:border-white/20"
-										>
-											<div class="flex items-center">
-												<button
-													class="text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
-												>
-													<svg
-														class="h-5 w-5"
-														viewBox="0 0 24 24"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path
-															d="M12 9.75L16.25 15.25H7.75L12 9.75Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-													</svg>
-												</button>
-											</div>
-											<div
-												class="text-sm text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
-											>
-												{{ Ticket.votes }}
-											</div>
-											<div class="flex items-center">
-												<button
-													class="text-black/30 transition-colors hover:text-gray-500 dark:text-white/30 dark:hover:text-white/60"
-												>
-													<svg
-														class="h-5 w-5"
-														viewBox="0 0 24 24"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path
-															d="M12 15.25L16.25 9.75H7.75L12 15.25Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-													</svg>
-												</button>
-											</div>
-										</div>
-										<div class="">
-											<div
-												class="flex items-center rounded border border-black/20 px-2 py-1 dark:border-white/20"
-											>
-												<button
-													class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-200"
-												>
-													<svg
-														class="mr-1 h-5 w-5"
-														viewBox="0 0 24 24"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path
-															d="M19.25 7C19.25 8.24264 18.2426 9.25 17 9.25C15.7574 9.25 14.75 8.24264 14.75 7C14.75 5.75736 15.7574 4.75 17 4.75C18.2426 4.75 19.25 5.75736 19.25 7Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-														<path
-															d="M9.25 12C9.25 13.2426 8.24264 14.25 7 14.25C5.75736 14.25 4.75 13.2426 4.75 12C4.75 10.7574 5.75736 9.75 7 9.75C8.24264 9.75 9.25 10.7574 9.25 12Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-														<path
-															d="M19.25 17C19.25 18.2426 18.2426 19.25 17 19.25C15.7574 19.25 14.75 18.2426 14.75 17C14.75 15.7574 15.7574 14.75 17 14.75C18.2426 14.75 19.25 15.7574 19.25 17Z"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-														<path
-															d="M14.5 16L9 13.5"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-														<path
-															d="M14.5 8.5L9 11"
-															stroke="currentColor"
-															stroke-width="1.5"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-														></path>
-													</svg>
-													Share
-												</button>
-											</div>
-										</div>
-									</div>
 								</div>
 							</div>
 							<section aria-labelledby="activity-title" class="mt-8 xl:mt-10">
@@ -1218,6 +1019,15 @@
 													#ask-motis
 												</div>
 											</div>
+											<transition
+												enter-active-class="transition ease-out duration-100"
+												enter-from-class="transform opacity-0 scale-95"
+												enter-to-class="transform opacity-100 scale-100"
+												leave-active-class="transition ease-in duration-75"
+												leave-from-class="transform opacity-100 scale-100"
+												leave-to-class="transform opacity-0 scale-95"
+												><TicketAiModal v-if="showDiv"
+											/></transition>
 
 											<transition
 												enter-active-class="transition ease-out duration-100"
@@ -1228,7 +1038,7 @@
 												leave-to-class="transform opacity-0 scale-95"
 												><div class="">
 													<div
-														class="flex space-x-3 rounded-lg p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:ring-slate-800"
+														class="flex space-x-3 rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-900 dark:bg-white/5 dark:ring-white/5"
 													>
 														<div class="flex-shrink-0">
 															<div class="relative">
@@ -1260,7 +1070,7 @@
 																		id="comment"
 																		name="comment"
 																		rows="3"
-																		class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-white/30 focus:ring-0 dark:text-white sm:py-1.5 sm:text-sm sm:leading-6"
+																		class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-black/40 focus:ring-0 dark:text-white dark:placeholder:text-white/30 sm:py-1.5 sm:text-sm sm:leading-6"
 																		placeholder="Add a comment"
 																	/>
 																</div>
@@ -1543,169 +1353,6 @@
 						<aside class="hidden w-full xl:block xl:pl-8">
 							<h2 class="sr-only">Details</h2>
 							<div class="space-y-3">
-								<div class="flex items-center space-x-2 dark:text-white">
-									<svg
-										class="h-6 w-6"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.25 9.25V6.75C9.25 6.19772 8.80228 5.75 8.25 5.75H5.75C5.19772 5.75 4.75 6.19772 4.75 6.75V9.25C4.75 9.80228 5.19772 10.25 5.75 10.25H8.25C8.80228 10.25 9.25 9.80228 9.25 9.25Z"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M9.25 18.25H5.75C5.19772 18.25 4.75 17.8023 4.75 17.25V13.75"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 6.75H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 14.75H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 9.25H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 17.25H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M8 16.25L7.42383 16.7301C7.59297 16.9331 7.85641 17.0321 8.11735 16.9908C8.37829 16.9494 8.59824 16.7738 8.69636 16.5285L8 16.25ZM10.8011 13.2587C11.0821 12.9543 11.0631 12.4799 10.7587 12.1989C10.4543 11.9179 9.97985 11.9369 9.6989 12.2413L10.8011 13.2587ZM7.32617 14.2699C7.06099 13.9517 6.58807 13.9087 6.26986 14.1738C5.95165 14.439 5.90866 14.9119 6.17383 15.2301L7.32617 14.2699ZM8.69636 16.5285C9.03866 15.6728 9.56133 14.855 10.0115 14.2398C10.2345 13.9351 10.4349 13.6865 10.5785 13.5152C10.6503 13.4296 10.7076 13.3637 10.7462 13.32C10.7655 13.2981 10.7801 13.2819 10.7894 13.2716C10.7941 13.2664 10.7974 13.2627 10.7994 13.2606C10.8004 13.2595 10.801 13.2588 10.8013 13.2585C10.8015 13.2583 10.8015 13.2583 10.8015 13.2583C10.8015 13.2583 10.8014 13.2584 10.8014 13.2584C10.8013 13.2585 10.8013 13.2585 10.8012 13.2586C10.8012 13.2586 10.8011 13.2587 10.25 12.75C9.6989 12.2413 9.69881 12.2414 9.69872 12.2415C9.69868 12.2415 9.69858 12.2416 9.6985 12.2417C9.69835 12.2419 9.69817 12.2421 9.69797 12.2423C9.69757 12.2427 9.69708 12.2433 9.6965 12.2439C9.69534 12.2452 9.69382 12.2468 9.69194 12.2489C9.68819 12.253 9.68303 12.2587 9.67653 12.2658C9.66352 12.2802 9.64515 12.3007 9.62195 12.327C9.57558 12.3795 9.50986 12.4551 9.42926 12.5512C9.26825 12.7432 9.04679 13.0181 8.80098 13.354C8.31367 14.02 7.71134 14.9522 7.30364 15.9715L8.69636 16.5285ZM6.17383 15.2301L7.42383 16.7301L8.57617 15.7699L7.32617 14.2699L6.17383 15.2301Z"
-											fill="currentColor"
-										></path>
-									</svg>
-
-									<Combobox
-										v-if="User.Account.type === 'super_admin'"
-										as="div"
-										v-model="selectedPerson"
-										class="group w-full"
-										:disabled="User.Account.type !== 'super_admin'"
-									>
-										<div class="relative">
-											<ComboboxInput
-												:disabled="User.Account.type !== 'super_admin'"
-												class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
-												@change="query = $event.target.value"
-												:display-value="(person) => person?.name"
-											/>
-											<ComboboxButton
-												:disabled="User.Account.type !== 'super_admin'"
-												class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
-											>
-												<ChevronUpDownIcon
-													class="h-5 w-5 text-gray-400"
-													aria-hidden="true"
-												/>
-											</ComboboxButton>
-
-											<ComboboxOptions
-												v-if="filteredPeople.length > 0"
-												class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
-											>
-												<ComboboxOption
-													@click="handleTicketEdit(person.id, idx)"
-													v-for="(person, idx) in filteredPeople"
-													:key="person.id"
-													:value="person"
-													:disabled="shouldDisable(selectedPerson.id, idx)"
-													as="template"
-													v-slot="{ active, selected }"
-												>
-													<li
-														:class="[
-															shouldDisable(selectedPerson.id, idx)
-																? 'cursor-not-allowed opacity-50'
-																: '',
-															'relative flex cursor-default select-none py-2 pl-8 pr-4',
-															active
-																? 'bg-indigo-600 text-white dark:text-white'
-																: 'text-gray-900 dark:text-slate-300',
-														]"
-													>
-														<span
-															:class="[
-																'block truncate',
-																selected && 'font-semibold',
-															]"
-														>
-															{{ person.name }}
-														</span>
-
-														<span
-															v-if="selected"
-															:class="[
-																'absolute inset-y-0 left-0 flex items-center pl-1.5',
-																active
-																	? 'text-white dark:text-white'
-																	: 'text-indigo-600',
-															]"
-														>
-															<CheckIcon class="h-5 w-5" aria-hidden="true" />
-														</span>
-														<span
-															v-else
-															class="absolute inset-y-0 left-0 flex items-center pl-1.5"
-															><svg
-																v-if="shouldDisable(selectedPerson.id, idx)"
-																class="h-5 w-5"
-																viewBox="0 0 24 24"
-																fill="none"
-																xmlns="http://www.w3.org/2000/svg"
-															>
-																<path
-																	d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7 7L17 17"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path></svg
-														></span>
-													</li>
-												</ComboboxOption>
-											</ComboboxOptions>
-										</div>
-									</Combobox>
-									<div
-										v-else
-										:class="[
-											stageType[Ticket.status],
-											'rounded-md px-2 py-1 text-sm capitalize',
-										]"
-									>
-										{{ Ticket.status.replace(/_/g, ' ') }}
-									</div>
-								</div>
 								<div
 									class="flex items-center space-x-2 dark:text-white"
 									v-if="User.Account.type === 'super_admin'"
@@ -1846,81 +1493,502 @@
 									</div>
 								</div>
 
-								<div class="flex items-center space-x-2">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-6 w-6 text-gray-400 dark:text-slate-300"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="1.5"
-											d="M19.25 9.25v-.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v8.5a2 2 0 0 0 2 2h2.5m5.75-5.5V15l1.25 1.25M8 4.75v3.5m8-3.5v3.5m-1 11a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Z"
-										></path>
-									</svg>
+								<div class="" id="partner-summary">
+									<div class="lg:col-start-3 lg:row-end-1">
+										<h2 class="sr-only">Summary</h2>
+										<div
+											class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5"
+										>
+											<dl class="flex flex-wrap">
+												<div class="flex-auto pl-6 pt-6">
+													<dt
+														class="text-sm font-semibold leading-6 text-slate-500"
+													>
+														Payout Bonus
+													</dt>
+													<dd
+														class="mt-1 text-base font-semibold leading-6 text-gray-900"
+													>
+														{{
+															!Ticket.partner_payout_amount
+																? 'Pending'
+																: `$${formatAccounting(Ticket.partner_payout_amount)}`
+														}}
+													</dd>
+												</div>
+												<div class="flex-none self-end px-6 pt-4">
+													<dt class="sr-only">Status</dt>
+													<dd
+														:class="[
+															partnerStages[Ticket.partner_status].styles,
+															'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium  ring-1 ring-inset ',
+														]"
+													>
+														{{ partnerStages[Ticket.partner_status].name }}
+													</dd>
+												</div>
+												<div
+													class="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6"
+												>
+													<dt class="flex-none">
+														<span class="sr-only">Client</span>
+														<img
+															v-if="ticketAvatar"
+															:src="ticketAvatar"
+															class="h-5 w-5 rounded-full"
+															alt=""
+														/>
 
-									<span class="text-sm text-gray-500 dark:text-slate-400"
-										>Due in <span>{{ dueDate }}</span></span
-									>
+														<UserCircleIcon
+															v-else
+															class="h-6 w-5 text-gray-400"
+															aria-hidden="true"
+														/>
+													</dt>
+													<dd
+														class="text-sm font-medium leading-6 text-gray-900"
+													>
+														{{
+															Ticket.User.firstName && Ticket.User.lastName
+																? Ticket.User.firstName +
+																  ' ' +
+																  Ticket.User.lastName
+																: Ticket.User.email
+														}}
+													</dd>
+												</div>
+												<div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+													<dt class="flex-none">
+														<span class="sr-only">Due date</span>
+
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-5 w-5 text-gray-400"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M19.25 9.25v-.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v8.5a2 2 0 0 0 2 2h2.5m5.75-5.5V15l1.25 1.25M8 4.75v3.5m8-3.5v3.5m-1 11a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Z"
+															></path>
+														</svg>
+													</dt>
+													<dd
+														class="text-sm leading-6 text-gray-500 dark:text-slate-400"
+													>
+														Due in <span>{{ dueDate }}</span>
+													</dd>
+												</div>
+											</dl>
+											<div class="mt-6 border-t border-gray-900/5 px-6 py-6">
+												<dt class="text-sm font-normal leading-6 text-gray-600">
+													Assignees
+												</dt>
+												<dd
+													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+												>
+													<ul role="list" class="mt-3 space-y-3">
+														<li class="flex justify-start">
+															<a class="flex items-center space-x-3">
+																<div class="flex-shrink-0">
+																	<img
+																		v-if="assignedToAvatar"
+																		class="h-5 w-5 rounded-full object-cover"
+																		:src="assignedToAvatar"
+																		alt=""
+																	/>
+																	<div
+																		v-else
+																		class="flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-center text-xs text-slate-400"
+																	>
+																		{{
+																			AssignedTo.firstName
+																				? AssignedTo.firstName.charAt(0)
+																				: AssignedTo.email.charAt(0)
+																		}}
+																	</div>
+																</div>
+																<div
+																	class="text-sm font-medium text-gray-900 dark:text-slate-100"
+																>
+																	{{
+																		AssignedTo.firstName && AssignedTo.lastName
+																			? AssignedTo.firstName +
+																			  ' ' +
+																			  AssignedTo.lastName
+																			: AssignedTo.email
+																	}}
+																</div>
+															</a>
+														</li>
+													</ul>
+												</dd>
+
+												<dt
+													class="mt-10 text-sm font-medium leading-6 text-gray-900"
+												>
+													Attachments
+												</dt>
+												<dd
+													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+												>
+													<ul
+														role="list"
+														class="divide-y divide-gray-100 rounded-md border border-gray-200"
+													>
+														<li
+															class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+														>
+															<div class="flex w-0 flex-1 items-center">
+																<svg
+																	class="h-5 w-5 flex-shrink-0 text-gray-400"
+																	viewBox="0 0 24 24"
+																	fill="none"
+																	xmlns="http://www.w3.org/2000/svg"
+																>
+																	<path
+																		d="M4.75 15.75L8.25 19.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																	<path
+																		d="M8.25 15.75L4.75 19.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																	<path
+																		d="M11.75 19.25H15.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																	<path
+																		d="M8.75 8.75H15.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																	<path
+																		d="M9.75 11.75H14.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																	<path
+																		d="M19.25 19.25V6.75C19.25 5.64543 18.3546 4.75 17.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V12.25"
+																		stroke="currentColor"
+																		stroke-width="1.5"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																	></path>
+																</svg>
+
+																<div class="ml-4 flex min-w-0 flex-1 gap-2">
+																	<span class="truncate font-medium">SOW</span>
+																	<span class="flex-shrink-0 text-gray-400"
+																		>2.4mb</span
+																	>
+																</div>
+															</div>
+															<div class="ml-4 flex-shrink-0">
+																<a
+																	href="#"
+																	class="font-medium text-indigo-600 hover:text-indigo-500"
+																	>Download</a
+																>
+															</div>
+														</li>
+														<li
+															class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+														>
+															<div class="flex w-0 flex-1 items-center">
+																<svg
+																	class="h-5 w-5 flex-shrink-0 text-gray-400"
+																	xmlns="http://www.w3.org/2000/svg"
+																	width="24"
+																	height="24"
+																	fill="none"
+																	viewBox="0 0 24 24"
+																>
+																	<path
+																		stroke="currentColor"
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		stroke-width="1.5"
+																		d="M13.75 4.75h-8v14.5l1.599-1.243a1 1 0 0 1 1.272.036L10 19.25l1.341-1.174a1 1 0 0 1 1.318 0L14 19.25l1.379-1.207a1 1 0 0 1 1.272-.036l1.599 1.243v-9m-4.5-5.5 4.5 5.5m-4.5-5.5v3.5a2 2 0 0 0 2 2h2.5"
+																	></path>
+																</svg>
+
+																<div class="ml-4 flex min-w-0 flex-1 gap-2">
+																	<span class="truncate font-medium"
+																		>Payout Invoice</span
+																	>
+																	<span class="flex-shrink-0 text-gray-400"
+																		>4.5mb</span
+																	>
+																</div>
+															</div>
+															<div class="ml-4 flex-shrink-0">
+																<a
+																	href="#"
+																	class="font-medium text-indigo-600 hover:text-indigo-500"
+																	>Download</a
+																>
+															</div>
+														</li>
+													</ul>
+												</dd>
+											</div>
+										</div>
+									</div>
 								</div>
-								<div class=""><OrgDealsInvoice /></div>
 							</div>
-							<div
-								class="mt-6 space-y-8 border-t border-gray-200 py-6 dark:border-slate-700"
-							>
+							<div class="mt-6 space-y-8 py-6 dark:border-slate-700">
 								<div>
-									<h2
-										class="text-sm font-normal text-gray-500 dark:text-slate-400"
-									>
-										Assignees
+									<h2 class="text-sm font-semibold leading-6 text-gray-900">
+										Activity
 									</h2>
-									<ul role="list" class="mt-3 space-y-3">
-										<li class="flex justify-start">
-											<a class="flex items-center space-x-3">
-												<div class="flex-shrink-0">
-													<img
-														v-if="assignedToAvatar"
-														class="h-5 w-5 rounded-full object-cover"
-														:src="assignedToAvatar"
-														alt=""
+									<ul role="list" class="mt-6 space-y-6">
+										<li
+											v-for="(activityItem, activityItemIdx) in activity"
+											:key="activityItem.id"
+											class="relative flex gap-x-4"
+										>
+											<div
+												:class="[
+													activityItemIdx === activity.length - 1
+														? 'h-6'
+														: '-bottom-6',
+													'absolute left-0 top-0 flex w-6 justify-center',
+												]"
+											>
+												<div class="w-px bg-gray-200" />
+											</div>
+											<template v-if="activityItem.type === 'commented'">
+												<img
+													:src="activityItem.person.imageUrl"
+													alt=""
+													class="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
+												/>
+												<div
+													class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200"
+												>
+													<div class="flex justify-between gap-x-4">
+														<div class="py-0.5 text-xs leading-5 text-gray-500">
+															<span class="font-medium text-gray-900">{{
+																activityItem.person.name
+															}}</span>
+															commented
+														</div>
+														<time
+															:datetime="activityItem.dateTime"
+															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+															>{{ activityItem.date }}</time
+														>
+													</div>
+													<p class="text-sm leading-6 text-gray-500">
+														{{ activityItem.comment }}
+													</p>
+												</div>
+											</template>
+											<template v-else>
+												<div
+													class="relative flex h-6 w-6 flex-none items-center justify-center bg-white"
+												>
+													<CheckCircleIcon
+														v-if="activityItem.type === 'paid'"
+														class="h-6 w-6 text-indigo-600"
+														aria-hidden="true"
 													/>
 													<div
 														v-else
-														class="flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-center text-xs text-slate-400"
-													>
-														{{
-															AssignedTo.firstName
-																? AssignedTo.firstName.charAt(0)
-																: AssignedTo.email.charAt(0)
-														}}
-													</div>
+														class="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300"
+													/>
 												</div>
-												<div
-													class="text-sm font-medium text-gray-900 dark:text-slate-100"
+												<p
+													class="flex-auto py-0.5 text-xs leading-5 text-gray-500"
 												>
-													{{
-														AssignedTo.firstName && AssignedTo.lastName
-															? AssignedTo.firstName + ' ' + AssignedTo.lastName
-															: AssignedTo.email
-													}}
-												</div>
-											</a>
+													<span class="font-medium text-gray-900">{{
+														activityItem.person.name
+													}}</span>
+													{{ activityItem.type }} the invoice.
+												</p>
+												<time
+													:datetime="activityItem.dateTime"
+													class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+													>{{ activityItem.date }}</time
+												>
+											</template>
 										</li>
 									</ul>
 								</div>
+								<div
+									class="flex items-center space-x-2 dark:text-white"
+									v-if="User.Account.type === 'super_admin'"
+								>
+									<svg
+										class="h-6 w-6"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9.25 9.25V6.75C9.25 6.19772 8.80228 5.75 8.25 5.75H5.75C5.19772 5.75 4.75 6.19772 4.75 6.75V9.25C4.75 9.80228 5.19772 10.25 5.75 10.25H8.25C8.80228 10.25 9.25 9.80228 9.25 9.25Z"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M9.25 18.25H5.75C5.19772 18.25 4.75 17.8023 4.75 17.25V13.75"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 6.75H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 14.75H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 9.25H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M12.75 17.25H19.25"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										></path>
+										<path
+											d="M8 16.25L7.42383 16.7301C7.59297 16.9331 7.85641 17.0321 8.11735 16.9908C8.37829 16.9494 8.59824 16.7738 8.69636 16.5285L8 16.25ZM10.8011 13.2587C11.0821 12.9543 11.0631 12.4799 10.7587 12.1989C10.4543 11.9179 9.97985 11.9369 9.6989 12.2413L10.8011 13.2587ZM7.32617 14.2699C7.06099 13.9517 6.58807 13.9087 6.26986 14.1738C5.95165 14.439 5.90866 14.9119 6.17383 15.2301L7.32617 14.2699ZM8.69636 16.5285C9.03866 15.6728 9.56133 14.855 10.0115 14.2398C10.2345 13.9351 10.4349 13.6865 10.5785 13.5152C10.6503 13.4296 10.7076 13.3637 10.7462 13.32C10.7655 13.2981 10.7801 13.2819 10.7894 13.2716C10.7941 13.2664 10.7974 13.2627 10.7994 13.2606C10.8004 13.2595 10.801 13.2588 10.8013 13.2585C10.8015 13.2583 10.8015 13.2583 10.8015 13.2583C10.8015 13.2583 10.8014 13.2584 10.8014 13.2584C10.8013 13.2585 10.8013 13.2585 10.8012 13.2586C10.8012 13.2586 10.8011 13.2587 10.25 12.75C9.6989 12.2413 9.69881 12.2414 9.69872 12.2415C9.69868 12.2415 9.69858 12.2416 9.6985 12.2417C9.69835 12.2419 9.69817 12.2421 9.69797 12.2423C9.69757 12.2427 9.69708 12.2433 9.6965 12.2439C9.69534 12.2452 9.69382 12.2468 9.69194 12.2489C9.68819 12.253 9.68303 12.2587 9.67653 12.2658C9.66352 12.2802 9.64515 12.3007 9.62195 12.327C9.57558 12.3795 9.50986 12.4551 9.42926 12.5512C9.26825 12.7432 9.04679 13.0181 8.80098 13.354C8.31367 14.02 7.71134 14.9522 7.30364 15.9715L8.69636 16.5285ZM6.17383 15.2301L7.42383 16.7301L8.57617 15.7699L7.32617 14.2699L6.17383 15.2301Z"
+											fill="currentColor"
+										></path>
+									</svg>
+
+									<Combobox
+										as="div"
+										v-model="selectedPerson"
+										class="group w-full"
+										:disabled="User.Account.type !== 'super_admin'"
+									>
+										<div class="relative">
+											<ComboboxInput
+												:disabled="User.Account.type !== 'super_admin'"
+												class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
+												@change="query = $event.target.value"
+												:display-value="(person) => person?.name"
+											/>
+											<ComboboxButton
+												:disabled="User.Account.type !== 'super_admin'"
+												class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+											>
+												<ChevronUpDownIcon
+													class="h-5 w-5 text-gray-400"
+													aria-hidden="true"
+												/>
+											</ComboboxButton>
+
+											<ComboboxOptions
+												v-if="filteredPeople.length > 0"
+												class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
+											>
+												<ComboboxOption
+													@click="handleTicketEdit(person.id, idx)"
+													v-for="(person, idx) in filteredPeople"
+													:key="person.id"
+													:value="person"
+													:disabled="shouldDisable(selectedPerson.id, idx)"
+													as="template"
+													v-slot="{ active, selected }"
+												>
+													<li
+														:class="[
+															shouldDisable(selectedPerson.id, idx)
+																? 'cursor-not-allowed opacity-50'
+																: '',
+															'relative flex cursor-default select-none py-2 pl-8 pr-4',
+															active
+																? 'bg-indigo-600 text-white dark:text-white'
+																: 'text-gray-900 dark:text-slate-300',
+														]"
+													>
+														<span
+															:class="[
+																'block truncate',
+																selected && 'font-semibold',
+															]"
+														>
+															{{ person.name }}
+														</span>
+
+														<span
+															v-if="selected"
+															:class="[
+																'absolute inset-y-0 left-0 flex items-center pl-1.5',
+																active
+																	? 'text-white dark:text-white'
+																	: 'text-indigo-600',
+															]"
+														>
+															<CheckIcon class="h-5 w-5" aria-hidden="true" />
+														</span>
+														<span
+															v-else
+															class="absolute inset-y-0 left-0 flex items-center pl-1.5"
+															><svg
+																v-if="shouldDisable(selectedPerson.id, idx)"
+																class="h-5 w-5"
+																viewBox="0 0 24 24"
+																fill="none"
+																xmlns="http://www.w3.org/2000/svg"
+															>
+																<path
+																	d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path>
+																<path
+																	d="M7 7L17 17"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																></path></svg
+														></span>
+													</li>
+												</ComboboxOption>
+											</ComboboxOptions>
+										</div>
+									</Combobox>
+								</div>
 							</div>
-							<transition
-								enter-active-class="transition ease-out duration-100"
-								enter-from-class="transform opacity-0 scale-95"
-								enter-to-class="transform opacity-100 scale-100"
-								leave-active-class="transition ease-in duration-75"
-								leave-from-class="transform opacity-100 scale-100"
-								leave-to-class="transform opacity-0 scale-95"
-								><TicketAiModal v-if="showDiv"
-							/></transition>
 						</aside>
 					</div>
 				</div>

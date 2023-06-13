@@ -9,9 +9,10 @@
 					src="~/assets/images/logo.png"
 					alt="Supabase"
 					class="mx-auto h-[40px] w-auto cursor-pointer rounded" /></a
-			><button data-state="closed">
+			>
+			<button data-state="closed">
 				<NuxtLink
-					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 bg-slate-200 text-scale-1200 flex h-10 w-10 items-center justify-center rounded shadow-sm transition-colors duration-200"
+					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200  text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
 					to="/dashboard/projects"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +30,7 @@
 						<polyline points="9 22 9 12 15 12 15 22"></polyline></svg
 				></NuxtLink>
 			</button>
-			<div class="bg-slate-200 h-px w-full"></div>
+			<!-- <div class="bg-slate-200 h-px w-full"></div>
 			<button data-state="closed">
 				<a
 					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
@@ -284,7 +285,7 @@
 							d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
 						></path></svg
 				></a>
-			</button>
+			</button> -->
 		</ul>
 		<ul class="flex flex-col items-center space-y-4">
 			<button data-state="closed">
