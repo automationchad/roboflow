@@ -51,7 +51,7 @@
 		CheckIcon,
 		ChevronDownIcon,
 		ChevronUpDownIcon,
-		UserCircleIcon as UserCircleIconMini,
+		UserCircleIcon,
 	} from '@heroicons/vue/20/solid';
 	import showdown from 'showdown';
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
@@ -704,7 +704,7 @@
 
 												<div
 													v-else
-													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-800"
+													class="mr-2 flex h-12 w-12 items-center justify-center rounded-full dark:text-white dark:border-white border border-slate-700  dark:bg-slate-800"
 												>
 													<svg
 														xmlns="http://www.w3.org/2000/svg"
