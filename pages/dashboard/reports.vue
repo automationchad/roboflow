@@ -5,8 +5,8 @@
 		</Head>
 
 		<OrgOnboardingOverlay v-if="!userData.hasCompletedOnboarding && !loading" />
-		<org-deals v-if="account.type === 'partner' && !loading" />
-		<org-clients v-if="account.type === 'client' || account.type === 'super_admin'" />
+		<org-deals v-if="(account.type === 'partner' || account.type === 'super_admin') && !loading" />
+		<org-clients v-if="(account.type === 'client' || account.type === 'super_admin')" />
 
 		<transition
 			enter-active-class="transition ease-out duration-100"
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-	definePageMeta({ layout: 'settings', middleware: ['auth'] });
+	definePageMeta({ layout: 'reports', middleware: ['auth'] });
 	import { ref } from 'vue';
 	import {
 		Dialog,

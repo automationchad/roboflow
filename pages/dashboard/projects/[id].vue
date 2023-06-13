@@ -1409,8 +1409,8 @@
 													<dt class="flex-none">
 														<span class="sr-only">Client</span>
 														<img
-															v-if="ticketAvatar"
-															:src="ticketAvatar"
+															v-if="assignedToAvatarAvatar"
+															:src="assignedToAvatar"
 															class="h-5 w-5 rounded-full"
 															alt=""
 														/>
@@ -1421,15 +1421,16 @@
 															aria-hidden="true"
 														/>
 													</dt>
+													
 													<dd
 														class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
 													>
 														{{
-															Ticket.User.firstName && Ticket.User.lastName
-																? Ticket.User.firstName +
+															AssignedTo.firstName && AssignedTo.lastName
+																? AssignedTo.firstName +
 																  ' ' +
-																  Ticket.User.lastName
-																: Ticket.User.email
+																  AssignedTo.lastName
+																: AssignedTo.email
 														}}
 													</dd>
 												</div>
@@ -1460,51 +1461,10 @@
 												</div>
 											</dl>
 											<div class="mt-6 border-t border-gray-900/5 px-6 py-6">
-												<dt class="text-sm font-normal leading-6 text-gray-600">
-													Assignees
-												</dt>
-												<dd
-													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-												>
-													<ul role="list" class="mt-3 space-y-3">
-														<li class="flex justify-start">
-															<a class="flex items-center space-x-3">
-																<div class="flex-shrink-0">
-																	<img
-																		v-if="assignedToAvatar"
-																		class="h-5 w-5 rounded-full object-cover"
-																		:src="assignedToAvatar"
-																		alt=""
-																	/>
-																	<div
-																		v-else
-																		class="flex h-5 w-5 items-center justify-center rounded-full border border-slate-600 bg-slate-700 text-center text-xs text-slate-400"
-																	>
-																		{{
-																			AssignedTo.firstName
-																				? AssignedTo.firstName.charAt(0)
-																				: AssignedTo.email.charAt(0)
-																		}}
-																	</div>
-																</div>
-																<div
-																	class="text-sm font-medium text-gray-900 dark:text-slate-100"
-																>
-																	{{
-																		AssignedTo.firstName && AssignedTo.lastName
-																			? AssignedTo.firstName +
-																			  ' ' +
-																			  AssignedTo.lastName
-																			: AssignedTo.email
-																	}}
-																</div>
-															</a>
-														</li>
-													</ul>
-												</dd>
+												
 
 												<dt
-													class="mt-10 text-sm font-medium leading-6 text-gray-900"
+													class="mt-0 text-sm font-medium leading-6 text-gray-900"
 												></dt>
 												<dd
 													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
@@ -1567,10 +1527,10 @@
 																	></path>
 																</svg>
 
-																<div class="ml-4 flex min-w-0 flex-1 gap-2">
+																<div class="ml-4 flex min-w-0 flex-1 gap-2 text-xs">
 																	<span class="truncate font-medium">SOW</span>
 																	<span class="flex-shrink-0 text-gray-400"
-																		>2.4mb</span
+																		>2.4MB</span
 																	>
 																</div>
 															</div>

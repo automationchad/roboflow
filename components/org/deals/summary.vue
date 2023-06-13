@@ -79,9 +79,9 @@
 					<h2
 						:class="[
 							selected
-								? 'border-b border-indigo-400 bg-black/5 font-medium  dark:bg-white/5'
+								? 'border-b border-indigo-400 bg-black/5 font-normal  dark:bg-white/5'
 								: '',
-							'mb-2 rounded-t-md p-4 text-sm dark:text-white',
+							'mb-2 rounded-t-md px-2.5 py-1 text-xs dark:text-white',
 						]"
 					>
 						Top deals
