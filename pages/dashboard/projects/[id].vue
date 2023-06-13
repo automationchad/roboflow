@@ -55,6 +55,7 @@
 	} from '@heroicons/vue/20/solid';
 	import showdown from 'showdown';
 	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
+	import { is } from 'date-fns/locale';
 
 	// Define all constants and reactive variables
 	const user = useSupabaseUser();
@@ -84,6 +85,13 @@
 
 	const loading = ref(true);
 
+	const is_error = ref(false);
+	const error_message = ref('');
+	const is_success = ref(false);
+	const success_message = ref('');
+
+	const showConfirm = ref(false);
+
 	const ticketAvatar = ref(null);
 	const currentAvatar = ref(null);
 	const assignedToAvatar = ref(null);
@@ -97,7 +105,9 @@
 	const selectedFile = ref(null);
 	const dealSize = ref(0);
 
-	const selectedPerson = ref({
+	const enabled = ref(false);
+
+	const selectedStage = ref({
 		id: 'proposal_submitted',
 		name: 'Proposal Submitted',
 	});
@@ -111,23 +121,62 @@
 
 	const shouldDisable = (id, index) => {
 		if (
-			(index < 5 && selectedIndex.value > index) ||
-			(selectedIndex.value < 4 && index > selectedIndex.value + 1) ||
-			index === 5
+			index < 5 ||
+			(selectedIndex.value < 4 && index > selectedIndex.value + 1)
 		) {
 			return true;
 		}
 		return false;
 	};
 
-	const handleTicketEdit = async (status, idx) => {
-		if (shouldDisable(status, idx)) {
-			return;
+	const handleTicketEdit = async () => {
+		try {
+			const { data, error } = await supabase
+				.from('Ticket')
+				.update({
+					status: selectedStage.value.id,
+					desc: input.value,
+					deal_size: parseInt(dealSize.value),
+					updatedOn: new Date(),
+				})
+				.eq('id', route.params.id);
+			if (error) {
+				throw new Error(error.message);
+			}
+			is_success.value = true;
+			success_message.value = 'Ticket updated successfully';
+			enabled.value = false;
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+			console.log(error);
 		}
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ status })
-			.eq('id', route.params.id);
+	};
+
+	const handleCancelEdit = () => {
+		input.value = ticket.value.desc;
+		dealSize.value = ticket.value.deal_size;
+		enabled.value = false;
+		showConfirm.value = false;
+	};
+
+	const notSaved = computed(() => {
+		if (
+			input.value !== ticket.value.desc ||
+			dealSize.value !== ticket.value.deal_size ||
+			selectedStage.value.id !== ticket.value.status
+		) {
+			return true;
+		}
+		return false;
+	});
+
+	const handleCancelConfirm = () => {
+		if (notSaved.value) {
+			showConfirm.value = true;
+		} else {
+			handleCancelEdit();
+		}
 	};
 
 	const styles = {
@@ -219,11 +268,18 @@
 		},
 	};
 
-	const people = [
-		{ id: 'initial_review', name: 'Initial Review' },
-		{ id: 'requirements_gathering', name: 'Requirements Gathering' },
-		{ id: 'proposal_submitted', name: 'Proposal Submitted' },
-		{ id: 'contract_pending', name: 'Contract Sent' },
+	const stages = [
+		{
+			id: 'initial_review',
+			name: 'Initial Review',
+			partner_id: 'use_case_review',
+		},
+		{
+			id: 'requirements_gathering',
+			name: 'Requirements Gathering',
+			partner_id: 'use_case_review',
+		},
+		{ id: 'contract_pending', name: 'SOW Sent', partner_id: 'sow_sent' },
 		{ id: 'invoice_pending', name: 'Invoice Sent' },
 		{ id: 'invoice_paid', name: 'Invoice Paid' },
 		{ id: 'solution_design', name: 'Solution Design' },
@@ -243,7 +299,7 @@
 	];
 
 	const selectedIndex = computed(() =>
-		people.findIndex((person) => person.id === selectedPerson.value.id)
+		stages.findIndex((person) => person.id === selectedStage.value.id)
 	);
 
 	const query = ref('');
@@ -288,17 +344,19 @@
 		.limit(1)
 		.single();
 
+	const ticket = ref(Ticket);
+
 	if (!Ticket) {
 		navigateTo('/ticket-not-found');
 		throw new CustomError(404, 'Ticket not found');
 	}
 
-	selectedPerson.value = people.find((o) => o.id === Ticket?.status);
+	selectedStage.value = stages.find((o) => o.id === Ticket?.status);
 
 	const filteredPeople = computed(() =>
 		query.value === ''
-			? people
-			: people.filter((person) => {
+			? stages
+			: stages.filter((person) => {
 					return person.name.toLowerCase().includes(query.value.toLowerCase());
 			  })
 	);
@@ -439,46 +497,6 @@
 	// 		return publicUrl;
 	// 	} else return '';
 	// };
-
-	const activity = [
-		{
-			id: 1,
-			type: 'created',
-			object: 'project',
-			person: { name: 'Chelsea Hagon' },
-			date: '7d ago',
-			dateTime: '2023-01-23T10:32',
-		},
-		{
-			id: 2,
-			type: 'edited',
-			person: { name: 'Chelsea Hagon' },
-			date: '6d ago',
-			dateTime: '2023-01-23T11:03',
-		},
-		{
-			id: 3,
-			type: 'sent',
-			person: { name: 'Chelsea Hagon' },
-			date: '6d ago',
-			dateTime: '2023-01-23T11:24',
-		},
-
-		{
-			id: 5,
-			type: 'viewed',
-			person: { name: 'Alex Curren' },
-			date: '2d ago',
-			dateTime: '2023-01-24T09:12',
-		},
-		{
-			id: 6,
-			type: 'paid',
-			person: { name: 'Alex Curren' },
-			date: '1d ago',
-			dateTime: '2023-01-24T09:20',
-		},
-	];
 
 	const fetchComments = async () => {
 		let { data: Ticket, error } = await supabase
@@ -649,12 +667,10 @@
 	};
 
 	const handleDealSizeUpdate = async () => {
-		loading.value = true;
 		const { data, error } = await supabase
 			.from('Ticket')
 			.update({ deal_size: parseInt(dealSize.value) })
 			.eq('id', route.params.id);
-		loading.value = false;
 	};
 
 	function handleKeydown(event) {
@@ -799,128 +815,28 @@
 										<h2 class="sr-only">Description</h2>
 
 										<Disclosure v-slot="{ open }" as="div">
-											<DisclosurePanel class="mt-4 flex items-start space-x-4">
-												<div class="min-w-0 flex-1">
-													<div class="relative">
-														<div
-															class="rounded-lg p-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-800"
-														>
-															<label for="comment" class="sr-only"
-																>Edit description</label
-															>
-															<textarea
-																v-model="input"
-																@input="update"
-																name="comment"
-																id="comment"
-																class="h-content w-full max-w-full border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-white sm:py-1.5 sm:leading-6"
-																placeholder="Reply..."
-															></textarea>
+											<div
+												v-if="enabled"
+												class="my-4 grid max-w-5xl grid-cols-8 pr-4"
+											>
+												<DisclosurePanel static as="div" class="col-span-8">
+													<textarea
+														v-model="input"
+														@input="update"
+														name="comment"
+														id="comment"
+														class="min-h-36 prose -mx-3 -mt-2 block w-full max-w-none border-none bg-transparent font-sans text-base leading-7 text-sky-600 placeholder:text-gray-400 focus:ring-0 dark:text-white"
+														placeholder="Reply..."
+													></textarea>
+												</DisclosurePanel>
+											</div>
 
-															<!-- Spacer element to match the height of the toolbar -->
-															<div class="p-2" aria-hidden="true">
-																<!-- Matches height of button in toolbar (1px border + 36px content height) -->
-																<div class="p-4 py-px">
-																	<div class="h-9" />
-																</div>
-															</div>
-														</div>
-
-														<div
-															class="absolute inset-x-0 bottom-0 flex justify-end p-2"
-														>
-															<div
-																class="flex flex-shrink-0 items-center space-x-2"
-															>
-																<DisclosureButton
-																	class="inline-flex items-center rounded-md border border-gray-300 p-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 dark:border-transparent dark:bg-slate-800 dark:text-white"
-																>
-																	<svg
-																		class="h-6 w-6"
-																		fill="none"
-																		viewBox="0 0 24 24"
-																	>
-																		<path
-																			stroke="currentColor"
-																			stroke-linecap="round"
-																			stroke-linejoin="round"
-																			stroke-width="1.5"
-																			d="M17.25 6.75L6.75 17.25"
-																		></path>
-																		<path
-																			stroke="currentColor"
-																			stroke-linecap="round"
-																			stroke-linejoin="round"
-																			stroke-width="1.5"
-																			d="M6.75 6.75L17.25 17.25"
-																		></path>
-																	</svg>
-																</DisclosureButton>
-																<DisclosureButton
-																	type="button"
-																	@click="handleDescUpdate()"
-																	class="inline-flex items-center rounded-md border border-indigo-600 bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:text-indigo-400"
-																>
-																	<svg
-																		class="h-6 w-6"
-																		viewBox="0 0 24 24"
-																		fill="none"
-																		xmlns="http://www.w3.org/2000/svg"
-																	>
-																		<path
-																			d="M7.75 12.75L10 15.25L16.25 8.75"
-																			stroke="currentColor"
-																			stroke-width="1.5"
-																			stroke-linecap="round"
-																			stroke-linejoin="round"
-																		></path>
-																	</svg>
-																</DisclosureButton>
-															</div>
-														</div>
-													</div>
-												</div>
-											</DisclosurePanel>
-											<div class="my-4 grid max-w-5xl grid-cols-8 pr-4">
+											<div class="my-4 grid max-w-5xl grid-cols-8 pr-4" v-else>
 												<div class="col-span-8">
 													<article
 														class="prose max-w-none dark:prose-invert"
 														v-html="convert(input)"
 													></article>
-												</div>
-
-												<div class="col-span-1">
-													<DisclosureButton
-														v-if="
-															(!open && Ticket.createdBy === user.id) ||
-															User.Account.type === 'super_admin'
-														"
-														class="flex items-center text-xs font-semibold text-gray-800 dark:text-white"
-													>
-														<div class="flex items-center">
-															<svg
-																class="h-5 w-5"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M19.25 19.25H13.75"
-																></path>
-															</svg>
-															EDIT
-														</div>
-													</DisclosureButton>
 												</div>
 											</div>
 										</Disclosure>
@@ -982,8 +898,17 @@
 										<div class="space-y-3 pb-4">
 											<div class="flex justify-between">
 												<div class="flex items-center dark:text-slate-300">
-													{{ Ticket.Comment.filter(o => o.activity_type !== 'event').length }} comment{{
-														Ticket.Comment.filter(o => o.activity_type !== 'event').length > 0 ? 's' : ''
+													{{
+														Ticket.Comment.filter(
+															(o) => o.activity_type !== 'event'
+														).length
+													}}
+													comment{{
+														Ticket.Comment.filter(
+															(o) => o.activity_type !== 'event'
+														).length > 0
+															? 's'
+															: ''
 													}}
 												</div>
 												<button
@@ -1324,7 +1249,7 @@
 										</div>
 
 										<div class="pt-6">
-											<!-- Activity feed-->
+											<!-- Comments feed-->
 											<div class="flex" v-if="!loading">
 												<div
 													v-if="comments.length <= 0"
@@ -1341,11 +1266,17 @@
 														<ticket-comment
 															v-for="(
 																activityItem, activityItemIdx
-															) in comments.filter(o => o.activity_type !== 'event')"
+															) in comments.filter(
+																(o) => !o.activity_type.includes('event')
+															)"
 															:key="activityItem.id"
 															:activity-item="activityItem"
 															:activity-item-idx="activityItemIdx"
-															:comments="comments.filter(o => o.activity_type !== 'event')"
+															:comments="
+																comments.filter(
+																	(o) => !o.activity_type.includes('event')
+																)
+															"
 															@updated="refreshData"
 														/>
 													</div>
@@ -1366,6 +1297,101 @@
 						<!-- Ticket details big -->
 						<aside class="hidden w-full xl:block xl:pl-8">
 							<h2 class="sr-only">Details</h2>
+							<div class="flex items-center justify-between py-3">
+								<div class="flex items-center space-x-2">
+									<div
+										:class="[
+											enabled ? 'mg_ai ' : 'bg-slate-100 ring-1 ring-slate-200',
+											'w-16 truncate rounded-md px-2.5 py-1 text-center text-xs shadow-sm',
+										]"
+									>
+										<span
+											:class="[
+												enabled ? 'mg_ai-button-text' : '',
+												'truncate text-xs',
+											]"
+											>{{ enabled ? 'Editing' : `Edited` }}</span
+										>
+									</div>
+									<Switch
+										v-model="enabled"
+										:disabled="User.Account.type !== 'super_admin'"
+										:class="[
+											enabled ? 'bg-indigo-600' : 'bg-gray-200',
+											'relative inline-flex h-4 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ',
+										]"
+									>
+										<span class="sr-only">Use setting</span>
+										<span
+											aria-hidden="true"
+											:class="[
+												enabled ? 'translate-x-3' : 'translate-x-0',
+												'pointer-events-none inline-block h-3 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+											]"
+										/>
+									</Switch>
+								</div>
+
+								<div class="space-x-2">
+									<button
+									v-if="notSaved"
+										:disabled="!enabled"
+										@click="handleCancelConfirm"
+										class="inline-flex items-center justify-center rounded-md bg-slate-100 p-1 text-xs font-normal shadow-sm ring-1 ring-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+									>
+										<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+											<path
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="1.5"
+												d="M17.25 6.75L6.75 17.25"
+											></path>
+											<path
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="1.5"
+												d="M6.75 6.75L17.25 17.25"
+											></path>
+										</svg>
+									</button>
+									<button
+										:disabled="!enabled"
+										@click="handleTicketEdit()"
+										class="mg_ai inline-flex items-center justify-center rounded-md bg-indigo-700 p-1 text-xs font-normal shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+									>
+										<svg
+											class="h-4 w-4 text-[#9382ff]"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												d="M6.75 19.25H17.25C18.3546 19.25 19.25 18.3546 19.25 17.25V9.82843C19.25 9.29799 19.0393 8.78929 18.6642 8.41421L15.5858 5.33579C15.2107 4.96071 14.702 4.75 14.1716 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25Z"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.75 19V15.75C8.75 15.1977 9.19772 14.75 9.75 14.75H14.25C14.8023 14.75 15.25 15.1977 15.25 15.75V19"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+											<path
+												d="M8.75 5V8.25"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											></path>
+										</svg>
+									</button>
+								</div>
+							</div>
 							<div class="space-y-3">
 								<div class="" id="partner-summary">
 									<div class="lg:col-start-3 lg:row-end-1">
@@ -1417,11 +1443,11 @@
 
 														<UserCircleIcon
 															v-else
-															class="h-6 w-5 text-gray-400"
+															class="h-5 w-6 text-gray-400"
 															aria-hidden="true"
 														/>
 													</dt>
-													
+
 													<dd
 														class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
 													>
@@ -1440,7 +1466,7 @@
 
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
-															class="h-5 w-5 text-gray-400"
+															class="h-5 w-6 text-gray-400"
 															fill="none"
 															viewBox="0 0 24 24"
 														>
@@ -1459,10 +1485,50 @@
 														Due in <span>{{ dueDate }}</span>
 													</dd>
 												</div>
+												<div
+													class="mt-4 flex w-full flex-none items-center gap-x-4 px-6"
+												>
+													<dt class="flex-none">
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-5 w-6 text-gray-400"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M19.25 12.25v-3.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v6.5a2 2 0 0 0 2 2h12.5m0 0-1.5-1.5m1.5 1.5L17.75 19m-3.5-7c0 1.795-1.007 3.25-2.25 3.25S9.75 13.795 9.75 12 10.757 8.75 12 8.75s2.25 1.455 2.25 3.25Z"
+															></path>
+														</svg>
+													</dt>
+													<dd class="w-full">
+														<div
+															class="relative w-full rounded-md shadow-sm"
+															v-if="enabled"
+														>
+															<input
+																type="text"
+																v-model="dealSize"
+																name="price"
+																id="price"
+																class="w-full rounded-md border-0 bg-white py-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
+																placeholder="0.00"
+																aria-describedby="price-currency"
+															/>
+														</div>
+														<div
+															v-else
+															class="text-sm leading-6 text-gray-500 dark:text-slate-400"
+														>
+															{{ formatAccounting(dealSize, true) }}
+														</div>
+													</dd>
+												</div>
 											</dl>
 											<div class="mt-6 border-t border-gray-900/5 px-6 py-6">
-												
-
 												<dt
 													class="mt-0 text-sm font-medium leading-6 text-gray-900"
 												></dt>
@@ -1527,7 +1593,9 @@
 																	></path>
 																</svg>
 
-																<div class="ml-4 flex min-w-0 flex-1 gap-2 text-xs">
+																<div
+																	class="ml-4 flex min-w-0 flex-1 gap-2 text-xs"
+																>
 																	<span class="truncate font-medium">SOW</span>
 																	<span class="flex-shrink-0 text-gray-400"
 																		>2.4MB</span
@@ -1595,14 +1663,18 @@
 									<ul role="list" class="mt-6 space-y-6">
 										<li
 											v-for="(activityItem, activityItemIdx) in comments.filter(
-												(o) => o.activity_type === 'event'
+												(o) => o.activity_type.includes('event')
 											)"
 											:key="activityItem.id"
 											class="relative flex gap-x-4"
 										>
 											<div
 												:class="[
-													activityItemIdx === activity.length - 1
+													activityItemIdx ===
+													comments.filter((o) =>
+														o.activity_type.includes('event')
+													).length -
+														1
 														? 'h-6'
 														: '-bottom-6',
 													'absolute left-0 top-0 flex w-6 justify-center',
@@ -1627,9 +1699,34 @@
 															commented
 														</div>
 														<time
-															:datetime="activityItem.dateTime"
 															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
-															>{{ activityItem.date }}</time
+															>{{ activityItem.createdOn }}</time
+														>
+													</div>
+													<p class="text-sm leading-6 text-gray-500">
+														{{ activityItem.comment }}
+													</p>
+												</div>
+											</template>
+											<template v-else-if="activityItem.type === 'event_cost'">
+												<img
+													:src="activityItem.person.imageUrl"
+													alt=""
+													class="relative mt-3 h-6 w-6 flex-none rounded-full bg-slate-50"
+												/>
+												<div
+													class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200"
+												>
+													<div class="flex justify-between gap-x-4">
+														<div class="py-0.5 text-xs leading-5 text-gray-500">
+															<span class="font-medium text-gray-900">{{
+																activityItem.person.name
+															}}</span>
+															commented
+														</div>
+														<time
+															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+															>{{ activityItem.createdOn }}</time
 														>
 													</div>
 													<p class="text-sm leading-6 text-gray-500">
@@ -1662,7 +1759,6 @@
 													{{ activityItem.text }}
 												</p>
 												<span
-													:datetime="activityItem.dateTime"
 													class="flex-none py-0.5 text-xs leading-5 text-gray-500"
 													>{{
 														formatDateDistance(activityItem.createdOn) + ' ago'
@@ -1670,302 +1766,130 @@
 												>
 											</template>
 										</li>
-									</ul>
-								</div>
-								<div
-									class="flex items-center space-x-2 dark:text-white"
-									v-if="User.Account.type === 'super_admin'"
-								>
-									<svg
-										class="h-6 w-6"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.25 9.25V6.75C9.25 6.19772 8.80228 5.75 8.25 5.75H5.75C5.19772 5.75 4.75 6.19772 4.75 6.75V9.25C4.75 9.80228 5.19772 10.25 5.75 10.25H8.25C8.80228 10.25 9.25 9.80228 9.25 9.25Z"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M9.25 18.25H5.75C5.19772 18.25 4.75 17.8023 4.75 17.25V13.75"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 6.75H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 14.75H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 9.25H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M12.75 17.25H19.25"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										></path>
-										<path
-											d="M8 16.25L7.42383 16.7301C7.59297 16.9331 7.85641 17.0321 8.11735 16.9908C8.37829 16.9494 8.59824 16.7738 8.69636 16.5285L8 16.25ZM10.8011 13.2587C11.0821 12.9543 11.0631 12.4799 10.7587 12.1989C10.4543 11.9179 9.97985 11.9369 9.6989 12.2413L10.8011 13.2587ZM7.32617 14.2699C7.06099 13.9517 6.58807 13.9087 6.26986 14.1738C5.95165 14.439 5.90866 14.9119 6.17383 15.2301L7.32617 14.2699ZM8.69636 16.5285C9.03866 15.6728 9.56133 14.855 10.0115 14.2398C10.2345 13.9351 10.4349 13.6865 10.5785 13.5152C10.6503 13.4296 10.7076 13.3637 10.7462 13.32C10.7655 13.2981 10.7801 13.2819 10.7894 13.2716C10.7941 13.2664 10.7974 13.2627 10.7994 13.2606C10.8004 13.2595 10.801 13.2588 10.8013 13.2585C10.8015 13.2583 10.8015 13.2583 10.8015 13.2583C10.8015 13.2583 10.8014 13.2584 10.8014 13.2584C10.8013 13.2585 10.8013 13.2585 10.8012 13.2586C10.8012 13.2586 10.8011 13.2587 10.25 12.75C9.6989 12.2413 9.69881 12.2414 9.69872 12.2415C9.69868 12.2415 9.69858 12.2416 9.6985 12.2417C9.69835 12.2419 9.69817 12.2421 9.69797 12.2423C9.69757 12.2427 9.69708 12.2433 9.6965 12.2439C9.69534 12.2452 9.69382 12.2468 9.69194 12.2489C9.68819 12.253 9.68303 12.2587 9.67653 12.2658C9.66352 12.2802 9.64515 12.3007 9.62195 12.327C9.57558 12.3795 9.50986 12.4551 9.42926 12.5512C9.26825 12.7432 9.04679 13.0181 8.80098 13.354C8.31367 14.02 7.71134 14.9522 7.30364 15.9715L8.69636 16.5285ZM6.17383 15.2301L7.42383 16.7301L8.57617 15.7699L7.32617 14.2699L6.17383 15.2301Z"
-											fill="currentColor"
-										></path>
-									</svg>
-
-									<Combobox
-										as="div"
-										v-model="selectedPerson"
-										class="group w-full"
-										:disabled="User.Account.type !== 'super_admin'"
-									>
-										<div class="relative">
-											<ComboboxInput
-												:disabled="User.Account.type !== 'super_admin'"
-												class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-sm sm:leading-6"
-												@change="query = $event.target.value"
-												:display-value="(person) => person?.name"
-											/>
-											<ComboboxButton
-												:disabled="User.Account.type !== 'super_admin'"
-												class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+										<li v-if="enabled" class="relative flex gap-x-4">
+											<div
+												:class="[
+													false ? 'h-6' : '-top-6',
+													'absolute bottom-2 left-0 flex w-6 justify-center',
+												]"
 											>
-												<ChevronUpDownIcon
-													class="h-5 w-5 text-gray-400"
-													aria-hidden="true"
-												/>
-											</ComboboxButton>
-
-											<ComboboxOptions
-												v-if="filteredPeople.length > 0"
-												class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
-											>
-												<ComboboxOption
-													@click="handleTicketEdit(person.id, idx)"
-													v-for="(person, idx) in filteredPeople"
-													:key="person.id"
-													:value="person"
-													:disabled="shouldDisable(selectedPerson.id, idx)"
-													as="template"
-													v-slot="{ active, selected }"
+												<div class="w-px bg-gray-200" />
+											</div>
+											<div class="flex flex-auto items-center">
+												<div
+													class="relative mr-4 flex h-6 w-6 flex-none items-center justify-center bg-slate-50"
 												>
-													<li
-														:class="[
-															shouldDisable(selectedPerson.id, idx)
-																? 'cursor-not-allowed opacity-50'
-																: '',
-															'relative flex cursor-default select-none py-2 pl-8 pr-4',
-															active
-																? 'bg-indigo-600 text-white dark:text-white'
-																: 'text-gray-900 dark:text-slate-300',
-														]"
+													<div
+														class="h-1.5 w-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300"
+													/>
+												</div>
+												<p class="flex-auto">
+													<Combobox
+														as="div"
+														v-model="selectedStage"
+														class="group"
+														:disabled="!enabled"
 													>
-														<span
-															:class="[
-																'block truncate',
-																selected && 'font-semibold',
-															]"
-														>
-															{{ person.name }}
-														</span>
-
-														<span
-															v-if="selected"
-															:class="[
-																'absolute inset-y-0 left-0 flex items-center pl-1.5',
-																active
-																	? 'text-white dark:text-white'
-																	: 'text-indigo-600',
-															]"
-														>
-															<CheckIcon class="h-5 w-5" aria-hidden="true" />
-														</span>
-														<span
-															v-else
-															class="absolute inset-y-0 left-0 flex items-center pl-1.5"
-															><svg
-																v-if="shouldDisable(selectedPerson.id, idx)"
-																class="h-5 w-5"
-																viewBox="0 0 24 24"
-																fill="none"
-																xmlns="http://www.w3.org/2000/svg"
+														<div class="relative">
+															<ComboboxInput
+																:disabled="!enabled"
+																class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-xs sm:leading-6"
+																:display-value="(person) => person?.name"
+															/>
+															<ComboboxButton
+																:disabled="!enabled"
+																class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 text-xs focus:outline-none"
 															>
-																<path
-																	d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7 7L17 17"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path></svg
-														></span>
-													</li>
-												</ComboboxOption>
-											</ComboboxOptions>
-										</div>
-									</Combobox>
-								</div>
-								<div
-									class="flex items-center space-x-2 dark:text-white"
-									v-if="User.Account.type === 'super_admin'"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-6 w-6"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="1.5"
-											d="M19.25 12.25v-3.5a2 2 0 0 0-2-2H6.75a2 2 0 0 0-2 2v6.5a2 2 0 0 0 2 2h12.5m0 0-1.5-1.5m1.5 1.5L17.75 19m-3.5-7c0 1.795-1.007 3.25-2.25 3.25S9.75 13.795 9.75 12 10.757 8.75 12 8.75s2.25 1.455 2.25 3.25Z"
-										></path>
-									</svg>
-									<div class="relative w-full rounded-md shadow-sm">
-										<div
-											class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-										>
-											<span class="text-gray-500 sm:text-sm">$</span>
-										</div>
-										<input
-											:disabled="User.Account.type !== 'super_admin'"
-											type="text"
-											v-model="dealSize"
-											name="price"
-											id="price"
-											class="w-full rounded-md border-0 bg-white py-1.5 pl-7 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
-											placeholder="0.00"
-											aria-describedby="price-currency"
-										/>
-										<div
-											class="absolute inset-y-0 right-0 flex items-center pr-3"
-										>
-											<button
-												:disabled="User.Account.type !== 'super_admin'"
-												class="relative disabled:opacity-60"
-												@click="handleDealSizeUpdate()"
-											>
-												<svg
-													v-if="!loading"
-													class="h-4 w-4"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M12 10V15.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M9.75 11.25L12 9L14.25 11.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-												</svg>
-												<svg
-													v-else
-													class="h-4 w-4 animate-spin"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M12 4.75V6.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M17.1266 6.87347L16.0659 7.93413"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M19.25 12L17.75 12"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M17.1266 17.1265L16.0659 16.0659"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M12 17.75V19.25"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M7.9342 16.0659L6.87354 17.1265"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M6.25 12L4.75 12"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-													<path
-														d="M7.9342 7.93413L6.87354 6.87347"
-														stroke="currentColor"
-														stroke-width="1.5"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													></path>
-												</svg>
-											</button>
-										</div>
-									</div>
+																<ChevronUpDownIcon
+																	class="h-5 w-5 text-gray-400"
+																	aria-hidden="true"
+																/>
+															</ComboboxButton>
+
+															<ComboboxOptions
+																v-if="filteredPeople.length > 0"
+																class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/20 sm:text-sm"
+															>
+																<ComboboxOption
+																	v-for="(person, idx) in filteredPeople"
+																	:key="person.id"
+																	:value="person"
+																	:disabled="
+																		shouldDisable(selectedStage.id, idx)
+																	"
+																	as="template"
+																	v-slot="{ active, selected }"
+																>
+																	<li
+																		:class="[
+																			shouldDisable(selectedStage.id, idx)
+																				? 'cursor-not-allowed opacity-50'
+																				: '',
+																			'relative flex cursor-default select-none py-2 pl-8 pr-4',
+																			active
+																				? 'bg-indigo-600 text-white dark:text-white'
+																				: 'text-gray-900 dark:text-slate-300',
+																		]"
+																	>
+																		<span
+																			:class="[
+																				'block truncate text-xs',
+																				selected && 'font-semibold ',
+																			]"
+																		>
+																			{{ person.name }}
+																		</span>
+
+																		<span
+																			v-if="selected"
+																			:class="[
+																				'absolute inset-y-0 left-0 flex items-center pl-1.5',
+																				active
+																					? 'text-white dark:text-white'
+																					: 'text-indigo-600',
+																			]"
+																		>
+																			<CheckIcon
+																				class="h-5 w-5"
+																				aria-hidden="true"
+																			/>
+																		</span>
+																		<span
+																			v-else
+																			class="absolute inset-y-0 left-0 flex items-center pl-1.5"
+																			><svg
+																				v-if="
+																					shouldDisable(selectedStage.id, idx)
+																				"
+																				class="h-5 w-5"
+																				viewBox="0 0 24 24"
+																				fill="none"
+																				xmlns="http://www.w3.org/2000/svg"
+																			>
+																				<path
+																					d="M19.25 12C19.25 16.0041 16.0041 19.25 12 19.25C7.99594 19.25 4.75 16.0041 4.75 12C4.75 7.99594 7.99594 4.75 12 4.75C16.0041 4.75 19.25 7.99594 19.25 12Z"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path>
+																				<path
+																					d="M7 7L17 17"
+																					stroke="currentColor"
+																					stroke-width="1.5"
+																					stroke-linecap="round"
+																					stroke-linejoin="round"
+																				></path></svg
+																		></span>
+																	</li>
+																</ComboboxOption>
+															</ComboboxOptions>
+														</div>
+													</Combobox>
+												</p>
+											</div>
+										</li>
+									</ul>
 								</div>
 							</div>
 						</aside>
@@ -1973,12 +1897,43 @@
 				</div>
 			</main>
 		</div>
-		<ImageModal
-			:isOpen="showImageModal"
-			:imageSrc="commentImageId"
-			:imageAlt="commentImageId"
-			:toggleModal="toggleModal"
+		<DeleteConfirm
+			v-if="showConfirm"
+			@cancel="showConfirm = false"
+			@confirm="handleCancelEdit"
+			:command="'close'"
+			:description="'There are unsaved changes. Are you sure you want to close the panel? Your changes will be lost.'"
 		/>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="success_message"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
+		</transition>
 	</div>
 </template>
 
@@ -2015,8 +1970,10 @@
 	.mg_ai {
 		color: transparent;
 		background: #2a004f;
-		border: 1px solid #aa00eda0;
-
+		--tw-ring-color: #aa00eda0;
+		--tw-ring-inset: inset;
+		box-shadow: var(--tw-ring-inset) 0 0 0
+			calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
 		transition: 0.3s cubic-bezier(0.6, 0.6, 0, 1) opacity,
 			0.3s cubic-bezier(0.6, 0.6, 0, 1) transform;
 	}

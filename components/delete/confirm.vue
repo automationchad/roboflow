@@ -15,8 +15,7 @@
 			</div>
 			<div class="px-5">
 				<p class="py-4 text-sm dark:text-slate-300">
-					This is permanent! Are you sure you want to {{ description }}? This action cannot be
-					undone.
+					{{ description }}.
 				</p>
 			</div>
 			<div
@@ -34,7 +33,7 @@
 						class="font-regular focus-visible:outline-brand-600 bordershadow-brand-fixed-1000 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 ring-1 ring-inset transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:bg-indigo-600 dark:ring-indigo-500 dark:hover:bg-indigo-500 dark:hover:ring-indigo-400"
 						type="button"
 					>
-						<span class="truncate">{{ command }}</span>
+						<span class="truncate">Confirm</span>
 					</button>
 				</div>
 			</div>
