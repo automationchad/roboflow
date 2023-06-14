@@ -62,8 +62,10 @@
 									>
 									<span
 										class="flex h-4 w-5 items-center justify-center rounded-full bg-slate-200 text-[8px] uppercase leading-none text-slate-500 ring-1 ring-inset ring-slate-300"
-									>{{ team.type[0] }}</span></li
-							></NuxtLink>
+										>{{ team.type[0] }}</span
+									>
+								</li></NuxtLink
+							>
 						</ul>
 					</div>
 					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
@@ -164,55 +166,11 @@
 
 <script setup>
 	import { ref, watch } from 'vue';
-	import {
-		Dialog,
-		DialogPanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		TransitionChild,
-		TransitionRoot,
-	} from '@headlessui/vue';
-	import {
-		Bars3Icon,
-		BellIcon,
-		CalendarIcon,
-		Cog6ToothIcon,
-		Cog8ToothIcon,
-		CodeBracketIcon,
-		DocumentDuplicateIcon,
-		CircleStackIcon,
-		QueueListIcon,
-		FolderIcon,
-		HomeIcon,
-		PlusIcon,
-		UsersIcon,
-		TicketIcon,
-		QuestionMarkCircleIcon,
-		CreditCardIcon,
-		XMarkIcon,
-		LockClosedIcon,
-		DocumentTextIcon,
-		DocumentChartBarIcon,
-		BuildingOfficeIcon,
-		CpuChipIcon,
-		InboxStackIcon,
-	} from '@heroicons/vue/24/outline';
-	import {
-		ChevronDownIcon,
-		MagnifyingGlassIcon,
-		ChartBarIcon,
-		StarIcon,
-		ArrowTopRightOnSquareIcon,
-	} from '@heroicons/vue/20/solid';
 
 	const user = useSupabaseUser();
 	const supabase = useSupabaseClient();
-	const avatarUrl = ref(null);
 
 	const route = useRoute();
-	const router = useRouter();
 
 	const title = ref('');
 
@@ -246,7 +204,7 @@
 		}
 	}
 
-	await fetchUserData();
+	fetchUserData();
 
 	watch(
 		() => route.params.organization,
@@ -270,42 +228,7 @@
 		{ immediate: true }
 	);
 
-	function moveOrgToFront(arr) {
-		const orgIndex =
-			User.Account.type === 'super_admin'
-				? arr.findIndex((obj) => obj.id === User.Account.id)
-				: arr.findIndex((obj) => obj?.name === 'Organization');
-		if (orgIndex > -1) {
-			const orgObj = arr.splice(orgIndex, 1)[0];
-			arr.unshift(orgObj);
-		}
-		return arr;
-	}
-
-	const getAvatarUrl = async (avatar) => {
-		const {
-			data: [File],
-			error: fileError,
-		} = await supabase.storage.from('avatars').list(`${avatar}/`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${user.value.id}`,
-		});
-		if (File) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from('avatars')
-				.getPublicUrl(`/${user.value.id}/${File.name}`);
-
-			return publicUrl;
-		} else return null;
-	};
-
 	const signOut = async () => {
 		await supabase.auth.signOut();
 	};
-
-	avatarUrl.value = await getAvatarUrl(user.value.id);
 </script>

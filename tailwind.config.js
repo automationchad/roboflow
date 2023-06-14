@@ -21,6 +21,7 @@ module.exports = {
 		},
 	},
 	plugins: [
+		require('postcss-nesting'),
 		require('@tailwindcss/typography'),
 		require('@tailwindcss/forms'),
 		require('@tailwindcss/aspect-ratio'),

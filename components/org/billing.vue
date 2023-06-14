@@ -84,6 +84,81 @@
 				</div>
 				<div class="space-y-2">
 					<div>
+						<h4>External payout account</h4>
+						<p class="text-sm opacity-50">
+							You can set up your external payout account, which is where your
+							earnings from referral bonuses will be directly deposited.
+						</p>
+					</div>
+					<div class="relative">
+						<div class="transition-opacity duration-300">
+							<div
+								class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+							>
+								<div class="bg-panel-body-light dark:bg-panel-body-dark">
+									<div class="px-6 py-4">
+										<div class="flex items-center space-x-2 opacity-50">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="21"
+												height="21"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												class="sbui-icon"
+											>
+												<rect
+													x="1"
+													y="4"
+													width="22"
+													height="16"
+													rx="2"
+													ry="2"
+												></rect>
+												<line x1="1" y1="10" x2="23" y2="10"></line>
+											</svg>
+											<p class="text-sm">No payment methods</p>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-panel-border-interior-light bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark border-t"
+								>
+									<div class="flex h-12 items-center px-6">
+										<div class="flex w-full justify-between">
+											<div></div>
+											<div>
+												<button
+													class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													type="button"
+												>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="14"
+														height="14"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<line x1="12" y1="5" x2="12" y2="19"></line>
+														<line x1="5" y1="12" x2="19" y2="12"></line></svg
+													><span class="truncate">Add new card</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="space-y-2">
+					<div>
 						<h4>Payment methods</h4>
 						<p class="text-sm opacity-50">
 							When adding a new payment method, either remove the old one or go
@@ -160,29 +235,7 @@
 						</div>
 					</div>
 				</div>
-				<div>
-					<iframe
-						src="https://newassets.hcaptcha.com/captcha/v1/2220dfa/static/hcaptcha.html#frame=checkbox&amp;id=139akizzbmj3&amp;host=supabase.com&amp;sentry=true&amp;reportapi=https%3A%2F%2Faccounts.hcaptcha.com&amp;recaptchacompat=true&amp;custom=false&amp;hl=en&amp;tplinks=on&amp;sitekey=4ca1fdb9-c9c9-4495-ba50-c85fc0e7ec1f&amp;size=invisible&amp;theme=light&amp;origin=https%3A%2F%2Fsupabase.com"
-						tabindex="0"
-						frameborder="0"
-						scrolling="no"
-						title="Widget containing checkbox for hCaptcha security challenge"
-						aria-hidden="true"
-						data-hcaptcha-widget-id="139akizzbmj3"
-						data-hcaptcha-response=""
-						style="display: none"
-					></iframe
-					><textarea
-						id="g-recaptcha-response-139akizzbmj3"
-						name="g-recaptcha-response"
-						style="display: none"
-					></textarea
-					><textarea
-						id="h-captcha-response-139akizzbmj3"
-						name="h-captcha-response"
-						style="display: none"
-					></textarea>
-				</div>
+
 				<div class="container my-4 max-w-4xl">
 					<h4>Billing email</h4>
 					<p class="text-sm opacity-50">

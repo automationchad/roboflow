@@ -2,11 +2,7 @@
 <template>
 	<div v-if="isOpen" class="modal">
 		<div class="modal-background" @click="toggleModal"></div>
-		<img
-			class="modal-image h-96 w-auto"
-			:src="imageSrc"
-			:alt="imageAlt"
-		/>
+		<img class="modal-image h-96 w-auto" :src="imageSrc" :alt="imageAlt" />
 	</div>
 </template>
 
@@ -44,8 +40,7 @@
 	}
 
 	.modal-image {
-		
 		border-radius: 5px;
-    z-index: 10;
+		z-index: 10;
 	}
 </style>

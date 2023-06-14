@@ -942,18 +942,3 @@
 	</div>
 </template>
 
-<style scoped>
-	.bordershadow-scale-600 {
-		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
-			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgb(64 68 82/8%) 0 2px 5px 0;
-	}
-
-	.bordershadow-brand-fixed-1000 {
-		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #7375ed 0 0 0 1px,
-			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-			rgb(64 68 82/8%) 0 2px 5px 0;
-	}
-</style>

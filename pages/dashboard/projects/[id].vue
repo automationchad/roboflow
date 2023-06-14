@@ -561,7 +561,7 @@
 </script>
 
 <template>
-	<div class="flex min-h-full">
+	<div class="bg-body flex min-h-full">
 		<div class="flex w-0 flex-1 flex-col">
 			<main class="flex-1">
 				<div class="px-5 py-5">
@@ -617,7 +617,7 @@
 													<div class="flex items-center">
 														<NuxtLink
 															:to="`/profile/${ticket?.User?.id}`"
-															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
+															class="text-gray-1000 mr-1 inline-flex items-center text-sm font-medium dark:text-white"
 														>
 															{{
 																ticket?.User?.firstName &&
@@ -630,7 +630,7 @@
 														</NuxtLink>
 
 														<span
-															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+															class="text-gray-1000 relative inline-flex pl-4 text-sm font-normal before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
 															{{
 																formatDateDistance(
@@ -670,7 +670,7 @@
 												{{ ticket.Account.name }} {{ ticket.type }}
 											</div> -->
 											<h1
-												class="max-w-5xl text-2xl font-semibold text-gray-900 dark:text-white"
+												class="text-gray-1000 max-w-5xl text-2xl font-semibold dark:text-white"
 											>
 												<div class="" v-if="ticket?.type === 'referral'">
 													{{
@@ -701,7 +701,7 @@
 														@input="update"
 														name="comment"
 														id="comment"
-														class="min-h-36 prose -mx-3 -mt-2 block w-full max-w-none border-none bg-transparent font-sans text-base leading-7 text-sky-600 placeholder:text-gray-400 focus:ring-0 dark:text-white"
+														class="min-h-36 prose -mx-3 -mt-2 block w-full max-w-none border-none bg-transparent font-sans text-base leading-7 text-sky-600 placeholder:text-gray-800 focus:ring-0 dark:text-white"
 														placeholder="Reply..."
 													></textarea>
 												</DisclosurePanel>
@@ -863,7 +863,7 @@
 																		id="comment"
 																		name="comment"
 																		rows="3"
-																		class="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-black/40 focus:ring-0 dark:text-white dark:placeholder:text-white/30 sm:py-1.5 sm:text-sm sm:leading-6"
+																		class="text-gray-1000 block w-full resize-none border-0 bg-transparent placeholder:text-black/40 focus:ring-0 dark:text-white dark:placeholder:text-white/30 sm:py-1.5 sm:text-sm sm:leading-6"
 																		placeholder="Add a comment"
 																	/>
 																</div>
@@ -957,23 +957,28 @@
 																		<button
 																			:disabled="comment_text === ''"
 																			type="submit"
-																			class="inline-flex items-center justify-center rounded-md border border-indigo-600 bg-indigo-700 px-2.5 py-1 text-xs font-normal text-white shadow-sm hover:border-indigo-500 hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
+																			class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 																		>
-																			<svg
-																				class="h-4 w-4"
-																				viewBox="0 0 24 24"
-																				fill="none"
-																				xmlns="http://www.w3.org/2000/svg"
+																			<span
+																				class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+																				><svg
+																					class="h-4 w-4"
+																					viewBox="0 0 24 24"
+																					fill="none"
+																					xmlns="http://www.w3.org/2000/svg"
+																				>
+																					<path
+																						d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
+																						stroke="currentColor"
+																						stroke-width="1.5"
+																						stroke-linecap="round"
+																						stroke-linejoin="round"
+																					></path>
+																				</svg>
+																				<span class="ml-1 truncate"
+																					>Comment</span
+																				></span
 																			>
-																				<path
-																					d="M9.875 13.625L15 19.25L19.25 4.75L4.75 10L9.875 13.625ZM9.875 13.625L12.25 11.75"
-																					stroke="currentColor"
-																					stroke-width="1.5"
-																					stroke-linecap="round"
-																					stroke-linejoin="round"
-																				></path>
-																			</svg>
-																			<span class="ml-1 truncate">Comment</span>
 																		</button>
 																	</div>
 																</div>
@@ -989,7 +994,7 @@
 											<div class="flex" v-if="!loading">
 												<div
 													v-if="comments.length <= 0"
-													class="flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
+													class="text-gray-1000 flex w-full rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm font-semibold hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:text-white"
 												>
 													No comments yet
 												</div>
@@ -1047,7 +1052,7 @@
 										v-model="enabled"
 										:disabled="User?.Account?.type !== 'super_admin'"
 										:class="[
-											enabled ? 'bg-indigo-600' : 'bg-gray-200',
+											enabled ? 'bg-brand-800' : 'bg-gray-600',
 											'relative inline-flex h-4 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:pointer-events-none ',
 										]"
 									>
@@ -1123,21 +1128,21 @@
 								</div>
 							</div>
 							<div class="space-y-3">
-								<div class="" id="partner-summary">
+								<div class="" id="partner-summary ">
 									<div class="lg:col-start-3 lg:row-end-1">
 										<h2 class="sr-only">Summary</h2>
 										<div
-											class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-inset ring-gray-900/5 dark:bg-white/5 dark:ring-white/5"
+											class="bg-panel-body-light dark:bg-panel-body-dark rounded-lg shadow-sm ring-1 ring-inset ring-gray-900/5 dark:bg-white/5 dark:ring-white/5"
 										>
 											<dl class="flex flex-wrap">
 												<div class="flex-auto pl-6 pt-6">
 													<dt
-														class="text-sm font-semibold leading-6 text-slate-500"
+														class="text-gray-1000 text-sm font-semibold leading-6"
 													>
 														Payout Bonus
 													</dt>
 													<dd
-														class="mt-1 text-base font-semibold leading-6 text-gray-900 dark:text-white"
+														class="text-gray-1000 mt-1 text-base font-semibold leading-6 dark:text-white"
 													>
 														{{
 															partnerPayoutAmount !== null
@@ -1175,13 +1180,13 @@
 
 														<UserCircleIcon
 															v-else
-															class="h-5 w-6 text-gray-400"
+															class="h-5 w-6 text-gray-800"
 															aria-hidden="true"
 														/>
 													</dt>
 
 													<dd
-														class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
+														class="text-gray-1000 text-sm font-medium leading-6 dark:text-white"
 													>
 														{{
 															assignedTo.firstName && assignedTo.lastName
@@ -1198,7 +1203,7 @@
 
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
-															class="h-5 w-6 text-gray-400"
+															class="h-5 w-6 text-gray-800"
 															fill="none"
 															viewBox="0 0 24 24"
 														>
@@ -1212,7 +1217,7 @@
 														</svg>
 													</dt>
 													<dd
-														class="text-sm leading-6 text-gray-500 dark:text-slate-400"
+														class="text-sm leading-6 text-gray-800 dark:text-slate-400"
 													>
 														Due in <span>{{ dueDate }}</span>
 													</dd>
@@ -1223,7 +1228,7 @@
 													<dt class="flex-none">
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
-															class="h-5 w-6 text-gray-400"
+															class="h-5 w-6 text-gray-800"
 															fill="none"
 															viewBox="0 0 24 24"
 														>
@@ -1246,14 +1251,14 @@
 																v-model="dealSize"
 																name="price"
 																id="price"
-																class="w-full rounded-md border-0 bg-white py-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
+																class="text-gray-1000 w-full rounded-md border-0 bg-white py-0 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:opacity-60 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-white/10 sm:text-sm sm:leading-6"
 																placeholder="0.00"
 																aria-describedby="price-currency"
 															/>
 														</div>
 														<div
 															v-else
-															class="text-sm leading-6 text-gray-500 dark:text-slate-400"
+															class="text-sm leading-6 text-gray-800 dark:text-slate-400"
 														>
 															{{
 																dealSize
@@ -1266,21 +1271,21 @@
 											</dl>
 											<div class="mt-6 border-t border-gray-900/5 px-6 py-6">
 												<dt
-													class="mt-0 text-sm font-medium leading-6 text-gray-900"
+													class="text-gray-1000 mt-0 text-sm font-medium leading-6"
 												></dt>
 												<dd
-													class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+													class="text-gray-1000 mt-2 text-sm sm:col-span-2 sm:mt-0"
 												>
 													<ul
 														role="list"
-														class="divide-y divide-gray-100 rounded-md border border-gray-200"
+														class="divide-y divide-gray-200 rounded-md border border-gray-400"
 													>
 														<li
 															class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
 														>
 															<div class="flex w-0 flex-1 items-center">
 																<svg
-																	class="h-5 w-5 flex-shrink-0 text-gray-400"
+																	class="h-5 w-5 flex-shrink-0 text-gray-800"
 																	viewBox="0 0 24 24"
 																	fill="none"
 																	xmlns="http://www.w3.org/2000/svg"
@@ -1333,7 +1338,7 @@
 																	class="ml-4 flex min-w-0 flex-1 gap-2 text-xs"
 																>
 																	<span class="truncate font-medium">SOW</span>
-																	<span class="flex-shrink-0 text-gray-400"
+																	<span class="flex-shrink-0 text-gray-800"
 																		>2.4MB</span
 																	>
 																</div>
@@ -1351,7 +1356,7 @@
 														>
 															<div class="flex w-0 flex-1 items-center">
 																<svg
-																	class="h-5 w-5 flex-shrink-0 text-gray-400"
+																	class="h-5 w-5 flex-shrink-0 text-gray-800"
 																	xmlns="http://www.w3.org/2000/svg"
 																	width="24"
 																	height="24"
@@ -1371,7 +1376,7 @@
 																	<span class="truncate font-medium"
 																		>Payout Invoice</span
 																	>
-																	<span class="flex-shrink-0 text-gray-400"
+																	<span class="flex-shrink-0 text-gray-800"
 																		>4.5mb</span
 																	>
 																</div>
@@ -1393,7 +1398,7 @@
 							</div>
 							<div class="mt-6 space-y-8 py-6 dark:border-slate-700">
 								<div>
-									<h2 class="text-sm font-semibold leading-6 text-gray-900">
+									<h2 class="text-gray-1000 text-sm font-semibold leading-6">
 										Activity
 									</h2>
 									<ul role="list" class="mt-6 space-y-6">
@@ -1422,18 +1427,18 @@
 													class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200"
 												>
 													<div class="flex justify-between gap-x-4">
-														<div class="py-0.5 text-xs leading-5 text-gray-500">
-															<span class="font-medium text-gray-900">{{
+														<div class="py-0.5 text-xs leading-5 text-gray-800">
+															<span class="text-gray-1000 font-medium">{{
 																activityItem.person.name
 															}}</span>
 															commented
 														</div>
 														<span
-															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+															class="flex-none py-0.5 text-xs leading-5 text-gray-800"
 															>{{ activityItem.created_on }}</span
 														>
 													</div>
-													<p class="text-sm leading-6 text-gray-500">
+													<p class="text-sm leading-6 text-gray-800">
 														{{ activityItem.comment }}
 													</p>
 												</div>
@@ -1448,18 +1453,18 @@
 													class="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200"
 												>
 													<div class="flex justify-between gap-x-4">
-														<div class="py-0.5 text-xs leading-5 text-gray-500">
-															<span class="font-medium text-gray-900">{{
+														<div class="py-0.5 text-xs leading-5 text-gray-800">
+															<span class="text-gray-1000 font-medium">{{
 																activityItem.person.name
 															}}</span>
 															commented
 														</div>
 														<span
-															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+															class="flex-none py-0.5 text-xs leading-5 text-gray-800"
 															>{{ activityItem.created_on }}</span
 														>
 													</div>
-													<p class="text-sm leading-6 text-gray-500">
+													<p class="text-sm leading-6 text-gray-800">
 														{{ activityItem.comment }}
 													</p>
 												</div>
@@ -1479,9 +1484,9 @@
 													/>
 												</div>
 												<p
-													class="flex-auto py-0.5 text-xs leading-5 text-gray-500"
+													class="flex-auto py-0.5 text-xs leading-5 text-gray-800"
 												>
-													<span class="font-medium text-gray-900">{{
+													<span class="text-gray-1000 font-medium">{{
 														activityItem.User?.firstName +
 														' ' +
 														activityItem.User?.lastName
@@ -1489,7 +1494,7 @@
 													{{ activityItem.text }}
 												</p>
 												<span
-													class="flex-none py-0.5 text-xs leading-5 text-gray-500"
+													class="flex-none py-0.5 text-xs leading-5 text-gray-800"
 													>{{
 														formatDateDistance(
 															new Date(activityItem.created_on) || new Date()
@@ -1525,7 +1530,7 @@
 														<div class="relative">
 															<ComboboxInput
 																:disabled="!enabled"
-																class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-xs sm:leading-6"
+																class="text-gray-1000 w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 group-disabled:opacity-50 dark:bg-slate-800 dark:text-white dark:ring-slate-700 sm:text-xs sm:leading-6"
 																:display-value="(person) => person?.name"
 															/>
 															<ComboboxButton
@@ -1533,7 +1538,7 @@
 																class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 text-xs focus:outline-none"
 															>
 																<ChevronUpDownIcon
-																	class="h-5 w-5 text-gray-400"
+																	class="h-5 w-5 text-gray-800"
 																	aria-hidden="true"
 																/>
 															</ComboboxButton>
@@ -1560,7 +1565,7 @@
 																			'relative flex cursor-default select-none py-2 pl-8 pr-4',
 																			active
 																				? 'bg-indigo-600 text-white dark:text-white'
-																				: 'text-gray-900 dark:text-slate-300',
+																				: 'text-gray-1000 dark:text-slate-300',
 																		]"
 																	>
 																		<span
