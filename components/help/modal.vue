@@ -205,14 +205,14 @@
 													></path></svg
 												><span class="truncate"
 													><span style="color: rgb(19, 25, 82)"
-														>Join Slack server</span
+														>Join Slack community</span
 													></span
 												>
 											</button></a
 										>
 									</div>
 								</div>
-								<div class="px-5">
+								<!-- <div class="px-5" v-if="false">
 									<div
 										class="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md"
 									>
@@ -239,16 +239,7 @@
 												><img
 													alt="discord illustration header"
 													sizes="100vw"
-													srcset="
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=640&amp;q=75   640w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=750&amp;q=75   750w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=828&amp;q=75   828w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=1080&amp;q=75 1080w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=1200&amp;q=75 1200w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=1920&amp;q=75 1920w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=2048&amp;q=75 2048w,
-														/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=3840&amp;q=75 3840w
-													"
+													
 													src="/dashboard/_next/image?url=%2Fdashboard%2Fimg%2Fsupport%2Fgithub-bg.jpg%3Fv-1&amp;w=3840&amp;q=75"
 													decoding="async"
 													data-nimg="fill"
@@ -291,7 +282,7 @@
 											</button></a
 										>
 									</div>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					</div>
