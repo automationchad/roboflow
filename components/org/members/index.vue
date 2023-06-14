@@ -191,6 +191,8 @@
 	});
 
 	const isEditRoleDisabled = (selectedUser) => {
+		if (selectedUser.status === 'pending') return true;
+		
 		const currentUserScopes = scopes.value.scopes.split(',');
 
 		// Check if the current user has the 'users:edit' scope
@@ -198,7 +200,7 @@
 
 		if(!currentUserScopes.includes('users:edit:owner')) return false;
 
-		// if (selectedUser.status === 'pending') return true;
+		
 
 		// Check if the current user is trying to edit their own role
 		if (user.value.id === selectedUser.id) return true;
@@ -713,7 +715,7 @@
 										<Menu
 											as="div"
 											class="relative flex items-center justify-end"
-											v-if="!isEditRoleDisabled(user)"
+											v-if="isEditRoleDisabled(user)"
 										>
 											<MenuButton
 												class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
