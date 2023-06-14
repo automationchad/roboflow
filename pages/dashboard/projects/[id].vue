@@ -1324,7 +1324,7 @@
 										:disabled="User.Account.type !== 'super_admin'"
 										:class="[
 											enabled ? 'bg-indigo-600' : 'bg-gray-200',
-											'relative inline-flex h-4 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ',
+											'relative inline-flex h-4 w-8 disabled:pointer-events-none flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ',
 										]"
 									>
 										<span class="sr-only">Use setting</span>
