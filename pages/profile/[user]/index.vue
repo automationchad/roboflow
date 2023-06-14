@@ -499,7 +499,7 @@
 									data-v-09d28134=""
 									v-for="ticket in User.Ticket"
 									:key="ticket.id"
-									:to="`/${ticket.accountId}/tickets/${ticket.id}`"
+									:to="`/dashboard/projects/${ticket.id}`"
 									class="war-room-post-preview-presenter war-room-profile-posts__preview bg-white/5"
 								>
 									<div
@@ -852,7 +852,7 @@
 		margin-right: 6px;
 	}
 
-	 .war-room-post-preview-presenter__menu {
+	.war-room-post-preview-presenter__menu {
 		line-height: 0;
 		color: var(--theme-color-sub-text);
 		margin: 5px 0 0 10px;
@@ -860,7 +860,7 @@
 		z-index: 2;
 	}
 
-	 .war-room-post-preview-presenter__menu:hover {
+	.war-room-post-preview-presenter__menu:hover {
 		color: var(--theme-sub_text-hover);
 	}
 
@@ -942,9 +942,7 @@
 		border: 1px solid white;
 	}
 
-	.war-room-post-preview-presenter__commenter:not(
-			:first-child
-		) {
+	.war-room-post-preview-presenter__commenter:not(:first-child) {
 		margin-left: -5px;
 	}
 

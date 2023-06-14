@@ -700,13 +700,13 @@
 															</transition>
 														</div>
 													</Listbox>
-													<p
+													<div
 														v-if="user.status === 'pending'"
-														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal absolute left-1/2 top-14 z-10 rounded-md bg-white px-2 py-1 text-xs text-slate-900 opacity-0 shadow-sm transition-all group-hover:opacity-100"
+														class="data-show:mt-2 min-w-fit w-[380px] data-show:animate-slide-down-normal data-hide:animate-slide-up-normal absolute -inset-x-1/2 top-14 z-10 rounded-md bg-white px-2 py-1 text-xs text-slate-900 opacity-0 shadow-sm transition-all group-hover:opacity-100"
 													>
 														Role can only be changed after the user has accepted
 														the invite
-													</p>
+													</div>
 												</div>
 											</div>
 										</div>

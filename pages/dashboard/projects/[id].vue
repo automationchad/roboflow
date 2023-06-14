@@ -64,22 +64,6 @@
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
 
-	const publishingOptions = [
-		{
-			title: 'AI Enabled',
-			ai: true,
-			description: 'This comment will trigger a reply from Tracy.',
-			current: true,
-		},
-		{
-			title: 'AI Disabled',
-			description: 'This comment will be posted without a reply from Tracy.',
-			ai: false,
-			current: false,
-		},
-	];
-
-	const selected = ref(publishingOptions[0]);
 	const converter = new showdown.Converter();
 	const loading = ref(true);
 
@@ -151,7 +135,7 @@
 		closed_lost: {
 			id: 'closed_lost',
 			name: 'Closed Lost',
-			styles: 'bg-red-100 text-white ring-red-100',
+			styles: 'bg-red-100 text-red-700 ring-red-200',
 		},
 		payout_pending: {
 			id: 'payout_pending',
@@ -244,7 +228,10 @@
 			let { data: Ticket, error: ticketError } = await supabase
 				.from('Ticket')
 				.select(
-					'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))'
+					`*, Account(id,name), 
+					Activity(
+						*, User(*)
+						), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))`
 				)
 				.eq('id', route.params.id)
 				.limit(1)
@@ -269,12 +256,12 @@
 	await getTicket();
 
 	const shouldDisable = (id, index) => {
-		if (
-			index < 5 ||
-			(selectedIndex.value < 4 && index > selectedIndex.value + 1)
-		) {
-			return true;
-		}
+		// if (
+
+		// 	(selectedIndex.value < 4 && index > selectedIndex.value + 1)
+		// ) {
+		// 	return true;
+		// }
 		return false;
 	};
 
@@ -307,6 +294,7 @@
 	const handleCancelEdit = () => {
 		input.value = ticket.value.desc;
 		dealSize.value = ticket.value.deal_size;
+		selectedStage.value = stages.find((o) => o.id === ticket.value.status);
 		enabled.value = false;
 		showConfirm.value = false;
 	};
@@ -538,7 +526,6 @@
 							createdBy: user.value.id,
 							ticketId: ticket.value.id,
 							threadId: thread_id,
-							ai_enabled: selected.value.ai,
 						},
 					]);
 
@@ -562,6 +549,8 @@
 	ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
 	currentAvatar.value = await getAvatarUrl(user.value.id);
 	assignedToAvatar.value = await getAvatarUrl(ticket.value.assignedTo);
+
+	console.log(ticket.value.Activity);
 
 	onMounted(async () => {
 		ticketAttachments.value = await getTicketAttachments(ticket.value.id);
@@ -768,14 +757,14 @@
 									<div
 										class="mt-16 flex items-center space-x-2 text-sm dark:text-white"
 									>
-										<NuxtLink
-											:to="`/${route.params.organization}/tickets`"
+										<span
 											:class="[
 												styles[ticket?.type],
 												'rounded-md px-2 py-1 font-normal capitalize ring-1 ring-inset transition-colors',
 											]"
-											>{{ ticket?.type }}</NuxtLink
 										>
+											{{ ticket?.type }}
+										</span>
 									</div>
 								</div>
 							</div>
@@ -785,20 +774,11 @@
 										<div class="space-y-3 pb-4">
 											<div class="flex justify-between">
 												<div class="flex items-center dark:text-slate-300">
-													{{
-														ticket?.Comment?.filter(
-															(o) => o.activity_type !== 'event'
-														).length
-													}}
-													comment{{
-														ticket?.Comment?.filter(
-															(o) => o.activity_type !== 'event'
-														).length > 0
-															? 's'
-															: ''
-													}}
+													{{ ticket?.Comment.length }}
+													comment{{ ticket?.Comment?.length > 0 ? 's' : '' }}
 												</div>
 												<button
+													:disabled="User.Account.type !== 'super_admin'"
 													@click="showDiv = !showDiv"
 													class="flex items-center rounded-full border border-gray-300 bg-white pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:border-[#423455] dark:bg-[#1A1B2C] dark:text-white"
 												>
@@ -888,139 +868,8 @@
 																	/>
 																</div>
 																<div
-																	class="mt-6 flex items-end justify-between space-x-4"
+																	class="mt-6 flex items-end justify-end space-x-4"
 																>
-																	<Listbox
-																		as="div"
-																		v-model="selected"
-																		class="-ml-10"
-																		v-slot="{ open }"
-																	>
-																		<ListboxLabel class="sr-only"
-																			>Change published status</ListboxLabel
-																		>
-																		<div class="relative">
-																			<ListboxButton
-																				class="inline-flex divide-x divide-indigo-700 rounded-md shadow-sm"
-																			>
-																				<div
-																					:class="[
-																						selected.ai
-																							? 'mg_ai'
-																							: 'border border-white/10 bg-white/5 text-white',
-																						'inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-1 shadow-sm',
-																					]"
-																				>
-																					<svg
-																						v-if="selected.ai"
-																						class="h-5 w-5"
-																						viewBox="0 0 24 24"
-																						fill="none"
-																						xmlns="http://www.w3.org/2000/svg"
-																					>
-																						<path
-																							d="M9.75 13C14 13 14 7.75 14 7.75C14 7.75 14 13 18.25 13C14 13 14 18.25 14 18.25C14 18.25 14 13 9.75 13Z"
-																							fill="#8900ff"
-																						></path>
-																						<path
-																							d="M5.75 8C8 8 8 5.75 8 5.75C8 5.75 8 8 10.25 8C8 8 8 10.25 8 10.25C8 10.25 8 8 5.75 8Z"
-																							fill="#8900ff"
-																						></path>
-																						<path
-																							d="M7.75 16.25H7.76M18.25 5.75H18.26M18.25 18.25H18.26M14 7.75C14 7.75 14 13 9.75 13C14 13 14 18.25 14 18.25C14 18.25 14 13 18.25 13C14 13 14 7.75 14 7.75ZM8 5.75C8 5.75 8 8 5.75 8C8 8 8 10.25 8 10.25C8 10.25 8 8 10.25 8C8 8 8 5.75 8 5.75Z"
-																							stroke="#8900ff"
-																							stroke-width="1.5"
-																							stroke-linecap="round"
-																							stroke-linejoin="round"
-																						></path>
-																					</svg>
-
-																					<p
-																						:class="[
-																							selected.ai
-																								? 'mg_ai-button-text text-sm'
-																								: '',
-																							'text-xs',
-																						]"
-																					>
-																						{{ selected.title }}
-																					</p>
-																					<ChevronDownIcon
-																						:class="[
-																							open ? 'rotate-180' : '',
-																							'h-4 w-4 text-[#8900ff] transition-transform',
-																						]"
-																					/>
-																				</div>
-																			</ListboxButton>
-
-																			<transition
-																				leave-active-class="transition ease-in duration-100"
-																				leave-from-class="opacity-100"
-																				leave-to-class="opacity-0"
-																			>
-																				<ListboxOptions
-																					class="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-900 dark:ring-white/10"
-																				>
-																					<ListboxOption
-																						as="template"
-																						v-for="option in publishingOptions"
-																						:key="option.title"
-																						:value="option"
-																						v-slot="{ active, selected }"
-																					>
-																						<li
-																							:class="[
-																								active
-																									? 'bg-white/5 text-white'
-																									: 'text-sm text-white',
-																								'cursor-default select-none p-4 text-sm',
-																							]"
-																						>
-																							<div class="flex flex-col">
-																								<div
-																									class="flex justify-between"
-																								>
-																									<p
-																										:class="
-																											selected
-																												? 'font-semibold'
-																												: 'font-normal'
-																										"
-																									>
-																										{{ option.title }}
-																									</p>
-																									<span
-																										v-if="selected"
-																										:class="
-																											active
-																												? 'text-white'
-																												: 'text-indigo-600'
-																										"
-																									>
-																										<CheckIcon
-																											class="h-5 w-5"
-																											aria-hidden="true"
-																										/>
-																									</span>
-																								</div>
-																								<p
-																									:class="[
-																										active
-																											? 'text-indigo-200'
-																											: 'text-gray-500',
-																										'mt-2',
-																									]"
-																								>
-																									{{ option.description }}
-																								</p>
-																							</div>
-																						</li>
-																					</ListboxOption>
-																				</ListboxOptions>
-																			</transition>
-																		</div>
-																	</Listbox>
 																	<div
 																		class="flex items-center justify-end space-x-4"
 																	>
@@ -1153,18 +1002,12 @@
 														<ticket-comment
 															v-for="(
 																activityItem, activityItemIdx
-															) in comments.filter(
-																(o) => !o.activity_type.includes('event')
-															)"
+															) in comments"
 															:key="activityItem.id"
 															:activity-item="activityItem"
 															:activity-item-idx="activityItemIdx"
-															:comments="
-																comments.filter(
-																	(o) => !o.activity_type.includes('event')
-																)
-															"
-															@updated="getComments"
+															:comments="comments"
+															@updated="fetchComments"
 														/>
 													</div>
 												</section>
@@ -1297,9 +1140,13 @@
 														class="mt-1 text-base font-semibold leading-6 text-gray-900 dark:text-white"
 													>
 														{{
-															!partnerPayoutAmount
+															partnerPayoutAmount !== null
 																? 'Pending'
-																: `$${formatAccounting(dealSize * 0.1)}`
+																: `$${formatAccounting(
+																		(ticket?.partner_status !== 'closed_lost'
+																			? dealSize
+																			: 0) * 0.1
+																  )}`
 														}}
 													</dd>
 												</div>
@@ -1551,19 +1398,13 @@
 									</h2>
 									<ul role="list" class="mt-6 space-y-6">
 										<li
-											v-for="(activityItem, activityItemIdx) in comments.filter(
-												(o) => o.activity_type.includes('event')
-											)"
+											v-for="(activityItem, activityItemIdx) in ticket.Activity"
 											:key="activityItem.id"
 											class="relative flex gap-x-4"
 										>
 											<div
 												:class="[
-													activityItemIdx ===
-													comments.filter((o) =>
-														o.activity_type.includes('event')
-													).length -
-														1
+													activityItemIdx === ticket.Activity.length - 1
 														? 'h-6'
 														: '-bottom-6',
 													'absolute left-0 top-0 flex w-6 justify-center',
@@ -1587,9 +1428,9 @@
 															}}</span>
 															commented
 														</div>
-														<time
+														<span
 															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
-															>{{ activityItem.createdOn }}</time
+															>{{ activityItem.created_on }}</span
 														>
 													</div>
 													<p class="text-sm leading-6 text-gray-500">
@@ -1613,9 +1454,9 @@
 															}}</span>
 															commented
 														</div>
-														<time
+														<span
 															class="flex-none py-0.5 text-xs leading-5 text-gray-500"
-															>{{ activityItem.createdOn }}</time
+															>{{ activityItem.created_on }}</span
 														>
 													</div>
 													<p class="text-sm leading-6 text-gray-500">
@@ -1650,7 +1491,9 @@
 												<span
 													class="flex-none py-0.5 text-xs leading-5 text-gray-500"
 													>{{
-														formatDateDistance(activityItem.createdOn) + ' ago'
+														formatDateDistance(
+															new Date(activityItem.created_on) || new Date()
+														) + ' ago'
 													}}</span
 												>
 											</template>

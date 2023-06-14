@@ -390,8 +390,7 @@
 			</div>
 			<div
 				v-if="
-					props.activityItem.activity_type === 'user_comment' ||
-					props.activityItem.activity_type === 'ai_comment'
+					props.activityItem.type === 'user' || props.activityItem.type === 'ai'
 				"
 			>
 				<div
@@ -598,7 +597,7 @@
 							props.activityItem.User.id === User.id
 								? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
 								: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
-							props.activityItem.activity_type === 'ai_comment'
+							props.activityItem.type === 'ai'
 								? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 								: '',
 							props.activityItem.deleted
@@ -741,8 +740,7 @@
 								class="flex space-x-1"
 								v-if="
 									reply.createdBy === User.id ||
-									(User.systemRole === 'super_admin' &&
-										reply.activity_type === 'ai_comment')
+									(User.systemRole === 'super_admin' && reply.type === 'ai')
 								"
 							>
 								<button
@@ -846,7 +844,7 @@
 								reply.User.id === User.id
 									? ' bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
 									: ' bg-[#E6E5EB] text-gray-700 ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
-								reply.activity_type === 'ai_comment'
+								reply.type === 'ai'
 									? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 									: '',
 								'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4  py-3 text-sm leading-7 ring-1 ring-inset',
@@ -878,12 +876,18 @@
 				>
 					<Disclosure v-slot="{ open }">
 						<div class="flex items-center justify-start pl-8">
-							<img v-if="currentAvatar"
+							<img
+								v-if="currentAvatar"
 								:src="currentAvatar"
 								alt=""
 								class="h-5 w-5 rounded-full object-cover"
 							/>
-							<div v-else class="h-5 w-5 rounded-full bg-gray-500 text-xs text-center flex justify-center items-center text-white">{{User.email[0]}}</div>		
+							<div
+								v-else
+								class="flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-center text-xs text-white"
+							>
+								{{ User.email[0] }}
+							</div>
 
 							<DisclosureButton
 								class="ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
@@ -987,16 +991,13 @@
 					</Disclosure>
 				</div>
 			</div>
-			<div
-				class=""
-				v-else-if="props.activityItem.activity_type === 'audio_comment'"
-			>
+			<div class="" v-else-if="props.activityItem.type === 'audio'">
 				<div
 					:class="[
 						props.activityItem.User.id === User.id
 							? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
 							: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
-						props.activityItem.activity_type === 'ai_comment'
+						props.activityItem.type === 'ai'
 							? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 							: '',
 						props.activityItem.deleted
