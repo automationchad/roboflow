@@ -1,5 +1,13 @@
 <script setup>
-	import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
+	import {
+		Menu,
+		MenuButton,
+		MenuItems,
+		MenuItem,
+		Disclosure,
+		DisclosurePanel,
+		DisclosureButton,
+	} from '@headlessui/vue';
 
 	import { watch } from 'vue';
 
@@ -134,7 +142,7 @@
 
 <template>
 	<div
-		class="border-scale-500 sticky top-0 z-10 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-2 dark:border-white/10 dark:bg-[#020014]"
+		class="border-scale-500 sticky top-0 z-10 flex h-12 max-h-12 items-center justify-between border-b bg-[#F8F8FB] px-5 py-3 dark:border-white/10 dark:bg-[#020014]"
 	>
 		<div class="-ml-2 flex items-center text-sm">
 			<Menu as="div"
@@ -296,35 +304,40 @@
 			</Menu>
 		</div>
 		<div class="flex items-center space-x-2 dark:text-white">
-			<NuxtLink
-				:to="'https://motisgroup.helpkit.so'"
-				type="button"
-				aria-haspopup="dialog"
-				aria-expanded="false"
-				aria-controls="radix-462"
-				data-state="closed"
-				class="focus:outline-scale-600 flex rounded bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
-			>
-				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded border-none px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
-					><svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="sbui-icon text-scale-900"
-					>
-						<circle cx="12" cy="12" r="10"></circle>
-						<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-						<line x1="12" y1="17" x2="12.01" y2="17"></line></svg
-					><span class="truncate">Help</span>
-				</span></NuxtLink
-			><button
+			<Menu as="div" class="relative"
+				><MenuButton
+					:to="'https://motisgroup.helpkit.so'"
+					type="button"
+					aria-haspopup="dialog"
+					aria-expanded="false"
+					aria-controls="radix-462"
+					data-state="closed"
+					class="focus:outline-scale-600 flex rounded bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
+				>
+					<span
+						class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded border-none px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="sbui-icon text-scale-900"
+						>
+							<circle cx="12" cy="12" r="10"></circle>
+							<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+							<line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+						><span class="truncate">Help</span>
+					</span> </MenuButton
+				><MenuItems class="absolute right-0 top-8"
+					><help-modal /></MenuItems
+			></Menu>
+
+			<button
 				type="button"
 				aria-haspopup="dialog"
 				aria-expanded="false"
@@ -333,7 +346,7 @@
 				class="focus:outline-scale-600 flex rounded border-none bg-white p-0 outline-none outline-offset-1 transition-all focus:outline-4 dark:bg-white/10"
 			>
 				<span
-					class="font-regular bg-scale-100 hover:bg-scale-300 dark:bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
+					class="font-regular bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-slate-700 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 dark:text-slate-300"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -397,22 +410,11 @@
 </template>
 
 <style scoped>
-	@media (prefers-color-scheme: dark) {
-		bordershadow-scale-600 {
-			box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-				rgba(0, 0, 0, 0.22) 0 1px 1px 0, #828c90 0 0 0 1px,
-				rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-				rgb(64 68 82/8%) 0 2px 5px 0;
-		}
-	}
-
-	@media (prefers-color-scheme: light) {
-		.bordershadow-scale-600 {
-			box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-				rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
-				rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
-				rgb(64 68 82/8%) 0 2px 5px 0;
-		}
+	.bordershadow-scale-600 {
+		box-shadow: rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgba(0, 0, 0, 0.22) 0 1px 1px 0, #dfe3e6 0 0 0 1px,
+			rgba(0, 0, 0, 0.012) 0 0 0 0, rgba(0, 0, 0, 0.012) 0 0 0 0,
+			rgb(64 68 82/8%) 0 2px 5px 0;
 	}
 
 	.bordershadow-brand-fixed-1000 {

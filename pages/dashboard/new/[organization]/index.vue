@@ -32,6 +32,12 @@
 	const selectedTicket = ref({ title: null });
 	const selectedFiles = ref([]);
 
+	const selectedPDFFile = ref(null);
+
+	const onPDFFileChange = (e) => {
+		selectedPDFFile.value = e.target.files[0];
+	};
+
 	const projectName = ref('');
 	const projectSummary = ref('');
 
@@ -122,7 +128,7 @@
 	const isDisabled = computed(() => {
 		return (
 			!projectName.value ||
-			!projectSummary.value ||
+			(selectedPDFFile.value ? false : !projectSummary.value) ||
 			!selectedSeverity.value ||
 			!selectedTicket.value ||
 			submit_loading.value
@@ -239,17 +245,45 @@
 					{
 						name: projectName.value,
 						type: selectedTicket.value.id,
-						
 						createdBy: user.value.id,
 						dueDate: generateDueDate(selectedSeverity.value),
 						accountId: route.params.organization,
 						assignedTo: accountManager.id,
 						desc: projectSummary.value,
+						ticketLoading: selectedPDFFile.value ? true : false,
 					},
 				])
 				.select();
 			if (error) {
 				throw new Error(`Error inserting ticket: ${error.message}`);
+			}
+
+			if (selectedPDFFile.value) {
+				const reader = new FileReader();
+				reader.readAsDataURL(selectedPDFFile.value);
+
+				reader.onloadend = async function () {
+					const base64data = reader.result;
+
+					const url = 'https://ed7965f7-7202-48f5-be9e-6a3af2e398f1.trayapp.io';
+
+					const options = {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							file: base64data,
+							ticketId: ticketData[0].id,
+						}),
+					};
+
+					const response = await $fetch(url, options);
+
+					if (!response.ok) {
+						throw new Error(`Error uploading file: ${response.statusText}`);
+					}
+				};
 			}
 
 			if (selectedFiles.value.length > 0) {
@@ -258,13 +292,16 @@
 
 			is_success.value = true;
 			success_message.value = 'Successfully created project';
+
 			if (selectedAccount.value.User[0].count === 0) {
 				router.push(`/dashboard/new/${route.params.organization}/invite`);
 			} else router.push(`/dashboard/projects/${ticketData[0].id}`);
+
 			submit_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
 			error_message.value = error;
+			submit_loading.value = false;
 			console.error('Error submitting ticket:', error);
 		}
 	};
@@ -568,21 +605,55 @@
 												/>
 											</div>
 										</div>
-										<p
-											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
-										></p>
+										<div
+											class="data-show:animate-slide-down-normal data-hide:animate-slide-up-normal mt-2 flex items-center space-x-2 text-xs transition-all"
+										>
+											<button
+												class="font-regular text-scale-1200 focus-visible:outline-scale-700 pointer-events-auto relative inline-flex cursor-pointer items-center space-x-3 rounded bg-slate-100 px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 ring-1 ring-inset ring-slate-300 transition transition-all duration-200 ease-out hover:bg-slate-200 focus-visible:outline-4 focus-visible:outline-offset-1"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="mr-1 h-4 w-4"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+													></path>
+													<polyline points="17 8 12 3 7 8"></polyline>
+													<line x1="12" y1="3" x2="12" y2="15"></line>
+												</svg>
+												Upload a file
+												<input
+													class="absolute inset-0 z-[500] h-full w-full opacity-0 outline-none outline-0 file:bg-emerald-300"
+													type="file"
+													accept="application/pdf"
+													@change="onPDFFileChange"
+												/>
+											</button>
+											<span>{{
+												selectedPDFFile
+													? selectedPDFFile.name
+													: 'No file selected'
+											}}</span>
+										</div>
 
 										<p
-											@click="generateExample"
 											class="mt-2 text-sm leading-normal text-slate-500"
 											id="password-description"
 										>
 											Need some inspiration or don't know what a good use case
 											looks like?
-											<span
-												class="hover:text-brand-900 cursor-pointer text-indigo-500 underline transition"
-												>Generate an example</span
+											<button
+												@click="generateExample"
+												class="hover:text-brand-900 cursor-pointer bg-none text-indigo-500 underline transition"
 											>
+												Generate an example
+											</button>
 										</p>
 									</div>
 								</div>

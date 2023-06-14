@@ -1,7 +1,7 @@
 <template>
 	<div
 		id="with-sidebar"
-		class="hide-scrollbar h-full w-64 z-0 overflow-auto border-r border-black/10 dark:border-white/10"
+		class="hide-scrollbar z-0 h-full w-64 overflow-auto border-r border-black/10 dark:border-white/10"
 		style="height: 100vh; max-height: 100vh"
 	>
 		<div class="mb-2">
@@ -52,7 +52,7 @@
 								target="_self"
 								@click="(title = team.name), (teams = teams)"
 								:to="`/dashboard/org/${team.id}`"
-								><button
+								><li
 									class="group flex max-w-full cursor-pointer items-center space-x-2 border-slate-700 py-1 font-normal text-slate-400 outline-none ring-slate-300 focus-visible:z-10 focus-visible:ring-1 group-hover:border-slate-500 dark:text-slate-300"
 								>
 									<span
@@ -60,8 +60,10 @@
 										class="w-full truncate text-sm text-slate-300/90 text-slate-500 transition group-hover:text-slate-700 dark:group-hover:text-slate-200"
 										>{{ team.name }}</span
 									>
-								</button></NuxtLink
-							>
+									<span
+										class="flex h-4 w-5 items-center justify-center rounded-full bg-slate-200 text-[8px] uppercase leading-none text-slate-500 ring-1 ring-inset ring-slate-300"
+									>{{ team.type[0] }}</span></li
+							></NuxtLink>
 						</ul>
 					</div>
 					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
@@ -227,7 +229,7 @@
 		if (userData.Account.type === 'super_admin') {
 			const { data: accountData, error: accountError } = await supabase
 				.from('Account')
-				.select('*,Ticket(status,type)')
+				.select('*,Ticket(status,type)');
 			teams.value = accountData;
 		} else teams.value = [userData.Account];
 

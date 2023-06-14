@@ -73,116 +73,54 @@
 		},
 		{
 			title: 'AI Disabled',
-			description: 'This comment will be posted without a reply from tracy.',
+			description: 'This comment will be posted without a reply from Tracy.',
 			ai: false,
 			current: false,
 		},
 	];
 
 	const selected = ref(publishingOptions[0]);
-
-	const converter = await new showdown.Converter();
-
+	const converter = new showdown.Converter();
 	const loading = ref(true);
+
+	const ticketLoading = ref(false);
 
 	const is_error = ref(false);
 	const error_message = ref('');
 	const is_success = ref(false);
 	const success_message = ref('');
-
 	const showConfirm = ref(false);
-
-	const ticketAvatar = ref(null);
-	const currentAvatar = ref(null);
-	const assignedToAvatar = ref(null);
-
 	const comments = ref([]);
-	const comment_text = ref('');
-	const reply_text = ref('');
-
-	const imageSrc = ref(null);
-	const fileInput = ref(null);
-	const selectedFile = ref(null);
 	const dealSize = ref(0);
-
 	const partnerPayoutAmount = ref(0);
-
 	const enabled = ref(false);
-
+	const query = ref('');
 	const selectedStage = ref({
 		id: 'proposal_submitted',
 		name: 'Proposal Submitted',
 	});
-
-	const ticketAttachments = ref([]);
+	const imageSrc = ref(null);
+	const selectedFile = ref(null);
+	const fileInput = ref(null);
+	const input = ref('');
 	const aiResponse = ref('');
 	const showDiv = ref(false);
-
 	const commentImageId = ref('');
 	const showImageModal = ref(false);
+	const assignedTo = ref(null);
+	const ticket = ref(null);
+	const User = ref({});
 
-	const shouldDisable = (id, index) => {
-		if (
-			index < 5 ||
-			(selectedIndex.value < 4 && index > selectedIndex.value + 1)
-		) {
-			return true;
-		}
-		return false;
-	};
+	const comment_text = ref('');
+	const reply_text = ref('');
 
-	const handleTicketEdit = async () => {
-		try {
-			const { data, error } = await supabase
-				.from('Ticket')
-				.update({
-					status: selectedStage.value.id,
-					desc: input.value,
-					deal_size: parseInt(dealSize.value),
-					partner_payout_amount: parseInt(dealSize.value) * 0.1,
-					updatedOn: new Date(),
-					lastUpdatedBy: user.value.id,
-				})
-				.eq('id', route.params.id);
-			if (error) {
-				throw new Error(error.message);
-			}
-			is_success.value = true;
-			success_message.value = 'Ticket updated successfully';
-			enabled.value = false;
-		} catch (error) {
-			is_error.value = true;
-			error_message.value = error.message;
-			console.log(error);
-		}
-	};
+	const ticketAvatar = ref('');
+	const currentAvatar = ref('');
+	const assignedToAvatar = ref('');
 
-	const handleCancelEdit = () => {
-		input.value = ticket.value.desc;
-		dealSize.value = ticket.value.deal_size;
-		enabled.value = false;
-		showConfirm.value = false;
-	};
+	const ticketAttachments = ref([]);
 
-	const notSaved = computed(() => {
-		if (
-			input.value !== ticket.value.desc ||
-			dealSize.value !== ticket.value.deal_size ||
-			selectedStage.value.id !== ticket.value.status
-		) {
-			return true;
-		}
-		return false;
-	});
-
-	const handleCancelConfirm = () => {
-		if (notSaved.value) {
-			showConfirm.value = true;
-		} else {
-			handleCancelEdit();
-		}
-	};
-
+	// Styles
 	const styles = {
 		referral:
 			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300  text-pink-900 dark:text-pink-200',
@@ -192,51 +130,6 @@
 		new: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
 		sales_inquiry:
 			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300  text-lime-900 dark:text-lime-200',
-	};
-
-	const stageType = {
-		initial_review:
-			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
-		requirements_gathering:
-			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
-		proposal_submitted:
-			'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300 text-purple-900 dark:text-purple-200',
-		contract_pending:
-			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
-		invoice_pending:
-			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
-		invoice_paid:
-			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
-		solution_design:
-			'bg-teal-100 dark:bg-teal-700 dark:ring-teal-500 ring-teal-300 text-teal-900 dark:text-teal-200',
-		in_development:
-			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 text-lime-900 dark:text-lime-200',
-		unit_testing:
-			'bg-indigo-100 dark:bg-indigo-700 dark:ring-indigo-500 ring-indigo-300 text-indigo-900 dark:text-indigo-200',
-		integration_testing:
-			'bg-amber-100 dark:bg-amber-700 dark:ring-amber-500 ring-amber-300 text-amber-900 dark:text-amber-200',
-		user_acceptance_testing:
-			'bg-pink-100 dark:bg-pink-700 dark:ring-pink-500 ring-pink-300 text-pink-900 dark:text-pink-200',
-		bug_fixing:
-			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
-		deployment_preparation:
-			'bg-gray-100 dark:bg-gray-700 dark:ring-gray-500 ring-gray-300 text-gray-900 dark:text-gray-200',
-		in_deployment:
-			'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300 text-sky-900 dark:text-sky-200',
-		post_deployment_review:
-			'bg-blue-100 dark:bg-blue-700 dark:ring-blue-500 ring-blue-300 text-blue-900 dark:text-blue-200',
-		maintenance_mode:
-			'bg-yellow-100 dark:bg-yellow-700 dark:ring-yellow-500 ring-yellow-300 text-yellow-900 dark:text-yellow-200',
-		upgrades_and_enhancements:
-			'bg-lime-100 dark:bg-lime-700 dark:ring-lime-500 ring-lime-300 text-lime-900 dark:text-lime-200',
-		project_on_hold:
-			'bg-orange-100 dark:bg-orange-700 dark:ring-orange-500 ring-orange-300 text-orange-900 dark:text-orange-200',
-		project_rejected:
-			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
-		project_cancelled:
-			'bg-red-100 dark:bg-red-700 dark:ring-red-500 ring-red-300 text-red-900 dark:text-red-200',
-		project_completed:
-			'bg-green-100 dark:bg-green-700 dark:ring-green-500 ring-green-300 text-green-900 dark:text-green-200',
 	};
 
 	const partnerStages = {
@@ -302,62 +195,20 @@
 		{ id: 'project_completed', name: 'Project Completed' },
 	];
 
+	// Computed values
 	const selectedIndex = computed(() =>
 		stages.findIndex((person) => person.id === selectedStage.value.id)
 	);
-
-	const query = ref('');
-
-	// const aiEnabled = ref(Ticket.ai_enabled);
-
-	const showImage = (id) => {
-		commentImageId.value = id;
-		showImageModal.value = true;
-	};
-
-	const toggleModal = () => {
-		showImageModal.value = !showImageModal.value;
-	};
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 type,
-		 stripeCustomerId
-	   )`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	class CustomError extends Error {
-		constructor(code, message) {
-			super(message);
-			this.code = code;
+	const notSaved = computed(() => {
+		if (
+			input.value !== ticket?.value?.desc ||
+			dealSize.value !== ticket.value.deal_size ||
+			selectedStage.value.id !== ticket.value.status
+		) {
+			return true;
 		}
-	}
-
-	let { data: Ticket, error: ticketError } = await supabase
-		.from('Ticket')
-		.select(
-			'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))'
-		)
-		.eq('id', route.params.id)
-		.limit(1)
-		.single();
-
-	const ticket = ref(Ticket);
-
-	partnerPayoutAmount.value = Ticket.partner_payout_amount;
-
-	if (!Ticket) {
-		navigateTo('/ticket-not-found');
-		throw new CustomError(404, 'Ticket not found');
-	}
-
-	selectedStage.value = stages.find((o) => o.id === Ticket?.status);
+		return false;
+	});
 
 	const filteredPeople = computed(() =>
 		query.value === ''
@@ -367,22 +218,126 @@
 			  })
 	);
 
-	dealSize.value = Ticket.deal_size;
+	// Functions
 
-	const input = ref(Ticket.desc);
+	const getUser = async () => {
+		let { data: userData, error: userError } = await supabase
+			.from('User')
+			.select(
+				`*,Account (
+	     id,
+		 type,
+		 stripeCustomerId
+	   )`
+			)
+			.eq('id', user.value.id)
+			.limit(1)
+			.single();
+
+		User.value = userData;
+	};
+
+	await getUser();
+
+	const getTicket = async () => {
+		try {
+			let { data: Ticket, error: ticketError } = await supabase
+				.from('Ticket')
+				.select(
+					'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))'
+				)
+				.eq('id', route.params.id)
+				.limit(1)
+				.single();
+
+			if (!Ticket) {
+				navigateTo('/ticket-not-found');
+				throw new Error('Ticket not found');
+			}
+			ticket.value = Ticket;
+			ticketLoading.value = Ticket.ticketLoading;
+			partnerPayoutAmount.value = Ticket.partner_payout_amount;
+			selectedStage.value = stages.find((o) => o.id === Ticket?.status);
+			dealSize.value = Ticket.deal_size;
+			input.value = Ticket.desc;
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		}
+	};
+
+	await getTicket();
+
+	const shouldDisable = (id, index) => {
+		if (
+			index < 5 ||
+			(selectedIndex.value < 4 && index > selectedIndex.value + 1)
+		) {
+			return true;
+		}
+		return false;
+	};
+
+	const handleTicketEdit = async () => {
+		try {
+			const { data, error } = await supabase
+				.from('Ticket')
+				.update({
+					status: selectedStage.value.id,
+					desc: input.value,
+					deal_size: parseInt(dealSize.value),
+					partner_payout_amount: parseInt(dealSize.value) * 0.1,
+					updatedOn: new Date(),
+					lastUpdatedBy: user.value.id,
+				})
+				.eq('id', route.params.id);
+			if (error) {
+				throw new Error(error.message);
+			}
+			is_success.value = true;
+			success_message.value = 'Ticket updated successfully';
+			enabled.value = false;
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+			console.log(error);
+		}
+	};
+
+	const handleCancelEdit = () => {
+		input.value = ticket.value.desc;
+		dealSize.value = ticket.value.deal_size;
+		enabled.value = false;
+		showConfirm.value = false;
+	};
+
+	const handleCancelConfirm = () => {
+		if (notSaved.value) {
+			showConfirm.value = true;
+		} else {
+			handleCancelEdit();
+		}
+	};
 
 	const dueDate = computed(() => {
-		return formatDistance(new Date(Ticket.dueDate), new Date(), {
+		return formatDistance(new Date(ticket.value.dueDate), new Date(), {
 			addPrefix: true,
 		});
 	});
 
-	const { data: AssignedTo, error: assignedError } = await supabase
-		.from('User')
-		.select('*')
-		.eq('id', Ticket.assignedTo)
-		.limit(1)
-		.single();
+	const getAssignedTo = async () => {
+		const { data, error } = await supabase
+			.from('User')
+			.select('*')
+			.eq('id', ticket.value.assignedTo)
+			.limit(1)
+			.single();
+		if (error) {
+			throw new Error(error.message);
+		}
+		assignedTo.value = data;
+	};
+	await getAssignedTo();
 
 	const uploadImage = (event) => {
 		const file = event.target.files[0];
@@ -391,13 +346,6 @@
 			selectedFile.value = file;
 		}
 	};
-
-	// const handleAIToggle = async (id) => {
-	// 	const { data, error } = await supabase
-	// 		.from('Ticket')
-	// 		.update({ ai_enabled: !aiEnabled.value })
-	// 		.eq('id', id);
-	// };
 
 	const removeImage = () => {
 		imageSrc.value = null;
@@ -458,51 +406,6 @@
 	const getAvatarUrl = async (avatar) => fetchFromStorage('avatars', avatar);
 	const getCommentImageUrl = async (id) =>
 		fetchFromStorage('images', `comments/${id}`);
-	// const getTicketAttachments = async (id) => fetchFromStorage('images', `attachments/${id}`);
-
-	// const getAvatarUrl = async (avatar) => {
-	// 	const {
-	// 		data: [File],
-	// 		error: fileError,
-	// 	} = await supabase.storage.from('avatars').list(`${avatar}`, {
-	// 		limit: 100,
-	// 		offset: 0,
-	// 		sortBy: { column: 'updated_at', order: 'desc' },
-	// 		search: `${avatar}`,
-	// 	});
-
-	// 	if (File) {
-	// 		const {
-	// 			data: { publicUrl },
-	// 		} = await supabase.storage
-	// 			.from('avatars')
-	// 			.getPublicUrl(`/${avatar}/${File.name}`);
-
-	// 		return publicUrl;
-	// 	} else return '';
-	// };
-
-	// const getCommentImageUrl = async (id) => {
-	// 	const {
-	// 		data: [File],
-	// 		error: fileError,
-	// 	} = await supabase.storage.from('images').list(`comments`, {
-	// 		limit: 100,
-	// 		offset: 0,
-	// 		sortBy: { column: 'updated_at', order: 'desc' },
-	// 		search: `${id}`,
-	// 	});
-
-	// 	if (File) {
-	// 		const {
-	// 			data: { publicUrl },
-	// 		} = await supabase.storage
-	// 			.from('images')
-	// 			.getPublicUrl(`/comments/${File.name}`);
-
-	// 		return publicUrl;
-	// 	} else return '';
-	// };
 
 	const fetchComments = async () => {
 		let { data: Ticket, error } = await supabase
@@ -582,17 +485,7 @@
 		return commentList;
 	};
 
-	ticketAttachments.value = await getTicketAttachments(Ticket.id);
-	console.log(ticketAttachments.value);
-
-	ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
-
-	currentAvatar.value = await getAvatarUrl(user.value.id);
-	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
-
-	const refreshData = async () => {
-		comments.value = await fetchComments();
-	};
+	comments.value = await fetchComments();
 
 	const convert = (text) => {
 		const formatted = converter.makeHtml(text);
@@ -608,7 +501,7 @@
 						{
 							text: thread_id ? reply_text.value : comment_text.value,
 							createdBy: user.value.id,
-							ticketId: Ticket.id,
+							ticketId: ticket.value.id,
 							threadId: thread_id,
 							attachment: true,
 						},
@@ -643,7 +536,7 @@
 						{
 							text: thread_id !== null ? reply_text.value : comment_text.value,
 							createdBy: user.value.id,
-							ticketId: Ticket.id,
+							ticketId: ticket.value.id,
 							threadId: thread_id,
 							ai_enabled: selected.value.ai,
 						},
@@ -665,33 +558,16 @@
 		}
 	};
 
-	const handleDescUpdate = async () => {
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ desc: input.value })
-			.eq('id', route.params.id);
-	};
+	ticketAttachments.value = await getTicketAttachments(ticket.value.id);
+	ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
+	currentAvatar.value = await getAvatarUrl(user.value.id);
+	assignedToAvatar.value = await getAvatarUrl(ticket.value.assignedTo);
 
-	const handleDealSizeUpdate = async () => {
-		const { data, error } = await supabase
-			.from('Ticket')
-			.update({ deal_size: parseInt(dealSize.value) })
-			.eq('id', route.params.id);
-	};
-
-	function handleKeydown(event) {
-		if (event.ctrlKey) {
-			showDiv.value = !showDiv.value;
-		}
-	}
 	onMounted(async () => {
-		loading.value = true;
-		await refreshData();
+		ticketAttachments.value = await getTicketAttachments(ticket.value.id);
+		ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
+		currentAvatar.value = await getAvatarUrl(user.value.id);
 		loading.value = false;
-		window.addEventListener('keydown', handleKeydown);
-	});
-	onUnmounted(() => {
-		window.removeEventListener('keydown', handleKeydown);
 	});
 </script>
 
@@ -715,6 +591,7 @@
 												<div class="relative" v-if="ticketAvatar">
 													<img
 														:src="ticketAvatar"
+														alt="Ticket avatar"
 														class="relative mr-2 flex h-12 w-12 items-center justify-center rounded-full object-cover"
 													/>
 													<img
@@ -750,28 +627,32 @@
 												<div class="">
 													<div class="flex items-center">
 														<NuxtLink
-															:to="`/profile/${Ticket.User.id}`"
+															:to="`/profile/${ticket?.User?.id}`"
 															class="mr-1 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
 														>
 															{{
-																Ticket.User.firstName && Ticket.User.lastName
-																	? Ticket.User.firstName +
+																ticket?.User?.firstName &&
+																ticket?.User?.lastName
+																	? ticket?.User?.firstName +
 																	  ' ' +
-																	  Ticket.User.lastName
-																	: Ticket.User.email.split('@')[0]
+																	  ticket?.User?.lastName
+																	: ticket?.User?.email.split('@')[0]
 															}}
 														</NuxtLink>
 
 														<span
 															class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
-															{{ formatDateDistance(Ticket.createdOn) }}
-															<!-- {{ Ticket.User.jobTitle }} -->
+															{{
+																formatDateDistance(
+																	ticket?.createdOn || new Date()
+																)
+															}}
 														</span>
 													</div>
 													<div class="space-x-1">
 														<span
-															v-for="badge in Ticket.User.badges"
+															v-for="badge in ticket?.User?.badges"
 															:key="badge.id"
 															:class="[
 																badge.id,
@@ -797,21 +678,21 @@
 													></path>
 												</svg>
 
-												{{ Ticket.Account.name }} {{ Ticket.type }}
+												{{ ticket.Account.name }} {{ ticket.type }}
 											</div> -->
 											<h1
 												class="max-w-5xl text-2xl font-semibold text-gray-900 dark:text-white"
 											>
-												<div class="" v-if="Ticket.type === 'referral'">
+												<div class="" v-if="ticket?.type === 'referral'">
 													{{
-														Ticket.User.firstName
-															? Ticket.User.firstName
-															: Ticket.User.email
+														ticket?.User?.firstName
+															? ticket?.User?.firstName
+															: ticket?.User?.email
 													}}
 													<span class="text-slate-400">referred</span>
-													{{ Ticket.name }}
+													{{ ticket?.name }}
 												</div>
-												<div class="" v-else>{{ Ticket.name }}</div>
+												<div class="" v-else>{{ ticket?.name }}</div>
 											</h1>
 										</div>
 									</div>
@@ -890,10 +771,10 @@
 										<NuxtLink
 											:to="`/${route.params.organization}/tickets`"
 											:class="[
-												styles[Ticket.type],
+												styles[ticket?.type],
 												'rounded-md px-2 py-1 font-normal capitalize ring-1 ring-inset transition-colors',
 											]"
-											>{{ Ticket.type }}</NuxtLink
+											>{{ ticket?.type }}</NuxtLink
 										>
 									</div>
 								</div>
@@ -905,12 +786,12 @@
 											<div class="flex justify-between">
 												<div class="flex items-center dark:text-slate-300">
 													{{
-														Ticket.Comment.filter(
+														ticket?.Comment?.filter(
 															(o) => o.activity_type !== 'event'
 														).length
 													}}
 													comment{{
-														Ticket.Comment.filter(
+														ticket?.Comment?.filter(
 															(o) => o.activity_type !== 'event'
 														).length > 0
 															? 's'
@@ -1283,7 +1164,7 @@
 																	(o) => !o.activity_type.includes('event')
 																)
 															"
-															@updated="refreshData"
+															@updated="getComments"
 														/>
 													</div>
 												</section>
@@ -1300,7 +1181,7 @@
 								</div>
 							</section>
 						</div>
-						<!-- Ticket details big -->
+						<!-- ticket details big -->
 						<aside class="hidden w-full xl:block xl:pl-8">
 							<h2 class="sr-only">Details</h2>
 							<div class="flex items-center justify-between py-3">
@@ -1321,7 +1202,7 @@
 									</div>
 									<Switch
 										v-model="enabled"
-										:disabled="User.Account.type !== 'super_admin'"
+										:disabled="User?.Account?.type !== 'super_admin'"
 										:class="[
 											enabled ? 'bg-indigo-600' : 'bg-gray-200',
 											'relative inline-flex h-4 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:pointer-events-none ',
@@ -1426,11 +1307,11 @@
 													<dt class="sr-only">Status</dt>
 													<dd
 														:class="[
-															partnerStages[Ticket.partner_status].styles,
+															partnerStages[ticket?.partner_status].styles,
 															'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium  ring-1 ring-inset ',
 														]"
 													>
-														{{ partnerStages[Ticket.partner_status].name }}
+														{{ partnerStages[ticket?.partner_status].name }}
 													</dd>
 												</div>
 												<div
@@ -1439,9 +1320,9 @@
 													<dt class="flex-none">
 														<span class="sr-only">Client</span>
 														<img
-															v-if="assignedToAvatarAvatar"
+															v-if="assignedToAvatar"
 															:src="assignedToAvatar"
-															class="h-5 w-5 rounded-full"
+															class="h-5 w-5 rounded-full object-cover"
 															alt=""
 														/>
 
@@ -1456,11 +1337,11 @@
 														class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
 													>
 														{{
-															AssignedTo.firstName && AssignedTo.lastName
-																? AssignedTo.firstName +
+															assignedTo.firstName && assignedTo.lastName
+																? assignedTo.firstName +
 																  ' ' +
-																  AssignedTo.lastName
-																: AssignedTo.email
+																  assignedTo.lastName
+																: assignedTo.email
 														}}
 													</dd>
 												</div>
@@ -1760,9 +1641,9 @@
 													class="flex-auto py-0.5 text-xs leading-5 text-gray-500"
 												>
 													<span class="font-medium text-gray-900">{{
-														activityItem.User.firstName +
+														activityItem.User?.firstName +
 														' ' +
-														activityItem.User.lastName
+														activityItem.User?.lastName
 													}}</span>
 													{{ activityItem.text }}
 												</p>
@@ -1942,6 +1823,7 @@
 				:description="error_message"
 			/>
 		</transition>
+		<LoadingModal v-if="ticketLoading" />
 	</div>
 </template>
 

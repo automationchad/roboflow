@@ -1,6 +1,10 @@
+<script setup>
+	import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
+</script>
+
 <template>
 	<div
-		class="bg-body border-scale-500 flex w-14 flex-col justify-between overflow-y-hidden border-r p-2"
+		class="bg-body border-scale-500 flex w-14 flex-col z-[500] justify-between overflow-y-hidden border-r p-2"
 		style="height: 100vh"
 	>
 		<ul class="flex flex-col space-y-2">
@@ -8,11 +12,11 @@
 				><img
 					src="~/assets/images/logo.png"
 					alt="Supabase"
-					class="mx-auto h-[40px] w-auto cursor-pointer rounded" /></a
-			>
+					class="mx-auto h-[40px] w-auto cursor-pointer rounded"
+			/></a>
 			<button data-state="closed">
 				<NuxtLink
-					class="bg-scale-200 hover:bg-slate-200 text-scale-900 hover:text-scale-1200  text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200"
+					class="bg-scale-200 text-scale-900 hover:text-scale-1200 text-scale-1200 flex h-10 w-10 items-center justify-center rounded transition-colors duration-200 hover:bg-slate-200"
 					to="/dashboard/projects"
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -290,7 +294,7 @@
 		<ul class="flex flex-col items-center space-y-4">
 			<button data-state="closed">
 				<span
-					class="font-regular text-scale-1200 hover:bg-slate-200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+					class="font-regular text-scale-1200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-slate-200 focus-visible:outline-4 focus-visible:outline-offset-1"
 					><span class="truncate"
 						><div class="py-1">
 							<svg
@@ -308,36 +312,84 @@
 								<circle cx="11" cy="11" r="8"></circle>
 								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
 							</svg></div></span
-				></span></button
-			><button
-				type="button"
-				id="radix-459"
-				aria-haspopup="menu"
-				aria-expanded="false"
-				data-state="closed"
-				class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
-			>
-				<span
-					class="font-regular text-scale-1200 hover:bg-slate-200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-					><span class="truncate"
-						><div class="py-1">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="18"
-								height="18"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="sbui-icon"
-							>
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-								<circle cx="12" cy="7" r="4"></circle>
-							</svg></div></span
 				></span>
 			</button>
+
+			<Menu as="div" class="relative"
+				><MenuButton
+					aria-haspopup="menu"
+					aria-expanded="false"
+					class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+				>
+					<span
+						class="font-regular text-scale-1200 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-slate-200 focus-visible:outline-4 focus-visible:outline-offset-1"
+						><span class="truncate"
+							><div class="py-1">
+								<svg
+									class=""
+									xmlns="http://www.w3.org/2000/svg"
+									width="18"
+									height="18"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+									<circle cx="12" cy="7" r="4"></circle>
+								</svg></div></span></span
+				></MenuButton>
+				<div><MenuItems class="fixed bottom-0 left-12 z-[600]">
+					<div
+						class="z-40 w-64 min-w-fit rounded border bg-white py-1.5 shadow-lg"
+					>
+						<MenuItem as="div" v-slot="{ active, selected }">
+							<NuxtLink
+								:to="`/dashboard/account/me`"
+								:class="[
+									active ? 'bg-gray-100 text-gray-800' : '',
+									selected ? '' : '',
+									'text-body-light text-gray-700 focus:bg-selection focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+								]"
+							><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="sbui-icon "><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+								<span>{{ 'Account Preferences' }}</span>
+							</NuxtLink>
+						</MenuItem>
+						<div
+							role="separator"
+							aria-orientation="horizontal"
+							class="my-2 w-full border-t-[1px]"
+						></div>
+						<!-- <MenuItem as="div" v-slot="{ active }">
+							<NuxtLink
+								:to="`/dashboard/new/`"
+								:class="[
+									active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
+									'text-body-light focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
+								]"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="sbui-icon"
+								>
+									<line x1="12" y1="5" x2="12" y2="19"></line>
+									<line x1="5" y1="12" x2="19" y2="12"></line></svg
+								><span>New project</span>
+							</NuxtLink>
+						</MenuItem> -->
+					</div>
+				</MenuItems></div>
+				
+			</Menu>
 		</ul>
 	</div>
 </template>
