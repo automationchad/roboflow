@@ -105,6 +105,8 @@
 	const selectedFile = ref(null);
 	const dealSize = ref(0);
 
+	const partnerPayoutAmount = ref(0);
+
 	const enabled = ref(false);
 
 	const selectedStage = ref({
@@ -137,6 +139,7 @@
 					status: selectedStage.value.id,
 					desc: input.value,
 					deal_size: parseInt(dealSize.value),
+					partner_payout_amount: parseInt(dealSize.value) * 0.1,
 					updatedOn: new Date(),
 					lastUpdatedBy: user.value.id,
 				})
@@ -346,6 +349,8 @@
 		.single();
 
 	const ticket = ref(Ticket);
+
+	partnerPayoutAmount.value = Ticket.partner_payout_amount;
 
 	if (!Ticket) {
 		navigateTo('/ticket-not-found');
@@ -1335,7 +1340,7 @@
 
 								<div class="space-x-2">
 									<button
-									v-if="notSaved"
+										v-if="notSaved"
 										:disabled="!enabled"
 										@click="handleCancelConfirm"
 										class="inline-flex items-center justify-center rounded-md bg-slate-100 p-1 text-xs font-normal shadow-sm ring-1 ring-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:opacity-50"
@@ -1411,11 +1416,9 @@
 														class="mt-1 text-base font-semibold leading-6 text-gray-900 dark:text-white"
 													>
 														{{
-															!Ticket.partner_payout_amount
+															!partnerPayoutAmount
 																? 'Pending'
-																: `$${formatAccounting(
-																		Ticket.partner_payout_amount
-																  )}`
+																: `$${formatAccounting(dealSize * 0.1)}`
 														}}
 													</dd>
 												</div>
