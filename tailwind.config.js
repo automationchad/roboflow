@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	darkMode: 'class',
+	// darkMode: 'class',
 	content: [
 		'./components/**/*.{js,vue,ts}',
 		'./layouts/**/*.vue',
@@ -17,11 +17,11 @@ module.exports = {
 		extend: {
 			transitionProperty: {
 				width: 'width',
+				height: 'height',
 			},
 		},
 	},
 	plugins: [
-		require('postcss-nesting'),
 		require('@tailwindcss/typography'),
 		require('@tailwindcss/forms'),
 		require('@tailwindcss/aspect-ratio'),

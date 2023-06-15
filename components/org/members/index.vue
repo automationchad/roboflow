@@ -192,15 +192,13 @@
 
 	const isEditRoleDisabled = (selectedUser) => {
 		if (selectedUser.status === 'pending') return true;
-		
+
 		const currentUserScopes = scopes.value.scopes.split(',');
 
 		// Check if the current user has the 'users:edit' scope
 		if (!currentUserScopes.includes('users:edit')) return true;
 
-		if(!currentUserScopes.includes('users:edit:owner')) return false;
-
-		
+		if (!currentUserScopes.includes('users:edit:owner')) return false;
 
 		// Check if the current user is trying to edit their own role
 		if (user.value.id === selectedUser.id) return true;
@@ -628,20 +626,23 @@
 															<ListboxButton
 																:disabled="isEditRoleDisabled(user)"
 																:class="[
-																	'text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 relative box-border block w-full cursor-pointer rounded-md border bg-none px-4 py-2 indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current disabled:opacity-50 aria-expanded:ring-2',
+																	isEditRoleDisabled(user)
+																		? 'cursor-not-allowed opacity-50'
+																		: 'cursor-pointer',
+																	'text-scale-1200  focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2   indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md  focus:ring-2 focus:ring-current aria-expanded:ring-2 ',
 																]"
 																><span
 																	class="flex w-full flex-row items-center space-x-3"
-																	><span class="truncate capitalize">{{
+																	><span class="truncate capitalize text-scale-1200">{{
 																		user.systemRole
 																	}}</span></span
 																>
 
 																<span
-																	class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+																	class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
 																>
 																	<ChevronDownIcon
-																		class="h-5 w-5 text-gray-200"
+																		class="h-5 w-5 text-scale-600"
 																		aria-hidden="true"
 																	/>
 																</span>
@@ -702,7 +703,7 @@
 													</Listbox>
 													<div
 														v-if="user.status === 'pending'"
-														class="data-show:mt-2 min-w-fit w-[380px] data-show:animate-slide-down-normal data-hide:animate-slide-up-normal absolute -inset-x-1/2 top-14 z-10 rounded-md bg-white px-2 py-1 text-xs text-slate-900 opacity-0 shadow-sm transition-all group-hover:opacity-100"
+														class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal absolute -inset-x-1/2 top-14 z-10 w-[380px] min-w-fit rounded-md bg-white px-2 py-1 text-xs text-slate-900 opacity-0 shadow-sm transition-all group-hover:opacity-100"
 													>
 														Role can only be changed after the user has accepted
 														the invite
@@ -718,9 +719,10 @@
 											v-if="isEditRoleDisabled(user)"
 										>
 											<MenuButton
-												class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
+												as="button"
+												class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 relative box-border block w-full rounded-md border border-gray-400 bg-none px-4 py-2 indent-px text-sm opacity-50 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current aria-expanded:ring-2"
 												><span
-													class="font-regular text-scale-1200 hover:bg-scale-500 focus-visible:outline-scale-700 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-none outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+													class="flex w-full flex-row items-center space-x-3"
 													><svg
 														xmlns="http://www.w3.org/2000/svg"
 														width="14"
@@ -931,5 +933,3 @@
 		/>
 	</transition>
 </template>
-
-

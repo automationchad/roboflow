@@ -327,7 +327,6 @@
 							createdBy: user.value.id,
 							ticketId: Ticket.id,
 							threadId: thread_id,
-							ai_enabled: selected.value.ai,
 						},
 					]);
 
@@ -406,7 +405,7 @@
 					>
 						<div class="flex items-center">
 							<div
-								class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
+								class="text-gray-1000 mr-3 inline-flex items-center text-sm font-medium dark:text-white"
 							>
 								<img
 									v-if="props.activityItem.avatarUrl"
@@ -477,7 +476,7 @@
 								</div>
 
 								<span
-									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+									class="relative inline-flex pl-4 text-sm font-normal text-gray-900 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 								>
 									{{ formatDateDistance(props.activityItem.createdOn) }}
 								</span>
@@ -596,9 +595,9 @@
 						:class="[
 							props.activityItem.User.id === User.id
 								? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
-								: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
+								: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200   dark:ring-white/5',
 							props.activityItem.type === 'ai'
-								? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
+								? 'ai_shadow  shadow-inset shadow-[#9643FF]/25'
 								: '',
 							props.activityItem.deleted
 								? 'text-black/30 dark:text-white/50'
@@ -665,7 +664,7 @@
 						<header class="mb-2 flex items-center justify-between">
 							<div class="flex items-center">
 								<div
-									class="mr-3 inline-flex items-center text-sm font-medium text-gray-900 dark:text-white"
+									class="mr-3 inline-flex items-center text-sm font-medium text-gray-1000 dark:text-white"
 								>
 									<div v-if="reply.avatarUrl" class="">
 										<img
@@ -722,14 +721,14 @@
 
 										<div
 											v-if="reply.User.badges.length > 1"
-											class="badge-extra rounded-md border border-gray-600 px-1.5 leading-4 text-black/40 dark:text-gray-400"
+											class="badge-extra rounded-md border border-gray-600 px-1.5 leading-4 text-gray-900 dark:text-gray-400"
 										>
 											+{{ reply.User.badges.length - 1 }}
 										</div>
 									</div>
 
 									<span
-										class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
+										class="relative inline-flex pl-4 text-sm font-normal text-gray-900 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 									>
 										{{ formatDateDistance(reply.createdOn) }}
 									</span>
@@ -843,7 +842,7 @@
 							:class="[
 								reply.User.id === User.id
 									? ' bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
-									: ' bg-[#E6E5EB] text-gray-700 ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
+									: ' bg-[#E6E5EB] text-gray-1000 ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
 								reply.type === 'ai'
 									? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 									: '',

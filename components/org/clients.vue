@@ -81,14 +81,14 @@
 						class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4"
 					>
 						<span
-							class="font-regular focus-visible:outline-brand-600 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 relative inline-flex cursor-pointer items-center space-x-2 rounded bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 ring-1 ring-inset transition transition-all duration-200 ease-out hover:bg-indigo-400 focus-visible:outline-4 focus-visible:outline-offset-1"
+							class=" relative cursor-pointer inline-flex items-center space-x-2 text-center font-regular transition ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1   bg-brand-fixed-1100 hover:bg-brand-fixed-1000 text-white bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600  shadow-sm text-xs px-2.5 py-1"
 							><span class="truncate">New project</span></span
 						></MenuButton
 					>
 
 					<MenuItems class="absolute top-8 z-10 min-w-max">
 						<div
-							class="bg origin-dropdown data-open:animate-dropdown-content-show data-closed:animate-dropdown-content-hide z-40 w-64 min-w-fit rounded border bg-white py-1.5 shadow-lg"
+							class="bg origin-dropdown data-open:animate-dropdown-content-show data-closed:animate-dropdown-content-hide border border-gray-400 z-40 w-64 min-w-fit rounded bg-white py-1.5 shadow-lg"
 							style="outline: none; pointer-events: auto"
 						>
 							<div
@@ -116,7 +116,7 @@
 							<div
 								role="separator"
 								aria-orientation="horizontal"
-								class="my-2 w-full border-t-[1px]"
+								class="my-2 w-full border-gray-400 border-t-[1px]"
 							></div>
 							<MenuItem as="div" v-slot="{ active }">
 								<NuxtLink

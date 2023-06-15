@@ -1415,7 +1415,7 @@
 													'absolute left-0 top-0 flex w-6 justify-center',
 												]"
 											>
-												<div class="w-px bg-gray-200" />
+												<div class="w-px bg-gray-400" />
 											</div>
 											<template v-if="activityItem.type === 'commented'">
 												<img
