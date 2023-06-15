@@ -186,7 +186,7 @@
 			>
 				<div class="flex items-start space-x-1">
 					<img
-						src="~/assets/images/giovanni_ai_profile.png"
+						src="~/assets/images/elliot_ai_profile.png"
 						alt="Tracy AI"
 						class="mr-2 mt-1 h-5 w-5 rounded-full object-cover"
 					/>
@@ -268,8 +268,8 @@
 								loading
 									? 'AI is writing...'
 									: aiResponse
-									? 'Tell Gio what to do next...'
-									: 'Ask Gio to write anything...'
+									? 'Tell Elliot what to do next...'
+									: 'Ask Elliot to write anything...'
 							"
 						/>
 						<div class="flex items-center space-x-1">
