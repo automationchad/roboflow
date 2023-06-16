@@ -35,10 +35,9 @@
 											href="/dashboard/project/nsfipxnlucvgchlkqvqw/settings/general"
 											><li role="menuitem" class="outline-none">
 												<a
-													class="ring-scale-1200 bg-scale-400 dark:bg-scale-300 text-scale-900 group z-10 flex cursor-pointer items-center space-x-3 rounded-md px-3 py-1 font-semibold outline-none focus-visible:z-10 focus-visible:ring-1"
-													aria-current="page"
+													class="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex cursor-pointer items-center space-x-3 px-3 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
 													><span
-														class="text-scale-1200 w-full truncate text-sm font-semibold transition"
+														class="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
 														><div
 															class="flex w-full items-center justify-between gap-1"
 														>
@@ -189,9 +188,10 @@
 											href="/dashboard/project/nsfipxnlucvgchlkqvqw/settings/billing/subscription"
 											><li role="menuitem" class="outline-none">
 												<a
-													class="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex cursor-pointer items-center space-x-3 px-3 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
+													class="ring-scale-1200 bg-scale-400 dark:bg-scale-300 text-scale-900 group z-10 flex cursor-pointer items-center space-x-3 rounded-md px-3 py-1 font-semibold outline-none focus-visible:z-10 focus-visible:ring-1"
+													aria-current="page"
 													><span
-														class="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
+														class="text-scale-1200 w-full truncate text-sm font-semibold transition"
 														><div
 															class="flex w-full items-center justify-between gap-1"
 														>
@@ -260,3 +260,13 @@
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	*,
+	:after,
+	:before {
+		box-sizing: border-box;
+		border-style: solid;
+		border-color: hsl(210deg 7.5% 94.9% / 1);
+	}
+</style>

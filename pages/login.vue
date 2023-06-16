@@ -86,25 +86,23 @@
 		}
 	};
 
-	onMounted(() => {
-		watchEffect(async () => {
-			if (user.value) {
-				const { data: user_data, error } = await supabase
-					.from('User')
-					.select('accountId')
-					.eq('id', user.value.id)
-					.limit(1)
-					.single();
-				if (error) {
-					console.log(error);
-					return;
-				} else if (user_data.accountId) {
-					router.push(`/dashboard/projects`);
-				} else {
-					router.push(`/dashboard/new`);
-				}
+	watch(async () => {
+		if (user.value) {
+			const { data: user_data, error } = await supabase
+				.from('User')
+				.select('accountId')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
+			if (error) {
+				console.log(error);
+				return;
+			} else if (user_data.accountId) {
+				router.push(`/dashboard/projects`);
+			} else {
+				router.push(`/dashboard/new`);
 			}
-		});
+		}
 	});
 </script>
 

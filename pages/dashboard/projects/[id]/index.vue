@@ -1134,7 +1134,7 @@
 										<div
 											class="bg-panel-body-light dark:bg-panel-body-dark rounded-lg shadow-sm ring-1 ring-inset ring-gray-900/5 dark:bg-white/5 dark:ring-white/5"
 										>
-											<dl class="flex flex-wrap">
+											<dl class="flex flex-wrap mb-6">
 												<div class="flex-auto pl-6 pt-6">
 													<dt
 														class="text-gray-1000 text-sm font-semibold leading-6"
@@ -1269,15 +1269,15 @@
 													</dd>
 												</div>
 											</dl>
-											<div class="mt-6 border-t border-gray-900/5 px-6 py-6">
+											<div class="border-t border-gray-900/5 px-6 py-6" >
 												<dt
 													class="text-gray-1000 mt-0 text-sm font-medium leading-6"
 												></dt>
 												<dd
-													class="text-gray-1000 mt-2 text-sm sm:col-span-2 sm:mt-0"
+													class="text-gray-1000 mt-2 text-sm sm:col-span-2 sm:mt-0" v-if="false"
 												>
 													<ul
-														role="list"
+														role="list" 
 														class="divide-y divide-gray-200 rounded-md border border-gray-400"
 													>
 														<li

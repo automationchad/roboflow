@@ -409,9 +409,7 @@ div[data-radix-portal]:not(.portal--toast) {
 	--border-color-control: 91.8deg 0% 20.8%;
 }
 
-/*
-! tailwindcss v3.3.2 | MIT License | https://tailwindcss.com
-*/
+
 *,
 :after,
 :before {
@@ -420,6 +418,7 @@ div[data-radix-portal]:not(.portal--toast) {
 	border-style: solid;
 	border-color: hsl(var(--border-color-default) / 1);
 }
+
 
 :after,
 :before {

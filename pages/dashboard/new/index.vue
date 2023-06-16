@@ -61,13 +61,20 @@
 			loading.value = true;
 			// Insert account data
 
-			// Create Stripe customer
-			const customer = await $fetch('/api/stripe/customer/create', {
-				method: 'post',
-				body: {
-					company_name: body.name,
-				},
-			});
+			let customer;
+
+			if (selectedOption.value.id === 'partner') {
+				customer = await $fetch('/api/stripe/account/create', {
+					method: 'post',
+				});
+			} else {
+				customer = await $fetch('/api/stripe/customer/create', {
+					method: 'post',
+					body: {
+						company_name: body.name,
+					},
+				});
+			}
 
 			const { data: accountData, error: accountError } = await supabase
 				.from('Account')
@@ -142,8 +149,12 @@
 		<section class="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
 			<div class="relative">
 				<div class="transition-opacity duration-300">
-					<div class="mb-8 rounded-md border bg-white/60 border-gray-400 shadow-sm">
-						<div class="bg-panel-body-light dark:bg-panel-body-dark rounded-t-md">
+					<div
+						class="mb-8 rounded-md border border-gray-400 bg-white/60 shadow-sm"
+					>
+						<div
+							class="bg-panel-body-light dark:bg-panel-body-dark rounded-t-md"
+						>
 							<div class="flex items-center px-6 py-4">
 								<div><h4>Create a new organization</h4></div>
 							</div>
@@ -263,7 +274,7 @@
 																			selected
 																				? 'bg-slate-200'
 																				: 'text-slate-500',
-																			'w-full focus:text-slate-1200  relative cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none ',
+																			'focus:text-slate-1200 relative  w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none ',
 																		]"
 																	>
 																		<div class="flex items-center space-x-3">
@@ -310,7 +321,7 @@
 							</div>
 						</div>
 						<div
-							class="border-panel-border-interior-light bg-panel-footer-light dark:border-panel-border-interior-dark rounded-b-md dark:bg-panel-footer-dark border-t"
+							class="border-panel-border-interior-light bg-panel-footer-light dark:border-panel-border-interior-dark dark:bg-panel-footer-dark rounded-b-md border-t"
 						>
 							<div class="flex h-12 items-center px-6">
 								<div class="flex w-full items-center justify-between">
@@ -329,7 +340,7 @@
 											:disabled="loading"
 											@click="handleSubmit(form_responses)"
 											:class="[
-												' relative cursor-pointer inline-flex items-center space-x-2 text-center font-regular transition ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1   bg-brand-fixed-1100 hover:bg-brand-fixed-1000 text-white bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600  shadow-sm text-xs px-2.5 py-1 disabled:pointer-events-none disabled:opacity-50',
+												' font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1   text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all  duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50',
 											]"
 											type="button"
 										>

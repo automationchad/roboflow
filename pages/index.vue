@@ -7,7 +7,7 @@
 
 	const test_url = 'http://localhost:3000';
 
-	const test = false;
+	const test = true;
 
 	const redirectTo = route.query.returnTo
 		? `${test ? test_url : base_url}/join/${route.query.returnTo}`
@@ -38,12 +38,10 @@
 	const error_message = ref('');
 	const loading = ref(false);
 
-	onMounted(() => {
-		watchEffect(async () => {
-			if (user.value) {
-				navigateTo(`/dashboard/projects`);
-			}
-		});
+	watch(async () => {
+		if (user.value) {
+			navigateTo(`/dashboard/projects`);
+		}
 	});
 
 	const showPasswordHandle = (event) => {
@@ -124,31 +122,20 @@
 				}
 			}
 
-			if (oauth) {
-				const { data, error } = await supabase.auth.signInWithOAuth({
-					provider: 'google',
-					options: {
-						emailRedirectTo: redirectTo,
+			const { user, error } = await supabase.auth.signUp({
+				email: email.value,
+				password: password.value,
+				options: {
+					emailRedirectTo: redirectTo,
+					data: {
+						role,
 					},
-				});
-				if (error) {
-					throw new Error(error.message);
-				}
-			} else {
-				const { user, error } = await supabase.auth.signUp({
-					email: email.value,
-					password: password.value,
-					options: {
-						emailRedirectTo: redirectTo,
-						data: {
-							role,
-						},
-					},
-				});
-				if (error) {
-					throw new Error(error.message);
-				}
+				},
+			});
+			if (error) {
+				throw new Error(error.message);
 			}
+
 			loading.value = false;
 			is_success.value = true;
 			showSuccess.value = true;
@@ -161,6 +148,26 @@
 		} finally {
 			email.value = '';
 			password.value = '';
+		}
+	};
+
+	const handleSignUpProvider = async (provider) => {
+		try {
+			const { data, error } = await supabase.auth.signInWithOAuth({
+				provider,
+				options: {
+					redirectTo: redirectTo,
+				},
+			});
+			if (error) {
+				throw new Error(error.message);
+			}
+			loading.value = false;
+		} catch (error) {
+			loading.value = false;
+			error_message.value = error;
+			is_error.value = true;
+			console.log('error', error);
 		}
 	};
 </script>
@@ -262,25 +269,41 @@
 					</div>
 					<div class="flex flex-col gap-5">
 						<button
-							@click="signUp(true)"
+							@click="handleSignUpProvider('google')"
 							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded px-4 py-2 text-center text-base shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 							type="button"
 						>
 							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="18"
-								height="18"
+								class="h-4 w-4"
 								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="sbui-icon"
+								fill="currentColor"
+								stroke="none"
 							>
 								<path
-									d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M23.52 12.273c0-.852-.076-1.669-.219-2.454H12v4.641h6.459a5.52 5.52 0 0 1-2.395 3.621v3.012h3.877c2.27-2.089 3.579-5.166 3.579-8.82Z"
+									fill="#4285F4"
+								></path>
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M12 24c3.24 0 5.956-1.075 7.941-2.907l-3.877-3.012c-1.075.72-2.45 1.147-4.064 1.147-3.125 0-5.77-2.112-6.715-4.948h-4.01v3.11A11.996 11.996 0 0 0 12 24Z"
+									fill="#34A853"
+								></path>
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M5.285 14.28A7.213 7.213 0 0 1 4.91 12c0-.79.136-1.56.376-2.28V6.61H1.276A11.995 11.995 0 0 0 0 12c0 1.936.464 3.77 1.276 5.39l4.01-3.11Z"
+									fill="#FBBC05"
+								></path>
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M12 4.773c1.761 0 3.344.606 4.587 1.794l3.442-3.44C17.951 1.188 15.235 0 12 0A11.996 11.996 0 0 0 1.277 6.61l4.01 3.11C6.228 6.884 8.874 4.773 12 4.773Z"
+									fill="#EA4335"
 								></path></svg
-							><span class="truncate">Continue with GitHub</span>
+							><span class="truncate">Continue with Google</span>
 						</button>
 						<div class="relative">
 							<div class="absolute inset-0 flex items-center">

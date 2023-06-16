@@ -3,10 +3,14 @@
 		<Head>
 			<Title>Motis Group | Dashboard</Title>
 		</Head>
-
-		<OrgOnboardingOverlay v-if="!userData.hasCompletedOnboarding && !loading" />
-		<org-deals v-if="account.type === 'partner' && !loading" />
-		<org-clients v-if="account.type === 'client' || account.type === 'super_admin'" />
+		<!-- <OrgLoadingOverlay v-if="loading" /> -->
+		<OrgOnboardingOverlay
+			v-if="!user_data.hasCompletedOnboarding"
+		/>
+		<org-deals v-else-if="account.type === 'partner' && !loading" />
+		<org-clients
+			v-else-if="account.type === 'client' || account.type === 'super_admin'"
+		/>
 
 		<transition
 			enter-active-class="transition ease-out duration-100"
@@ -72,6 +76,7 @@
 		LinkIcon,
 		MagnifyingGlassIcon,
 	} from '@heroicons/vue/20/solid';
+	import { is } from 'date-fns/locale';
 
 	const user = useSupabaseUser();
 
@@ -85,41 +90,54 @@
 	const error_message = ref('');
 	const is_success = ref(false);
 
-	const account = ref({ type: 'client' });
+	const user_data = ref({});
 
-	if (!user.value) {
-		navigateTo('/login');
-	}
+	const account = ref({ type: 'client' });
 
 	// Check to see if user has an accountId
 
-	let { data: userData, error: userError } = await supabase
-		.from('User')
-		.select('*')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	const getData = async () => {
+		try {
+			let { data: userData, error: userError } = await supabase
+				.from('User')
+				.select('*')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
 
-	if (userData.accountId === null) {
-		navigateTo('/dashboard/new');
-	} else {
-		// Get account data
-		let { data: accountData, error: accountError } = await supabase
-			.from('Account')
-			.select('*')
-			.eq('id', userData.accountId)
-			.limit(1)
-			.single();
+			if (userError) throw new Error(userError.message);
 
-		account.value = accountData;
-		loading.value = false;
-	}
+			user_data.value = userData;
 
-	onMounted(async () => {
-		watchEffect(() => {
-			if (!user.value) {
-				navigateTo('/');
+			if (userData.accountId === null) {
+				navigateTo('/dashboard/new');
+			} else {
+				// Get account data
+				let { data: accountData, error: accountError } = await supabase
+					.from('Account')
+					.select('*')
+					.eq('id', userData.accountId)
+					.limit(1)
+					.single();
+
+				if (accountError) throw new Error(accountError.message);
+
+				account.value = accountData;
 			}
-		});
+
+			// loading.value = false;
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+			console.log(error);
+		}
+	};
+
+	await getData();
+
+	watch(() => {
+		if (!user.value) {
+			navigateTo('/');
+		}
 	});
 </script>

@@ -1,8 +1,63 @@
+<script setup>
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+
+	const loading = ref(true);
+	const is_error = ref(false);
+	const error_message = ref('');
+	const is_success = ref(false);
+	const success_message = ref('');
+	const account = ref({ type: 'client' });
+
+	const getData = async () => {
+		try {
+			const { data, error } = await supabase
+				.from('User')
+				.select('*,Account(id,name)')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
+
+			account.value = data;
+
+			if (error) {
+				throw new Error(error.message);
+			}
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		} finally {
+			loading.value = false;
+		}
+	};
+
+	await getData();
+
+	const completeOnboarding = async () => {
+		try {
+			const { data, error } = await supabase
+				.from('User')
+				.update({ hasCompletedOnboarding: true })
+				.eq('id', user.value.id);
+
+			if (error) {
+				throw new Error(error.message);
+			}
+
+			is_success.value = true;
+			success_message.value = 'Onboarding complete!';
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		}
+	};
+</script>
+
 <template>
 	<main class="flex-1 overflow-y-auto" style="max-height: 100vh">
 		<div class="mx-auto my-16 w-full max-w-7xl space-y-16">
 			<div class="mx-6 flex items-center space-x-6">
-				<h1 class="text-3xl">test</h1>
+				<h1 class="text-3xl">{{ account.Account.name }}</h1>
 			</div>
 			<div class="mx-6"></div>
 			<div class="mx-6">
@@ -12,7 +67,7 @@
 							<div class="flex h-full flex-col justify-between">
 								<div class="space-y-2">
 									<h3 class="text-scale-1200 text-xl">
-										Welcome to your new project
+										Welcome to your new organization
 									</h3>
 									<p class="text-scale-1100 text-base">
 										Your project has been deployed on its own instance, with its
@@ -26,119 +81,98 @@
 								>
 									<div class="space-y-2">
 										<h3 class="text-scale-1200 text-xl">
-											Get started by building out your database
+											Get started by submitting a project
 										</h3>
 										<p class="text-scale-1100 text-base">
-											Start building your app by creating tables and inserting
-											data. Our table editor makes Postgres as easy to use as a
-											spreadsheet, but there's also our SQL editor if you need
-											something more.
+											Start your project by creating a ticket and inserting
+											information. Our AI assistants make collecting information
+											a breeze, but there's also your personal Slack channel if
+											you need something more.
 										</p>
 									</div>
 									<div class="flex flex-wrap items-center gap-2">
-										<a href="/dashboard/project/ywpgafmqbdrqaavwrwab/editor"
+										<NuxtLink :to="`/dashboard/new/${account.Account.id}`"
 											><button
+												@click="completeOnboarding"
 												class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 												type="button"
 											>
 												<svg
-													class="text-color-inherit m-auto"
-													width="22px"
-													height="19px"
-													viewBox="0 0 22 19"
-													version="1.1"
-													xmlns="http://www.w3.org/2000/svg"
-													xmlns:xlink="http://www.w3.org/1999/xlink"
-													style="width: 14px; height: 14px"
+													class="text-color-inherit mr-auto h-4 w-4"
+													fill="none"
+													viewBox="0 0 24 24"
 												>
-													<g
-														id="Page-1"
-														stroke="none"
-														stroke-width="1"
-														fill="none"
-														fill-rule="evenodd"
-													>
-														<g
-															id="Artboard"
-															transform="translate(-967.000000, -2846.000000)"
-															stroke="currentColor"
-															stroke-width="2"
-														>
-															<g
-																id="table-editor"
-																transform="translate(968.000000, 2847.000000)"
-															>
-																<rect
-																	id="Rectangle"
-																	x="0"
-																	y="0"
-																	width="20"
-																	height="17"
-																	rx="2"
-																></rect>
-																<line
-																	x1="0"
-																	y1="11"
-																	x2="21"
-																	y2="11"
-																	id="Path"
-																></line>
-																<line
-																	x1="0"
-																	y1="5.5"
-																	x2="21"
-																	y2="5.5"
-																	id="Path"
-																></line>
-																<line
-																	x1="7"
-																	y1="0"
-																	x2="7"
-																	y2="16"
-																	id="Path"
-																></line>
-															</g>
-														</g>
-													</g></svg
-												><span class="truncate">Table editor</span>
-											</button></a
+													<path
+														stroke="currentColor"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="1.5"
+														d="M19.25 6.75C19.25 6.19772 18.8023 5.75 18.25 5.75H5.75C5.19772 5.75 4.75 6.19771 4.75 6.75V8.04566C4.75 8.50939 5.07835 8.89813 5.49029 9.11107C6.53552 9.65136 7.25 10.7422 7.25 12C7.25 13.2578 6.53552 14.3486 5.49029 14.8889C5.07835 15.1019 4.75 15.4906 4.75 15.9543V17.25C4.75 17.8023 5.19771 18.25 5.75 18.25H18.25C18.8023 18.25 19.25 17.8023 19.25 17.25V15.9543C19.25 15.4906 18.9216 15.1019 18.5097 14.8889C17.4645 14.3486 16.75 13.2578 16.75 12C16.75 10.7422 17.4645 9.65136 18.5097 9.11107C18.9216 8.89813 19.25 8.50939 19.25 8.04566V6.75Z"
+													></path>
+												</svg>
+												<span class="truncate">Project creator</span>
+											</button></NuxtLink
 										><a href="/dashboard/project/ywpgafmqbdrqaavwrwab/sql"
 											><button
 												class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 												type="button"
 											>
 												<svg
-													class="text-color-inherit m-auto"
-													width="22px"
-													height="19px"
-													viewBox="0 0 22 19"
-													version="1.1"
+													class="h-5 w-5"
 													xmlns="http://www.w3.org/2000/svg"
 													xmlns:xlink="http://www.w3.org/1999/xlink"
-													style="width: 14px; height: 14px"
+													x="0px"
+													y="0px"
+													viewBox="0 0 270 270"
+													xml:space="preserve"
 												>
-													<g
-														id="Page-1"
-														stroke="none"
-														stroke-width="1"
-														fill="none"
-														fill-rule="evenodd"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-													>
-														<g
-															id="Artboard"
-															transform="translate(-964.000000, -2867.000000)"
-															stroke="currentColor"
-															stroke-width="2"
-														>
+													<g>
+														<g>
 															<path
-																d="M970.7,2873.47 L973.9,2876.67 L970.7,2879.87 M985,2883 L985,2870.06801 C985,2868.96639 984.109168,2868.07219 983.007556,2868.06803 L967.007556,2868.00758 C965.902994,2868.00341 965.004187,2868.89545 965.000014,2870.00001 C965.000005,2870.00253 965,2870.00505 965,2870.00757 L965,2883 C965,2884.10457 965.895431,2885 967,2885 L983,2885 C984.104569,2885 985,2884.10457 985,2883 Z M976.033333,2879.97 L979.233333,2879.97"
-																id="Shape"
-															></path>
+																class="st0"
+																d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"
+															/>
+															<path
+																class="st0"
+																d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9
+			s-12.9-5.8-12.9-12.9V151.2z"
+															/>
+														</g>
+														<g>
+															<path
+																class="st1"
+																d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"
+															/>
+															<path
+																class="st1"
+																d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9
+			s5.8-12.9,12.9-12.9H118.8z"
+															/>
+														</g>
+														<g>
+															<path
+																class="st2"
+																d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"
+															/>
+															<path
+																class="st2"
+																d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9
+			c7.1,0,12.9,5.8,12.9,12.9V118.8z"
+															/>
+														</g>
+														<g>
+															<path
+																class="st3"
+																d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"
+															/>
+															<path
+																class="st3"
+																d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9
+			c0,7.1-5.8,12.9-12.9,12.9H151.2z"
+															/>
 														</g>
 													</g></svg
-												><span class="truncate">SQL editor</span>
+												><span class="truncate">Slack Channel</span>
 											</button></a
 										><a
 											target="_blank"
@@ -170,7 +204,10 @@
 									</div>
 								</div>
 								<div class="col-span-12 lg:col-span-5">
-									<div class="pointer-events-none relative h-full w-full">
+									<div
+										class="pointer-events-none relative h-full w-full"
+										v-if="false"
+									>
 										<div
 											class="bg-scale-100 border-scale-500 h-[180px] w-[290px] space-y-1 overflow-hidden rounded-t border px-4 py-3 lg:w-[400px]"
 										>
@@ -439,9 +476,18 @@
 											</div>
 										</div>
 									</div>
+									<div class="pointer-events-none relative h-full w-full">
+										<img
+											src="https://canvasapp.com/_next/image?url=%2Ftemporary%2Fillustrations%2Fslack.png&w=828&q=75"
+											alt=""
+										/>
+									</div>
 								</div>
 							</div>
-							<div class="flex h-full flex-col justify-between space-y-6">
+							<div
+								class="flex h-full flex-col justify-between space-y-6"
+								v-if="false"
+							>
 								<div class="max-w-2xl space-y-2">
 									<h3 class="text-scale-1200 text-xl">
 										Explore our other products
@@ -819,7 +865,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-span-12 lg:col-span-4">
+					<div class="col-span-12 lg:col-span-4" v-if="false">
 						<div class="space-y-6">
 							<div class="space-y-2">
 								<h3 class="text-scale-1200 text-xl">
@@ -877,7 +923,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-span-12 lg:col-span-8">
+					<div class="col-span-12 lg:col-span-8" v-if="false">
 						<div class="relative">
 							<div class="transition-opacity duration-300">
 								<div
@@ -1094,7 +1140,6 @@
 					</div>
 				</div>
 			</div>
-			
 		</div>
 	</main>
 </template>
