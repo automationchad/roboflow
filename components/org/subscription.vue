@@ -1,245 +1,803 @@
+<script setup>
+	import { reactive, onMounted, ref } from 'vue';
+
+	import visa from '~/assets/images/payment-methods/visa.png';
+	import mastercard from '~/assets/images/payment-methods/mastercard.png';
+
+	import { format } from 'date-fns';
+
+	const user = useSupabaseUser();
+	const supabase = useSupabaseClient();
+
+	const route = useRoute();
+	const router = useRouter();
+
+	const subscription = ref([]);
+
+	const customer = ref(null);
+	const paymentMethods = ref([]);
+	const account = ref(null);
+
+	const loading = ref(true);
+
+	const deals = ref([]);
+
+	const getData = async () => {
+		let { data: accountData, error: accountError } = await supabase
+			.from('organizations')
+			.select(`id,status,type,stripe_customer_id,stripe_account_id`)
+			.eq('id', route.params.organization)
+			.limit(1)
+			.single();
+
+		if (accountData.stripe_account_id) {
+			account.value = await getStripeAccountData(accountData.stripe_account_id);
+		}
+
+		if (accountData.stripe_customer_id) {
+			customer.value = await getStripeCustomerData(
+				accountData.stripe_customer_id
+			);
+
+			paymentMethods.value = await getStripePaymentMethodData(
+				accountData.stripe_customer_id
+			);
+		}
+
+		console.log(customer.value);
+
+		console.log(paymentMethods.value);
+
+		const { data: dealData, error: dealError } = await supabase
+			.from('projects')
+			.select(`*`)
+			.eq('organization_id', route.params.organization)
+			.eq('partner_status', 'payout_paid');
+
+		deals.value = dealData;
+		loading.value = false;
+	};
+
+	const handlePayoutLogin = async () => {
+		const { url } = await $fetch('/api/stripe/account/login', {
+			method: 'post',
+			body: {
+				account_id: accountData.stripe_customer_id,
+			},
+		});
+		navigateTo(url, { external: true });
+	};
+
+	const handlePayoutOnboarding = async (id) => {
+		const { url } = await $fetch('/api/stripe/account/onboarding', {
+			method: 'post',
+			body: {
+				account_id: id,
+			},
+		});
+		navigateTo(url, { external: true });
+	};
+
+	const handleReset = async () => {
+		state.customer = await fetchData();
+		state.loading = false;
+		state.email = state.customer.email;
+	};
+
+	const handleUpdateStripe = async (customer, values) => {
+		const { data } = await $fetch('/api/stripe/customer/update', {
+			method: 'post',
+			body: {
+				customer,
+				values,
+			},
+		});
+		return data;
+	};
+
+	const getStripeAccountData = async (customer) => {
+		const data = await $fetch(`/api/stripe/account/${customer}`, {
+			method: 'get',
+		});
+		return data;
+	};
+
+	const getStripeCustomerData = async (customer) => {
+		const data = await $fetch(`/api/stripe/customer/${customer}`, {
+			method: 'get',
+		});
+		return data;
+	};
+
+	const getStripePaymentMethodData = async (customer) => {
+		const data = await $fetch(`/api/stripe/payment-method/${customer}`, {
+			method: 'get',
+		});
+		return data;
+	};
+
+	getData();
+</script>
+
 <template>
-	<div class="h-full">
-		<warning-access :role="User.systemRole" />
-		<div class="space-y-6 lg:px-0">
-			<!-- Plan -->
-			<div class="mx-auto w-full">
-				<div class="container max-w-4xl space-y-8 py-8">
-					<div class="mb-10" v-if="upgrade_needed || freePlan">
-								<div
-									class="block w-full rounded border border-slate-100 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900"
+	<main class="flex-1 overflow-y-auto" style="max-height: 100vh">
+		<div class="relative">
+			<div
+				class="absolute right-16 top-[1.9rem] z-10 flex items-center space-x-3 xl:right-32"
+			>
+				<div class="flex flex-row gap-6 text-xs">
+					<div class="">
+						<button
+							type="button"
+							id=""
+							name=""
+							class="focus:ring-scale-400 bg-scale-500 hover:bg-scale-700 !bg-brand-900 !hover:bg-brand-900 relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent p-0 outline-none transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-current"
+						>
+							<span
+								aria-hidden="true"
+								class="bg-scale-100 dark:bg-scale-900 inline-block !h-3 h-5 !w-3 w-5 translate-x-3 rounded-full shadow ring-0 transition duration-200 ease-in-out dark:bg-white"
+							></span>
+						</button>
+					</div>
+				</div>
+				<p class="text-scale-1100 -translate-y-[1px] text-xs">
+					Preview new interface
+				</p>
+			</div>
+			<div class="border-b">
+				<div
+					class="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 2xl:px-32"
+				>
+					<h3 class="text-scale-1200 text-xl">Subscription</h3>
+				</div>
+			</div>
+			<div class="border-b">
+				<div
+					class="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-16 lg:px-16 2xl:px-32"
+				>
+					<div class="grid grid-cols-12 gap-6" id="plan">
+						<div class="col-span-12 space-y-6 lg:col-span-5">
+							<div class="sticky top-16 space-y-6">
+								<p class="text-base">Subscription plan</p>
+								<div class="text-scale-1000 text-sm">
+									To manage your billing address, emails or Tax ID, head to your
+									<a href="/org/gujvascqmaqhbcsazlwd/billing"
+										><span
+											class="hover:text-green-1000 text-sm text-green-900 transition"
+											>organization settings</span
+										>.</a
+									>
+								</div>
+								<div class="space-y-2">
+									<p class="text-scale-1100 text-sm">More information</p>
+									<div>
+										<a
+											target="_blank"
+											rel="noreferrer"
+											href="https://supabase.com/pricing"
+											><div
+												class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+											>
+												<p class="text-sm">Pricing</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon"
+												>
+													<path
+														d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+													></path>
+													<polyline points="15 3 21 3 21 9"></polyline>
+													<line x1="10" y1="14" x2="21" y2="3"></line>
+												</svg></div
+										></a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-span-12 space-y-6 lg:col-span-7">
+							<div>
+								<p class="text-sm">This project is currently on the plan:</p>
+								<p class="text-brand-900 text-2xl uppercase">Pro</p>
+							</div>
+							<div>
+								<button
+									data-state="closed"
+									class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+									type="button"
 								>
-									<div class="flex flex-col px-4">
-										<div class="flex items-center justify-between">
-											<div class="flex w-full space-x-3 lg:items-start">
-												<span class="text-slate-900 dark:text-white"
-													><svg
-														xmlns="http://www.w3.org/2000/svg"
-														width="21"
-														height="21"
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														stroke-width="2"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														class="sbui-icon"
-													>
-														<circle cx="12" cy="12" r="10"></circle>
-														<line x1="12" y1="8" x2="12" y2="12"></line>
-														<line
-															x1="12"
-															y1="16"
-															x2="12.01"
-															y2="16"
-														></line></svg
-												></span>
-												<div class="flex-grow">
-													<h5 class="text-sm text-slate-900 dark:text-white">
-														{{ upgrade_needed ? "You are exceeding your plans quota" : `Your account plan is paused` }}
-													</h5>
-												</div>
-											</div>
+									<span class="truncate">Change subscription plan</span>
+								</button>
+							</div>
+							<div
+								class="bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 relative flex items-start space-x-4 rounded-md border px-6 py-4"
+							>
+								<div class="text-scale-900">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="18"
+										height="18"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="sbui-icon"
+									>
+										<circle cx="12" cy="12" r="10"></circle>
+										<line x1="12" y1="16" x2="12" y2="12"></line>
+										<line x1="12" y1="8" x2="12.01" y2="8"></line>
+									</svg>
+								</div>
+								<div class="flex flex-1 items-center justify-between">
+									<div>
+										<h3 class="text-scale-1200 mb-1 block text-sm font-normal">
+											This project is limited by the included usage
+										</h3>
+										<div class="text-scale-1100 text-xs">
+											<p class="text-scale-1000 text-sm">
+												When this project exceeds its
+												<a
+													class="hover:text-green-1000 text-sm text-green-900 transition"
+													href="/project/nsfipxnlucvgchlkqvqw/settings/billing/subscription#breakdown"
+													>included usage quotas</a
+												>, it may become unresponsive.
+												<span
+													>You can change the Cost Control settings if you plan
+													on exceeding the included usage quotas.</span
+												>
+											</p>
 										</div>
+									</div>
+								</div>
+							</div>
+							<div class="flex w-full flex-col">
+								<div class="flex justify-between space-x-8 pb-1 align-baseline">
+									<p
+										class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate pb-1 text-sm"
+									>
+										Current billing cycle (Jun 18 - Jul 18)
+									</p>
+									<p class="text-scale-1100 text-sm">29 Days left</p>
+								</div>
+								<div
+									class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+								>
+									<div
+										class="bg-scale-1200 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+										style="width: 3.33333%"
+									></div>
+								</div>
+							</div>
+							<div class="relative">
+								<div class="transition-opacity duration-300">
+									<div
+										class="border-panel-border-light dark:border-panel-border-dark undefined mb-8 overflow-hidden rounded-md border shadow-sm"
+									>
 										<div
-											class="mt-3 flex flex-col space-y-3 overflow-hidden transition-all"
-											style="max-height: 500px"
+											v-for="method in paymentMethods.filter(
+												(v) =>
+													customer.invoice_settings.default_payment_method ===
+													v.id
+											)"
+											:key="method.id"
+											class="bg-panel-body-light dark:bg-panel-body-dark"
 										>
-											<div class="text-sm text-slate-500 dark:text-slate-400">
-												<div class="p-1">
-													<div>
-														<p class="mb-4">
-															Your project is currently on the
-															<span class="capitalize">{{
-																retainer.tier
-															}}</span>
-															tier -
-															{{
-																retainer.tier === 'enterprise'
-																? 'Please schedule a call with us to discuss a custom plan to scale up.'
-																: `upgrade to the ${plans[
-																	plans.findIndex(
-																		(o) => o.id === retainer.tier
-																	) + 1
-																].name
-																} tier
-																																																																																																																																																																																																																		for a greatly increased quota and continue to
-																																																																																																																																																																																																																		scale.`
-															}}
-															<p v-if="retainer.tier !== 'enterprise'">
-															See
-															<a
-																class="text-indigo-800 dark:text-indigo-400"
-																href="/settings/billing/update"
-																>pricing page</a
-															>
-															for a full breakdown of available plans.
-														</p>
-														</p>
-														
-														<button
-														v-if="retainer.tier !== 'enterprise'"
-															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
-															type="button"
-														>
-															<span class="truncate">Upgrade to {{ plans[
-																plans.findIndex(
-																	(o) => o.id === retainer.tier
-																) + 1
-															].name }} </span>
-														</button>
-														<button
-														v-else
-															class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
-															type="button"
-														>
-															<span class="truncate">Enquire about custom</span>
-														</button>
-													</div>
+											<div
+												class="flex flex-col justify-between space-y-6 px-6 py-4 md:flex-row md:space-y-0 lg:items-center"
+											>
+												<div
+													class="text-scale-1000 flex items-center space-x-3 font-mono tracking-wide"
+												>
+													<img
+														alt="Credit card brand"
+														:src="
+															method.card.brand === 'visa' ? visa : mastercard
+														"
+														width="24"
+													/><span class="font-mono text-sm"
+														>**** **** **** {{ method.card.last4 }}</span
+													>
+												</div>
+												<div
+													class="text-scale-1000 flex flex-row space-x-3 text-sm"
+												>
+													<span
+														>Expires {{ method.card.exp_month }}/{{
+															`${method.card.exp_year}`.slice(2)
+														}}</span
+													>
+												</div>
+												<div data-state="closed">
+													<button
+														class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+														type="button"
+													>
+														<span class="truncate">Change</span>
+													</button>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-					<div class="relative">
-						<div class="transition-opacity duration-300">
-							<div
-								class="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border border-slate-200 dark:border-slate-800 dark:bg-slate-900"
-							>
-								<div class="bg-panel-body-light dark:bg-panel-body-dark">
-									<div class="flex items-center justify-between px-6 pt-4">
-										<div class="flex flex-col">
-											<p class="text-sm text-slate-500">Current subscription</p>
-											<h3 class="mb-0 text-xl dark:text-slate-100">
-												<span class="capitalize">{{ retainer.tier }}</span> tier
-											</h3>
-										</div>
-										<div class="flex flex-col items-end space-y-2">
-											<NuxtLink
-												to="/settings/billing/update"
-												class="font-regular focus-visible:outline-brand-600 transition-color relative inline-flex cursor-pointer items-center space-x-2 rounded border border-indigo-400 bg-indigo-500 px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 duration-200 ease-out hover:border-indigo-300 hover:bg-indigo-600 focus-visible:outline-4 focus-visible:outline-offset-1"
-												type="button"
-											>
-												<span class="truncate">Change subscription</span>
-											</NuxtLink>
-										</div>
-									</div>
-									<div class="mt-2 px-6 pb-4">
-										<p class="text-sm text-slate-500">
-											See our
-											<NuxtLink
-												href="/settings/billing/update"
-												class="underline"
-												>pricing</NuxtLink
-											>
-											for a more detailed analysis of what Motis Group has on
-											offer.
+						</div>
+					</div>
+					<div class="self-center">
+						<div>
+							<iframe
+								src="https://newassets.hcaptcha.com/captcha/v1/672044a/static/hcaptcha.html#frame=checkbox&amp;id=26y0gvo4aij2&amp;host=app.supabase.com&amp;sentry=true&amp;reportapi=https%3A%2F%2Faccounts.hcaptcha.com&amp;recaptchacompat=true&amp;custom=false&amp;hl=en&amp;tplinks=on&amp;sitekey=4ca1fdb9-c9c9-4495-ba50-c85fc0e7ec1f&amp;size=invisible&amp;theme=light&amp;origin=https%3A%2F%2Fapp.supabase.com"
+								tabindex="0"
+								frameborder="0"
+								scrolling="no"
+								title="Widget containing checkbox for hCaptcha security challenge"
+								aria-hidden="true"
+								data-hcaptcha-widget-id="26y0gvo4aij2"
+								data-hcaptcha-response=""
+								style="display: none"
+							></iframe
+							><textarea
+								id="g-recaptcha-response-26y0gvo4aij2"
+								name="g-recaptcha-response"
+								style="display: none"
+							></textarea
+							><textarea
+								id="h-captcha-response-26y0gvo4aij2"
+								name="h-captcha-response"
+								style="display: none"
+							></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="border-b">
+				<div
+					class="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-16 lg:px-16 2xl:px-32"
+				>
+					<div class="grid grid-cols-12 gap-6" id="cost-control">
+						<div class="col-span-12 lg:col-span-5">
+							<div class="sticky top-16">
+								<div class="space-y-6">
+									<div>
+										<p class="text-base">Cost Control</p>
+										<p class="text-scale-1000 text-sm">
+											Control whether to usage beyond your plans included quota
 										</p>
 									</div>
+									<div class="space-y-2">
+										<p class="text-scale-1100 text-sm">More information</p>
+										<div>
+											<a
+												target="_blank"
+												rel="noreferrer"
+												href="https://supabase.com/docs/guides/platform/spend-cap"
+												><div
+													class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+												>
+													<p class="text-sm">Spend cap</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+														></path>
+														<polyline points="15 3 21 3 21 9"></polyline>
+														<line x1="10" y1="14" x2="21" y2="3"></line>
+													</svg></div
+											></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-span-12 space-y-6 lg:col-span-7">
+							<p class="text-scale-1000 text-sm">
+								You can control whether your project is charged for additional
+								usage beyond the
+								<a
+									class="hover:text-green-1000 text-sm text-green-900 transition"
+									href="/project/nsfipxnlucvgchlkqvqw/settings/billing/subscription#breakdown"
+									>included quota</a
+								>
+								of your subscription plan. If you need to go beyond the included
+								quota, simply switch off your spend cap to pay for additional
+								usage.
+							</p>
+							<div class="flex space-x-6">
+								<div>
 									<div
-										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 text-slate-500 dark:border-slate-800"
+										class="bg-scale-100 dark:bg-scale-400 h-[96px] w-[160px] rounded-md shadow"
 									>
-										<div class="w-[40%]">
-											<p class="text-scale-900 text-xs uppercase">Item</p>
+										<img
+											alt="Spend Cap"
+											width="160"
+											height="96"
+											:src="`~/assets/images/spend-cap-${'on'}${'--light'}.png`"
+										/>
+									</div>
+								</div>
+								<div>
+									<p class="mb-1">Spend cap is enabled</p>
+									<p class="text-scale-1000 text-sm">
+										<span
+											>You won't be charged any extra for usage. However, your
+											project could become unresponsive or enter read only mode
+											if you exceed the included quota.</span
+										>
+									</p>
+									<button
+										data-state="closed"
+										class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative mt-4 inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+										type="button"
+									>
+										<span class="truncate">Change spend cap</span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="border-b">
+				<div
+					class="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-16 lg:px-16 2xl:px-32"
+				>
+					<div class="grid grid-cols-12 gap-6" id="addons">
+						<div class="col-span-12 lg:col-span-5">
+							<div class="sticky top-16">
+								<div class="space-y-6">
+									<div>
+										<p class="text-base">Add ons</p>
+										<p class="text-scale-1000 text-sm">
+											Level up your project with add-ons
+										</p>
+									</div>
+									<div class="space-y-2">
+										<p class="text-scale-1100 text-sm">More information</p>
+										<div>
+											<a
+												target="_blank"
+												rel="noreferrer"
+												href="https://supabase.com/docs/guides/platform/compute-add-ons"
+												><div
+													class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+												>
+													<p class="text-sm">Compute add-ons</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+														></path>
+														<polyline points="15 3 21 3 21 9"></polyline>
+														<line x1="10" y1="14" x2="21" y2="3"></line>
+													</svg></div
+											></a>
 										</div>
-										<div class="flex w-[20%] justify-end">
-											<p class="text-scale-900 text-xs uppercase">Amount</p>
+										<div>
+											<a
+												target="_blank"
+												rel="noreferrer"
+												href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+												><div
+													class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+												>
+													<p class="text-sm">PITR backups</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+														></path>
+														<polyline points="15 3 21 3 21 9"></polyline>
+														<line x1="10" y1="14" x2="21" y2="3"></line>
+													</svg></div
+											></a>
 										</div>
-										<div class="flex w-[20%] justify-end">
-											<p class="text-scale-900 text-xs uppercase">Unit Price</p>
+										<div>
+											<a
+												target="_blank"
+												rel="noreferrer"
+												href="https://supabase.com/docs/guides/platform/custom-domains"
+												><div
+													class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+												>
+													<p class="text-sm">Custom domains</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+														></path>
+														<polyline points="15 3 21 3 21 9"></polyline>
+														<line x1="10" y1="14" x2="21" y2="3"></line>
+													</svg></div
+											></a>
 										</div>
-										<div class="flex w-[20%] justify-end">
-											<p class="text-scale-900 text-xs uppercase">Price</p>
+										<div>
+											<a
+												target="_blank"
+												rel="noreferrer"
+												href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+												><div
+													class="flex items-center space-x-2 opacity-50 transition hover:opacity-100"
+												>
+													<p class="text-sm">Connection Pooler</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon"
+													>
+														<path
+															d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+														></path>
+														<polyline points="15 3 21 3 21 9"></polyline>
+														<line x1="10" y1="14" x2="21" y2="3"></line>
+													</svg></div
+											></a>
 										</div>
 									</div>
-									<div
-										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
-									>
-										<div class="flex w-[40%] items-center gap-3">
-											<span class="text-sm">Base Plan</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{ retainer.quantity }}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{
-												formatAccounting(retainer.amount / 100, true)
-											}}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{
-												formatAccounting(
-													(retainer.amount / 100) * retainer.quantity
-													, true)
-											}}</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-span-12 space-y-6 lg:col-span-7">
+							<div class="space-y-6 py-2">
+								<div class="flex space-x-6">
+									<div>
+										<div
+											class="bg-scale-100 dark:bg-scale-400 h-[96px] w-[160px] rounded-md shadow"
+										>
+											<img
+												alt="Optimized Compute"
+												width="160"
+												height="96"
+												src="/img/optimized-compute-off.png"
+											/>
 										</div>
 									</div>
-									<div v-if="hosting"
-										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
-									>
-										<div class="flex w-[40%] items-center gap-3">
-											<span class="text-sm">Hosting</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{ 1 }}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{
-												formatAccounting(150, true)
-											}}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{
-												formatAccounting(
-													150 * retainer.quantity, true
-												)
-											}}</span>
-										</div>
-									</div>
-									<div v-if="hosting"
-										class="dark:border-panel-border-dark relative flex items-center border-t border-slate-100 px-6 py-3 dark:border-slate-800 dark:text-slate-200"
-									>
-										<div class="flex w-[40%] items-center gap-3">
-											<span class="text-sm">Executions</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{ state.kpis['Task Runs'].toLocaleString() }}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">${{
-												formatAccounting(taskPrice(state.kpis['Task Runs'], false) / state.kpis['Task Runs'])
-											}}</span>
-										</div>
-										<div class="flex w-[20%] justify-end">
-											<span class="text-sm">{{
-												formatAccounting(
-													taskPrice(state.kpis['Task Runs']) * retainer.quantity, true
-												)
-											}}</span>
-										</div>
-									</div>
-									<div
-										class="border-panel-border-light relative flex items-center border-t px-6 py-3 dark:border-slate-800"
-									>
-										<div class="w-[80%]">
-											<p class="text-sm text-slate-500">
-												Estimated cost for
-												{{
-													format(firstDay, 'MMM d, yyyy') +
-													' - ' +
-													format(addDays(firstDay, 30), 'MMM d, yyyy')
-												}}
-												so far
-											</p>
+									<div class="flex-grow">
+										<p class="text-scale-1000 text-sm">Optimized compute</p>
+										<p class="">Micro</p>
+										<button
+											data-state="closed"
+											class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative mt-2 inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+											type="button"
+										>
+											<span class="truncate">Change optimized compute</span>
+										</button>
+										<div
+											class="mt-2 flex w-full items-center justify-between border-b py-2"
+										>
+											<a
+												href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#ram"
+												><div class="group flex items-center space-x-2">
+													<p
+														class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+													>
+														Memory
+													</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+													>
+														<polyline points="9 18 15 12 9 6"></polyline>
+													</svg></div
+											></a>
+											<p class="text-sm">1 GB</p>
 										</div>
 										<div
-											class="flex w-[20%] items-center justify-end space-x-1"
+											class="flex w-full items-center justify-between border-b py-2"
 										>
-											<p class="text-slate-500">$</p>
-											<h3 class="m-0 text-xl dark:text-slate-200">{{ formatAccounting(
-												taskPrice(hosting ? state.kpis['Task Runs'] : 0) * retainer.quantity + (retainer.amount / 100 * retainer.quantity) + (hosting ? 150 : 0), false) }}</h3>
+											<a
+												href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#cpu"
+												><div class="group flex items-center space-x-2">
+													<p
+														class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+													>
+														CPU
+													</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+													>
+														<polyline points="9 18 15 12 9 6"></polyline>
+													</svg></div
+											></a>
+											<p class="text-sm">2-core ARM (Shared)</p>
 										</div>
+										<div
+											class="flex w-full items-center justify-between border-b py-2"
+										>
+											<p class="text-scale-1000 text-sm">
+												No. of direct connections
+											</p>
+											<p class="text-sm">60</p>
+										</div>
+										<div
+											class="flex w-full items-center justify-between border-b py-2"
+										>
+											<p class="text-scale-1000 text-sm">
+												No. of pooler connections
+											</p>
+											<p class="text-sm">200</p>
+										</div>
+										<div
+											class="flex w-full items-center justify-between border-b py-2"
+										>
+											<a
+												href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#disk_io"
+												><div class="group flex items-center space-x-2">
+													<p
+														class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+													>
+														Max Disk Throughput
+													</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+													>
+														<polyline points="9 18 15 12 9 6"></polyline>
+													</svg></div
+											></a>
+											<p class="text-sm">2,085 Mbps</p>
+										</div>
+										<div class="flex w-full items-center justify-between py-2">
+											<a
+												href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#disk_io"
+												><div class="group flex items-center space-x-2">
+													<p
+														class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+													>
+														Baseline Disk Throughput
+													</p>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+													>
+														<polyline points="9 18 15 12 9 6"></polyline>
+													</svg></div
+											></a>
+											<p class="text-sm">87 Mbps</p>
+										</div>
+									</div>
+								</div>
+								<div class="w-full border-t"></div>
+								<div class="flex space-x-6">
+									<div>
+										<div
+											class="bg-scale-100 dark:bg-scale-400 h-[96px] w-[160px] rounded-md shadow"
+										>
+											<img
+												alt="Point-In-Time-Recovery"
+												width="160"
+												height="96"
+												src="/img/pitr-off.png?v=2"
+											/>
+										</div>
+									</div>
+									<div>
+										<p class="text-scale-1000 text-sm">
+											Point in time recovery
+										</p>
+										<p class="">Point in time recovery is not enabled</p>
+										<button
+											data-state="closed"
+											class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative mt-2 inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+											type="button"
+										>
+											<span class="truncate"
+												>Change point in time recovery</span
+											>
+										</button>
+									</div>
+								</div>
+								<div class="w-full border-t"></div>
+								<div class="flex space-x-6">
+									<div>
+										<div
+											class="bg-scale-100 dark:bg-scale-400 h-[96px] w-[160px] rounded-md shadow"
+										>
+											<img
+												alt="Custom Domain"
+												width="160"
+												height="96"
+												src="/img/custom-domain-off.png"
+											/>
+										</div>
+									</div>
+									<div>
+										<p class="text-scale-1000 text-sm">Custom domain</p>
+										<p class="">Custom domain is not enabled</p>
+										<button
+											data-state="closed"
+											class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative mt-2 inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+											type="button"
+										>
+											<span class="truncate">Change custom domain</span>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -247,678 +805,620 @@
 					</div>
 				</div>
 			</div>
-			<org-billing />
-			<section aria-labelledby="plan-heading" v-if="false">
-				<fieldset
-					:disabled="
-						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
-					"
-					class="disabled:opacity-60"
+			<div class="border-b">
+				<div
+					class="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-16 lg:px-16 2xl:px-32"
 				>
-					<div class="sm:overflow-hidden">
-						<div class="space-y-6 bg-white dark:bg-slate-900">
-							<ul
-								role="list"
-								class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-							>
-								<li
-									v-for="(plan, idx) in plans"
-									:key="plan.id"
-									class="col-span-1 flex min-h-[500px] flex-col border bg-white text-center dark:border-white/10 dark:bg-slate-800"
-								>
-									<div
-										class="group relative h-full overflow-hidden ring-2 ring-inset ring-black/20"
-									>
-										<img
-											class="h-full w-full object-cover transition-opacity group-hover:opacity-95"
-											:src="plan.image"
-											:alt="plan.name"
-										/>
-										<div
-											class="absolute left-0 top-0 h-full w-full bg-black opacity-50"
-										></div>
-										<div
-											class="absolute left-0 top-0 flex h-full w-full flex-col justify-between px-6 py-4"
-										>
-											<div
-												class="flex flex-col items-start justify-start self-start"
-											>
-												<h4
-													class="text-xl font-semibold tracking-tight text-white"
-												>
-													{{ plan.name }}
-												</h4>
-												<div
-													class="max-w-sm break-words text-left text-xs text-slate-300"
-												>
-													{{ plan.desc }}
-												</div>
-												<h3
-													class="mt-8 text-3xl font-semibold tracking-tight text-white"
-												>
-													${{ plan.priceMonthly.toLocaleString()
-													}}<small class="text-sm text-slate-300">/mo</small>
-												</h3>
-												<div class="text-left">
-													<ul
-														role="list"
-														class="mt-4 space-y-1 text-sm text-white dark:text-gray-300"
-													>
-														<div class="mb-2 dark:text-gray-300">
-															<span v-if="idx === 0">
-																<strong class="">{{ plan.name }}</strong>
-																includes:</span
-															>
-															<span v-else
-																>Everything in
-																<strong class="">{{
-																	plans[idx - 1].name
-																}}</strong
-																>, plus:</span
-															>
-														</div>
-														<li
-															v-for="feature in plan.features"
-															:key="feature"
-															class="flex text-xs"
-														>
-															<CheckIcon class="mr-1 h-4 w-4" />
-															{{ feature }}
-														</li>
-													</ul>
-												</div>
-											</div>
-											<div class="flex w-full items-center self-end">
-												<div
-													class="flex w-full items-center justify-between rounded-lg py-1 text-sm"
-													v-if="retainer.tier === plan.id"
-												>
-													<div class="flex items-center">
-														<div
-															class="flex items-center rounded-md border border-lime-400 bg-lime-200 px-3 py-0.5 text-lime-700"
-															v-if="
-																retainer.status === 'active' &&
-																new Date(retainer.resumesAt) <=
-																new Date(new Date().getTime())
-															"
-														>
-															Active
-														</div>
-														<div
-															class="flex items-center rounded-md border border-sky-400 bg-sky-200 px-3 py-0.5 text-sky-700"
-															v-else-if="
-																retainer.status === 'active' &&
-																new Date(retainer.resumesAt) >
-																new Date(new Date().getTime())
-															"
-														>
-															Resuming
-														</div>
-														<div
-															class="flex items-center rounded-md border border-yellow-400 bg-yellow-200 px-3 py-0.5 text-yellow-700"
-															v-else
-														>
-															Paused
-														</div>
-													</div>
-													<div class="flex items-center text-xs text-white">
-														<span
-															v-if="
-																retainer.status === 'paused' ||
-																new Date(retainer.resumesAt) >
-																new Date(new Date().getTime())
-															"
-															class="mr-1.5 flex items-center"
-															><svg
-																class="h4 mr-0.5 w-4"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<circle
-																	cx="12"
-																	cy="12"
-																	r="7.25"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																></circle>
-																<path
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	d="M12 8V12L14 14"
-																></path>
-															</svg>
-
-															{{
-																Math.floor(
-																	retainer.daysLeft / (24 * 3600 * 1000)
-																)
-															}}
-															days</span
-														>
-														<button
-															v-if="retainer.status === 'active'"
-															:disabled="loading"
-															@click="
-																handlePause(retainer.stripeSubscriptionId)
-															"
-															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 p-0.5 text-slate-200 transition-colors hover:border-slate-600 hover:text-white"
-														>
-															<svg
-																v-if="loading"
-																class="h-5 w-5 animate-spin"
-																viewBox="0 0 24 24"
-																fill="none"
-																xmlns="http://www.w3.org/2000/svg"
-															>
-																<path
-																	d="M12 4.75V6.25"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M17.1266 6.87347L16.0659 7.93413"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M19.25 12L17.75 12"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M17.1266 17.1265L16.0659 16.0659"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M12 17.75V19.25"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7.9342 16.0659L6.87354 17.1265"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M6.25 12L4.75 12"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7.9342 7.93413L6.87354 6.87347"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-															</svg>
-															<svg
-																v-else
-																class="h-5 w-5"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M15.25 6.75V17.25"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M8.75 6.75V17.25"
-																></path>
-															</svg>
-														</button>
-														<button
-															v-else
-															:disabled="loading"
-															@click="
-																handleResume(
-																	retainer.stripeSubscriptionId,
-																	retainer.daysLeft
-																)
-															"
-															class="justify-right flex items-center rounded-md border border-slate-700 bg-slate-800 p-0.5 text-slate-200 transition-colors hover:border-slate-600 hover:text-white"
-														>
-															<svg
-																v-if="loading"
-																class="h-5 w-5 animate-spin"
-																viewBox="0 0 24 24"
-																fill="none"
-																xmlns="http://www.w3.org/2000/svg"
-															>
-																<path
-																	d="M12 4.75V6.25"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M17.1266 6.87347L16.0659 7.93413"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M19.25 12L17.75 12"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M17.1266 17.1265L16.0659 16.0659"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M12 17.75V19.25"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7.9342 16.0659L6.87354 17.1265"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M6.25 12L4.75 12"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-																<path
-																	d="M7.9342 7.93413L6.87354 6.87347"
-																	stroke="currentColor"
-																	stroke-width="1.5"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																></path>
-															</svg>
-
-															<svg
-																v-else
-																class="h-5 w-5"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M18.25 12L5.75 5.75V18.25L18.25 12Z"
-																></path>
-															</svg>
-														</button>
-													</div>
-												</div>
-												<button
-													v-else
-													@click="
-														handleCheckout(
-															{ id: plan.id },
-															'retainer',
-															User.Account.stripeCustomerId,
-															User.Account.subscription
-														)
-													"
-													class="w-full rounded-lg bg-indigo-500 px-8 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-400"
-												>
-													{{
-														idx <
-														plans.findIndex((plan) => retainer.tier === plan.id)
-														? 'Downgrade'
-														: 'Upgrade'
-													}}
-												</button>
-											</div>
-										</div>
-									</div>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</fieldset>
-			</section>
-			<!-- Add Ons -->
-			<section aria-labelledby="plan-heading" v-if="false">
-				<fieldset
-					:disabled="
-						User.systemRole !== 'owner' && User.systemRole !== 'super_admin'
-					"
-					class="disabled:opacity-60"
-				>
-					<div class="mt-8">
-						<div class="space-y-6">
-							<div
-								class="flex justify-between border-b border-slate-200 py-6 dark:border-slate-700"
-							>
-								<h2 class="font-semibold dark:text-white">Hosting</h2>
+					<div class="grid grid-cols-12 gap-6" id="breakdown">
+						<div class="col-span-12 lg:col-span-5">
+							<div class="sticky top-16">
+								<p class="text-base">Billing breakdown</p>
+								<p class="text-scale-1000 text-sm">
+									Current billing cycle: Jun 18 - Jul 18
+								</p>
 							</div>
-							<div class="py-4 text-sm text-slate-400">
-								<!-- <div class="">No add on added</div> -->
+						</div>
+						<div class="col-span-12 space-y-6 lg:col-span-7">
+							<p class="text-sm">Included usage summary</p>
+							<p class="text-scale-1000 text-sm">
+								Your plan includes a limited amount of usage. If the usage on
+								your project exceeds these quotas, you may experience
+								restrictions, as you are currently not billed for overage. It
+								may take up to 24 hours for usage stats to update.
+							</p>
+							<div class="grid grid-cols-12">
 								<div
-									class="flex flex-col items-start gap-x-8 gap-y-6 border border-gray-900/10 bg-gray-50 p-8 dark:border-white/10 dark:bg-slate-800 sm:gap-y-10 sm:p-10 lg:col-span-3 lg:flex-row lg:items-center"
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:border-r md:pr-4"
 								>
-									<div class="lg:min-w-0 lg:flex-1">
-										<div class="mt-1 flex items-center">
-											<h3
-												class="text-lg font-semibold leading-8 tracking-tight text-slate-600 dark:text-white"
-											>
-												Tray.io hosting
-											</h3>
-											<div
-												class="ml-3 flex items-center rounded-lg py-1 text-sm text-lime-600 dark:text-lime-400"
-												v-if="hosting"
-											>
-												<CheckCircleIcon class="mr-1 h-5 w-5" />
-												Active
-											</div>
-										</div>
-
-										<p
-											class="mt-1 text-sm leading-7 text-gray-600 dark:text-slate-300"
-										>
-											Get full access to all of the standard Tray.io license
-											features for 70% of the cost by joining us.
-										</p>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#dbSize"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Database space
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
 									</div>
-
-									<button
-										@click="
-											hosting
-												? handleCheckout(
-													{ id: selectedPlan.id },
-													'retainer',
-													User.Account.stripeCustomerId,
-													User.Account.Subscription
-												)
-												: handleCheckout(
-													{},
-													'add_on',
-													User.Account.stripeCustomerId
-												)
-										"
-										class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-black shadow dark:bg-slate-100"
-									>
-										<SparklesIcon class="mr-1 h-5 w-5" />{{
-											hosting ? 'Manage License' : 'Upgrade License'
-										}}
-									</button>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												76.28 MB of 8 GB
+											</p>
+											<p class="text-scale-1100 text-sm">0.93%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0.931145%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:pl-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#dbEgress"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Database egress
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 bytes of 50 GB
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:border-r md:pr-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#mau"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Active users
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 100,000
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:pl-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#mauSso"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Active SSO users
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 50
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:border-r md:pr-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#storageSize"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Storage space
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												53.96 MB of 100 GB
+											</p>
+											<p class="text-scale-1100 text-sm">0.05%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0.052694%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:pl-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#storageEgress"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Storage egress
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 bytes of 200 GB
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:border-r md:pr-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#storageImageTransformations"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Storage Image Transformations
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 100
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:pl-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#realtimePeakConnections"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Realtime peak connections
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 500
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 border-b py-4 md:col-span-6 md:border-r md:pr-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#realtimeMessageCount"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Realtime messages
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 5,000,000
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 py-4 md:col-span-6 md:pl-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#funcInvocations"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Edge Function invocations
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 2,000,000
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
+								</div>
+								<div
+									class="border-scale-400 col-span-12 space-y-4 py-4 md:col-span-6 md:border-r md:pr-4"
+								>
+									<div class="flex items-center justify-between">
+										<a
+											href="/project/nsfipxnlucvgchlkqvqw/settings/billing/usage#funcCount"
+											><div class="group flex items-center space-x-2">
+												<p
+													class="text-scale-1100 group-hover:text-scale-1200 cursor-pointer text-sm transition"
+												>
+													Edge Functions
+												</p>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon -translate-x-2 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+												>
+													<polyline points="9 18 15 12 9 6"></polyline>
+												</svg></div
+										></a>
+									</div>
+									<div class="flex w-full flex-col">
+										<div
+											class="flex justify-between space-x-8 pb-1 align-baseline"
+										>
+											<p
+												class="text-scale-1200 capitalize-sentence !text-scale-1000 max-w-[75%] truncate text-sm"
+											>
+												0 of 100
+											</p>
+											<p class="text-scale-1100 text-sm">0.00%</p>
+										</div>
+										<div
+											class="relative h-1 w-full overflow-hidden rounded border border-none bg-gray-300 p-0 dark:bg-gray-600"
+										>
+											<div
+												class="bg-scale-1100 absolute inset-x-0 bottom-0 h-1 rounded transition-all"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
 								</div>
 							</div>
+							<p class="!mt-10 text-sm">Upcoming cost for next invoice</p>
+							<p class="text-scale-1000 text-sm">
+								The following table shows your upcoming costs. Depending on your
+								usage, the final amount may vary. Next invoice on
+								<span class="text-scale-1100">Jul 18, 2023</span>.
+							</p>
+							<table class="w-full">
+								<thead>
+									<tr class="border-b">
+										<th
+											class="text-scale-1000 w-1/2 py-2 text-left text-sm font-normal"
+										>
+											Item
+										</th>
+										<th
+											class="text-scale-1000 py-2 text-left text-sm font-normal"
+										>
+											Count
+										</th>
+										<th
+											class="text-scale-1000 py-2 text-left text-sm font-normal"
+										>
+											Unit price
+										</th>
+										<th
+											class="text-scale-1000 py-2 text-right text-sm font-normal"
+										>
+											Price
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="border-b">
+										<td class="py-2 text-sm">Pro plan</td>
+										<td class="py-2 text-sm">1</td>
+										<td class="py-2 text-sm">$25</td>
+										<td class="py-2 text-right text-sm">$25</td>
+									</tr>
+								</tbody>
+								<tbody>
+									<tr>
+										<td class="py-2 text-sm">Total</td>
+										<td class="py-2 text-sm"></td>
+										<td class="py-2 text-sm"></td>
+										<td class="py-2 text-right text-sm">$25</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
-				</fieldset>
-			</section>
+				</div>
+			</div>
 		</div>
-	</div>
+	</main>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import {
-	Disclosure,
-	DisclosureButton,
-	DisclosurePanel,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuItems,
-	RadioGroup,
-	RadioGroupDescription,
-	RadioGroupLabel,
-	RadioGroupOption,
-	Switch,
-	SwitchGroup,
-	SwitchLabel,
-} from '@headlessui/vue';
-import {
-	CheckCircleIcon,
-	MagnifyingGlassIcon,
-	QuestionMarkCircleIcon,
-	XCircleIcon,
-} from '@heroicons/vue/20/solid';
-import {
-	Bars3Icon,
-	BellIcon,
-	PencilIcon,
-	ExclamationTriangleIcon,
-	CogIcon,
-	CreditCardIcon,
-	SparklesIcon,
-	KeyIcon,
-	SquaresPlusIcon,
-	UserCircleIcon,
-	CheckIcon,
-	XMarkIcon,
-} from '@heroicons/vue/24/outline';
-
-import { format, addDays } from 'date-fns';
-
-import free from '@/assets/images/plans/free.png';
-import support from '~/assets/images/plans/support.png';
-import growth from '~/assets/images/plans/growth.png';
-import enterprise from '~/assets/images/plans/enterprise.png';
-
-const user = useSupabaseUser();
-const supabase = useSupabaseClient();
-
-const state = reactive({
-	kpis: { 'Task Runs': 0 },
-	loading: true,
-});
-
-
-
-const kpis = ref(state.kpis);
-const workflows = ref(state.workflows);
-const loading = ref(state.loading);
-
-const plans = [
-	{
-		name: 'Free',
-		id: 'free',
-		desc: 'Experiment for free',
-		features: ['No requests'],
-
-		priceMonthly: 0,
-		priceYearly: 0,
-		limit: 'No requests',
-	},
-	{
-		name: 'Basic',
-		id: 'basic',
-		desc: 'Great for running lightweight automations',
-		features: [
-			'Up to 2 hours of development',
-			'Unlimited debugging',
-			'48 hours (18/5) response time',
-		],
-
-		priceMonthly: 600,
-		priceYearly: 6000,
-		limit: 'Up to 5 active requests',
-	},
-	{
-		name: 'Growth',
-		id: 'growth',
-		desc: 'We scale as you scale',
-
-		features: [
-			'Up to 20 hours of development',
-			'Unlimited project requests',
-			'QA testing',
-			'Add us to your Slack',
-			'36-hour (18/5) response time',
-		],
-		priceMonthly: 1800,
-		priceYearly: 18000,
-		limit: 'Up to 25 active requests',
-	},
-	{
-		name: 'Enterprise',
-		id: 'enterprise',
-		desc: 'Governance, compliance and support.',
-		features: [
-			'Up to 80 hours of development',
-			'Concurrent requests',
-			'Regular unit & load testing',
-			'Team coaching',
-			'Monthly strategy call',
-			'Process documentation hub',
-			'24-hour (18/7) response time',
-		],
-
-		priceMonthly: 5400,
-		priceYearly: 54000,
-		limit: 'Unlimited active requests',
-	},
-];
-
-
-let { data: User, error: userError } = await supabase
-	.from('User')
-	.select(
-		`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,type,Ticket(*),Subscription(*),User(*))`
-	)
-	.eq('id', user.value.id)
-	.limit(1)
-	.single();
-
-async function fetchData() {
-	const workspaceId =
-		User.Account.type === 'super_admin' ? 'null' : User.Account.trayWorkspaceId;
-	const kpis = await $fetch(`/api/tray/kpis/${workspaceId}`);
-	const data = { kpis };
-	return data;
-}
-
-
-const retainer = User.Account.Subscription.find((o) => o.type === 'retainer');
-
-var date = new Date(Date.now());
-var firstDay = new Date(
-	date.getFullYear(),
-	date.getMonth(),
-	new Date(retainer.startDate).getDate()
-);
-
-onMounted(async () => {
-	const { kpis } = await fetchData();
-	state.kpis = kpis;
-
-	loading.value = false;
-});
-
-let hosting = {};
-hosting = User.Account.Subscription.find((o) => o.type === 'hosting');
-
-const selectedPlan = ref(null);
-
-const upgrade_needed = ref(false);
-
-const entitlements = await getEntitlements();
-
-upgrade_needed.value = entitlements[retainer.tier].ticket_count - User.Account.Ticket.filter((o) => o.status !== 'done').length < 0 || entitlements[retainer.tier].user_count - User.Account.User.length < 0
-
-const freePlan = retainer.tier === 'free';
-
-const handleCheckout = async (product, type, customer) => {
-	selectedPlan.value = product.id;
-	const { url } = await $fetch('/api/stripe/checkout', {
-		method: 'post',
-		body: {
-			product: { id: selectedPlan.value },
-			type,
-			customer,
-			account: User.Account,
-		},
-	});
-	location.href = url;
-};
-
-const handlePause = async (subscriptionId) => {
-	loading.value = true;
-	const { date: paused, error } = await $fetch(
-		'/api/stripe/subscription/pause',
-		{
-			method: 'post',
-			body: {
-				subscriptionId,
-			},
-		}
-	);
-	location.reload();
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	retainer.value = User.Account.Subscription.find(
-		(o) => o.type === 'retainer'
-	);
-};
-
-const handleResume = async (subscriptionId, days_left) => {
-	loading.value = true;
-	const { date: resumed, error } = await $fetch(
-		'/api/stripe/subscription/resume',
-		{
-			method: 'post',
-			body: {
-				subscriptionId,
-				days_left,
-			},
-		}
-	);
-	location.reload();
-
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`systemRole,Account(id,stripeCustomerId,trayWorkspaceId,Subscription(*))`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-	retainer.value = User.Account.Subscription.find(
-		(o) => o.type === 'retainer'
-	);
-};
-</script>

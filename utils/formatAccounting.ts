@@ -1,6 +1,6 @@
-export default function formatNumber(
+export default function formatAccounting(
 	num: string | number,
-	dollar: boolean
+	trailing: boolean
 ): string {
 	if (typeof num === 'number' && !isFinite(num)) {
 		num = 0;
@@ -25,9 +25,9 @@ export default function formatNumber(
 
 	formattedNum = numberWithCommas(formattedNum);
 
-	if (dollar) {
-		return num < 0 ? `($${formattedNum})` : `$${formattedNum}`;
-	} else {
-		return num < 0 ? `-${formattedNum}` : `${formattedNum}`;
+	if (trailing) {
+		formattedNum = formattedNum.replace(/\.?0+$/, '');
 	}
+
+	return num < 0 ? `-${formattedNum}` : `${formattedNum}`;
 }

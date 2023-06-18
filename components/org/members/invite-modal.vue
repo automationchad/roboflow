@@ -149,238 +149,172 @@
 <template>
 	<div
 		@click="emit('close')"
-		class="fixed inset-0 grid place-items-center overflow-y-auto bg-white/60"
+		class="bg-scale-600/75 fixed inset-0 grid place-items-center overflow-y-auto"
 	>
-		<div @click.stop>
+		<div
+			@click.stop
+			role="dialog"
+			id="radix-134"
+			aria-describedby="radix-142"
+			aria-labelledby="radix-141"
+			data-state="open"
+			class="bg-scale-100 dark:bg-scale-300 border-scale-300 dark:border-scale-500 data-open:animate-overlay-show data-closed:animate-overlay-hide relative my-4 !overflow-visible rounded-md border shadow-xl sm:w-full sm:max-w-lg sm:align-middle"
+			tabindex="-1"
+			style="pointer-events: auto"
+		>
 			<div
-				class="dark:bg-scale-300 my-4 max-w-lg rounded-md border border-slate-300 bg-white shadow-xl sm:w-[32rem] sm:align-middle"
+				class="bg-scale-200 dark:bg-scale-400 border-scale-300 dark:border-scale-500 space-y-1 border-b px-4 py-3 sm:px-5"
 			>
-				<div class="dark:bg-panel-body-dark bg-slate-100">
-					<div class="flex items-center px-6 py-4">
-						<div><h3>Invite a member to this organization</h3></div>
-					</div>
-				</div>
-				<div>
-					<div class="px-5">
-						<div class="w-full py-4">
-							<div class="space-y-4">
-								<div class="space-y-2">
-									<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
-										<div
-											class="col-span-12 flex flex-row justify-between space-x-2"
-										>
-											<label class="text-scale-1100 block text-sm" for="role"
-												>Member role</label
-											>
-										</div>
-										<div class="col-span-12">
-											<div class="">
-												<Listbox
-													v-model="selectedRole"
-													as="div"
-													v-slot="{ open }"
-													class="relative w-auto"
-												>
-													<ListboxButton
-														:class="[
-															open
-																? 'border-slate-500 shadow-md ring-2 ring-slate-300'
-																: '',
-															'box-border block w-full rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm placeholder-slate-800 shadow-sm outline-none transition-all ',
-														]"
-													>
-														<span
-															class="flex w-full flex-row items-center space-x-3"
-															><span class="truncate">{{
-																selectedRole.name
-															}}</span
-															><span
-																class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-																><svg
-																	class="text-scale-600 h-5 w-5"
-																	xmlns="http://www.w3.org/2000/svg"
-																	viewBox="0 0 20 20"
-																	fill="currentColor"
-																	aria-hidden="true"
-																>
-																	<path
-																		fill-rule="evenodd"
-																		d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-																		clip-rule="evenodd"
-																	></path></svg></span
-														></span>
-													</ListboxButton>
-													<transition
-														leave-active-class="transition ease-in duration-100"
-														leave-from-class="opacity-100"
-														leave-to-class="opacity-0"
-														><ListboxOptions
-															class="dark:bg-scale-300 absolute z-[500] mt-1 max-h-60 w-full overflow-auto overflow-y-scroll rounded-md border border-solid border-gray-100 bg-white py-1 text-base shadow-lg dark:border-gray-600 sm:text-sm"
-														>
-															<ListboxOption
-																v-for="role in roles"
-																:key="role.id"
-																:value="role"
-																v-slot="{ selected, active }"
-																><div
-																	:class="[
-																		selected ? 'bg-slate-200' : '',
-																		active ? 'bg-slate-50' : '',
-																		'text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 relative w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
-																	]"
-																>
-																	<div class="flex items-center space-x-3">
-																		<span>{{ role.name }}</span>
-																	</div>
-																	<span
-																		class="text-brand-900 text-brand-900 absolute inset-y-0 right-0 flex items-center pr-3"
-																		><svg
-																			v-if="selected"
-																			xmlns="http://www.w3.org/2000/svg"
-																			width="21"
-																			height="21"
-																			viewBox="0 0 24 24"
-																			fill="none"
-																			stroke="currentColor"
-																			stroke-linecap="round"
-																			stroke-linejoin="round"
-																			class="h-5 w-5 text-lime-500"
-																			aria-hidden="true"
-																		>
-																			<polyline
-																				points="20 6 9 17 4 12"
-																			></polyline></svg
-																	></span>
-																</div>
-															</ListboxOption> </ListboxOptions
-													></transition>
-												</Listbox>
-											</div>
-											<p
-												data-state="hide"
-												class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
-											></p>
-										</div>
-									</div>
-								</div>
+				Invite a member to this organization
+			</div>
+			<form>
+				<div class="px-5">
+					<div class="w-full py-4">
+						<div class="space-y-4">
+							<div class="space-y-2">
 								<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
 									<div
 										class="col-span-12 flex flex-row justify-between space-x-2"
 									>
-										<label class="text-scale-1100 block text-sm" for="email"
-											>Email address</label
+										<label class="text-scale-1100 block text-sm" for="role"
+											>Member role</label
 										>
 									</div>
 									<div class="col-span-12">
 										<div class="">
-											<div class="relative">
-												<input
-													id="email"
-													name=""
-													placeholder="Enter email address"
-													type="email"
-													:class="[
-														invalid_email
-															? 'border-rose-400 bg-rose-50 placeholder:text-rose-400'
-															: 'bg-slate-100',
-														'peer box-border block w-full rounded-md border border-slate-300  px-4 py-2 pl-10 text-sm placeholder-slate-300 shadow-sm outline-none transition-all  focus:border-slate-500 focus:shadow-md focus:ring-2 focus:ring-current focus:ring-slate-300',
-													]"
-													v-model="inviteeEmail"
-												/>
+											<button
+												class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2 indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current aria-expanded:ring-2"
+												name="role"
+												id="role"
+												type="button"
+												aria-haspopup="menu"
+												aria-expanded="false"
+												data-state="closed"
+											>
+												<span
+													class="flex w-full flex-row items-center space-x-3"
+													><span class="truncate">Developer</span></span
+												><span
+													class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+													><svg
+														class="text-scale-600 h-5 w-5"
+														xmlns="http://www.w3.org/2000/svg"
+														viewBox="0 0 20 20"
+														fill="currentColor"
+														aria-hidden="true"
+													>
+														<path
+															fill-rule="evenodd"
+															d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+															clip-rule="evenodd"
+														></path></svg
+												></span>
+											</button>
+										</div>
+										<p
+											data-state="hide"
+											class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+										></p>
+									</div>
+								</div>
+							</div>
+							<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
+								<div
+									class="col-span-12 flex flex-row justify-between space-x-2"
+								>
+									<label class="text-scale-1100 block text-sm" for="email"
+										>Email address</label
+									>
+								</div>
+								<div class="col-span-12">
+									<div class="">
+										<div class="relative">
+											<input
+												id="email"
+												name=""
+												placeholder="Enter email address"
+												type="text"
+												class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 box-border block w-full rounded-md border border border-red-700 bg-red-100 px-4 py-2 pl-10 text-sm shadow-sm outline-none transition-all placeholder:text-red-600 focus:shadow-md focus:ring-2 focus:ring-current focus:ring-red-500"
+												value="Rev-Ops"
+											/>
+											<div
+												class="text-scale-1100 pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="21"
+													height="21"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="sbui-icon"
+												>
+													<path
+														d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+													></path>
+													<polyline points="22,6 12,13 2,6"></polyline>
+												</svg>
+											</div>
+											<div
+												data-lastpass-icon-root="true"
+												style="
+													position: relative !important;
+													height: 0px !important;
+													width: 0px !important;
+													float: left !important;
+												"
+											></div>
+											<div
+												class="absolute inset-y-0 right-0 flex items-center space-x-1 pl-3 pr-1"
+											>
 												<div
-													class="text-scale-1100 pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+													class="pointer-events-none inset-y-0 right-3 flex items-center pl-2 pr-2 text-red-900"
 												>
 													<svg
 														xmlns="http://www.w3.org/2000/svg"
-														width="21"
-														height="21"
+														width="20"
+														height="20"
 														viewBox="0 0 24 24"
 														fill="none"
 														stroke="currentColor"
+														stroke-width="2"
 														stroke-linecap="round"
 														stroke-linejoin="round"
 														class="sbui-icon"
 													>
-														<path
-															d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-														></path>
-														<polyline points="22,6 12,13 2,6"></polyline>
+														<circle cx="12" cy="12" r="10"></circle>
+														<line x1="12" y1="8" x2="12" y2="12"></line>
+														<line x1="12" y1="16" x2="12.01" y2="16"></line>
 													</svg>
-												</div>
-												<div
-													class="absolute inset-y-0 right-0 flex items-center space-x-1 pl-3 pr-1"
-												>
-													<div
-														v-if="invalid_email"
-														class="pointer-events-none inset-y-0 right-3 flex items-center pl-2 pr-2 text-rose-600"
-													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="20"
-															height="20"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="sbui-icon"
-														>
-															<circle cx="12" cy="12" r="10"></circle>
-															<line x1="12" y1="8" x2="12" y2="12"></line>
-															<line x1="12" y1="16" x2="12.01" y2="16"></line>
-														</svg>
-													</div>
 												</div>
 											</div>
 										</div>
-										<p
-											v-if="invalid_email"
-											:class="[
-												invalid_email ? 'mt-2' : '',
-												'text-sm text-rose-600 transition-all',
-											]"
-										>
-											{{ invalid_email }}
-										</p>
 									</div>
+									<p
+										data-state="show"
+										class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
+									>
+										Must be a valid email address
+									</p>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="bg-scale-300 dark:bg-scale-500 my-2 h-px w-full"></div>
-					<div class="px-5">
-						<div class="pb-3 pt-2">
-							<button
-								:disabled="invalid_email || submit_loading"
-								@click="sendInvitation()"
-								class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded bg-indigo-500 px-4 py-2 text-center text-sm text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50"
-								type="submit"
-							>
-								<svg
-									v-if="submit_loading"
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									class="animate-spin"
-									fill="none"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="1.5"
-										d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
-									></path>
-								</svg>
-
-								<span class="truncate">Invite new member</span>
-							</button>
-						</div>
+				</div>
+				<div class="bg-scale-300 dark:bg-scale-500 my-2 h-px w-full"></div>
+				<div class="px-5">
+					<div class="pb-3 pt-2">
+						<button
+							class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded px-4 py-2 text-center text-sm text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+							type="submit"
+						>
+							<span class="truncate">Invite new member</span>
+						</button>
 					</div>
 				</div>
-			</div>
+			</form>
 		</div>
 	</div>
 </template>

@@ -211,7 +211,7 @@
 												<div class="mt-2">
 													<button
 														@click="deleteConfirm = true"
-														class="font-regular text-red-1100 bordershadow-red-700 hover:bordershadow-red-900 hover:text-lo-contrast relative inline-flex cursor-pointer items-center space-x-2 rounded bg-red-200 px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-red-600 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-red-700"
+														class="font-regular text-red-1100 bordershadow-red-700 hover:bordershadow-red-900 hover:text-lo-contrast relative inline-flex cursor-pointer hover:text-white items-center space-x-2 rounded bg-red-200 px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-red-900 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-red-700"
 														type="button"
 													>
 														<span class="truncate">Delete organization</span>
@@ -265,7 +265,7 @@
 			leave-from-class="transform opacity-100"
 			leave-to-class="transform opacity-0"
 		>
-			<DeleteOrgConfirm
+			<LazyDeleteOrgConfirm
 				v-if="deleteConfirm"
 				@cancel="deleteConfirm = false"
 				:command="''"

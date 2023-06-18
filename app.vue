@@ -1,5 +1,5 @@
 <template>
-	<div class="min-h-screen bg-[#F8F8FB] dark:bg-[#020014]">
+	<div class="min-h-screen">
 		<NuxtLayout
 			><NuxtLoadingIndicator :throttle="5" :height="1" /><NuxtPage
 		/></NuxtLayout>
@@ -9,13 +9,33 @@
 <script setup>
 	import { onMounted } from 'vue';
 
+	const isDarkMode = ref(false);
+
 	onMounted(() => {
-		let script = document.createElement('script');
-		script.src = 'https://www.helpkit.so/widget/script.js';
-		script.async = true;
-		script.id = 'helpkit-widget';
-		script.dataset.projectId = 'motisgroup';
-		document.body.appendChild(script);
+		if (isDarkMode.value) {
+			document.documentElement.classList.add('dark');
+		} else if (!isDarkMode.value) {
+			document.documentElement.classList.remove('dark');
+		}
+		// Whenever the user explicitly chooses light mode
+		else if (
+			localStorage.theme === 'dark' ||
+			(!('theme' in localStorage) &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+
+		// Whenever the user explicitly chooses light mode
+		localStorage.theme = 'light';
+
+		// Whenever the user explicitly chooses dark mode
+		localStorage.theme = 'dark';
+
+		// Whenever the user explicitly chooses to respect the OS preference
+		localStorage.removeItem('theme');
 	});
 </script>
 
@@ -29,7 +49,7 @@
 		-moz-osx-font-smoothing: grayscale;
 	}
 
-	@media (prefers-color-scheme: dark) {
+	/* @media (prefers-color-scheme: dark) {
 		html {
 			background: #020014;
 		}
@@ -39,11 +59,9 @@
 		html {
 			background: #f8f8fb;
 		}
-	}
+	} */
 
 	html {
 		scroll-behavior: smooth;
 	}
-
-	
 </style>

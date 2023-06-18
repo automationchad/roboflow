@@ -1,12 +1,12 @@
 <template>
 	<div
 		id="with-sidebar"
-		class="hide-scrollbar z-0 h-full w-64 overflow-auto border-r border-black/10 dark:border-white/10"
+		class="hide-scrollbar z-0 h-full w-64 overflow-auto border-r border-scale-500"
 		style="height: 100vh; max-height: 100vh"
 	>
 		<div class="mb-2">
 			<div
-				class="flex h-12 max-h-12 items-center border-b border-black/10 px-6 dark:border-white/10"
+				class="flex h-12 max-h-12 items-center border-b px-6 border-scale-500"
 			>
 				<h4 class="mb-0 truncate text-lg dark:text-slate-200" :title="title">
 					{{ title }}
@@ -21,9 +21,9 @@
 				aria-labelledby="options-menu"
 			>
 				<ul>
-					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
+					<div class="border-b border-scale-500 px-6 py-5 ">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-400">Projects</span>
+							<span class="w-full text-sm text-scale-900">Projects</span>
 						</div>
 						<ul class="space-y-1">
 							<NuxtLink class="block" to="/dashboard/projects"
@@ -32,16 +32,16 @@
 								>
 									<span
 										title="All projects"
-										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-200 dark:text-slate-300/90"
+										class="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
 										>All projects</span
 									>
 								</button></NuxtLink
 							>
 						</ul>
 					</div>
-					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
+					<div class="border-b  px-6 py-5 border-scale-500">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-400 dark:text-slate-400"
+							<span class="w-full text-sm text-scale-900"
 								>Organizations</span
 							>
 						</div>
@@ -57,16 +57,16 @@
 								>
 									<span
 										:title="team.name"
-										class="w-full truncate text-sm text-slate-300/90 text-slate-500 transition group-hover:text-slate-700 dark:group-hover:text-slate-200"
+										class="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
 										>{{ team.name }}</span
 									>
 								</li></NuxtLink
 							>
 						</ul>
 					</div>
-					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
+					<div class="border-b  px-6 py-5 border-scale-500">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-400 dark:text-slate-300"
+							<span class="w-full text-sm text-scale-900"
 								>Account</span
 							>
 						</div>
@@ -77,16 +77,16 @@
 								>
 									<span
 										title="Preferences"
-										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
+										class="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
 										>Preferences</span
 									>
 								</button></a
 							>
 						</ul>
 					</div>
-					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
+					<div class="border-b border-scale-500 px-6 py-5 ">
 						<div class="mb-2 flex space-x-3 font-normal">
-							<span class="w-full text-sm text-slate-400 dark:text-slate-300"
+							<span class="w-full text-sm text-scale-900"
 								>Documentation</span
 							>
 						</div>
@@ -112,14 +112,14 @@
 											<polyline points="7 7 17 7 17 17"></polyline></svg></span
 									><span
 										title="Guides"
-										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
+										class="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
 										>Guides</span
 									>
 								</button></a
 							>
 						</ul>
 					</div>
-					<div class="border-b border-black/10 px-6 py-5 dark:border-white/10">
+					<div class="border-b border-scale-500  px-6 py-5 ">
 						<ul class="space-y-1">
 							<li role="menuitem" class="outline-none">
 								<button
@@ -147,7 +147,7 @@
 										</svg>
 									</div>
 									<span
-										class="w-full truncate text-sm text-slate-500 transition group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200"
+										class="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
 										>Logout</span
 									>
 								</button>

@@ -3,10 +3,6 @@ import { format } from 'date-fns';
 
 const test = true;
 
-const tray_key = test
-	? 'ca1703e63f9e4fe8829bfe8144f8cc5229f476511bc24288b514333311220b46'
-	: 'c872e7dfb9404c1a8c29757b8e5715e0d20af44d95264c819be3fdab09f1f447';
-
 export default defineEventHandler(async (event) => {
 	const user = await serverSupabaseUser(event);
 	const supabase = await serverSupabaseClient(event);

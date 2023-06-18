@@ -29,10 +29,10 @@ export default defineNuxtConfig({
 	css: ['~/assets/css/main.css'],
 	modules: ['@nuxtjs/supabase', '@nuxt/image-edge', '@nuxtjs/color-mode'],
 	// plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
-	postcss: {
-		plugins: {
-			tailwindcss: {},
-			autoprefixer: {},
-		},
-	},
+	// postcss: {
+	// 	plugins: {
+	// 		tailwindcss: {},
+	// 		autoprefixer: {},
+	// 	},
+	// },
 });

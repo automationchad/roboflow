@@ -6,6 +6,7 @@
 	import OrgBilling from '@/components/org/billing.vue';
 	import OrgUsage from '@/components/org/usage.vue';
 	import OrgInvoices2 from '@/components/org/invoices2.vue';
+	import OrgSubscription from '@/components/org/subscription.vue';
 
 	definePageMeta({ layout: 'settings', middleware: ['auth'] });
 
@@ -27,6 +28,10 @@
 		{
 			name: 'Billing',
 			component: OrgBilling,
+		},
+		{
+			name: 'Subscription',
+			component: OrgSubscription,
 		},
 		{
 			name: 'Usage',
@@ -64,9 +69,7 @@
 						data-orientation="horizontal"
 						class="w-full justify-between space-y-4"
 					>
-						<TabList
-							class="flex items-center border-b border-slate-200 dark:border-white/10"
-						>
+						<TabList class="border-scale-400 flex items-center border-b">
 							<Tab
 								v-slot="{ selected }"
 								v-for="tab in tabs"
@@ -76,9 +79,9 @@
 								<div
 									:class="[
 										selected
-											? 'border-b-2 border-slate-900 text-slate-900 dark:border-white dark:text-white'
-											: 'text-slate-500 hover:text-slate-700',
-										'text-scale-900 text-scale-1200 border-scale-1200 relative flex cursor-pointer items-center px-3 py-2 text-center text-sm leading-4 transition focus:outline-none',
+											? 'border-scale-1200  text-scale-1200 border-b-2'
+											: 'text-scale-900',
+										' border-scale-1200 relative flex cursor-pointer items-center px-3 py-2 text-center text-sm leading-4 transition focus:outline-none',
 									]"
 								>
 									<span>{{ tab.name }}</span>
