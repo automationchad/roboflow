@@ -1,9 +1,9 @@
 <template>
 	<div class="mb-8">
 		<div class="container my-4 max-w-4xl space-y-8">
-			<form id="org-general-settings">
+			<form @submit.prevent="handleOrgNameUpdate">
 				<div
-					class="bg-scale-100 dark:bg-white/5 dark:border-white/5 border-scale-400 overflow-hidden rounded-md border shadow"
+					class="bg-scale-100 border-scale-400 overflow-hidden rounded-md border shadow dark:border-white/5 dark:bg-white/5"
 				>
 					<div class="divide-scale-400 flex flex-col gap-0 divide-y">
 						<div
@@ -31,11 +31,11 @@
 										<div class="">
 											<div class="relative">
 												<input
+													v-model="changedOrgName"
 													id="name"
 													name=""
 													type="text"
 													class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-3 py-2 text-sm leading-4 shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
-													value="automationchad's Org"
 												/>
 											</div>
 										</div>
@@ -131,11 +131,26 @@
 								>
 									<span class="truncate">Cancel</span></button
 								><button
-									form="org-general-settings"
-									class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 pointer-events-none relative inline-flex cursor-not-allowed cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white opacity-50 shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-									disabled=""
+									class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+									:disabled="!showSave"
 									type="submit"
 								>
+									<svg
+										v-if="loading"
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4 animate-spin"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="1.5"
+											d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+										></path>
+									</svg>
+
 									<span class="truncate">Save</span>
 								</button>
 							</div>
@@ -195,7 +210,8 @@
 												</p>
 												<div class="mt-2">
 													<button
-														class="font-regular text-red-1100 bordershadow-red-700 hover:bordershadow-red-900 hover:text-lo-contrast relative inline-flex cursor-pointer items-center space-x-2 rounded bg-red-200 px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-red-900 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-red-700"
+														@click="deleteConfirm = true"
+														class="font-regular text-red-1100 bordershadow-red-700 hover:bordershadow-red-900 hover:text-lo-contrast relative inline-flex cursor-pointer items-center space-x-2 rounded bg-red-200 px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out hover:bg-red-600 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-red-700"
 														type="button"
 													>
 														<span class="truncate">Delete organization</span>
@@ -211,137 +227,134 @@
 				</div>
 			</div>
 		</div>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<SuccessModal
+				v-if="is_success"
+				@close="is_success = false"
+				:title="success_message"
+				:description="''"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0 scale-95"
+			enter-to-class="transform opacity-100 scale-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100 scale-100"
+			leave-to-class="transform opacity-0 scale-95"
+		>
+			<ErrorModal
+				v-if="is_error"
+				@close="is_error = false"
+				:title="'Error: '"
+				:description="error_message"
+			/>
+		</transition>
+		<transition
+			enter-active-class="transition ease-out duration-100"
+			enter-from-class="transform opacity-0"
+			enter-to-class="transform opacity-100"
+			leave-active-class="transition ease-in duration-75"
+			leave-from-class="transform opacity-100"
+			leave-to-class="transform opacity-0"
+		>
+			<DeleteOrgConfirm
+				v-if="deleteConfirm"
+				@cancel="deleteConfirm = false"
+				:command="''"
+				:description="orgName"
+			/>
+		</transition>
 	</div>
 </template>
 
 <script setup>
-	import { ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		ExclamationTriangleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		PencilIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		UserMinusIcon,
-		TrashIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
 
-	import { format } from 'date-fns';
-
-	const user = useSupabaseUser();
-
+	const route = useRoute();
 	const supabase = useSupabaseClient();
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(`*,Account(*)`)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
+	const orgName = ref('');
 
-	const handleCheckout = async (product, type, customer) => {
-		const { url } = await $fetch('/api/stripe/checkout', {
-			method: 'post',
-			body: {
-				product,
-				type,
-				customer,
-				account: User.Account,
-			},
-		});
-		location.href = url;
+	const changedOrgName = ref('');
+
+	const deleteConfirm = ref(false);
+
+	
+
+	const loading = ref(false);
+
+	const is_error = ref(false);
+	const error_message = ref('');
+	const is_success = ref(false);
+	const success_message = ref('');
+
+	const getData = async () => {
+		try {
+			const { data: accountData, error: accountError } = await supabase
+				.from('organizations')
+				.select('name')
+				.eq('id', route.params.organization)
+				.limit(1)
+				.single();
+			if (accountError) throw new Error(accountError.message);
+			orgName.value = accountData.name;
+			changedOrgName.value = accountData.name;
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		}
 	};
 
-	const navigation = [
-		{ name: 'Dashboard', href: '#' },
-		{ name: 'Jobs', href: '#' },
-		{ name: 'Applicants', href: '#' },
-		{ name: 'Company', href: '#' },
-	];
-	const userNavigation = [
-		{ name: 'Your Profile', href: '#' },
-		{ name: 'Settings', href: '#' },
-		{ name: 'Sign out', href: '#' },
-	];
+	await getData();
 
-	const plans = [
-		{
-			name: 'Free',
-			id: 'free',
-			image: '@/assets/images/plans/waitlist.png',
-			priceMonthly: 0,
-			priceYearly: 0,
-			limit: 'No requests',
-		},
-		{
-			name: 'Basic',
-			id: 'basic',
-			image: '~/assets/images/plans/support.png',
-			priceMonthly: 600,
-			priceYearly: 6000,
-			limit: 'Up to 5 active requests',
-		},
-		{
-			name: 'Growth',
-			id: 'growth',
-			image: '~/assets/images/plans/growth.png',
-			priceMonthly: 1800,
-			priceYearly: 18000,
-			limit: 'Up to 25 active requests',
-		},
-		{
-			name: 'Enterprise',
-			id: 'enterprise',
-			image: '~/assets/images/plans/enterprise.png',
-			priceMonthly: 5400,
-			priceYearly: 54000,
-			limit: 'Unlimited active requests',
-		},
-	];
+	const handleOrgNameUpdate = async () => {
+		try {
+			loading.value = true;
+			const { error } = await supabase
+				.from('organizations')
+				.update({ name: changedOrgName.value })
+				.eq('id', route.params.organization);
+			if (error) throw new Error(error.message);
+			loading.value = false;
+			is_success.value = true;
+			success_message.value = 'Organization name updated';
+			await getData();
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		}
+	};
 
-	const people = [
-		{
-			name: 'Jane Cooper',
-			title: 'Paradigm Representative',
-			role: 'Admin',
-			email: 'janecooper@example.com',
-			telephone: '+1-202-555-0170',
-			imageUrl:
-				'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60',
-		},
-		// More people...
-	];
-	const { data: payments } = await $fetch(
-		`/api/stripe/invoices/${User.Account.stripeCustomerId}`
-	);
+	const showSave = computed(() => {
+		return (
+			orgName.value !== '' &&
+			orgName.value !== changedOrgName.value &&
+			loading.value !== true
+		);
+	});
 
-	const selectedPlan = ref(plans[0]);
-	const annualBillingEnabled = ref(false);
+	const deleteOrganization = async () => {
+		try {
+			loading.value = true;
+			const { error } = await supabase
+				.from('organizations')
+				.delete()
+				.eq('id', route.params.organization);
+			if (error) throw new Error(error.message);
+			loading.value = false;
+			is_success.value = true;
+			success_message.value = 'Organization deleted';
+			await getData();
+		} catch (error) {
+			is_error.value = true;
+			error_message.value = error.message;
+		}
+	};
 </script>

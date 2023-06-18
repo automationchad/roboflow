@@ -54,21 +54,20 @@
 
 	const getData = async () => {
 		const { data: User, error: userError } = await supabase
-			.from('User')
+			.from('users')
 			.select(
-				`*,Account (
+				`*,organizations (
 			     id,
 				 name
 			   )`
 			)
-			.eq('id', user.value.id)
 			.limit(1)
 			.single();
-		originalFirstName.value = User.firstName;
-		originalLastName.value = User.lastName;
-		firstName.value = User.firstName;
-		lastName.value = User.lastName;
-		email.value = User.email;
+		originalFirstName.value = User.first_name;
+		originalLastName.value = User.last_name;
+		firstName.value = User.first_name;
+		lastName.value = User.last_name;
+		email.value = User.primary_email;
 	};
 
 	await getData();
@@ -666,5 +665,3 @@
 		</transition>
 	</div>
 </template>
-
-

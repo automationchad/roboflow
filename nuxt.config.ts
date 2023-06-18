@@ -1,8 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
-	ssr: true, // enable server-side rendering
-	target: 'server', // use Node.js server environment
 	app: {
 		head: {
 			title: 'Motis Group | Automation and Business Process Consulting App',
@@ -29,11 +27,7 @@ export default defineNuxtConfig({
 		SUPABASE_URL: process.env.SUPABASE_URL,
 	},
 	css: ['~/assets/css/main.css'],
-	modules: [
-		'@nuxtjs/supabase',
-		'@nuxt/image-edge',
-		'@nuxtjs/color-mode',
-	],
+	modules: ['@nuxtjs/supabase', '@nuxt/image-edge', '@nuxtjs/color-mode'],
 	// plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
 	postcss: {
 		plugins: {

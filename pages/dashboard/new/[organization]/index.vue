@@ -1,13 +1,11 @@
 <script setup>
+	import { ref } from 'vue';
 	import {
 		Listbox,
 		ListboxButton,
 		ListboxOptions,
 		ListboxOption,
 	} from '@headlessui/vue';
-	import { ref } from 'vue';
-
-	const SUPER_ADMIN = 'super_admin';
 
 	definePageMeta({ layout: 'project', middleware: ['auth'] });
 
@@ -43,59 +41,24 @@
 
 	async function fetchData() {
 		try {
-			const fetchUserData = supabase
-				.from('User')
-				.select(
-					`*,
-					Account(
-					type
-					)`
-				)
-				.eq('id', user.value.id)
-				.limit(1)
-				.single();
+			const { data: organizationData, error: organizationError } =
+				await supabase.from('organizations').select('*, users(count)');
 
-			const fetchAccountData = supabase
-				.from('Account')
-				.select('*, User(count)');
-			// .neq('type', 'super_admin');
-
-			const [
-				{ data: userData, error: userError },
-				{ data: accountData, error: accountError },
-			] = await Promise.all([fetchUserData, fetchAccountData]);
-
-			if (userError)
-				throw new Error(`Error fetching user data: ${userError.message}`);
-			if (accountError)
-				throw new Error(`Error fetching account data: ${accountError.message}`);
-
-			if (userData.Account && userData.Account.type === 'super_admin') {
-				accounts.value = accountData;
-				selectedAccount.value = accountData.find(
-					(o) => o.id === route.params.organization
+			if (organizationError)
+				throw new Error(
+					`Error fetching account data: ${organizationError.message}`
 				);
-			} else {
-				const { data: singleAccountData, error: singleAccountError } =
-					await supabase
-						.from('Account')
-						.select('*,User(count)')
-						.eq('id', route.params.organization);
 
-				if (singleAccountError)
-					throw new Error(
-						`Error fetching single account data: ${singleAccountError.message}`
-					);
-
-				accounts.value = singleAccountData;
-				selectedAccount.value = singleAccountData[0];
-			}
+			accounts.value = organizationData;
+			selectedAccount.value = organizationData.find(
+				(o) => o.id === route.params.organization
+			);
 
 			const {
 				category,
 				severity,
 				error: getTicketTypesError,
-			} = getTicketTypes(selectedAccount.value.type, 'active');
+			} = getTicketTypes('default', 'active');
 
 			if (getTicketTypesError)
 				throw new Error(
@@ -105,10 +68,8 @@
 			categories.value = category;
 
 			severities.value = severity;
-
 			selectedSeverity.value = severity[0];
 			selectedTicket.value = category[0];
-
 			page_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
@@ -117,7 +78,7 @@
 		}
 	}
 
-	await fetchData();
+	fetchData();
 
 	watch(selectedAccount, (newAccount) => {
 		if (newAccount) {
@@ -332,10 +293,6 @@
 		}
 	}
 
-	onMounted(async () => {
-		await fetchData();
-	});
-
 	function resetFields() {
 		projectName.value = '';
 		projectSummary.value = '';
@@ -514,7 +471,8 @@
 																><div
 																	:class="[
 																		selected ? 'bg-slate-100' : '',
-																		'w-listbox text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 bg-scale-600 relative cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
+																		active ? 'bg-scale-600' : '',
+																		'text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 relative  w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
 																	]"
 																>
 																	<div class="flex items-center space-x-3">
@@ -719,7 +677,8 @@
 															><div
 																:class="[
 																	selected ? 'bg-slate-100' : '',
-																	'w-listbox text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 bg-scale-600 relative cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
+																	active ? 'bg-scale-600' : '',
+																	'text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 relative  w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
 																]"
 															>
 																<div class="flex flex-col items-start">
@@ -825,7 +784,8 @@
 																><div
 																	:class="[
 																		selected ? 'bg-slate-100' : '',
-																		'w-listbox text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 bg-scale-600 relative cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
+																		active ? 'bg-scale-600' : '',
+																		'text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 relative  w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
 																	]"
 																>
 																	<div class="flex flex-col items-start">
@@ -941,4 +901,3 @@
 		</transition>
 	</div>
 </template>
-

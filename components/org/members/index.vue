@@ -49,7 +49,7 @@
 	const deleteCommand = ref('');
 	const deleteDescription = ref('');
 
-	const users = ref([]);
+	const members = ref([]);
 	const selectedRoles = reactive({});
 
 	const showInvite = ref(false);
@@ -67,7 +67,9 @@
 
 	const account = ref(null);
 
-	const scopes = ref({});
+	const role = ref('Owner');
+
+	const permissions = ref({});
 
 	const handleError = (msg) => {
 		error_message.value = msg;
@@ -80,93 +82,93 @@
 		fetchData();
 	};
 
-	const fetchFromStorage = async (storageName, searchParam) => {
-		const {
-			data: [File],
-			error: fileError,
-		} = await supabase.storage.from(storageName).list(`${searchParam}`, {
-			limit: 100,
-			offset: 0,
-			sortBy: { column: 'updated_at', order: 'desc' },
-			search: `${searchParam}`,
-		});
+	// const fetchFromStorage = async (storageName, searchParam) => {
+	// 	const {
+	// 		data: [File],
+	// 		error: fileError,
+	// 	} = await supabase.storage.from(storageName).list(`${searchParam}`, {
+	// 		limit: 100,
+	// 		offset: 0,
+	// 		sortBy: { column: 'updated_at', order: 'desc' },
+	// 		search: `${searchParam}`,
+	// 	});
 
-		if (File) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from(storageName)
-				.getPublicUrl(`/${searchParam}/${File.name}`);
+	// 	if (File) {
+	// 		const {
+	// 			data: { publicUrl },
+	// 		} = await supabase.storage
+	// 			.from(storageName)
+	// 			.getPublicUrl(`/${searchParam}/${File.name}`);
 
-			return publicUrl;
-		} else return '';
-	};
+	// 		return publicUrl;
+	// 	} else return '';
+	// };
 
 	const getAvatarUrl = async (avatar) => fetchFromStorage('avatars', avatar);
 
 	async function fetchData() {
+		const { data: userPermissions, error: userPermissionsError } =
+			await supabase
+				.from('users')
+				.select('id,roles(name,permissions(scopes))')
+				.eq('id', user.value.id)
+				.limit(1)
+				.single();
+
+		role.value = userPermissions.roles.name;
+		permissions.value = userPermissions.roles.permissions.scopes;
+
 		const { data: accountData, error: accountError } = await supabase
-			.from('Account')
-			.select(`id, User(*)`)
+			.from('organizations')
+			.select(
+				`id, users(id,username,primary_email,first_name,last_name,roles(name))`
+			)
 			.eq('id', route.params.organization)
 			.limit(1)
 			.single();
 
 		const { data: invitationData, error: invitationError } = await supabase
-			.from('Invitation')
-			.select('*')
-			.eq('account', route.params.organization);
+			.from('invitations')
+			.select('*,roles(name)')
+			.eq('organization_id', route.params.organization);
 
-		const { data: userData, error: userError } = await supabase
-			.from('User')
-			.select(`*`)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
+		console.log(invitationData);
+		console.log(accountData);
 
-		const { data: scopesData, error: scopesError } = await supabase
-			.from('Scopes')
-			.select('*')
-			.eq('systemRole', userData.systemRole)
-			.limit(1)
-			.single();
+		// const { data: userData, error: userError } = await supabase
+		// 	.from('users')
+		// 	.select(`*`);
 
-		account.value = accountData;
-		scopes.value = scopesData;
-		users.value = accountData.User.concat(invitationData);
-		currentUser.value = userData;
+		// account.value = accountData;
 
-		const promises = [];
-		for (const user of users.value) {
-			let promise = getAvatarUrl(user.id).then(
-				(avatarUrl) => (user.avatarUrl = avatarUrl)
-			);
-			promises.push(promise);
+		members.value = accountData.users.concat(invitationData);
+		currentUser.value = user.value.id;
+
+		console.log(members.value);
+
+		for (let user of members.value) {
+			selectedRoles[user.id] = ref(user.roles.name);
 		}
 
-		await Promise.all(promises);
-
-		for (let user of users.value) {
-			selectedRoles[user.id] = ref(user.systemRole);
-		}
+		console.log(selectedRoles);
 
 		loading.value = false;
 	}
 
 	await fetchData();
 
-	watch(
-		selectedRoles,
-		async (newRoles, oldRoles) => {
-			for (let userId in newRoles) {
-				if (newRoles[userId] !== oldRoles[userId]) {
-					// The role for this user has changed, so update the backend.
-					await editUserRole(userId, newRoles[userId]);
-				}
-			}
-		},
-		{ deep: true }
-	);
+	// watch(
+	// 	selectedRoles,
+	// 	async (newRoles, oldRoles) => {
+	// 		for (let userId in newRoles) {
+	// 			if (newRoles[userId] !== oldRoles[userId]) {
+	// 				// The role for this user has changed, so update the backend.
+	// 				await editUserRole(userId, newRoles[userId]);
+	// 			}
+	// 		}
+	// 	},
+	// 	{ deep: true }
+	// );
 
 	const handleDeleteConfirm = (person) => {
 		showDelete.value = true;
@@ -180,90 +182,28 @@
 	};
 
 	const isAddingDisabled = computed(() => {
-		const currentUserScopes = scopes.value.scopes.split(',');
-		// Check if the current user has the 'users:add' scope
-		if (!currentUserScopes.includes('users:create')) return true;
-
-		// Check if the current user is a viewer
-		if (user.systemRole === 'viewer') return true;
-
-		return false;
+		// Check permissions based on the role
+		return (
+			!permissions.value['members:add_admin'] ||
+			!permissions.value['members:add_dev'] ||
+			!permissions.value['members:add_owner']
+		);
 	});
 
-	const isEditRoleDisabled = (selectedUser) => {
-		if (selectedUser.status === 'pending') return true;
+	const isEditRoleDisabled = computed(() => {
+		// Check permissions based on the role
+		return !permissions.value['organization:write'];
+	});
 
-		const currentUserScopes = scopes.value.scopes.split(',');
-
-		// Check if the current user has the 'users:edit' scope
-		if (!currentUserScopes.includes('users:edit')) return true;
-
-		if (!currentUserScopes.includes('users:edit:owner')) return false;
-
-		// Check if the current user is trying to edit their own role
-		if (user.value.id === selectedUser.id) return true;
-
-		if (
-			selectedUser.systemRole === 'owner' &&
-			account.value.User.filter((o) => o.systemRole === 'owner').length === 1
-		)
-			return true;
-
-		// Check if the current user is an admin and the selected user is an owner
-		if (
-			currentUser.systemRole === 'admin' &&
-			selectedUser.systemRole === 'owner'
-		)
-			return true;
-
-		// Check if the current user is a contributor or viewer
-		// Add the relevant checks here
-
-		return false;
-	};
-
-	const isDeleteDisabled = (selectedUser) => {
-		const currentUserScopes = scopes.value.scopes.split(',');
-
-		// Check if the current user has the 'users:delete' scope
-		if (!currentUserScopes.includes('users:delete')) return true;
-
-		// Check if the current user is trying to delete their own account
-		if (user.value.id === selectedUser.id) return true;
-
-		if (users.value.length <= 1) return true;
-
-		if (
-			users.value.length ===
-			users.value.filter((o) => o.systemRole === 'owner').length
-		)
-			return true;
-
-		if (
-			users.value.filter((o) => o.systemRole === 'owner').length === 1 &&
-			selectedUser.systemRole === 'owner'
-		)
-			return true;
-
-		if (
-			selectedUser.systemRole === 'owner' &&
-			selectedUser.status !== 'pending' &&
-			users.value.filter((o) => o.systemRole === 'owner').length === 1
-		)
-			return true;
-
-		// Check if the current user is an admin and the selected user is an owner
-		if (
-			currentUser.systemRole === 'admin' &&
-			selectedUser.systemRole === 'owner'
-		)
-			return true;
-
-		// Check if the current user is a contributor or viewer
-		// Add the relevant checks here
-
-		return false;
-	};
+	const isDeleteDisabled = computed(() => {
+		// Check permissions based on the role
+		return (
+			!permissions.value['organization:delete'] ||
+			!permissions.value['members:remove_admin'] ||
+			!permissions.value['members:remove_dev'] ||
+			!permissions.value['members:remove_owner']
+		);
+	});
 
 	function moveUserToFront(arr) {
 		const orgIndex = arr.findIndex((obj) => obj.id === user.value.id);
@@ -289,127 +229,126 @@
 	};
 
 	// Function to edit user role
-	async function editUserRole(userId, newRole) {
-		if (isEditRoleDisabled(userId)) {
-			console.error('User is not allowed to edit roles');
-			return;
-		}
+	// async function editUserRole(userId, newRole) {
+	// 	if (isEditRoleDisabled(userId)) {
+	// 		console.error('User is not allowed to edit roles');
+	// 		return;
+	// 	}
 
-		const { error } = await supabase
-			.from('User')
-			.update({ systemRole: newRole })
-			.eq('id', userId);
+	// 	const { error } = await supabase
+	// 		.from('User')
+	// 		.update({ systemRole: newRole })
+	// 		.eq('id', userId);
 
-		if (error) {
-			is_success.value = false;
-			is_error.value = true;
-			error_message.value = 'Error updating user role';
-			console.error('Error updating user role:', error);
-		} else {
-			// Update the local user data as well
-			const user = users.value.find((u) => u.id === userId);
-			if (user) {
-				user.systemRole = newRole;
-			}
-			is_success.value = true;
-			success_message.value = 'User role updated successfully';
-			console.log('User role updated successfully');
-		}
-	}
+	// 	if (error) {
+	// 		is_success.value = false;
+	// 		is_error.value = true;
+	// 		error_message.value = 'Error updating user role';
+	// 		console.error('Error updating user role:', error);
+	// 	} else {
+	// 		// Update the local user data as well
+	// 		const user = users.value.find((u) => u.id === userId);
+	// 		if (user) {
+	// 			user.systemRole = newRole;
+	// 		}
+	// 		is_success.value = true;
+	// 		success_message.value = 'User role updated successfully';
+	// 		console.log('User role updated successfully');
+	// 	}
+	// }
 
-	// Function to delete user
-	async function deleteUser(person) {
-		try {
-			loading.value = true;
-			if (isDeleteDisabled(person)) {
-				throw new Error('User is not allowed to be deleted');
-			}
+	// // Function to delete user
+	// async function deleteUser(person) {
+	// 	try {
+	// 		loading.value = true;
+	// 		if (isDeleteDisabled(person)) {
+	// 			throw new Error('User is not allowed to be deleted');
+	// 		}
 
-			if (person.status === 'pending') {
-				const { error: inviteDeleteError } = await supabase
-					.from('Invitation')
-					.delete()
-					.eq('id', person.id);
-				if (inviteDeleteError) {
-					throw new Error(
-						inviteDeleteError.message || inviteDeleteError.toString()
-					);
-				}
-			} else {
-				const { error: userDeleteError } = await supabase
-					.from('User')
-					.delete()
-					.eq('id', person.id);
+	// 		if (person.status === 'pending') {
+	// 			const { error: inviteDeleteError } = await supabase
+	// 				.from('Invitation')
+	// 				.delete()
+	// 				.eq('id', person.id);
+	// 			if (inviteDeleteError) {
+	// 				throw new Error(
+	// 					inviteDeleteError.message || inviteDeleteError.toString()
+	// 				);
+	// 			}
+	// 		} else {
+	// 			const { error: userDeleteError } = await supabase
+	// 				.from('User')
+	// 				.delete()
+	// 				.eq('id', person.id);
 
-				if (userDeleteError) {
-					throw new Error(
-						userDeleteError.message || userDeleteError.toString()
-					);
-				}
-			}
-		} catch (error) {
-			is_success.value = false;
-			is_error.value = true;
-			error_message.value = error.message || error.toString();
+	// 			if (userDeleteError) {
+	// 				throw new Error(
+	// 					userDeleteError.message || userDeleteError.toString()
+	// 				);
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		is_success.value = false;
+	// 		is_error.value = true;
+	// 		error_message.value = error.message || error.toString();
 
-			console.error(error);
-		} finally {
-			loading.value = false;
-			showDelete.value = false;
-			users.value = users.value.filter((u) => u.id !== person.id);
+	// 		console.error(error);
+	// 	} finally {
+	// 		loading.value = false;
+	// 		showDelete.value = false;
+	// 		users.value = users.value.filter((u) => u.id !== person.id);
 
-			is_success.value = true;
-			success_message.value = 'User deleted successfully';
-			console.log('User deleted successfully');
-		}
-	}
+	// 		is_success.value = true;
+	// 		success_message.value = 'User deleted successfully';
+	// 		console.log('User deleted successfully');
+	// 	}
+	// }
 
-	const sendInvitation = async () => {
-		try {
-			loading.value = true;
-			// Try to insert the invitation
-			const { data: userData, error: userError } = await supabase
-				.from('User')
-				.select('email')
-				.eq('email', inviteeEmail.value);
+	// const sendInvitation = async () => {
+	// 	try {
+	// 		loading.value = true;
+	// 		// Try to insert the invitation
+	// 		const { data: userData, error: userError } = await supabase
+	// 			.from('User')
+	// 			.select('email')
+	// 			.eq('email', inviteeEmail.value);
 
-			if (userData.length > 0) {
-				inviteeEmail.value = '';
-				throw new Error('User already exists');
-			}
-			const { data: invitation, error } = await supabase
-				.from('Invitation')
-				.insert([
-					{
-						email: inviteeEmail.value,
-						systemRole: accountData.User.length === 0 ? 'owner' : 'contributor',
-						createdBy: user.value.id,
-						expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-						account: route.params.organization,
-					},
-				])
-				.select('*');
+	// 		if (userData.length > 0) {
+	// 			inviteeEmail.value = '';
+	// 			throw new Error('User already exists');
+	// 		}
+	// 		const { data: invitation, error } = await supabase
+	// 			.from('Invitation')
+	// 			.insert([
+	// 				{
+	// 					email: inviteeEmail.value,
+	// 					systemRole: accountData.User.length === 0 ? 'owner' : 'contributor',
+	// 					createdBy: user.value.id,
+	// 					expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+	// 					account: route.params.organization,
+	// 				},
+	// 			])
+	// 			.select('*');
 
-			if (error) {
-				throw new Error(error.message || error.toString());
-			} else {
-				users.value.push(invitation[0]);
-				is_error.value = false;
-				inviteeEmail.value = '';
-				success_message.value = 'Invitation sent successfully';
-				is_success.value = true;
-			}
-			loading.value = false;
-		} catch (error) {
-			is_success.value = false;
-			is_error.value = true;
-			error_message.value = error.message || error.toString();
-			loading.value = false;
-		}
-	};
+	// 		if (error) {
+	// 			throw new Error(error.message || error.toString());
+	// 		} else {
+	// 			users.value.push(invitation[0]);
+	// 			is_error.value = false;
+	// 			inviteeEmail.value = '';
+	// 			success_message.value = 'Invitation sent successfully';
+	// 			is_success.value = true;
+	// 		}
+	// 		loading.value = false;
+	// 	} catch (error) {
+	// 		is_success.value = false;
+	// 		is_error.value = true;
+	// 		error_message.value = error.message || error.toString();
+	// 		loading.value = false;
+	// 	}
+	// };
 
 	const roles = [
-		{ id: 'super_admin', name: 'Super Admin' },
 		{ id: 'owner', name: 'Owner' },
 		{ id: 'admin', name: 'Administrator' },
 		{ id: 'contributor', name: 'Contributor' },
@@ -518,12 +457,12 @@
 							<tbody class="dark:text-white">
 								<tr
 									class="relative bg-white/90"
-									v-for="user in users"
-									:key="user.id"
+									v-for="member in members"
+									:key="member.id"
 								>
 									<td>
 										<div class="flex items-center space-x-4">
-											<div v-if="user.avatarUrl">
+											<div v-if="member.avatarUrl">
 												<span
 													style="
 														box-sizing: border-box;
@@ -590,28 +529,34 @@
 											</div>
 											<div>
 												<p class="text-slate-900">
-													{{ user.firstName }} {{ user.lastName }}
-													{{ user.id === currentUser.id ? '(You)' : '' }}
+													<span v-if="member.invited_email">{{
+														member.invited_email
+													}}</span>
+													<span v-else>{{
+														member.username
+															? member.username
+															: member.first_name + ' ' + member.last_name
+													}}</span>
 												</p>
-												<p class="text-slate-500">{{ user.email }}</p>
+												<p class="text-slate-500">
+													{{ member.primary_email }}
+												</p>
 											</div>
 										</div>
 									</td>
 									<td>
 										<span
 											v-if="
-												user.expires &&
-												new Date(user.expires) > new Date() &&
-												user.status === 'pending'
+												member.invited_at &&
+												new Date(member.invited_at) < new Date()
 											"
 											class="inline-flex items-center rounded-full border border-yellow-400 bg-yellow-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:border-yellow-700"
 											>Invited</span
 										>
 										<span
 											v-else-if="
-												user.expires &&
-												new Date(user.expires) < new Date() &&
-												user.status === 'pending'
+												member.invited_at &&
+												new Date(member.invited_at) > new Date()
 											"
 											class="inline-flex items-center rounded-full border border-red-400 bg-red-200 bg-opacity-10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:border-red-700"
 											>Expired</span
@@ -621,28 +566,29 @@
 										<div class="relative w-[140px]">
 											<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
 												<div class="group col-span-12">
-													<Listbox as="div" v-model="selectedRoles[user.id]">
+													<Listbox as="div" v-model="selectedRoles[member.id]">
 														<div>
 															<ListboxButton
-																:disabled="isEditRoleDisabled(user)"
+																:disabled="isEditRoleDisabled"
 																:class="[
-																	isEditRoleDisabled(user)
+																	isEditRoleDisabled
 																		? 'cursor-not-allowed opacity-50'
 																		: 'cursor-pointer',
 																	'text-scale-1200  focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 aria-expanded:border-scale-900 aria-expanded:ring-scale-400 relative box-border block w-full rounded-md border border bg-none px-4 py-2   indent-px text-sm shadow-sm outline-none transition-all focus:shadow-md  focus:ring-2 focus:ring-current aria-expanded:ring-2 ',
 																]"
 																><span
 																	class="flex w-full flex-row items-center space-x-3"
-																	><span class="truncate capitalize text-scale-1200">{{
-																		user.systemRole
-																	}}</span></span
+																	><span
+																		class="text-scale-1200 truncate capitalize"
+																		>{{ member.roles.name }}</span
+																	></span
 																>
 
 																<span
-																	class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+																	class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
 																>
 																	<ChevronDownIcon
-																		class="h-5 w-5 text-scale-600"
+																		class="text-scale-600 h-5 w-5"
 																		aria-hidden="true"
 																	/>
 																</span>
@@ -654,6 +600,7 @@
 																leave-to-class="opacity-0"
 															>
 																<ListboxOptions
+																	v-if="false"
 																	class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
 																>
 																	<ListboxOption
@@ -716,7 +663,7 @@
 										<Menu
 											as="div"
 											class="relative flex items-center justify-end"
-											v-if="isEditRoleDisabled(user)"
+											v-if="isEditRoleDisabled"
 										>
 											<MenuButton
 												as="button"
@@ -876,7 +823,9 @@
 								<tr class="dark:bg-panel-secondary-dark bg-white/90">
 									<td colspan="4">
 										<p class="text-scale-1100">
-											{{ users.length }} user{{ users.length > 1 ? 's' : '' }}
+											{{ members.length }} user{{
+												members.length > 1 ? 's' : ''
+											}}
 										</p>
 									</td>
 								</tr>

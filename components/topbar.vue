@@ -17,17 +17,6 @@
 
 	const supabase = useSupabaseClient();
 
-	const { data: userInitial, error: userErrorInitial } = await supabase
-		.from('User')
-		.select('accountId')
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	if (!userInitial.accountId) {
-		router.push('/dashboard/new');
-	}
-
 	const route = useRoute();
 	const title = ref(null);
 	const description = ref(null);
@@ -42,56 +31,21 @@
 	const accounts = ref([]);
 
 	async function fetchUserData() {
-		const { data: userInitial, error: userErrorInitial } = await supabase
-			.from('User')
-			.select('accountId')
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-
-		if (!userInitial.accountId) {
-			router.push('/dashboard/new');
-			return;
-		}
-
-		const { data: userData, error: userError } = await supabase
-			.from('User')
-			.select(`*,Account(type, name, id)`)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-
-		admin.value = userData.Account.type === 'super_admin';
-
-		// if (admin.value) {
-		// 	orgButtonDisabled.value = false;
-		// 	projectButtonDisabled.value = false;
-		// }
-
-		if (admin.value) {
-			const { data: accountData, error: accountError } = await supabase
-				.from('Account')
-				.select('*,Ticket(status,type)')
-				.neq('type', 'super_admin');
-			accounts.value = accountData;
-		} else accounts.value = [userData.Account];
+		const { data: accountData, error: accountError } = await supabase
+			.from('organizations')
+			.select('id,name');
+		accounts.value = accountData;
 
 		if (route.params.id) {
-			const { data: accountData, error: accountError } = await supabase
-				.from('Account')
-				.select('id,name,Ticket(id)')
-				.eq('Ticket.id', route.params.id)
-				.limit(1)
-				.single();
-			const { data: ticketData, error: ticketError } = await supabase
-				.from('Ticket')
-				.select('name,accountId,Account(name)')
+			const { data: projectData, error: projectError } = await supabase
+				.from('projects')
+				.select('name,organizations(id,name)')
 				.eq('id', route.params.id)
 				.limit(1)
 				.single();
-			title.value = ticketData.Account.name;
-			description.value = ticketData.name;
-			accountId.value = ticketData.accountId;
+
+			title.value = projectData.organizations.name;
+			description.value = projectData.name;
 		} else if (route.path.includes('/dashboard/projects') && !route.params.id) {
 			title.value = 'Motis Group';
 			description.value = 'Projects';
@@ -333,8 +287,7 @@
 							<line x1="12" y1="17" x2="12.01" y2="17"></line></svg
 						><span class="truncate">Help</span>
 					</span> </MenuButton
-				><MenuItems class="absolute right-0 top-8"
-					><help-modal /></MenuItems
+				><MenuItems class="absolute right-0 top-8"><help-modal /></MenuItems
 			></Menu>
 
 			<button

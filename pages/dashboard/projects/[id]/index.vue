@@ -1,19 +1,11 @@
 <script setup>
+	definePageMeta({ middleware: ['auth'] });
 	// Import all necessary libraries and components
 	import { ref, computed } from 'vue';
 	import {
-		Dialog,
-		DialogPanel,
 		Disclosure,
 		DisclosureButton,
 		DisclosurePanel,
-		TransitionChild,
-		TransitionRoot,
-		Listbox,
-		ListboxButton,
-		ListboxLabel,
-		ListboxOption,
-		ListboxOptions,
 		Combobox,
 		ComboboxButton,
 		ComboboxInput,
@@ -22,45 +14,18 @@
 		ComboboxOptions,
 		Switch,
 	} from '@headlessui/vue';
+
 	import {
-		ArchiveBoxIcon,
-		Bars3BottomLeftIcon,
-		Bars4Icon,
-		ClockIcon,
-		HomeIcon,
-		UserCircleIcon as UserCircleIconOutline,
-		FaceFrownIcon,
-		FaceSmileIcon,
-		FireIcon,
-		HandThumbUpIcon,
-		HeartIcon,
-		PaperClipIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
-	import {
-		BellIcon,
-		CalendarIcon,
-		ChatBubbleLeftEllipsisIcon,
 		CheckCircleIcon,
-		LockOpenIcon,
-		TrashIcon,
-		LockClosedIcon,
-		MagnifyingGlassIcon,
-		PencilIcon,
-		TagIcon,
 		CheckIcon,
-		ChevronDownIcon,
 		ChevronUpDownIcon,
-		UserCircleIcon,
 	} from '@heroicons/vue/20/solid';
 	import showdown from 'showdown';
-	import { format, formatDistanceStrict, formatDistance } from 'date-fns';
-	import { is } from 'date-fns/locale';
 
 	// Define all constants and reactive variables
 	const user = useSupabaseUser();
-
 	const supabase = useSupabaseClient();
+
 	const route = useRoute();
 	const props = defineProps(['open', 'comments']);
 
@@ -74,7 +39,9 @@
 	const is_success = ref(false);
 	const success_message = ref('');
 	const showConfirm = ref(false);
+
 	const comments = ref([]);
+
 	const dealSize = ref(0);
 	const partnerPayoutAmount = ref(0);
 	const enabled = ref(false);
@@ -87,13 +54,17 @@
 	const selectedFile = ref(null);
 	const fileInput = ref(null);
 	const input = ref('');
-	const aiResponse = ref('');
+
 	const showDiv = ref(false);
-	const commentImageId = ref('');
-	const showImageModal = ref(false);
-	const assignedTo = ref(null);
-	const ticket = ref(null);
-	const User = ref({});
+
+	const assignedTo = ref({
+		id: '',
+		first_name: '',
+		last_name: '',
+		primary_email: '',
+	});
+
+	const project = ref(null);
 
 	const comment_text = ref('');
 	const reply_text = ref('');
@@ -101,8 +72,6 @@
 	const ticketAvatar = ref('');
 	const currentAvatar = ref('');
 	const assignedToAvatar = ref('');
-
-	const ticketAttachments = ref([]);
 
 	// Styles
 	const styles = {
@@ -179,15 +148,11 @@
 		{ id: 'project_completed', name: 'Project Completed' },
 	];
 
-	// Computed values
-	const selectedIndex = computed(() =>
-		stages.findIndex((person) => person.id === selectedStage.value.id)
-	);
 	const notSaved = computed(() => {
 		if (
-			input.value !== ticket?.value?.desc ||
-			dealSize.value !== ticket.value.deal_size ||
-			selectedStage.value.id !== ticket.value.status
+			input.value !== project.value.description ||
+			dealSize.value !== project.value.deal_size ||
+			selectedStage.value.id !== project.value.status
 		) {
 			return true;
 		}
@@ -204,49 +169,23 @@
 
 	// Functions
 
-	const getUser = async () => {
-		let { data: userData, error: userError } = await supabase
-			.from('User')
-			.select(
-				`*,Account (
-	     id,
-		 type,
-		 stripeCustomerId
-	   )`
-			)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
-
-		User.value = userData;
-	};
-
-	await getUser();
-
 	const getTicket = async () => {
 		try {
-			let { data: Ticket, error: ticketError } = await supabase
-				.from('Ticket')
+			let { data: projectData, error: projectError } = await supabase
+				.from('projects')
 				.select(
-					`*, Account(id,name), 
-					Activity(
-						*, User(*)
-						), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*, Account(id,name))`
+					`id, name, description, partner_status, type, status, severity, assigned_id, created_at, due_date, users(id,first_name,last_name,username,badges), organizations(id,name), comments(text,thread_id,type,users(first_name,last_name,username,badges)), activity(text,type,created_at, users(first_name,last_name,username))`
 				)
 				.eq('id', route.params.id)
 				.limit(1)
 				.single();
 
-			if (!Ticket) {
-				navigateTo('/ticket-not-found');
-				throw new Error('Ticket not found');
-			}
-			ticket.value = Ticket;
-			ticketLoading.value = Ticket.ticketLoading;
-			partnerPayoutAmount.value = Ticket.partner_payout_amount;
-			selectedStage.value = stages.find((o) => o.id === Ticket?.status);
-			dealSize.value = Ticket.deal_size;
-			input.value = Ticket.desc;
+			project.value = projectData;
+			// ticketLoading.value = Ticket.ticketLoading;
+			// partnerPayoutAmount.value = Ticket.partner_payout_amount;
+			// selectedStage.value = stages.find((o) => o.id === Ticket?.status);
+			// dealSize.value = Ticket.deal_size;
+			input.value = project.value.description;
 		} catch (error) {
 			is_error.value = true;
 			error_message.value = error.message;
@@ -271,7 +210,7 @@
 				.from('Ticket')
 				.update({
 					status: selectedStage.value.id,
-					desc: input.value,
+					description: input.value,
 					deal_size: parseInt(dealSize.value),
 					partner_payout_amount: parseInt(dealSize.value) * 0.1,
 					updatedOn: new Date(),
@@ -292,9 +231,9 @@
 	};
 
 	const handleCancelEdit = () => {
-		input.value = ticket.value.desc;
-		dealSize.value = ticket.value.deal_size;
-		selectedStage.value = stages.find((o) => o.id === ticket.value.status);
+		input.value = project.value.description;
+		dealSize.value = project.value.deal_size;
+		selectedStage.value = stages.find((o) => o.id === project.value.status);
 		enabled.value = false;
 		showConfirm.value = false;
 	};
@@ -308,24 +247,25 @@
 	};
 
 	const dueDate = computed(() => {
-		return formatDistance(new Date(ticket.value.dueDate), new Date(), {
+		return formatDistance(new Date(project.value.due_date), new Date(), {
 			addPrefix: true,
 		});
 	});
 
-	const getAssignedTo = async () => {
-		const { data, error } = await supabase
-			.from('User')
-			.select('*')
-			.eq('id', ticket.value.assignedTo)
-			.limit(1)
-			.single();
-		if (error) {
-			throw new Error(error.message);
-		}
-		assignedTo.value = data;
-	};
-	await getAssignedTo();
+	// const getAssignedTo = async () => {
+	// 	const { data, error } = await supabase
+	// 		.from('users')
+	// 		.select('*')
+	// 		.eq('id', project.value.assigned_id)
+	// 		.limit(1)
+	// 		.single();
+	// 	if (error) {
+	// 		throw new Error(error.message);
+	// 	}
+	// 	assignedTo.value = data;
+	// };
+
+	// await getAssignedTo();
 
 	const uploadImage = (event) => {
 		const file = event.target.files[0];
@@ -339,31 +279,6 @@
 		imageSrc.value = null;
 		selectedFile.value = null;
 		fileInput.value = '';
-	};
-
-	const getTicketAttachments = async (id) => {
-		const { data: files, error: fileError } = await supabase.storage
-			.from('images')
-			.list(`attachments`, {
-				limit: 100,
-				offset: 0,
-				sortBy: { column: 'updated_at', order: 'desc' },
-				search: `${id}`,
-			});
-
-		let images = [];
-
-		for (const file of files) {
-			const {
-				data: { publicUrl },
-			} = await supabase.storage
-				.from('images')
-				.getPublicUrl(`attachments/${file.name}`);
-
-			images.push(publicUrl);
-		}
-
-		return images;
 	};
 
 	// Define a general function to fetch from Supabase storage
@@ -392,29 +307,15 @@
 	// Refactor getAvatarUrl, getCommentImageUrl, and getTicketAttachments
 	// to use the general fetchFromStorage function
 	const getAvatarUrl = async (avatar) => fetchFromStorage('avatars', avatar);
-	const getCommentImageUrl = async (id) =>
-		fetchFromStorage('images', `comments/${id}`);
 
 	const fetchComments = async () => {
-		let { data: Ticket, error } = await supabase
-			.from('Ticket')
-			.select(
-				'*, Account(id,name), Comment(*,User(firstName,lastName,systemRole,id,avatarPath,badges),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,badges))), User(*,Account(id,name))'
-			)
-			.eq('id', route.params.id)
-			.limit(1)
-			.single();
-
-		let comments = Ticket.Comment;
 		let commentList = [];
 		let replyList = [];
 
-		for (const comment of comments) {
+		for (const comment of project.value.comments) {
 			let commentObj = {
 				...comment,
-				avatarUrl: '',
-				attachments: [], // Create an empty array to hold files
-				Comment: [], // Create an empty array to hold replies
+				replies: [], // Create an empty array to hold replies
 			};
 
 			// Check if this is a reply to another comment
@@ -425,48 +326,21 @@
 			}
 		}
 
-		// Load avatar URLs asynchronously and update the comment data
-		const promises = [];
-		for (const comment of commentList) {
-			let promise = getAvatarUrl(comment.createdBy).then(
-				(avatarUrl) => (comment.avatarUrl = avatarUrl)
-			);
-			promises.push(promise);
-			promise = getCommentImageUrl(comment.id).then((imageUrl) =>
-				comment.attachments.push(imageUrl)
-			);
-			promises.push(promise);
-		}
-
-		for (const reply of replyList) {
-			let promise = getAvatarUrl(reply.createdBy).then(
-				(avatarUrl) => (reply.avatarUrl = avatarUrl)
-			);
-			promises.push(promise);
-			promises.push(promise);
-			promise = getCommentImageUrl(reply.id).then((imageUrl) =>
-				reply.attachments.push(imageUrl)
-			);
-			promises.push(promise);
-		}
-
-		await Promise.all(promises);
-
 		// Sort the commentList array in descending order by createdOn date
-		commentList.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn));
+		commentList.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
 		// Loop through the replyList and add each reply to the appropriate comment
-		for (const reply of replyList) {
-			const parentComment = commentList.find(
-				(comment) => comment.id === reply.threadId
-			);
-			if (parentComment) {
-				parentComment.Comment.push(reply);
-			}
-			parentComment.Comment.sort(
-				(a, b) => new Date(a.createdOn) - new Date(b.createdOn)
-			);
-		}
+		// for (const reply of replyList) {
+		// 	const parentComment = commentList.find(
+		// 		(comment) => comment.id === reply.thread_id
+		// 	);
+		// 	if (parentComment) {
+		// 		parentComment.comments.push(reply);
+		// 	}
+		// 	parentComment.comments.sort(
+		// 		(a, b) => new Date(a.created_at) - new Date(b.created_at)
+		// 	);
+		// }
 
 		// Sort the replies within each parent comment in descending order by createdOn date
 
@@ -474,6 +348,8 @@
 	};
 
 	comments.value = await fetchComments();
+
+	console.log(comments.value);
 
 	const convert = (text) => {
 		const formatted = converter.makeHtml(text);
@@ -488,9 +364,9 @@
 					.insert([
 						{
 							text: thread_id ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: ticket.value.id,
-							threadId: thread_id,
+							created_by: user.value.id,
+							project_id: project.value.id,
+							thread_id: thread_id,
 							attachment: true,
 						},
 					])
@@ -523,9 +399,9 @@
 					.insert([
 						{
 							text: thread_id !== null ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: ticket.value.id,
-							threadId: thread_id,
+							created_by: user.value.id,
+							project_id: project.value.id,
+							thread_id,
 						},
 					]);
 
@@ -545,19 +421,18 @@
 		}
 	};
 
-	ticketAttachments.value = await getTicketAttachments(ticket.value.id);
-	ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
+	ticketAvatar.value = await getAvatarUrl(project.value.users.id);
 	currentAvatar.value = await getAvatarUrl(user.value.id);
-	assignedToAvatar.value = await getAvatarUrl(ticket.value.assignedTo);
+	// assignedToAvatar.value = await getAvatarUrl(ticket.value.assignedTo);
 
-	console.log(ticket.value.Activity);
+	// console.log(ticket.value.Activity);
 
-	onMounted(async () => {
-		ticketAttachments.value = await getTicketAttachments(ticket.value.id);
-		ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
-		currentAvatar.value = await getAvatarUrl(user.value.id);
-		loading.value = false;
-	});
+	// onMounted(async () => {
+	// 	ticketAttachments.value = await getTicketAttachments(ticket.value.id);
+	// 	ticketAvatar.value = await getAvatarUrl(ticket.value.createdBy);
+	// 	currentAvatar.value = await getAvatarUrl(user.value.id);
+	// 	loading.value = false;
+	// });
 </script>
 
 <template>
@@ -615,33 +490,32 @@
 
 												<div class="">
 													<div class="flex items-center">
-														<NuxtLink
-															:to="`/profile/${ticket?.User?.id}`"
+														<span
 															class="text-gray-1000 mr-1 inline-flex items-center text-sm font-medium dark:text-white"
 														>
 															{{
-																ticket?.User?.firstName &&
-																ticket?.User?.lastName
-																	? ticket?.User?.firstName +
+																project.users.first_name &&
+																project.users?.last_name
+																	? project.users.first_name +
 																	  ' ' +
-																	  ticket?.User?.lastName
-																	: ticket?.User?.email.split('@')[0]
+																	  project.users.last_name
+																	: project.users.primary_email.split('@')[0]
 															}}
-														</NuxtLink>
+														</span>
 
 														<span
 															class="text-gray-1000 relative inline-flex pl-4 text-sm font-normal before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 														>
 															{{
 																formatDateDistance(
-																	ticket?.createdOn || new Date()
+																	project.created_at || new Date()
 																)
 															}}
 														</span>
 													</div>
 													<div class="space-x-1">
 														<span
-															v-for="badge in ticket?.User?.badges"
+															v-for="badge in project.users.badges"
 															:key="badge.id"
 															:class="[
 																badge.id,
@@ -672,16 +546,16 @@
 											<h1
 												class="text-gray-1000 max-w-5xl text-2xl font-semibold dark:text-white"
 											>
-												<div class="" v-if="ticket?.type === 'referral'">
+												<div class="" v-if="project.type === 'referral'">
 													{{
-														ticket?.User?.firstName
-															? ticket?.User?.firstName
-															: ticket?.User?.email
+														project.users.first_name
+															? project.users.first_name
+															: project.users.primary_email
 													}}
 													<span class="text-slate-400">referred</span>
-													{{ ticket?.name }}
+													{{ project.name }}
 												</div>
-												<div class="" v-else>{{ ticket?.name }}</div>
+												<div class="" v-else>{{ project.name }}</div>
 											</h1>
 										</div>
 									</div>
@@ -718,52 +592,16 @@
 										</Disclosure>
 									</div>
 
-									<div class="mt-6" v-if="ticketAttachments.length > 0">
-										<div class="mb-2">
-											<svg
-												width="25"
-												height="24"
-												viewBox="0 0 25 24"
-												class="dark:text-slate-400"
-												fill="none"
-												xmlns="http://www.w3.org/2000/svg"
-											>
-												<path
-													d="M19.4496 11.9511L13.3335 17.8601C11.4156 19.7131 8.30597 19.7131 6.38804 17.8601C4.46306 16.0003 4.47116 12.9826 6.4061 11.1325L12.0503 5.70078C13.3626 4.43293 15.4902 4.43292 16.8025 5.70075C18.1196 6.97324 18.114 9.038 16.7901 10.3039L11.0824 15.7858C10.374 16.4702 9.22538 16.4702 8.51694 15.7858C7.80849 15.1013 7.80849 13.9916 8.51695 13.3071L13.2435 8.74069"
-													stroke="currentColor"
-													stroke-width="1.5"
-													stroke-linecap="round"
-													stroke-linejoin="round"
-												></path>
-											</svg>
-										</div>
-
-										<div class="grid grid-cols-5 gap-x-4">
-											<button
-												v-for="image in ticketAttachments"
-												class=""
-												@click="
-													(commentImageId = image), (showImageModal = true)
-												"
-											>
-												<img
-													:src="image"
-													:alt="image"
-													class="h-full w-auto rounded-md object-cover"
-												/>
-											</button>
-										</div>
-									</div>
 									<div
 										class="mt-16 flex items-center space-x-2 text-sm dark:text-white"
 									>
 										<span
 											:class="[
-												styles[ticket?.type],
+												styles[project.type],
 												'rounded-md px-2 py-1 font-normal capitalize ring-1 ring-inset transition-colors',
 											]"
 										>
-											{{ ticket?.type }}
+											{{ project.type }}
 										</span>
 									</div>
 								</div>
@@ -774,12 +612,10 @@
 										<div class="space-y-3 pb-4">
 											<div class="flex justify-between">
 												<div class="flex items-center dark:text-slate-300">
-													{{ ticket?.Comment.length }}
-													comment{{ ticket?.Comment?.length > 0 ? 's' : '' }}
+													{{ project.comments.length }}
+													comment{{ project.comments.length > 0 ? 's' : '' }}
 												</div>
 												<button
-													:disabled="User.Account.type !== 'super_admin'"
-													@click="showDiv = !showDiv"
 													class="flex items-center rounded-full border border-gray-300 bg-white pl-2 pr-3 text-sm text-gray-800 shadow-sm dark:border-[#423455] dark:bg-[#1A1B2C] dark:text-white"
 												>
 													<svg
@@ -1050,7 +886,6 @@
 									</div>
 									<Switch
 										v-model="enabled"
-										:disabled="User?.Account?.type !== 'super_admin'"
 										:class="[
 											enabled ? 'bg-brand-800' : 'bg-gray-600',
 											'relative inline-flex h-4 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:pointer-events-none ',
@@ -1134,7 +969,7 @@
 										<div
 											class="bg-panel-body-light dark:bg-panel-body-dark rounded-lg shadow-sm ring-1 ring-inset ring-gray-900/5 dark:bg-white/5 dark:ring-white/5"
 										>
-											<dl class="flex flex-wrap mb-6">
+											<dl class="mb-6 flex flex-wrap">
 												<div class="flex-auto pl-6 pt-6">
 													<dt
 														class="text-gray-1000 text-sm font-semibold leading-6"
@@ -1148,7 +983,7 @@
 															partnerPayoutAmount !== null
 																? 'Pending'
 																: `$${formatAccounting(
-																		(ticket?.partner_status !== 'closed_lost'
+																		(projects.partner_status !== 'closed_lost'
 																			? dealSize
 																			: 0) * 0.1
 																  )}`
@@ -1159,11 +994,11 @@
 													<dt class="sr-only">Status</dt>
 													<dd
 														:class="[
-															partnerStages[ticket?.partner_status].styles,
+															partnerStages[project.partner_status].styles,
 															'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium  ring-1 ring-inset ',
 														]"
 													>
-														{{ partnerStages[ticket?.partner_status].name }}
+														{{ partnerStages[project.partner_status].name }}
 													</dd>
 												</div>
 												<div
@@ -1189,11 +1024,11 @@
 														class="text-gray-1000 text-sm font-medium leading-6 dark:text-white"
 													>
 														{{
-															assignedTo.firstName && assignedTo.lastName
-																? assignedTo.firstName +
+															assignedTo.first_name && assignedTo.last_name
+																? assignedTo.first_name +
 																  ' ' +
-																  assignedTo.lastName
-																: assignedTo.email
+																  assignedTo.last_name
+																: assignedTo.primary_email
 														}}
 													</dd>
 												</div>
@@ -1219,7 +1054,7 @@
 													<dd
 														class="text-sm leading-6 text-gray-800 dark:text-slate-400"
 													>
-														Due in <span>{{ dueDate }}</span>
+														Due in <span>{{ project.due_date }}</span>
 													</dd>
 												</div>
 												<div
@@ -1261,23 +1096,24 @@
 															class="text-sm leading-6 text-gray-800 dark:text-slate-400"
 														>
 															{{
-																dealSize
-																	? formatAccounting(dealSize, true)
+																project.deal_sized
+																	? formatAccounting(project.deal_sized, true)
 																	: 'Pending'
 															}}
 														</div>
 													</dd>
 												</div>
 											</dl>
-											<div class="border-t border-gray-900/5 px-6 py-6" >
+											<div class="border-t border-gray-900/5 px-6 py-6">
 												<dt
 													class="text-gray-1000 mt-0 text-sm font-medium leading-6"
 												></dt>
 												<dd
-													class="text-gray-1000 mt-2 text-sm sm:col-span-2 sm:mt-0" v-if="false"
+													class="text-gray-1000 mt-2 text-sm sm:col-span-2 sm:mt-0"
+													v-if="false"
 												>
 													<ul
-														role="list" 
+														role="list"
 														class="divide-y divide-gray-200 rounded-md border border-gray-400"
 													>
 														<li
@@ -1403,13 +1239,15 @@
 									</h2>
 									<ul role="list" class="mt-6 space-y-6">
 										<li
-											v-for="(activityItem, activityItemIdx) in ticket.Activity"
+											v-for="(
+												activityItem, activityItemIdx
+											) in project.activity"
 											:key="activityItem.id"
 											class="relative flex gap-x-4"
 										>
 											<div
 												:class="[
-													activityItemIdx === ticket.Activity.length - 1
+													activityItemIdx === project.activity.length - 1
 														? 'h-6'
 														: '-bottom-6',
 													'absolute left-0 top-0 flex w-6 justify-center',
@@ -1435,7 +1273,7 @@
 														</div>
 														<span
 															class="flex-none py-0.5 text-xs leading-5 text-gray-800"
-															>{{ activityItem.created_on }}</span
+															>{{ activityItem.created_at }}</span
 														>
 													</div>
 													<p class="text-sm leading-6 text-gray-800">
@@ -1461,7 +1299,7 @@
 														</div>
 														<span
 															class="flex-none py-0.5 text-xs leading-5 text-gray-800"
-															>{{ activityItem.created_on }}</span
+															>{{ activityItem.created_at }}</span
 														>
 													</div>
 													<p class="text-sm leading-6 text-gray-800">
@@ -1487,9 +1325,9 @@
 													class="flex-auto py-0.5 text-xs leading-5 text-gray-800"
 												>
 													<span class="text-gray-1000 font-medium">{{
-														activityItem.User?.firstName +
+														activityItem.users.first_name +
 														' ' +
-														activityItem.User?.lastName
+														activityItem.users.last_name
 													}}</span>
 													{{ activityItem.text }}
 												</p>
@@ -1497,7 +1335,7 @@
 													class="flex-none py-0.5 text-xs leading-5 text-gray-800"
 													>{{
 														formatDateDistance(
-															new Date(activityItem.created_on) || new Date()
+															new Date(activityItem.created_at) || new Date()
 														) + ' ago'
 													}}</span
 												>

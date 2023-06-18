@@ -1,5 +1,27 @@
 export default function (type: string, status: string) {
 	const category = {
+		default: [
+			{
+				id: 'bug',
+				type: 'engineering',
+				title: 'Modify an existing automation',
+				min_plan: 'support',
+				desc: 'Small-scale request such as an automation bug fix, small or straightforward change to an existing process',
+			},
+			{
+				id: 'new',
+				type: 'engineering',
+				title: 'Create a new automation project',
+				min_plan: 'growth',
+				desc: 'You have a project recommendation, an idea, major process change request, or any other larger initiative.',
+			},
+			{
+				id: 'referral',
+				type: 'sales',
+				title: 'New deal registration',
+				desc: "Submit a new referral deal. As a partner, we'll kick back anything you help us close.",
+			},
+		],
 		client: [
 			{
 				id: 'asap',

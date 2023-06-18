@@ -7,13 +7,13 @@
 	import OrgUsage from '@/components/org/usage.vue';
 	import OrgInvoices2 from '@/components/org/invoices2.vue';
 
-	definePageMeta({ layout: 'settings' });
+	definePageMeta({ layout: 'settings', middleware: ['auth'] });
 
 	const route = useRoute();
 
 	const supabase = useSupabaseClient();
 
-	const name = ref('');
+	const name = ref('ytest');
 
 	const tabs = [
 		{
@@ -28,33 +28,25 @@
 			name: 'Billing',
 			component: OrgBilling,
 		},
+		{
+			name: 'Usage',
+			component: OrgUsage,
+		},
+		{
+			name: 'Invoices',
+			component: OrgInvoices2,
+		},
 	];
 
 	const getData = async () => {
 		let { data: accountData, error: userError } = await supabase
-			.from('Account')
-			.select(`name,type`)
+			.from('organizations')
+			.select(`name`)
 			.eq('id', route.params.organization)
 			.limit(1)
 			.single();
+
 		name.value = accountData.name;
-		if (accountData.type === 'partner') {
-			tabs.push({
-				name: 'Payouts',
-				component: OrgInvoices2,
-			});
-		} else {
-			tabs.push(
-				{
-					name: 'Usage',
-					component: OrgUsage,
-				},
-				{
-					name: 'Invoices',
-					component: OrgInvoices2,
-				}
-			);
-		}
 	};
 
 	await getData();

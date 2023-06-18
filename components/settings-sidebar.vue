@@ -60,10 +60,6 @@
 										class="w-full truncate text-sm text-slate-300/90 text-slate-500 transition group-hover:text-slate-700 dark:group-hover:text-slate-200"
 										>{{ team.name }}</span
 									>
-									<span
-										class="flex h-4 w-5 items-center justify-center rounded-full bg-slate-200 text-[8px] uppercase leading-none text-slate-500 ring-1 ring-inset ring-slate-300"
-										>{{ team.type[0] }}</span
-									>
 								</li></NuxtLink
 							>
 						</ul>
@@ -177,34 +173,23 @@
 	const teams = ref([]);
 
 	async function fetchUserData() {
-		const { data: userData, error: userError } = await supabase
-			.from('User')
-			.select(`*,Account(type, name, id)`)
-			.eq('id', user.value.id)
-			.limit(1)
-			.single();
 
-		if (userData.Account.type === 'super_admin') {
-			const { data: accountData, error: accountError } = await supabase
-				.from('Account')
-				.select('*,Ticket(status,type)');
-			teams.value = accountData;
-		} else teams.value = [userData.Account];
+		let { data: accountData, error: accountError } = await supabase
+			.from('organizations')
+			.select('id,name');
+
+		teams.value = accountData;
 
 		if (route.params.organization) {
-			const { data: Account, error: accountError } = await supabase
-				.from('Account')
-				.select('name')
-				.eq('id', route.params.organization)
-				.limit(1)
-				.single();
-			title.value = Account.name;
+			title.value = accountData.find(
+				(org) => org.id === route.params.organization
+			).name;
 		} else {
 			title.value = 'Dashboard';
 		}
 	}
 
-	fetchUserData();
+	await fetchUserData();
 
 	watch(
 		() => route.params.organization,

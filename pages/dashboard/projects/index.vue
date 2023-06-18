@@ -3,14 +3,8 @@
 		<Head>
 			<Title>Motis Group | Dashboard</Title>
 		</Head>
-		<!-- <OrgLoadingOverlay v-if="loading" /> -->
-		<OrgOnboardingOverlay
-			v-if="!user_data.hasCompletedOnboarding"
-		/>
-		<org-deals v-else-if="account.type === 'partner' && !loading" />
-		<org-clients
-			v-else-if="account.type === 'client' || account.type === 'super_admin'"
-		/>
+		<!-- <org-deals /> -->
+		<org-clients />
 
 		<transition
 			enter-active-class="transition ease-out duration-100"
@@ -96,44 +90,38 @@
 
 	// Check to see if user has an accountId
 
-	const getData = async () => {
-		try {
-			let { data: userData, error: userError } = await supabase
-				.from('User')
-				.select('*')
-				.eq('id', user.value.id)
-				.limit(1)
-				.single();
+	// const getData = async () => {
+	// 	try {
+	// 		let { data: userData, error: userError } = await supabase
+	// 			.from('users')
+	// 			.select('*');
 
-			if (userError) throw new Error(userError.message);
+	// 		if (userError) throw new Error(userError.message);
 
-			user_data.value = userData;
+	// 		user_data.value = userData;
 
-			if (userData.accountId === null) {
-				navigateTo('/dashboard/new');
-			} else {
-				// Get account data
-				let { data: accountData, error: accountError } = await supabase
-					.from('Account')
-					.select('*')
-					.eq('id', userData.accountId)
-					.limit(1)
-					.single();
+	// 		} else {
+	// 			// Get account data
+	// 			let { data: accountData, error: accountError } = await supabase
+	// 				.from('organizations')
+	// 				.select('id,name');
 
-				if (accountError) throw new Error(accountError.message);
+	// 			console.log(accountData);
 
-				account.value = accountData;
-			}
+	// 			if (accountError) throw new Error(accountError.message);
 
-			// loading.value = false;
-		} catch (error) {
-			is_error.value = true;
-			error_message.value = error.message;
-			console.log(error);
-		}
-	};
+	// 			account.value = accountData;
+	// 		}
 
-	await getData();
+	// 		// loading.value = false;
+	// 	} catch (error) {
+	// 		is_error.value = true;
+	// 		error_message.value = error.message;
+	// 		console.log(error);
+	// 	}
+	// };
+
+	// await getData();
 
 	watch(() => {
 		if (!user.value) {

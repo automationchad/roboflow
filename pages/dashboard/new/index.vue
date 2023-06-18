@@ -1,5 +1,5 @@
 <script setup>
-	definePageMeta({ layout: 'project' });
+	definePageMeta({ layout: 'project', middleware: ['auth'] });
 
 	import { ref } from 'vue';
 
@@ -13,9 +13,12 @@
 	} from '@headlessui/vue';
 
 	const options = [
-		{ id: 'client', name: 'Client' },
-		{ id: 'partner', name: 'Partner' },
 		{ id: 'personal', name: 'Personal' },
+		{ id: 'educational', name: 'Educational' },
+		{ id: 'startup', name: 'Startup' },
+		{ id: 'agency', name: 'Agency' },
+		{ id: 'company', name: 'Company' },
+		{ id: 'n/a', name: 'N/A' },
 	];
 
 	const selectedOption = ref(options[0]);
@@ -53,6 +56,31 @@
 		};
 	};
 
+	const createTrayWorkspace = async (body) => {
+		const variables = {
+			workspaceName: body.name,
+			workspaceDescription: body.description,
+			workspacePurpose: 'CONSULTANCY',
+			workspaceColor: '#4ACC94',
+			workspaceIsSandbox: true,
+		};
+
+		try {
+			const { data: trayWorkspaceData, error: trayWorkspaceError } =
+				await $fetch('/api/tray/workspaces/create', {
+					method: 'POST',
+					body: variables,
+				});
+
+			if (trayWorkspaceError) {
+				throw new Error(trayWorkspaceError.message);
+			}
+			return { data: trayWorkspaceData, error: null };
+		} catch (e) {
+			return { data: null, error: { message: e } };
+		}
+	};
+
 	const handleSubmit = async (body) => {
 		try {
 			if (!body.name) {
@@ -61,53 +89,32 @@
 			loading.value = true;
 			// Insert account data
 
-			let customer;
-
-			if (selectedOption.value.id === 'partner') {
-				customer = await $fetch('/api/stripe/account/create', {
-					method: 'post',
+			const { data: trayWorkspace, error: trayWorkspaceError } =
+				await createTrayWorkspace({
+					name: body.name,
+					description: selectedOption.value.id,
 				});
-			} else {
-				customer = await $fetch('/api/stripe/customer/create', {
-					method: 'post',
-					body: {
-						company_name: body.name,
-					},
-				});
+
+			if (trayWorkspaceError) {
+				throw new Error(trayWorkspaceError.message);
 			}
 
-			const { data: accountData, error: accountError } = await supabase
-				.from('Account')
-				.insert([
-					{
-						name: body.name,
-						type: selectedOption.value.id,
-						stripeCustomerId: customer.id,
-						status: 'active',
-					},
-				])
-				.select();
+			const account = await $fetch('/api/stripe/account/create', {
+				method: 'post',
+			});
 
-			const { data: userData, error: userError } = await supabase
-				.from('User')
-				.select('accountId')
-				.eq('id', user.value.id)
-				.limit(1)
-				.single();
-
-			if (!userData.accountId) {
-				const { error: userUpdateError } = await supabase
-					.from('User')
-					.update({ accountId: accountData[0].id })
-					.eq('id', user.value.id);
-				if (userUpdateError) {
-					throw new Error(userUpdateError.message);
-				}
+			if (!account || account.error) {
+				throw new Error(
+					account.error ? account.error : 'Error creating account'
+				);
 			}
 
-			if (accountError) {
-				throw new Error(accountError.message);
-			}
+			const customer = await $fetch('/api/stripe/customer/create', {
+				method: 'post',
+				body: {
+					company_name: body.name,
+				},
+			});
 
 			if (!customer || customer.error) {
 				throw new Error(
@@ -116,23 +123,43 @@
 			}
 
 			// Create Stripe subscription
-			// if (!body.options.partner) {
-			// 	const subscription = await $fetch('/api/stripe/subscription/create', {
-			// 		method: 'post',
-			// 		body: {
-			// 			customer,
-			// 		},
-			// 	});
 
-			// 	if (!subscription || subscription.error) {
-			// 		throw new Error(
-			// 			subscription.error
-			// 				? subscription.error
-			// 				: 'Error creating subscription'
-			// 		);
-			// 	}
-			// }
-			router.push(`/dashboard/new/${accountData[0].id}`);
+			const subscription = await $fetch('/api/stripe/subscription/create', {
+				method: 'post',
+				body: {
+					customer,
+				},
+			});
+
+			if (!subscription || subscription.error) {
+				throw new Error(
+					subscription.error
+						? subscription.error
+						: 'Error creating subscription'
+				);
+			}
+
+			const payload = {
+				name: body.name,
+				type: selectedOption.value.id,
+				stripe_customer_id: customer.id,
+				stripe_account_id: account.id,
+				tray_workspace_id: trayWorkspace.id,
+				status: 'ACTIVE',
+			};
+
+			const { data: orgInsert, error: orgInsertError } = await supabase.rpc(
+				'create_organization_and_member',
+				{
+					organization_data: payload,
+					user_id: user.value.id,
+				}
+			);
+
+			if (orgInsertError) {
+				throw new Error(orgInsertError.message);
+			}
+			router.push(`/dashboard/new/${orgInsert.id}`);
 		} catch (error) {
 			console.log(error);
 			loading.value = false;

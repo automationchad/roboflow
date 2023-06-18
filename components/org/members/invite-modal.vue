@@ -45,10 +45,10 @@
 
 	async function fetchAccountData() {
 		try {
-			const { role, error: getTicketTypesError } = await getTicketTypes(
-				null,
-				'active'
-			);
+			const { data: rolesData, error: getTicketTypesError } = await supabase
+				.from('roles')
+				.select('*')
+				.order('id', { ascending: true });
 
 			if (getTicketTypesError) {
 				throw new Error(
@@ -56,8 +56,8 @@
 				);
 			}
 
-			roles.value = role;
-			selectedRole.value = role[0];
+			roles.value = rolesData;
+			selectedRole.value = rolesData[0];
 			page_loading.value = false;
 		} catch (error) {
 			is_error.value = true;
@@ -95,38 +95,26 @@
 			if (!inviteeEmail.value) {
 				throw new Error('No email included');
 			}
-			// Try to insert the invitation
-			const { data: userData, error: userError } = await supabase
-				.from('User')
-				.select('email')
-				.eq('email', inviteeEmail.value);
 
 			const { data: inviteData, error: inviteError } = await supabase
-				.from('Invitation')
-				.select('email')
-				.eq('email', inviteeEmail.value);
+				.from('invitations')
+				.select('id')
+				.eq('invited_email', inviteeEmail.value);
 
-			if (userData.length > 0 || inviteData.length > 0) {
+			if (inviteData.length > 0) {
 				inviteeEmail.value = '';
-				throw new Error(
-					userData.length > 0
-						? 'User already exists in this organization'
-						: 'Email has already recieved an invite'
-				);
+				throw new Error('Email has already received an invite');
 			}
 
 			const { data: invitation, error } = await supabase
-				.from('Invitation')
+				.from('invitations')
 				.insert([
 					{
-						email: inviteeEmail.value,
-						systemRole: selectedRole.value.id,
-						createdBy: user.value.id,
-						expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-						account: route.params.organization,
+						invited_email: inviteeEmail.value,
+						role_id: selectedRole.value.id,
+						organization_id: route.params.organization,
 					},
-				])
-				.select('*');
+				]);
 			// If there was an error inserting the invitation, log the error and alert the user
 			if (error) {
 				throw new Error(error.message || error.toString());
@@ -238,7 +226,7 @@
 																	:class="[
 																		selected ? 'bg-slate-200' : '',
 																		active ? 'bg-slate-50' : '',
-																		'w-listbox text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 bg-scale-600 relative cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
+																		'text-scale-900 hover:bg-scale-300 dark:hover:bg-scale-500 focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 text-scale-1200 relative w-full cursor-pointer select-none border-none py-2 pl-3 pr-9 text-sm transition focus:outline-none',
 																	]"
 																>
 																	<div class="flex items-center space-x-3">
