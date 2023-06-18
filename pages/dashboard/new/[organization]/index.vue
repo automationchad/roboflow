@@ -78,7 +78,7 @@
 		}
 	}
 
-	fetchData();
+	await fetchData();
 
 	watch(selectedAccount, (newAccount) => {
 		if (newAccount) {
