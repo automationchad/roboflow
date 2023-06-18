@@ -331,31 +331,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="self-center">
-						<div>
-							<iframe
-								src="https://newassets.hcaptcha.com/captcha/v1/672044a/static/hcaptcha.html#frame=checkbox&amp;id=26y0gvo4aij2&amp;host=app.supabase.com&amp;sentry=true&amp;reportapi=https%3A%2F%2Faccounts.hcaptcha.com&amp;recaptchacompat=true&amp;custom=false&amp;hl=en&amp;tplinks=on&amp;sitekey=4ca1fdb9-c9c9-4495-ba50-c85fc0e7ec1f&amp;size=invisible&amp;theme=light&amp;origin=https%3A%2F%2Fapp.supabase.com"
-								tabindex="0"
-								frameborder="0"
-								scrolling="no"
-								title="Widget containing checkbox for hCaptcha security challenge"
-								aria-hidden="true"
-								data-hcaptcha-widget-id="26y0gvo4aij2"
-								data-hcaptcha-response=""
-								style="display: none"
-							></iframe
-							><textarea
-								id="g-recaptcha-response-26y0gvo4aij2"
-								name="g-recaptcha-response"
-								style="display: none"
-							></textarea
-							><textarea
-								id="h-captcha-response-26y0gvo4aij2"
-								name="h-captcha-response"
-								style="display: none"
-							></textarea>
-						</div>
-					</div>
+					
 				</div>
 			</div>
 			<div class="border-b">
