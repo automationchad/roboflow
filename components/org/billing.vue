@@ -309,12 +309,7 @@
 										<div class="space-y-2">
 											<div class="flex items-center justify-between">
 												<div class="flex items-center space-x-8">
-													<img
-														alt=""
-														class="text-xs"
-														src="/dashboard/img/payment-methods/mastercard.png"
-														width="32"
-													/>
+													<img alt="" class="text-xs" :src="visa" width="32" />
 													<div
 														class="grid w-64 gap-2 text-sm leading-4 md:grid md:grid-cols-12"
 													>
