@@ -121,7 +121,7 @@
 
 <template>
 	<main class="flex-1 overflow-y-auto" style="max-height: 100vh">
-		<div class="relative">
+		<!-- <div class="relative">
 			<div
 				class="absolute right-16 top-[1.9rem] z-10 flex items-center space-x-3 xl:right-32"
 			>
@@ -1395,6 +1395,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</main>
 </template>
