@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
 		customer = await stripe.customers.create({
 			email: body.email,
 			name: body.company_name,
+			metadata: body.metadata,
 		});
 	}
 	return customer;

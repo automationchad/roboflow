@@ -160,25 +160,10 @@
 		showImageModal.value = !showImageModal.value;
 	};
 
-	let { data: User, error: userError } = await supabase
-		.from('User')
-		.select(
-			`*,Account (
-	     id,
-		 type,
-		 stripeCustomerId
-	   )`
-		)
-		.eq('id', user.value.id)
-		.limit(1)
-		.single();
-
-	let { data: Ticket, error: ticketError } = await supabase
-		.from('Ticket')
-		.select(
-			'*, Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges,email),Comment(*,User(firstName,lastName,systemRole,id,avatarPath,jobTitle,badges))), User(*)'
-		)
-		.eq('id', route.params.id)
+	let { data: project, error: projectError } = await supabase
+		.from('projects')
+		.select('*, users(*)')
+		.eq('id', route.params.project_id)
 		.limit(1)
 		.single();
 
@@ -273,7 +258,7 @@
 
 	// ticketAvatar.value = await getAvatarUrl(Ticket.createdBy);
 	currentAvatar.value = await getAvatarUrl(user.value.id);
-	assignedToAvatar.value = await getAvatarUrl(Ticket.assignedTo);
+	assignedToAvatar.value = await getAvatarUrl(project.assigned_id);
 
 	const convert = (text) => {
 		const formatted = converter.makeHtml(text);
@@ -289,9 +274,9 @@
 					.insert([
 						{
 							text: thread_id ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: Ticket.id,
-							threadId: thread_id,
+							created_by: user.value.id,
+							project_id: project.id,
+							thread_id,
 							attachment: true,
 						},
 					])
@@ -324,9 +309,9 @@
 					.insert([
 						{
 							text: thread_id !== null ? reply_text.value : comment_text.value,
-							createdBy: user.value.id,
-							ticketId: Ticket.id,
-							threadId: thread_id,
+							created_by: user.value.id,
+							project_id: project.id,
+							thread_id,
 						},
 					]);
 
@@ -396,7 +381,7 @@
 					class=""
 					v-if="
 						!props.activityItem.deleted ||
-						props.activityItem?.Comment.length > 0
+						props.activityItem?.replies.length > 0
 					"
 				>
 					<footer
@@ -407,34 +392,22 @@
 							<div
 								class="text-gray-1000 mr-3 inline-flex items-center text-sm font-medium dark:text-white"
 							>
-								<img
-									v-if="props.activityItem.avatarUrl"
-									class="relative z-0 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB] dark:ring-[#020014]"
-									:src="props.activityItem.avatarUrl"
-									alt=""
-								/>
-								<div
-									v-else
-									class="mr-2 flex h-5 w-5 items-center justify-center rounded-full border border-sky-600/20 bg-sky-100 text-xs text-sky-500"
-								>
-									<UserCircleIconMini class="m-0 h-5 w-5" />
-								</div>
-								<NuxtLink :to="'/profile/' + props.activityItem.User.id"
+								<NuxtLink :to="'/profile/' + props.activityItem.users.id"
 									>{{
-										props.activityItem.User.firstName
-											? props.activityItem.User.firstName
-											: props.activityItem.User.email
+										props.activityItem.users.first_name
+											? props.activityItem.users.first_name
+											: props.activityItem.users.primary_email
 									}}
 									{{
-										props.activityItem.User.lastName
-											? props.activityItem.User.lastName
+										props.activityItem.users.last_name
+											? props.activityItem.users.last_name
 											: ''
 									}}</NuxtLink
 								>
 
 								<div class="ml-2 mr-1 flex items-center space-x-1">
 									<div
-										v-for="badge in props.activityItem.User.badges.slice(0, 1)"
+										v-for="badge in props.activityItem.users.badges.slice(0, 1)"
 										:key="badge.id"
 										:class="[
 											badge.id,
@@ -468,27 +441,24 @@
 										>
 									</div>
 									<div
-										v-if="props.activityItem.User.badges.length - 1"
+										v-if="props.activityItem.users.badges.length - 1"
 										class="badge-extra rounded-md border border-gray-600 px-1.5 leading-4 text-gray-400"
 									>
-										+{{ props.activityItem.User.badges.length - 1 }}
+										+{{ props.activityItem.users.badges.length - 1 }}
 									</div>
 								</div>
 
 								<span
 									class="relative inline-flex pl-4 text-sm font-normal text-gray-900 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 								>
-									{{ formatDateDistance(props.activityItem.createdOn) }}
+									{{ formatDateDistance(props.activityItem.created_at) }}
 								</span>
 							</div>
 						</div>
 
 						<div
 							class="flex space-x-1"
-							v-if="
-								props.activityItem.createdBy === User.id ||
-								User.systemRole === 'super_admin'
-							"
+							v-if="props.activityItem.created_by === user.id"
 						>
 							<button
 								class="text-slate-400 transition-colors hover:text-indigo-400"
@@ -514,7 +484,7 @@
 								@click="
 									handleDelete(
 										props.activityItem.id,
-										props.activityItem.Comment.length > 0
+										props.activityItem.replies.length > 0
 									)
 								"
 								class="text-slate-400 transition-colors hover:text-rose-400"
@@ -592,29 +562,27 @@
 						</div>
 					</footer>
 					<div
+						:style="
+							(props.activityItem.users.id === user.id
+								? 'background: #4ca2ff; color: white'
+								: 'background: #e6e5eb; color: black',
+							'border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-top-left-radius: 0.125rem; border-bottom-right-radius: 0.5rem; border-bottom-left-radius: 0.5rem')
+						"
 						:class="[
-							props.activityItem.User.id === User.id
-								? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
-								: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200   dark:ring-white/5',
-							props.activityItem.type === 'ai'
-								? 'ai_shadow  shadow-inset shadow-[#9643FF]/25'
-								: '',
+							props.activityItem.type === 'ai' ? 'ai_shadow ' : '',
 							props.activityItem.deleted
 								? 'text-black/30 dark:text-white/50'
 								: '',
-							'ml-8 rounded-b-lg rounded-r-lg rounded-tl-sm px-4 py-3 text-sm leading-7 ring-1 ring-inset',
+							' px-4 py-3 text-sm leading-7',
 						]"
 						v-html="convert(props.activityItem.text)"
 					></div>
-					<div class="mt-2 pl-8">
+					<div class="mt-2">
 						<a
-							v-if="
-								props.activityItem.text.includes('below') &&
-								props.activityItem.User.systemRole === 'super_admin'
-							"
+							v-if="props.activityItem.text.includes('below')"
 							:href="`https://calendly.com/motis-group/partners?name=${
-								Ticket.User.firstName + ' ' + Ticket.User.lastName
-							}&email=${Ticket.User.email}&utm_source=${Ticket.id}`"
+								project.users.first_name + ' ' + project.users.last_name
+							}&email=${project.users.primary_email}&utm_source=${project.id}`"
 							target="_blank"
 							class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
 							>Schedule a call</a
@@ -622,7 +590,7 @@
 					</div>
 					<div
 						v-if="props.activityItem.attachment && !props.activityItem.deleted"
-						class="my-3 flex overflow-hidden pl-8"
+						class="my-3 flex overflow-hidden"
 					>
 						<button
 							@click="
@@ -641,51 +609,42 @@
 					</div>
 				</div>
 
-				<div class="ml-4" v-if="props.activityItem?.Comment">
+				<div class="ml-4" v-if="props.activityItem?.replies">
 					<article
-						v-for="(reply, idx) in props.activityItem?.Comment"
+						v-for="(reply, idx) in props.activityItem?.replies"
 						id="reply-messages"
 						:key="reply.id"
-						class="relative my-6 pl-2 text-base lg:pl-4"
+						class="relative my-6 pl-4 text-base lg:pl-4"
 					>
 						<div
-							v-if="idx < props.activityItem?.Comment.length - 1"
+							v-if="idx < props.activityItem.replies - 1"
 							:class="[
 								props.activityItemIdx === props.comments.length
 									? 'h-6 '
 									: '-bottom-6',
-								'absolute  left-0 top-0 flex w-12 justify-center',
+								'absolute left-0 top-0 flex w-12 justify-center',
 							]"
 						>
 							<div
-								class="w-px bg-gradient-to-b from-slate-300/0 via-slate-300/20 to-slate-300/0"
+								style="
+									 width: 1px; height: 100%;
+								"
+								class="bg-scale-600"
 							/>
 						</div>
 						<header class="mb-2 flex items-center justify-between">
 							<div class="flex items-center">
 								<div
-									class="mr-3 inline-flex items-center text-sm font-medium text-gray-1000 dark:text-white"
+									class="text-gray-1000 mr-3 inline-flex items-center text-sm font-medium dark:text-white"
 								>
-									<div v-if="reply.avatarUrl" class="">
-										<img
-											class="relative z-50 mr-2 h-6 w-6 rounded-full object-cover ring-8 ring-[#F8F8FB] dark:ring-[#020014]"
-											:src="reply.avatarUrl"
-											:alt="reply.User.firstName + ' ' + reply.User.lastName"
-										/>
-									</div>
-
-									<div
-										v-else
-										class="mr-2 h-5 w-5 rounded-full bg-slate-300"
-									></div>
-									<NuxtLink :to="'/profile/' + reply.User.id"
-										>{{ reply.User.firstName }}
-										{{ reply.User.lastName }}</NuxtLink
+									<span :to="'/profile/' + reply.users.id"
+										>{{ reply.users.first_name }}
+										{{ reply.users.last_name }}</span
 									>
 
 									<div class="ml-2 mr-1 flex items-center space-x-1">
 										<div
-											v-for="badge in reply.User.badges.slice(0, 1)"
+											v-for="badge in reply.users.badges.slice(0, 1)"
 											:key="badge.id"
 											:class="[
 												badge.id,
@@ -720,27 +679,24 @@
 										</div>
 
 										<div
-											v-if="reply.User.badges.length > 1"
+											v-if="reply.users.badges.length > 1"
 											class="badge-extra rounded-md border border-gray-600 px-1.5 leading-4 text-gray-900 dark:text-gray-400"
 										>
-											+{{ reply.User.badges.length - 1 }}
+											+{{ reply.users.badges.length - 1 }}
 										</div>
 									</div>
 
 									<span
 										class="relative inline-flex pl-4 text-sm font-normal text-gray-900 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 									>
-										{{ formatDateDistance(reply.createdOn) }}
+										{{ formatDateDistance(reply.created_at) }}
 									</span>
 								</div>
 							</div>
 
 							<div
 								class="flex space-x-1"
-								v-if="
-									reply.createdBy === User.id ||
-									(User.systemRole === 'super_admin' && reply.type === 'ai')
-								"
+								v-if="reply.created_by === user.id || reply.type === 'ai'"
 							>
 								<button
 									class="text-slate-400 transition-colors hover:text-indigo-400"
@@ -839,10 +795,15 @@
 							</div>
 						</header>
 						<div
+							:style="
+								reply.users.id === user.id
+									? 'background-color: #4ca2ff; color: white'
+									: 'background-color: #e6e5eb; color: black'
+							"
 							:class="[
-								reply.User.id === User.id
+								reply.users.id === user.id
 									? ' bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
-									: ' bg-[#E6E5EB] text-gray-1000 ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
+									: ' text-gray-1000 bg-[#E6E5EB] ring-black/5 dark:bg-[#1C1B2C] dark:text-white dark:ring-white/5',
 								reply.type === 'ai'
 									? 'ai_shadow shadow-inset shadow-[#9643FF]/25'
 									: '',
@@ -853,17 +814,16 @@
 						</div>
 
 						<div class="mt-2 pl-8">
-							<NuxtLink
-								v-if="
-									reply.text.includes('below') &&
-									reply.User.systemRole === 'super_admin'
-								"
-								:to="`https://calendly.com/motis-group/partners?name=${
-									Ticket.User.firstName + ' ' + Ticket.User.lastName
-								}&email=${Ticket.User.email}&utm_source=${Ticket.id}`"
+							<a
+								v-if="reply.text.includes('below')"
+								:href="`https://calendly.com/motis-group/partners?name=${
+									project.users.first_name + ' ' + project.users.last_name
+								}&email=${project.users.primary_email}&utm_source=${
+									project.id
+								}`"
 								target="_blank"
 								class="rounded-md border border-indigo-500 bg-indigo-100 px-2 py-1 text-xs font-normal text-indigo-600 transition-colors dark:bg-indigo-800 dark:text-indigo-100 dark:hover:border-indigo-400 dark:hover:text-white"
-								>Schedule a call</NuxtLink
+								>Schedule a call</a
 							>
 						</div>
 					</article>
@@ -875,21 +835,8 @@
 				>
 					<Disclosure v-slot="{ open }">
 						<div class="flex items-center justify-start pl-8">
-							<img
-								v-if="currentAvatar"
-								:src="currentAvatar"
-								alt=""
-								class="h-5 w-5 rounded-full object-cover"
-							/>
-							<div
-								v-else
-								class="flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-center text-xs text-white"
-							>
-								{{ User.email[0] }}
-							</div>
-
 							<DisclosureButton
-								class="ml-2 flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
+								class="flex items-center text-xs font-normal text-gray-800 transition-colors dark:text-white dark:hover:text-[#9382ff]"
 							>
 								<div class="flex items-center">
 									<svg
@@ -905,11 +852,7 @@
 											stroke-linecap="round"
 											stroke-linejoin="round"
 										></path></svg
-									><span>Reply as &nbsp;</span
-									><span class="font-medium"
-										>{{ User.firstName ? User.firstName : User.email }}
-										{{ User.lastName ? User.lastName : '' }}</span
-									>
+									><span>Reply</span>
 								</div>
 							</DisclosureButton>
 						</div>
@@ -993,7 +936,7 @@
 			<div class="" v-else-if="props.activityItem.type === 'audio'">
 				<div
 					:class="[
-						props.activityItem.User.id === User.id
+						props.activityItem.users.id === user.id
 							? 'prose-invert bg-[#4CA2FF] text-white ring-white/5 dark:bg-[#0166C8]'
 							: 'bg-[#E6E5EB] ring-black/5 dark:prose-invert dark:bg-[#1C1B2C] dark:text-gray-200 dark:ring-white/5',
 						props.activityItem.type === 'ai'
@@ -1034,8 +977,8 @@
 									<UserCircleIconMini class="m-0 h-5 w-5" />
 								</div>
 								<div class="mr-1 flex items-center space-x-1">
-									{{ props.activityItem.User.firstName }}
-									{{ props.activityItem.User.lastName }}
+									{{ props.activityItem.users.first_name }}
+									{{ props.activityItem.users.last_name }}
 								</div>
 								<div class="font-normal text-slate-400">
 									{{ props.activityItem.text }}
@@ -1044,7 +987,7 @@
 								<span
 									class="relative inline-flex pl-4 text-sm font-normal text-gray-600 before:absolute before:left-1 before:top-2 before:h-[2px] before:w-[2px] before:bg-slate-400 before:content-[''] dark:text-slate-400"
 								>
-									{{ formatDateDistance(props.activityItem.createdOn) }}
+									{{ formatDateDistance(props.activityItem.created_at) }}
 								</span>
 							</div>
 						</div>

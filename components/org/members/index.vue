@@ -123,14 +123,14 @@
 			.select(
 				`id, users(id,username,primary_email,first_name,last_name,roles(name))`
 			)
-			.eq('id', route.params.organization)
+			.eq('id', route.params.organization_id)
 			.limit(1)
 			.single();
 
 		const { data: invitationData, error: invitationError } = await supabase
 			.from('invitations')
 			.select('*,roles(name)')
-			.eq('organization_id', route.params.organization);
+			.eq('organization_id', route.params.organization_id);
 
 		console.log(invitationData);
 		console.log(accountData);

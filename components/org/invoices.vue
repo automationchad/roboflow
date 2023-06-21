@@ -1,6 +1,5 @@
 <template>
 	<div class="">
-		
 		<div class="mt-8 space-y-6 lg:px-0">
 			<loading-spinner v-if="state.loading" />
 			<!-- Billing history -->
@@ -43,24 +42,13 @@
 													scope="col"
 													class="w-1/5 px-6 py-3 text-right text-sm font-medium text-gray-900 dark:text-slate-400"
 												></th>
-												<!--
-                              `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
-                            -->
 											</tr>
-											<!-- <tr class="px-6" v-if="state.invoices.length === 0">
-												<th
-													colspan="4"
-													class="py-24 text-sm font-normal text-slate-300"
-												>
-													No invoices
-												</th>
-											</tr> -->
 										</thead>
 
 										<tbody
 											class="divide-y divide-gray-200 bg-white dark:divide-slate-800 dark:bg-transparent"
 										>
-											<tr v-for="invoice in state.invoices" :key="invoice.id">
+											<tr v-for="invoice in invoices" :key="invoice.id">
 												<td
 													class="whitespace-nowrap px-6 py-3 text-sm font-normal text-gray-900 dark:text-white"
 												>
@@ -243,6 +231,42 @@
 													</a>
 												</td>
 											</tr>
+											<tr class="" v-if="invoices.length === 0 && !loading">
+												<td
+													class="col-span-6 p-3 py-12 text-center"
+													colspan="6"
+												>
+													<p class="text-scale-1000">
+														No payouts for this organization yet
+													</p>
+												</td>
+											</tr>
+											<tr class="" v-else>
+												<td
+													class="col-span-6 p-3 py-12 text-center"
+													colspan="6"
+												>
+													<p
+														class="text-scale-1000 flex items-center justify-center"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="mr-2 h-4 w-4 animate-spin"
+															fill="none"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke="currentColor"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="1.5"
+																d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+															></path>
+														</svg>
+														Checking for payouts
+													</p>
+												</td>
+											</tr>
 										</tbody>
 									</table>
 								</div>
@@ -257,57 +281,21 @@
 
 <script setup>
 	import { reactive, onMounted, ref } from 'vue';
-	import {
-		Disclosure,
-		DisclosureButton,
-		DisclosurePanel,
-		Menu,
-		MenuButton,
-		MenuItem,
-		MenuItems,
-		RadioGroup,
-		RadioGroupDescription,
-		RadioGroupLabel,
-		RadioGroupOption,
-		Switch,
-		SwitchGroup,
-		SwitchLabel,
-	} from '@headlessui/vue';
-	import {
-		MagnifyingGlassIcon,
-		QuestionMarkCircleIcon,
-		XCircleIcon,
-	} from '@heroicons/vue/20/solid';
-	import {
-		Bars3Icon,
-		BellIcon,
-		ExclamationTriangleIcon,
-		CogIcon,
-		CreditCardIcon,
-		SparklesIcon,
-		KeyIcon,
-		SquaresPlusIcon,
-		UserCircleIcon,
-		XMarkIcon,
-	} from '@heroicons/vue/24/outline';
 
 	import { format, formatDistance } from 'date-fns';
 
-	const state = reactive({
-		invoices: [],
-		loading: false,
-	});
+	const invoices = ref([]);
+
+	const loading = ref(true);
 
 	const route = useRoute();
-
-	const user = useSupabaseUser();
 
 	const supabase = useSupabaseClient();
 
 	let { data: accountData, error: accountError } = await supabase
-		.from('Account')
-		.select(`id, stripeCustomerId`)
-		.eq('id', route.params.organization)
+		.from('clients')
+		.select(`id, stripe_customer_id`)
+		.eq('id', route.params.client_id)
 		.limit(1)
 		.single();
 
@@ -318,17 +306,17 @@
 		open: 'bg-sky-100 dark:bg-sky-700 dark:ring-sky-500 ring-sky-300  text-sky-900 dark:text-sky-200',
 		void: 'bg-purple-100 dark:bg-purple-700 dark:ring-purple-500 ring-purple-300  text-purple-900 dark:text-purple-200',
 	};
-	const fetchData = async () => {
-		console.log(accountData);
+	const getInvoices = async () => {
 		const { data } = await $fetch(
-			`/api/stripe/invoices/${accountData.stripeCustomerId}`
+			`/api/stripe/invoices/${accountData.stripe_customer_id}`
 		);
 		return data;
 	};
 
-	onMounted(async () => {
-		state.invoices = await fetchData();
-		console.log(state.invoices);
-		state.loading = false;
-	});
+	const getData = async () => {
+		invoices.value = await getInvoices();
+		loading.value = false;
+	};
+
+	getData();
 </script>

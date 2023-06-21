@@ -9,33 +9,28 @@
 <script setup>
 	import { onMounted } from 'vue';
 
-	const isDarkMode = ref(false);
+	let isDarkMode;
+
+	// Check if localStorage is defined
+	if (typeof localStorage !== 'undefined') {
+		// Prioritize explicit user preference
+		if ('theme' in localStorage) {
+			isDarkMode = localStorage.theme === 'dark';
+		} else {
+			// Infer preference from OS settings if no explicit preference is set
+			isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		}
+	} else {
+		// Default to light mode if localStorage is not available
+		isDarkMode = false;
+	}
 
 	onMounted(() => {
-		if (isDarkMode.value) {
-			document.documentElement.classList.add('dark');
-		} else if (!isDarkMode.value) {
-			document.documentElement.classList.remove('dark');
-		}
-		// Whenever the user explicitly chooses light mode
-		else if (
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches)
-		) {
+		if (isDarkMode) {
 			document.documentElement.classList.add('dark');
 		} else {
 			document.documentElement.classList.remove('dark');
 		}
-
-		// Whenever the user explicitly chooses light mode
-		localStorage.theme = 'light';
-
-		// Whenever the user explicitly chooses dark mode
-		localStorage.theme = 'dark';
-
-		// Whenever the user explicitly chooses to respect the OS preference
-		localStorage.removeItem('theme');
 	});
 </script>
 

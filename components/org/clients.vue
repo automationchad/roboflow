@@ -7,10 +7,9 @@
 
 	const { data: accountData, error: accountError } = await supabase
 		.from('organizations')
-		.select('id,name,projects(id,name,status)');
+		.select('id,name,clients(id,name,status)');
 
 	accounts.value = accountData;
-	console.log(accounts.value);
 
 	const stageType = {
 		initial_review:
@@ -68,7 +67,7 @@
 					>
 						<span
 							class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-							><span class="truncate">New project</span></span
+							><span class="truncate">New client</span></span
 						></MenuButton
 					>
 
@@ -89,7 +88,7 @@
 								:key="account.id"
 							>
 								<NuxtLink
-									:to="`/dashboard/new/${account.id}`"
+									:to="`/new/${account.id}`"
 									:class="[
 										active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
 										'text-body-light focus:bg-selection focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
@@ -106,7 +105,7 @@
 							></div>
 							<MenuItem as="div" v-slot="{ active }">
 								<NuxtLink
-									to="/dashboard/new"
+									to="/new"
 									:class="[
 										active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
 										'text-body-light focus:text-body group relative flex w-full cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none',
@@ -144,11 +143,11 @@
 					>
 						<li
 							class="col-span-1"
-							v-for="project in account.projects"
-							:key="project.id"
-							v-if="account.projects.length > 0"
+							v-for="client in account.clients"
+							:key="client.id"
+							v-if="account.clients.length > 0"
 						>
-							<NuxtLink :to="`/dashboard/projects/${project.id}`">
+							<NuxtLink :to="`/clients/${client.id}`">
 								<div
 									class="bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light dark:border-panel-border-dark hover:bg-panel-border-light dark:hover:bg-panel-border-dark hover:border-panel-border-hover-light dark:hover:border-panel-border-hover-dark group relative flex h-32 cursor-pointer flex-row rounded-md border px-6 py-4 text-left transition duration-150 ease-in-out hover:border-gray-300"
 								>
@@ -156,19 +155,19 @@
 										<h5 class="text-scale-1200">
 											<div class="flex w-full flex-row justify-between gap-1">
 												<span class="flex-shrink truncate">{{
-													project.name
+													client.name
 												}}</span>
 											</div>
 										</h5>
 										<div class="w-full">
 											<div class="flex items-end justify-between">
 												<span class="text-scale-1000 text-sm"
-													>{{ project.status }} |
+													>{{ client.status }} |
 												</span>
 												<div class="grow text-right">
 													<span
 														:class="[
-															stageType[project.status],
+															stageType[client.status],
 															'bg-scale-200 text-scale-1100 border-scale-700 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1',
 														]"
 														><div class="flex items-center gap-2">
@@ -193,7 +192,7 @@
 																	y2="9"
 																></line></svg
 															><span class="truncate capitalize">{{
-																project.status.replace(/_/g, ' ')
+																client.status.replace(/_/g, ' ')
 															}}</span>
 														</div></span
 													>
@@ -225,13 +224,13 @@
 							class="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-200 p-6 text-center"
 						>
 							<div class="space-y-1">
-								<p>No projects</p>
+								<p>No clients</p>
 								<p class="text-sm text-slate-600">
-									Get started by creating a new project.
+									Get started by creating a new client.
 								</p>
 							</div>
 							<div>
-								<NuxtLink :to="`/dashboard/new/${account.id}`"
+								<NuxtLink :to="`/new/${account.id}`"
 									><button
 										class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 										type="button"
@@ -249,7 +248,7 @@
 										>
 											<line x1="12" y1="5" x2="12" y2="19"></line>
 											<line x1="5" y1="12" x2="19" y2="12"></line></svg
-										><span class="truncate">New Project</span>
+										><span class="truncate">New Client</span>
 									</button></NuxtLink
 								>
 							</div>

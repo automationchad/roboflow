@@ -200,7 +200,7 @@
 											<h3 class="text-red-1200 mb-1 block text-sm font-normal">
 												<span class="text-red-900"
 													>Deleting this organization will also remove its
-													projects</span
+													clients</span
 												>
 											</h3>
 											<div class="text-red-1100 text-xs">
@@ -300,7 +300,7 @@
 			const { data: accountData, error: accountError } = await supabase
 				.from('organizations')
 				.select('name')
-				.eq('id', route.params.organization)
+				.eq('id', route.params.organization_id)
 				.limit(1)
 				.single();
 			if (accountError) throw new Error(accountError.message);
@@ -320,7 +320,7 @@
 			const { error } = await supabase
 				.from('organizations')
 				.update({ name: changedOrgName.value })
-				.eq('id', route.params.organization);
+				.eq('id', route.params.organization_id);
 			if (error) throw new Error(error.message);
 			loading.value = false;
 			is_success.value = true;
@@ -346,7 +346,7 @@
 			const { error } = await supabase
 				.from('organizations')
 				.delete()
-				.eq('id', route.params.organization);
+				.eq('id', route.params.organization_id);
 			if (error) throw new Error(error.message);
 			loading.value = false;
 			is_success.value = true;

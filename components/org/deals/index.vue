@@ -238,7 +238,7 @@
 							>
 								<button
 									:disabled="!admin"
-									@click="navigateTo('/dashboard/new')"
+									@click="navigateTo('/new')"
 									:class="[
 										active ? 'bg-gray-100 text-gray-800' : 'text-slate-600',
 										'text-body-light w-full focus:text-body group relative flex cursor-pointer items-center space-x-2 border-none px-4 py-1.5 text-sm focus:outline-none disabled:cursor-not-allowed',

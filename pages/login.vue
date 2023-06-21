@@ -32,7 +32,7 @@
 
 	const redirectTo = route.query.returnTo
 		? `${test ? test_url : base_url}/join/${route.query.returnTo}`
-		: `${test ? test_url : base_url}/dashboard/projects`;
+		: `${test ? test_url : base_url}/clients`;
 
 	const login = async () => {
 		try {
@@ -86,22 +86,9 @@
 		}
 	};
 
-	watch(async () => {
+	watchEffect(() => {
 		if (user.value) {
-			const { data: user_data, error } = await supabase
-				.from('User')
-				.select('accountId')
-				.eq('id', user.value.id)
-				.limit(1)
-				.single();
-			if (error) {
-				console.log(error);
-				return;
-			} else if (user_data.accountId) {
-				router.push(`/dashboard/projects`);
-			} else {
-				router.push(`/dashboard/new`);
-			}
+			router.push(`/clients`);
 		}
 	});
 </script>

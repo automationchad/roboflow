@@ -1,11 +1,11 @@
 <template>
 	<div
-		class="grid h-screen min-h-full bg-white grid-cols-1 grid-rows-[1fr,auto,1fr] dark:bg-black lg:grid-cols-[max(50%,36rem),1fr]"
+		class="grid h-screen min-h-full grid-cols-1 grid-rows-[1fr,auto,1fr] bg-white dark:bg-black lg:grid-cols-[max(50%,36rem),1fr]"
 	>
 		<header
 			class="mx-auto w-full max-w-7xl px-6 pt-6 sm:pt-10 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:px-8"
 		>
-			<a href="/">
+			<a href="/clients">
 				<span class="sr-only">Motis Group</span>
 				<img
 					class="h-10 w-auto sm:h-12"
@@ -18,11 +18,13 @@
 			class="mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8"
 		>
 			<div class="max-w-lg">
-				<p class="text-base font-semibold leading-8 text-indigo-600 dark:text-indigo-400">
+				<p
+					class="text-base font-semibold leading-8 text-indigo-600 dark:text-indigo-400"
+				>
 					{{ error.statusCode }}
 				</p>
 				<h1
-					class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white"
+					class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl"
 				>
 					{{ error.message.split(':')[0] }}
 				</h1>
@@ -34,8 +36,10 @@
 					}}
 				</p>
 				<div class="mt-10">
-					<a href="/dashboard/projects" class="text-sm font-semibold leading-7 text-indigo-600"
-						><span aria-hidden="true">&larr;</span> Back to home</a
+					<NuxtLink
+						to="/clients"
+						class="text-sm font-semibold leading-7 text-indigo-600"
+						><span aria-hidden="true">&larr;</span> Back to home</NuxtLink
 					>
 				</div>
 			</div>

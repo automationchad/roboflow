@@ -1,6 +1,7 @@
 export default function (type: string, status: string) {
 	const category = {
 		default: [
+			{ id: '', title: 'Please select a library', desc: '', disabled: true },
 			{
 				id: 'bug',
 				type: 'engineering',
