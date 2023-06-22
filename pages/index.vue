@@ -1,837 +1,795 @@
 <script setup>
-	definePageMeta({ layout: 'public', middleware: ['auth'] });
+	import { ref, reactive, toRefs } from 'vue';
+	import annotationsFile from '../public/annotations.json';
 
-	const route = useRoute();
+	import { Switch } from '@headlessui/vue';
 
-	const base_url = 'https://app.motis.group';
+	import axios from 'axios';
 
-	const test_url = 'http://localhost:3000';
+	// Constants
+	const url = 'https://detect.roboflow.com/blood-cell-detection-1ekwu/2';
+	const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+	const params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
 
-	const test = true;
+	// Reactive variables
+	const result = ref(null);
+	const isLoading = ref(false);
+	const error = ref(null);
+	const fileInput = ref(null);
+	const state = reactive({
+		selectedFiles: new Set(),
+		images: [],
+	});
 
-	const redirectTo = route.query.returnTo
-		? `${test ? test_url : base_url}/join/${route.query.returnTo}`
-		: `${test ? test_url : base_url}/dashboard/projects`;
+	let imageIdToFileName = new Map();
+	let trueAnnotations = ref([]);
+	let predictedAnnotations = ref([]);
+	let originalImageWidth = ref(null);
+	let originalImageHeight = ref(null);
+	let scale = ref(1);
 
-	const user = useSupabaseUser();
-	const supabase = useSupabaseClient();
+	let classesInput = ref('');
 
-	if (user.value) {
-		navigateTo(`/dashboard/projects`);
+	const categoriesMap = computed(() => {
+		const map = new Map();
+		annotationsFile.categories.forEach((category) => {
+			map.set(category.name, category.id);
+		});
+		return map;
+	});
+
+	const categoryIDNameMap = new Map();
+	annotationsFile.categories.forEach((category) => {
+		categoryIDNameMap.set(category.id, category.name);
+	});
+
+	// Functions
+	const handleFiles = () => {
+		let newFiles = Array.from(fileInput.value.files);
+		if (newFiles.length + state.selectedFiles.size > 50) {
+			alert('You can only select up to 50 files at once.');
+			return;
+		}
+		newFiles.forEach((file) => {
+			state.selectedFiles.add(file);
+			state.images.push(URL.createObjectURL(file));
+		});
+
+		let classes = classesInput.value ? classesInput.value.split(',') : [];
+		let categoryIds = classes.map((className) =>
+			categoriesMap.value.get(className.trim())
+		);
+
+		trueAnnotations.value = annotationsMap
+			.get(Array.from(state.selectedFiles).map((file) => file.name)[0])
+			.filter(
+				(annotation) =>
+					categoryIds.length === 0 ||
+					categoryIds.includes(annotation.category_id)
+			);
+
+		console.log(trueAnnotations.value);
+
+		fileInput.value.value = '';
+	};
+
+	const onImageLoad = (event) => {
+		originalImageWidth.value = event.target.naturalWidth;
+		originalImageHeight.value = event.target.naturalHeight;
+		scale.value = event.target.width / originalImageWidth.value;
+	};
+
+	const removeImage = (index) => {
+		URL.revokeObjectURL(state.images[index]);
+		let file = Array.from(state.selectedFiles)[index];
+		state.selectedFiles.delete(file);
+		state.images.splice(index, 1);
+		fileInput.value.value = '';
+	};
+
+	const getBoundingBoxStyle = (annotation) => {
+		let [x, y, width, height] = annotation.bbox;
+		return {
+			top: `${(y - height / 2) * scale.value}px`,
+			left: `${(x - width / 2) * scale.value}px`,
+			width: `${width * scale.value}px`,
+			height: `${height * scale.value}px`,
+		};
+	};
+
+	const IoU = (boxA, boxB) => {
+		const xA = Math.max(boxA.x, boxB.x);
+		const yA = Math.max(boxA.y, boxB.y);
+		const xB = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
+		const yB = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
+		const intersectionArea = Math.max(0, xB - xA) * Math.max(0, yB - yA);
+		const boxAArea = boxA.area;
+		const boxBArea = boxB.width * boxB.height;
+		const iou = intersectionArea / (boxAArea + boxBArea - intersectionArea);
+		return iou;
+	};
+
+	const calculateBoundingBoxAccuracy = (predictedEntities, trueAnnotations) => {
+		let totalIoUForThisImage = 0;
+		let totalPredictionsForThisImage = predictedEntities.length;
+		for (let i = 0; i < predictedEntities.length; i++) {
+			let predictedEntity = predictedEntities[i];
+			let trueAnnotation = trueAnnotations[i];
+
+			if (predictedEntity === undefined || trueAnnotation === undefined) {
+				continue;
+			} else {
+				let iou = IoU(trueAnnotation.bbox, predictedEntity);
+				totalIoUForThisImage += iou;
+			}
+		}
+
+		let averageIoUForThisImage =
+			totalIoUForThisImage / totalPredictionsForThisImage;
+
+		return averageIoUForThisImage;
+	};
+
+	let classStyles = computed(() => {
+		let classes = classesInput.value.split(',');
+
+		let styles = {};
+
+		// You can customize the style generation logic here
+		classes.forEach((className, index) => {
+			let classTrim = className.trim();
+
+			// Ensure the object exists before setting properties
+			if (!styles[classTrim]) {
+				styles[classTrim] = {};
+			}
+
+			// This assigns a random color to each class
+			styles[classTrim]['background_styles'] = `background-color: hsl(${
+				(index * 360) / classes.length
+			}, 50%, 50%); opacity: 50%; color: white; font-size: 8px;`;
+			styles[classTrim]['border_styles'] = `border-color: hsl(${
+				(index * 360) / classes.length
+			}, 50%, 50%);`;
+		});
+
+		return styles;
+	});
+
+	const processImages = async () => {
+		isLoading.value = true;
+
+		const promises = Array.from(state.selectedFiles).map(async (file) => {
+			let formData = new FormData();
+			formData.append('file', file);
+
+			try {
+				const response = await axios.post(url, formData, {
+					headers: {
+						...headers,
+						'Content-Type': 'multipart/form-data',
+					},
+					params,
+				});
+
+				let predicted = response.data.predictions;
+
+				// If classesInput is not empty, filter predictions
+				if (classesInput.value.trim() !== '') {
+					const classes = classesInput.value.split(',');
+					predicted = predicted.filter((prediction) =>
+						classes.includes(prediction.class)
+					);
+				}
+
+				predictedAnnotations.value = predicted;
+
+				return {
+					fileName: file.name,
+				};
+			} catch (err) {
+				console.error(err);
+			}
+		});
+
+		try {
+			const results = await Promise.all(promises);
+			results.forEach((image) => {
+				if (image) {
+					result.value = image;
+				}
+			});
+			isLoading.value = false;
+
+			console.log(predictedAnnotations.value);
+		} catch (err) {
+			isLoading.value = false;
+			error.value = err.message;
+			console.error(err);
+		}
+	};
+
+	// Initial setup
+
+	const images = annotationsFile.images;
+	for (let image of images) {
+		imageIdToFileName.set(image.id, image.file_name);
 	}
 
-	const invitation = ref(null);
-	const email = ref('');
-	const password = ref('');
-
-	const passwordInputFocused = ref(false);
-
-	const startedTyping = ref(false);
-
-	const showPassword = ref(false);
-
-	const showError = ref(false);
-	const showSuccess = ref(false);
-
-	const is_error = ref(false);
-	const is_success = ref(false);
-	const error_message = ref('');
-	const loading = ref(false);
-
-	watch(async () => {
-		if (user.value) {
-			navigateTo(`/dashboard/projects`);
+	const annotationsMap = new Map();
+	for (const annotation of annotationsFile.annotations) {
+		const fileName = imageIdToFileName.get(annotation.image_id);
+		if (!annotationsMap.has(fileName)) {
+			annotationsMap.set(fileName, []);
 		}
-	});
-
-	const showPasswordHandle = (event) => {
-		event.stopPropagation();
-		showPassword.value = !showPassword.value;
-	};
-
-	const passwordValid = computed(() => {
-		if (!startedTyping.value) {
-			return { isValid: true, message: '' };
-		}
-		if (startedTyping.value && password.value.length === 0) {
-			return { isValid: false, message: 'Password is a required field' };
-		}
-		// Check if password is long enough
-		if (password.value.length <= 7) {
-			return {
-				isValid: false,
-				message: 'Password must be longer than 7 characters.',
-			};
-		}
-
-		// Check for uppercase letter
-		if (!/[A-Z]/.test(password.value)) {
-			return {
-				isValid: false,
-				message: 'Password must contain at least 1 uppercase letter.',
-			};
-		}
-
-		// Check for lowercase letter
-		if (!/[a-z]/.test(password.value)) {
-			return {
-				isValid: false,
-				message: 'Password must contain at least 1 lowercase letter.',
-			};
-		}
-
-		// Check for number
-		if (!/[0-9]/.test(password.value)) {
-			return {
-				isValid: false,
-				message: 'Password must contain at least 1 number.',
-			};
-		}
-
-		// Check for special character
-		if (!/[!<>@#\$%]/.test(password.value)) {
-			return {
-				isValid: false,
-				message:
-					'Password must contain at least 1 special character (!<>@#$%).',
-			};
-		}
-
-		return { isValid: true, message: 'Password is valid.' };
-	});
-
-	const signUp = async (oauth) => {
-		try {
-			loading.value = true;
-			if (!email.value || !password.value) {
-				throw new Error('Please fill in all fields');
-			}
-
-			let role = 'owner';
-
-			if (route.query.returnTo) {
-				const { data: invitation, error: invitationError } = await supabase
-					.from('Invitation')
-					.select('systemRole')
-					.eq('token', route.query.returnTo)
-					.limit(1)
-					.single();
-				role = invitation?.systemRole || 'owner';
-				if (invitationError) {
-					throw new Error(invitationError.message);
-				}
-			}
-
-			const { user, error } = await supabase.auth.signUp({
-				email: email.value,
-				password: password.value,
-				options: {
-					emailRedirectTo: redirectTo,
-					data: {
-						role,
-					},
-				},
-			});
-			if (error) {
-				throw new Error(error.message);
-			}
-
-			loading.value = false;
-			is_success.value = true;
-			showSuccess.value = true;
-		} catch (err) {
-			console.error(err);
-			is_error.value = true;
-			error_message.value = err.message;
-			showError.value = true;
-			loading.value = false;
-		} finally {
-			email.value = '';
-			password.value = '';
-		}
-	};
-
-	const handleSignUpProvider = async (provider) => {
-		try {
-			const { data, error } = await supabase.auth.signInWithOAuth({
-				provider,
-				options: {
-					redirectTo: redirectTo,
-				},
-			});
-			if (error) {
-				throw new Error(error.message);
-			}
-			loading.value = false;
-		} catch (error) {
-			loading.value = false;
-			error_message.value = error;
-			is_error.value = true;
-			console.log('error', error);
-		}
-	};
+		let { bbox, category_id } = annotation;
+		let className = categoryIDNameMap.get(category_id); // Add this line
+		let [x1, y1, width, height] = bbox;
+		let x = x1 + width / 2;
+		let y = y1 + height / 2;
+		let x2 = x1 + width;
+		let y2 = y1 + height;
+		let corners = {
+			topLeft: { x: x1, y: y1 },
+			topRight: { x: x2, y: y1 },
+			bottomRight: { x: x2, y: y2 },
+			bottomLeft: { x: x1, y: y2 },
+		};
+		let edges = {
+			top: [corners.topLeft, corners.topRight],
+			right: [corners.topRight, corners.bottomRight],
+			bottom: [corners.bottomRight, corners.bottomLeft],
+			left: [corners.bottomLeft, corners.topLeft],
+		};
+		let newAnnotation = {
+			...annotation,
+			className, // Add this line
+			bbox: { x, y, width, height, area: width * height, corners, edges },
+		};
+		annotationsMap.get(fileName).push(newAnnotation);
+	}
 </script>
 
 <template>
-	<div class="bg-scale-100 flex flex-1 flex-col">
-		<div class="absolute top-0 mx-auto w-full px-8 pt-6 sm:px-6 lg:px-8">
-			<nav class="relative flex items-center justify-between sm:h-10">
-				<div class="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
-					<div class="flex w-full items-center justify-between md:w-auto">
-						<a href="/dashboard/projects"
-							><span
-								style="
-									box-sizing: border-box;
-									display: inline-block;
-									overflow: hidden;
-									width: initial;
-									height: initial;
-									background: none;
-									opacity: 1;
-									border: 0;
-									margin: 0;
-									padding: 0;
-									position: relative;
-									max-width: 100%;
-								"
-								><span
-									style="
-										box-sizing: border-box;
-										display: block;
-										width: initial;
-										height: initial;
-										background: none;
-										opacity: 1;
-										border: 0;
-										margin: 0;
-										padding: 0;
-										max-width: 100%;
-									"
-									><img
-										style="
-											display: block;
-											max-width: 100%;
-
-											background: none;
-											opacity: 1;
-											border: 0;
-											margin: 0;
-											padding: 0;
-										"
-										alt=""
-										class="h-10 w-10"
-										aria-hidden="true"
-										src="~/assets/images/logo.png" /></span></span
-						></a>
-					</div>
+	<div id="inputForm">
+		<div class="header">
+			<div class="header__grid">
+				<img
+					class="header__logo"
+					src="https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/6143750f1177056d60fc52d9_roboflow_logomark_inference.png"
+					alt="Roboflow Inference"
+				/>
+				<div>
+					<label class="header__label" for="model">Model</label>
+					<input class="input" type="text" id="model" />
 				</div>
-				<div class="hidden items-center space-x-3 md:ml-10 md:flex md:pr-4">
-					<a
-						target="_blank"
-						rel="noreferrer"
-						href="https://Motis Group.com/docs"
-						><button
-							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-							type="button"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="sbui-icon"
-							>
-								<path
-									d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-								></path>
-								<polyline points="14 2 14 8 20 8"></polyline>
-								<line x1="16" y1="13" x2="8" y2="13"></line>
-								<line x1="16" y1="17" x2="8" y2="17"></line>
-								<polyline points="10 9 9 9 8 9"></polyline></svg
-							><span class="truncate">Documentation</span>
-						</button></a
-					>
+				<div>
+					<label class="header__label" for="version">Version</label>
+					<input class="input" type="number" id="version" />
 				</div>
-			</nav>
+				<div>
+					<label class="header__label" for="api_key">API Key</label>
+					<input class="input" type="text" id="api_key" />
+				</div>
+			</div>
 		</div>
-		<div class="flex flex-1">
-			<main
-				class="bg-scale-200 border-scale-500 flex flex-1 flex-shrink-0 flex-col items-center border-r px-5 pb-8 pt-16 shadow-lg"
-			>
-				<div class="flex w-[330px] flex-1 flex-col justify-center sm:w-[384px]">
-					<div class="mb-10">
-						<h1 class="mb-2 mt-8 text-2xl lg:text-3xl">Get started</h1>
-						<h2 class="text-scale-1100 text-sm">Create a new account</h2>
-					</div>
-					<div class="flex flex-col gap-5">
+
+		<div class="content">
+			<div class="content__grid">
+				<div class="col-12-s6-m4" id="method">
+					<label class="input__label">Upload Method</label>
+					<Switch
+						v-model="uploadMethod"
+						:class="[
+							uploadMethod ? 'bg-brand-600' : 'bg-gray-200',
+							'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
+						]"
+					>
+						<span class="sr-only">Use setting</span>
+						<span
+							aria-hidden="true"
+							:class="[
+								uploadMethod ? 'translate-x-5' : 'translate-x-0',
+								'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+							]"
+						/>
+					</Switch>
+				</div>
+
+				<div class="col-12-m8" id="fileSelectionContainer">
+					<label class="input__label" for="file">Select File</label>
+					<div class="flex">
+						<input
+							class="input input--left flex-1"
+							type="file"
+							ref="fileInput"
+							@change="handleFiles"
+						/>
 						<button
-							@click="handleSignUpProvider('google')"
-							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded px-4 py-2 text-center text-base shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-							type="button"
+							@click="removeImage(0)"
+							id="fileMock"
+							class="bttn right active"
 						>
-							<svg
-								class="h-4 w-4"
-								viewBox="0 0 24 24"
-								fill="currentColor"
-								stroke="none"
-							>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M23.52 12.273c0-.852-.076-1.669-.219-2.454H12v4.641h6.459a5.52 5.52 0 0 1-2.395 3.621v3.012h3.877c2.27-2.089 3.579-5.166 3.579-8.82Z"
-									fill="#4285F4"
-								></path>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M12 24c3.24 0 5.956-1.075 7.941-2.907l-3.877-3.012c-1.075.72-2.45 1.147-4.064 1.147-3.125 0-5.77-2.112-6.715-4.948h-4.01v3.11A11.996 11.996 0 0 0 12 24Z"
-									fill="#34A853"
-								></path>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M5.285 14.28A7.213 7.213 0 0 1 4.91 12c0-.79.136-1.56.376-2.28V6.61H1.276A11.995 11.995 0 0 0 0 12c0 1.936.464 3.77 1.276 5.39l4.01-3.11Z"
-									fill="#FBBC05"
-								></path>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M12 4.773c1.761 0 3.344.606 4.587 1.794l3.442-3.44C17.951 1.188 15.235 0 12 0A11.996 11.996 0 0 0 1.277 6.61l4.01 3.11C6.228 6.884 8.874 4.773 12 4.773Z"
-									fill="#EA4335"
-								></path></svg
-							><span class="truncate">Continue with Google</span>
+							Clear
 						</button>
-						<div class="relative">
-							<div class="absolute inset-0 flex items-center">
-								<div class="border-scale-700 w-full border-t"></div>
-							</div>
-							<div class="relative flex justify-center text-sm">
-								<span class="bg-scale-200 text-scale-1200 px-2 text-sm"
-									>or</span
-								>
-							</div>
+					</div>
+					<input style="display: none" type="file" id="file" />
+				</div>
+
+				<div class="col-12-m8" id="urlContainer" style="display: none">
+					<label class="input__label" for="file">Enter Image URL</label>
+					<div class="flex">
+						<input
+							type="text"
+							id="url"
+							placeholder="https://path.to/your.jpg"
+							class="input"
+						/><br />
+					</div>
+				</div>
+
+				<div class="col-12-m6">
+					<label class="input__label" for="classes">Filter Classes</label>
+					<input
+						type="text"
+						id="classes"
+						placeholder="Enter class names"
+						class="input"
+						v-model="classesInput"
+					/><br />
+					<span class="text--small">Separate names with commas</span>
+				</div>
+
+				<div class="col-6-m3 relative">
+					<label class="input__label" for="confidence">Min Confidence</label>
+					<div>
+						<i class="fas fa-crown"></i>
+						<span class="icon">%</span>
+						<input
+							type="number"
+							id="confidence"
+							value="40"
+							max="100"
+							accuracy="2"
+							min="0"
+							class="input input__icon"
+						/>
+					</div>
+				</div>
+				<div class="col-6-m3 relative">
+					<label class="input__label" for="overlap">Max Overlap</label>
+					<div>
+						<i class="fas fa-object-ungroup"></i>
+						<span class="icon">%</span>
+						<input
+							type="number"
+							id="overlap"
+							value="30"
+							max="100"
+							accuracy="2"
+							min="0"
+							class="input input__icon"
+						/>
+					</div>
+				</div>
+				<div class="col-6-m3" id="format">
+					<label class="input__label">Inference Result</label>
+					<div>
+						<button
+							id="imageButton"
+							data-value="image"
+							class="bttn left fill active"
+						>
+							Image
+						</button>
+						<button id="jsonButton" data-value="json" class="bttn right fill">
+							JSON
+						</button>
+					</div>
+				</div>
+				<div class="col-12 content__grid" id="imageOptions">
+					<div class="col-12-s6-m4" id="labels">
+						<label class="input__label">Labels</label>
+						<div>
+							<button class="bttn left">Off</button>
+							<button data-value="on" class="bttn right active">On</button>
 						</div>
-						<div class="relative">
+					</div>
+					<div class="col-12-s6-m4" id="stroke">
+						<label class="input__label">Stroke Width</label>
+						<div>
+							<button data-value="1" class="bttn left">1px</button>
+							<button data-value="2" class="bttn">2px</button>
+							<button data-value="5" class="bttn active">5px</button>
+							<button data-value="10" class="bttn right">10px</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<button @click="processImages" class="bttn__primary">
+						Run Inference
+					</button>
+				</div>
+			</div>
+			<div class="result" id="resultContainer" style="display: block">
+				<div class="divider"></div>
+				<div class="result__header">
+					<h3 class="headline">Result</h3>
+					<a href="#">Copy Code</a>
+				</div>
+				<!-- <pre id="output" class="codeblock">{{
+					isLoading ? 'Inferring...' : result
+				}}</pre> -->
+				<div class="grid grid-cols-2 gap-4">
+					<div class="col-span-1">
+						<h2>Annotations</h2>
+						<div class="image-container col-span-1">
+							<img
+								style="width: 416px; height: 416px"
+								:src="state.images[0]"
+								alt="Annotated Image"
+								@load="onImageLoad"
+							/>
 							<div
-								v-if="showSuccess"
-								class="absolute top-0 w-full delay-300 duration-500"
+								class="bounding-box"
+								v-for="(annotation, index) in trueAnnotations"
+								:key="index"
+								:style="`top: ${
+									annotation.bbox.y - annotation.bbox.height / 2
+								}px;
+								left: ${annotation.bbox.x - annotation.bbox.width / 2}px;
+								width: ${annotation.bbox.width}px;
+								height: ${annotation.bbox.height}px; ${
+									classStyles[annotation.className].border_styles
+								}`"
 							>
 								<div
-									class="bg-brand-300 dark:bg-brand-100 border-brand-700 relative flex w-full items-start space-x-4 rounded-md border px-6 py-4"
+									:style="classStyles[annotation.className].background_styles"
 								>
-									<div class="text-brand-900">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="18"
-											height="18"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="1.5"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="sbui-icon"
-										>
-											<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-											<polyline points="22 4 12 14.01 9 11.01"></polyline>
-										</svg>
-									</div>
-									<div class="flex flex-1 items-center justify-between">
-										<div>
-											<h3
-												class="text-brand-1200 mb-1 block text-sm font-normal"
-											>
-												Check your email to confirm
-											</h3>
-											<div class="text-brand-1100 text-xs">
-												You've successfully signed up. Please check your email
-												to confirm your account before signing in to the Motis
-												Group dashboard
-											</div>
-										</div>
-									</div>
+									{{ annotation.className }}
 								</div>
 							</div>
-							<form
-								v-else
-								@submit.prevent="signUp(false)"
-								id="signUp-form"
-								class="max-h-[1000px] w-full overflow-x-visible py-1 opacity-100 transition-all duration-500"
-							>
-								<div class="flex flex-col gap-4">
-									<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
-										<div
-											class="col-span-12 flex flex-row justify-between space-x-2"
-										>
-											<label class="text-scale-1100 block text-sm" for="email"
-												>Email</label
-											>
-										</div>
-										<div class="col-span-12">
-											<div class="">
-												<div class="relative">
-													<input
-														autocomplete="email"
-														id="email"
-														name="email"
-														placeholder="you@example.com"
-														type="email"
-														class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
-														v-model="email"
-													/>
-												</div>
-											</div>
-											<p
-												data-state="hide"
-												class="data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm text-red-900 transition-all"
-											></p>
-										</div>
-									</div>
-									<div class="grid gap-2 text-sm md:grid md:grid-cols-12">
-										<div
-											class="col-span-12 flex flex-row justify-between space-x-2"
-										>
-											<label
-												class="text-scale-1100 block text-sm"
-												for="password"
-												>Password</label
-											>
-										</div>
-										<div class="col-span-12">
-											<div class="">
-												<div class="relative">
-													<input
-														@blur="startedTyping = true"
-														@focus="passwordInputFocused = true"
-														autocomplete="new-password"
-														id="password"
-														name="password"
-														placeholder="••••••••"
-														:type="showPassword ? 'text' : 'password'"
-														:class="[
-															!passwordValid.isValid
-																? ' border-red-700 bg-red-100 placeholder:text-red-600 focus:ring-red-500'
-																: 'border-scale-700 focus:border-scale-900 focus:ring-scale-400 bg-scaleA-200  placeholder-scale-800',
-															'text-scale-1200  box-border block w-full rounded-md border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current',
-														]"
-														v-model="password"
-													/>
-													<div
-														class="absolute inset-y-0 right-0 flex items-center space-x-1 pl-3 pr-1"
-													>
-														<button
-															@click.prevent="showPasswordHandle"
-															class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative !mr-1 inline-flex cursor-pointer items-center space-x-2 rounded px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
-														>
-															<svg
-																v-if="!showPassword"
-																width="14"
-																height="14"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M19.25 12C19.25 13 17.5 18.25 12 18.25C6.5 18.25 4.75 13 4.75 12C4.75 11 6.5 5.75 12 5.75C17.5 5.75 19.25 11 19.25 12Z"
-																></path>
-																<circle
-																	cx="12"
-																	cy="12"
-																	r="2.25"
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																></circle></svg
-															><svg
-																v-else
-																width="14"
-																height="14"
-																fill="none"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M18.6247 10C19.0646 10.8986 19.25 11.6745 19.25 12C19.25 13 17.5 18.25 12 18.25C11.2686 18.25 10.6035 18.1572 10 17.9938M7 16.2686C5.36209 14.6693 4.75 12.5914 4.75 12C4.75 11 6.5 5.75 12 5.75C13.7947 5.75 15.1901 6.30902 16.2558 7.09698"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M19.25 4.75L4.75 19.25"
-																></path>
-																<path
-																	stroke="currentColor"
-																	stroke-linecap="round"
-																	stroke-linejoin="round"
-																	stroke-width="1.5"
-																	d="M10.409 13.591C9.53033 12.7123 9.53033 11.2877 10.409 10.409C11.2877 9.5303 12.7123 9.5303 13.591 10.409"
-																></path>
-															</svg>
-														</button>
-													</div>
-												</div>
-											</div>
-											<transition
-												enter-active-class="transition ease-out duration-100"
-												enter-from-class="transform opacity-0 translate-y-8"
-												enter-to-class="transform opacity-100"
-												leave-active-class="transition ease-in duration-75"
-												leave-from-class="transform opacity-100"
-												leave-to-class="transform opacity-0 translate-y-8"
-											>
-												<p
-													v-if="startedTyping && !passwordValid.isValid"
-													:class="['mt-2 text-sm text-red-900 transition-all']"
-												>
-													{{ passwordValid.message }}
-												</p>
-											</transition>
-										</div>
-									</div>
-									<div
-										:class="[
-											passwordInputFocused
-												? 'max-h-[100px] opacity-100'
-												: 'max-h-[0px] opacity-0',
-											'duration-400 overflow-y-hidden transition-all',
-										]"
-									>
-										<div class="text-sm">
-											<div
-												:class="[
-													!/[A-Z]/.test(password)
-														? 'text-scale-900'
-														: 'text-scale-1100',
-													'flex items-center gap-1 space-x-1.5 transition duration-200',
-												]"
-											>
-												<svg
-													v-if="!/[A-Z]/.test(password)"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.5"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-													></path>
-												</svg>
-												<svg
-													v-else
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-														fill-rule="evenodd"
-														clip-rule="evenodd"
-													></path>
-												</svg>
-												<p class="text-sm">Uppercase letter</p>
-											</div>
-											<div
-												:class="[
-													!/[a-z]/.test(password)
-														? 'text-scale-900'
-														: 'text-scale-1100',
-													'flex items-center gap-1 space-x-1.5 transition duration-200',
-												]"
-											>
-												<svg
-													v-if="!/[a-z]/.test(password)"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.5"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-													></path>
-												</svg>
-												<svg
-													v-else
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-														fill-rule="evenodd"
-														clip-rule="evenodd"
-													></path>
-												</svg>
-												<p class="text-sm">Lowercase letter</p>
-											</div>
-											<div
-												:class="[
-													!/[0-9]/.test(password)
-														? 'text-scale-900'
-														: 'text-scale-1100',
-													'flex items-center gap-1 space-x-1.5 transition duration-200',
-												]"
-											>
-												<svg
-													v-if="!/[0-9]/.test(password)"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.5"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-													></path>
-												</svg>
-												<svg
-													v-else
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-														fill-rule="evenodd"
-														clip-rule="evenodd"
-													></path>
-												</svg>
-												<p class="text-sm">Number</p>
-											</div>
-											<div
-												:class="[
-													!/[!<>@#\$%]/.test(password)
-														? 'text-scale-900'
-														: 'text-scale-1100',
-													'flex items-center gap-1 space-x-1.5 transition duration-200',
-												]"
-											>
-												<svg
-													v-if="!/[!<>@#\$%]/.test(password)"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.5"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-													></path>
-												</svg>
-												<svg
-													v-else
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-														fill-rule="evenodd"
-														clip-rule="evenodd"
-													></path>
-												</svg>
-												<p class="text-sm">
-													Special character (e.g. !?&lt;&gt;@#$%)
-												</p>
-											</div>
-											<div
-												:class="[
-													password.length < 7
-														? 'text-scale-900'
-														: 'text-scale-1100',
-													'flex items-center gap-1 space-x-1.5 transition duration-200',
-												]"
-											>
-												<svg
-													v-if="password.length < 7"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.5"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-													></path>
-												</svg>
-												<svg
-													v-else
-													xmlns="http://www.w3.org/2000/svg"
-													fill="currentColor"
-													viewBox="0 0 24 24"
-													class="h-4 w-4"
-												>
-													<path
-														d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-														fill-rule="evenodd"
-														clip-rule="evenodd"
-													></path>
-												</svg>
-												<p class="text-sm">&gt; 7 characters</p>
-											</div>
-										</div>
-									</div>
-
-									<button
-										type="submit"
-										class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000 focus-visible:outline-brand-600 relative flex inline-flex w-full cursor-pointer items-center items-center justify-center space-x-2 rounded px-4 py-2 text-center text-base text-white shadow-sm outline-none outline-0 transition transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-										:disabled="!passwordValid.isValid"
-									>
-										<svg
-											v-if="loading"
-											xmlns="http://www.w3.org/2000/svg"
-											class="h-5 w-5 animate-spin"
-											fill="none"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="1.5"
-												d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
-											></path>
-										</svg>
-
-										<span class="truncate">{{ 'Sign Up' }}</span>
-									</button>
-								</div>
-							</form>
 						</div>
 					</div>
-					<div class="my-8 self-center text-sm">
-						<span class="text-scale-1000">Have an account?</span>
-						<a
-							class="text-scale-1200 hover:text-scale-1100 underline transition"
-							href="/login"
-							>Sign In Now</a
-						>
-					</div>
-				</div>
-				<div class="sm:text-center">
-					<p class="text-scale-900 text-xs sm:mx-auto sm:max-w-sm">
-						By continuing, you agree to Motis Group's<!-- -->
-						<a
-							class="hover:text-scale-1100 underline"
-							href="https://Motis Group.com/terms"
-							>Terms of Service</a
-						>
-						<!-- -->and<!-- -->
-						<a
-							class="hover:text-scale-1100 underline"
-							href="https://Motis Group.com/privacy"
-							>Privacy Policy</a
-						>, and to receive periodic emails with updates.
-					</p>
-				</div>
-			</main>
-			<aside
-				class="hidden flex-1 flex-shrink basis-1/4 flex-col items-center justify-center xl:flex"
-			>
-				<div class="relative flex flex-col gap-6">
-					<div class="absolute -left-11 -top-12 select-none">
-						<span class="text-scale-600 text-[160px] leading-none">“</span>
-					</div>
-					<blockquote class="z-10 max-w-lg text-3xl">
-						Y'all @Motis Group + @nextjs is amazing! 🙌 Barely an hour into a
-						proof-of-concept and already have most of the functionality in
-						place. 🤯🤯🤯
-					</blockquote>
-					<a
-						href="https://twitter.com/justinjunodev/status/1500264302749622273"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="flex items-center gap-4"
-						><img
-							src="https://Motis Group.com/images/twitter-profiles/9k_ZB9OO_400x400.jpg"
-							alt="justinjunodev"
-							class="h-12 w-12 rounded-full"
-						/>
-						<div class="flex flex-col">
-							<cite
-								class="text-scale-1100 whitespace-nowrap font-medium not-italic"
-								>@justinjunodev</cite
+					<div class="col-span-1">
+						<h2>Prediction</h2>
+						<div class="relative col-span-1">
+							<img
+								style="width: 416px; height: 416px"
+								:src="state.images[0]"
+								alt="Predicted Image"
+							/>
+
+							<div
+								class="predicted-bounding-box flex flex-col justify-start"
+								v-for="(annotation, index) in predictedAnnotations"
+								:key="index"
+								:style="`top: ${annotation.y - annotation.height / 2}px;
+								left: ${annotation.x - annotation.width / 2}px;
+								width: ${annotation.width}px;
+								height: ${annotation.height}px; ${classStyles[annotation.class].border_styles}`"
 							>
-						</div></a
-					>
+								<div :style="classStyles[annotation.class].background_styles">
+									{{ annotation.class }} {{ annotation.confidence.toFixed(2) }}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-			</aside>
+			</div>
 		</div>
-		<transition
-			enter-active-class="transition ease-out duration-100"
-			enter-from-class="transform opacity-0 scale-95"
-			enter-to-class="transform opacity-100 scale-100"
-			leave-active-class="transition ease-in duration-75"
-			leave-from-class="transform opacity-100 scale-100"
-			leave-to-class="transform opacity-0 scale-95"
-		>
-			<SuccessModal
-				v-if="is_success"
-				@close="is_success = false"
-				:title="'Successfully created profile'"
-				:description="''"
-			/>
-		</transition>
-		<transition
-			enter-active-class="transition ease-out duration-100"
-			enter-from-class="transform opacity-0 scale-95"
-			enter-to-class="transform opacity-100 scale-100"
-			leave-active-class="transition ease-in duration-75"
-			leave-from-class="transform opacity-100 scale-100"
-			leave-to-class="transform opacity-0 scale-95"
-		>
-			<ErrorModal
-				v-if="is_error"
-				@close="is_error = false"
-				:title="'Error: '"
-				:description="error_message"
-			/>
-		</transition>
-		<transition
-			enter-active-class="transition ease-out duration-100"
-			enter-from-class="transform opacity-0 scale-95"
-			enter-to-class="transform opacity-100 scale-100"
-			leave-active-class="transition ease-in duration-75"
-			leave-from-class="transform opacity-100 scale-100"
-			leave-to-class="transform opacity-0 scale-95"
-		>
-			<LoadingModalSmall
-				v-if="loading"
-				:title="'Signing up...'"
-				:description="''"
-			/>
-		</transition>
 	</div>
 </template>
+
+<style scoped>
+	.box-RBC .box-label {
+		background-color: green;
+		font-size: 8px;
+		color: white;
+	}
+
+	.box-class2 .box-label {
+		background-color: blue;
+		font-size: 8px;
+		color: white;
+	}
+
+	.box-class3 .box-label {
+		background-color: red;
+		font-size: 8px;
+		color: white;
+	}
+	.image-container {
+		position: relative;
+	}
+
+	.bounding-box {
+		position: absolute;
+		border: 2px solid red;
+	}
+
+	.predicted-bounding-box {
+		position: absolute;
+		border: 2px solid green;
+	}
+
+	body {
+		font-family: 'Inter', sans-serif;
+		color: #666666;
+		background-color: #f7fafc;
+		font-size: 16px;
+		padding-bottom: 5rem;
+	}
+
+	.headline {
+		font-size: 1.25rem;
+		font-weight: 600;
+	}
+
+	.text--small {
+		font-size: 0.875rem;
+	}
+
+	a {
+		color: #606fc7;
+		font-weight: 600;
+	}
+
+	a:hover {
+		color: #434190;
+	}
+
+	i {
+		position: absolute;
+		padding: 0.75rem;
+		color: #606fc7;
+	}
+
+	span.icon {
+		position: absolute;
+		padding: 0.5rem;
+		right: 0;
+	}
+
+	.header {
+		background-color: white;
+		padding: 1rem;
+		padding-bottom: 2.5rem;
+	}
+
+	.header__grid {
+		display: grid;
+		grid-template-columns: repeat(1, minmax(0, 1fr));
+		grid-template-rows: repeat(3, minmax(0, 1fr));
+		gap: 1.5rem;
+		max-width: 56rem;
+	}
+
+	.header__logo {
+		height: 4rem;
+	}
+
+	.header__label {
+		text-transform: uppercase;
+		display: block;
+		margin-bottom: 0.5rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #718096;
+	}
+
+	.content {
+		padding: 1rem;
+		width: 100%;
+	}
+
+	.content__grid {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		grid-template-rows: repeat(3, minmax(0, 1fr));
+		max-width: 56rem;
+		column-gap: 1rem;
+		row-gap: 2.5rem;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+	}
+
+	.flex {
+		display: flex;
+	}
+
+	.flex-1 {
+		flex: 1 1 0%;
+	}
+
+	.relative {
+		position: relative;
+	}
+
+	.col-6-m3 {
+		grid-column: span 6 / span 6;
+	}
+
+	.col-12-s6-m4,
+	.col-12-m6,
+	.col-12-m8,
+	.col-12 {
+		grid-column: span 12 / span 12;
+	}
+
+	.result {
+		max-width: 56rem;
+	}
+
+	.result__header {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+	}
+
+	.divider {
+		border-width: 1px;
+		border-color: #cbd5e0;
+		margin-top: 2.5rem;
+		margin-bottom: 2.5rem;
+		height: 0;
+	}
+
+	input:disabled {
+		background-color: white;
+	}
+
+	.input {
+		border-width: 1px;
+		border-color: #cbd5e0;
+		border-radius: 0.25rem;
+		height: 2.5rem;
+		width: 100%;
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	.input--left {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+		margin-right: -1rem;
+	}
+
+	.input__icon {
+		padding-left: 2.5rem;
+		padding-right: 2.5rem;
+	}
+
+	.input__label {
+		margin-bottom: 0.5rem;
+		display: block;
+	}
+
+	.bttn {
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		background-color: white;
+		border-width: 1px;
+		border-color: #cbd5e0;
+		margin-right: -0.5rem;
+		height: 2.5rem;
+	}
+
+	.bttn.fill {
+		width: 50%;
+	}
+
+	.bttn:focus {
+		outline: 1px dotted;
+	}
+
+	.bttn:hover {
+		background-color: #edf2f7;
+	}
+
+	.left {
+		border-top-left-radius: 0.25rem;
+		border-bottom-left-radius: 0.25rem;
+	}
+
+	.right {
+		border-top-right-radius: 0.25rem;
+		border-bottom-right-radius: 0.25rem;
+		margin-right: 0;
+	}
+
+	.bttn.active {
+		background-color: #606fc7;
+		color: white;
+		border-width: 1px;
+		border-color: #606fc7;
+	}
+
+	.bttn__primary {
+		background-color: #606fc7;
+		color: white;
+		border-width: 1px;
+		border-color: #606fc7;
+		border-radius: 0.25rem;
+		font-size: 1.125rem;
+		padding-left: 1.25rem;
+		padding-right: 1.25rem;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+	}
+
+	.bttn.active:hover,
+	.bttn__primary:hover {
+		background-color: #4c51bf;
+	}
+
+	.codeblock {
+		border-width: 1px;
+		border-color: #cbd5e0;
+		border-radius: 0.25rem;
+		display: block;
+		padding: 0.75rem;
+		background-color: white;
+	}
+
+	#urlContainer {
+		display: none;
+	}
+
+	/* small breakpoint */
+	@media (min-width: 640px) {
+		.header {
+			padding: 2.5rem;
+		}
+		.header__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-rows: repeat(2, minmax(0, 1fr));
+		}
+		.header__logo {
+			grid-column: span 2 / span 2;
+		}
+		.content {
+			padding: 2.5rem;
+		}
+		.content__grid {
+			column-gap: 1rem;
+			row-gap: 2.5rem;
+		}
+		.col-12-s6-m4 {
+			grid-column: span 6 / span 6;
+		}
+	}
+
+	/* medium breakpoint */
+	@media (min-width: 768px) {
+		.header__grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-rows: repeat(1, minmax(0, 1fr));
+		}
+		.header__logo {
+			grid-column: span 1 / span 1;
+		}
+		.col-6-m3 {
+			grid-column: span 3 / span 3;
+		}
+		.col-12-s6-m4 {
+			grid-column: span 4 / span 4;
+		}
+		.col-12-m6 {
+			grid-column: span 6 / span 6;
+		}
+		.col-12-m8 {
+			grid-column: span 8 / span 8;
+		}
+		.bttn {
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+	}
+
+	#resultContainer {
+		display: none;
+	}
+</style>

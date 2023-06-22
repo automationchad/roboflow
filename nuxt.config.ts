@@ -13,26 +13,14 @@ export default defineNuxtConfig({
 						'A boutique dev shop assisting fast growing companies with process automation and software interoperability.',
 				},
 			],
-			script: [
-				{
-					src: 'https://assets.calendly.com/assets/external/widget.js',
-					defer: true,
-				},
-			],
 			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
 		},
 	},
-
-	publicRuntimeConfig: {
-		SUPABASE_URL: process.env.SUPABASE_URL,
-	},
 	css: ['~/assets/css/main.css'],
-	modules: ['@nuxtjs/supabase'],
-	// plugins: [{ src: '~/plugins/vercel.ts', mode: 'client' }],
-	// postcss: {
-	// 	plugins: {
-	// 		tailwindcss: {},
-	// 		autoprefixer: {},
-	// 	},
-	// },
+	postcss: {
+		plugins: {
+			tailwindcss: {},
+			autoprefixer: {},
+		},
+	},
 });
