@@ -9,7 +9,7 @@
 	// Constants
 	const url = 'https://detect.roboflow.com/blood-cell-detection-1ekwu/2';
 	const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-	const params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
+	const params = { api_key: process.env.ROBOFLOW_API_KEY };
 
 	// Reactive variables
 	const result = ref(null);
