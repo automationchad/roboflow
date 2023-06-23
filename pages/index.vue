@@ -77,8 +77,8 @@
 	const removeImage = (index) => {
 		state.images = [];
 		state.selectedFiles = new Set();
-		predictedAnnotations = [];
-		trueAnnotations = [];
+		predictedAnnotations.value = [];
+		trueAnnotations.value = [];
 		URL.revokeObjectURL(state.images[index]);
 		let file = Array.from(state.selectedFiles)[index];
 		state.selectedFiles.delete(file);
@@ -220,20 +220,21 @@
 			<div class="">
 				<div class="col" id="fileSelectionContainer">
 					<label class="input__label" for="file">Select File</label>
-					<div class="flex">
+					<div class="flex items-center">
 						<input
-							class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
+							class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border rounded-md border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
 							type="file"
 							ref="fileInput"
 							@change="handleFiles"
 						/>
+
 						<button
-							v-if="state.selectedFiles.length > 0"
+							v-if="state.images.length > 0"
 							@click="removeImage(0)"
-							id="fileMock"
-							class=""
+							type="button"
+							class="font-regular text-scale-1200 bg-scale-100 hover:bg-scale-300 border-scale-600 hover:border-scale-700 dark:border-scale-700 hover:dark:border-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center items-center justify-center space-x-2 rounded-md border px-2.5 py-1 text-center text-xs shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
 						>
-							Clear
+							<span class="truncate">Clear</span>
 						</button>
 					</div>
 					<input style="display: none" type="file" id="file" />
@@ -292,38 +293,36 @@
 							state.images.length === 0
 						"
 						@click="processImages"
-						:class="[
-							'font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex items-center justify-center space-x-2 rounded-md border px-3 py-2 text-center text-sm leading-4 text-white shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50',
-						]"
+						class="focus:outline-scale-600 flex rounded border-none bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4 disabled:pointer-events-none disabled:opacity-50"
 					>
-						<svg
-							v-if="isLoading"
-							class="mr-3 h-5 w-5 animate-spin"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							fill="none"
+						<span
+							type="button"
+							class="font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex cursor-pointer items-center items-center justify-center space-x-2 rounded-md border px-2.5 py-1 text-center text-xs text-white shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1"
+							><svg
+								v-if="isLoading"
+								class="h-4 w-4 animate-spin"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								fill="none"
+							>
+								<path
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="1.5"
+									d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+								></path></svg
+							><span class="truncate">{{
+								isLoading ? 'Inferring...' : 'Run inference'
+							}}</span></span
 						>
-							<path
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
-							></path>
-						</svg>
-						<span class="truncate">{{
-							isLoading ? 'Inferring...' : 'Run Inference'
-						}}</span>
 					</button>
 				</div>
 			</div>
 			<div class="mt-8 grid grid-cols-3 gap-4">
-				<div
-					class="col-span-2 grid grid-cols-2 gap-4"
-					v-if="state.images.length > 0 && selectedCategories.length > 0"
-				>
+				<div class="col-span-2 grid grid-cols-2 gap-4">
 					<div class="col-span-1">
 						<h2>Annotations</h2>
 						<div
@@ -331,11 +330,13 @@
 							style="width: 416px; height: 416px"
 						>
 							<img
+								v-if="state.images.length > 0 && selectedCategories.length > 0"
 								style="width: 416px; height: 416px"
 								:src="state.images[0]"
 								alt="Annotated Image"
 								@load="onImageLoad"
 							/>
+							<div v-else class="h-full w-full bg-black" />
 							<div
 								class="bounding-box"
 								v-for="(annotation, index) in filteredAnnotations"
@@ -361,7 +362,7 @@
 					</div>
 					<div class="col-span-1" style="width: 416px; height: 416px">
 						<h2>Prediction</h2>
-						<div class="relative col-span-1">
+						<div class="image-container relative col-span-1">
 							<div
 								class="absolute h-full w-full"
 								v-if="predictedAnnotations.length > 0"
@@ -402,10 +403,12 @@
 								</svg>
 							</div>
 							<img
+								v-if="state.images.length > 0 && selectedCategories.length > 0"
 								style="width: 416px; height: 416px"
 								:src="state.images[0]"
 								alt="Predicted Image"
 							/>
+							<div v-else class="h-full w-full bg-black" />
 						</div>
 					</div>
 				</div>
