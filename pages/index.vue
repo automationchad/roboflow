@@ -7,9 +7,14 @@
 	import axios from 'axios';
 
 	// Constants
-	const url = 'https://detect.roboflow.com/blood-cell-detection-1ekwu/2';
+
+	let api_key = ref('kxFwtA4VcEYhiYQBeaZe');
+	let modelId = ref('blood-cell-detection-1ekwu');
+	let version = ref(2);
+
+	let url = `https://detect.roboflow.com/${modelId.value}/${version.value}`;
 	const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-	const params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
+	let params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
 
 	// Reactive variables
 	const result = ref(null);
@@ -29,6 +34,8 @@
 	let scale = ref(1);
 	let selectedCategories = ref([]);
 
+	// Computed variables
+
 	const categories = computed(() => {
 		return annotationsFile.categories.map((category) => {
 			return { id: category.id, name: category.name };
@@ -43,6 +50,8 @@
 			return;
 		}
 		state.images = [];
+		state.selectedFiles = new Set();
+
 		state.selectedFiles.add(file);
 		state.images.push(URL.createObjectURL(file));
 		predictedAnnotations.value = [];
@@ -56,6 +65,10 @@
 	};
 
 	const removeImage = (index) => {
+		state.images = [];
+		state.selectedFiles = new Set();
+		predictedAnnotations.value = [];
+		trueAnnotations.value = [];
 		URL.revokeObjectURL(state.images[index]);
 		let file = Array.from(state.selectedFiles)[index];
 		state.selectedFiles.delete(file);
@@ -120,6 +133,7 @@
 
 	const processImages = async () => {
 		isLoading.value = true;
+		predictedAnnotations.value = [];
 
 		const promises = Array.from(state.selectedFiles).map(async (file) => {
 			let formData = new FormData();
@@ -135,21 +149,13 @@
 				});
 				let predicted = response.data.predictions;
 				predictedAnnotations.value = predicted;
-				return {
-					fileName: file.name,
-				};
 			} catch (err) {
 				console.error(err);
 			}
 		});
 
 		try {
-			const results = await Promise.all(promises);
-			results.forEach((image) => {
-				if (image) {
-					result.value = image;
-				}
-			});
+			await Promise.all(promises);
 			isLoading.value = false;
 		} catch (err) {
 			isLoading.value = false;
@@ -199,8 +205,8 @@
 </script>
 
 <template>
-	<div id="inputForm">
-		<!-- <div class="header">
+	<div id="inputForm" class="bg">
+		<div class="header">
 			<div class="header__grid">
 				<img
 					class="header__logo"
@@ -209,18 +215,18 @@
 				/>
 				<div>
 					<label class="header__label" for="model">Model</label>
-					<input class="input" type="text" id="model" />
+					<input class="input" type="text" id="model" v-model="modelId" />
 				</div>
 				<div>
 					<label class="header__label" for="version">Version</label>
-					<input class="input" type="number" id="version" />
+					<input class="input" type="number" id="version" v-model="version" />
 				</div>
 				<div>
 					<label class="header__label" for="api_key">API Key</label>
-					<input class="input" type="text" id="api_key" />
+					<input class="input" type="password" id="api_key" v-model="api_key" />
 				</div>
 			</div>
-		</div> -->
+		</div>
 
 		<div class="content">
 			<div class="">
@@ -331,7 +337,10 @@
 				>
 					<div class="col-span-1">
 						<h2>Annotations</h2>
-						<div class="image-container col-span-1">
+						<div
+							class="image-container col-span-1"
+							style="width: 416px; height: 416px"
+						>
 							<img
 								style="width: 416px; height: 416px"
 								:src="state.images[0]"
@@ -361,7 +370,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-span-1">
+					<div class="col-span-1" style="width: 416px; height: 416px">
 						<h2>Prediction</h2>
 						<div class="relative col-span-1">
 							<img
@@ -386,11 +395,15 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-span-1 text-xs" v-if="false">
-					<pre id="output" class="codeblock">{{ filteredAnnotations }}</pre>
-					<pre id="output" class="codeblock">{{ filteredPredictions }}</pre>
-					<pre id="output" class="codeblock">{{ classStyles }}</pre>
-					<pre id="output" class="codeblock">{{ selectedCategories }}</pre>
+				<div class="col-span-1 text-xs" v-if="true">
+					<pre id="output" class="codeblock">{{
+						`Bounding box accuracy: ${(
+							calculateBoundingBoxAccuracy(
+								filteredPredictions,
+								filteredAnnotations
+							) * 100
+						).toFixed(2)}%`
+					}}</pre>
 				</div>
 			</div>
 		</div>
@@ -421,12 +434,12 @@
 
 	.bounding-box {
 		position: absolute;
-		border: 2px solid red;
+		border: 1px solid;
 	}
 
 	.predicted-bounding-box {
 		position: absolute;
-		border: 2px solid green;
+		border: 1px dashed;
 	}
 
 	body {
