@@ -1,26 +1,25 @@
-Using Roboflow API for automated cell counting in microscopic images.
+# Automated Cell Counting with Roboflow API
 
-1. Organize ground truth annotations into a Map for easier filtering.
-2. Read and encodes each image file into base64, and sends to Roboflow API for detection.
-3. Store predicted cell counts and calculates ground truth counts post-processing.
-4. 
-4. Output ground truth and predicted counts for comparison.
+This repository provides a script for using the Roboflow API to automate cell counting in microscopic images. Here's a quick overview of the process:
 
-HOW TO TEST:
+1. **Annotation Organization:** The script first organizes ground truth annotations into a Map for easier filtering and processing.
+2. **Image Processing:** Each image file is then read, encoded into base64, and sent to the Roboflow API for cell detection.
+3. **Cell Counting:** The script stores the predicted cell counts and also calculates ground truth counts for post-processing.
+4. **Comparison of Results:** Finally, it outputs both the ground truth and predicted counts for comparison.
 
-Open terminal and navigate to the `script.js` file directory and run `node script.js`
+## How to Run the Script
 
+To test the script, open your terminal, navigate to the directory containing the `script.js` file, and run the following command:
 
-Suggested improvements:
+```bash
+node script.js
+```
 
-Solves for: "Dide we predict the same amount?"
+## Future Improvements and Considerations
 
-Next step is: "Did we predict the same location?"
+Here are a few points for future improvements and considerations:
 
-Next step is: "How well did we predict the closeness?".
-
-Security: Add the .env file.
-
-Be aware of that you'll need to know the diff between object classification and segmentation. Location based solution.
-
-- Using the bounding box coordinates to better predict the data. Not only the count but also the LOCATION to verify and prevent false positives.
+- **Validation:** The script currently solves for "Did we predict the same amount?" The next steps include addressing "Did we predict the same location?" and "How well did we predict the closeness?"
+- **Security:** Add the `.env` file to securely store sensitive data like API keys.
+- **Pre-requisites:** You should be aware of the differences between object classification and segmentation, especially in the context of location-based solutions.
+- **Better Predictions:** Consider using bounding box coordinates to enhance prediction accuracy. This will not only improve the cell count prediction but also verify the location to prevent false positives.
