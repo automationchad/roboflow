@@ -62,7 +62,6 @@
 		let file = fileInput.value.files[0];
 		state.images = [];
 		state.selectedFiles = new Set();
-
 		state.selectedFiles.add(file);
 		state.images.push(URL.createObjectURL(file));
 		predictedAnnotations.value = [];
@@ -223,15 +222,16 @@
 					<label class="input__label" for="file">Select File</label>
 					<div class="flex">
 						<input
-							class="input input--left flex-1"
+							class="text-scale-1200 focus:border-scale-900 focus:ring-scale-400 placeholder-scale-800 bg-scaleA-200 border-scale-700 box-border block w-full rounded-md border border px-4 py-2 text-sm shadow-sm outline-none transition-all focus:shadow-md focus:ring-2 focus:ring-current"
 							type="file"
 							ref="fileInput"
 							@change="handleFiles"
 						/>
 						<button
+							v-if="state.selectedFiles.length > 0"
 							@click="removeImage(0)"
 							id="fileMock"
-							class="bttn right active"
+							class=""
 						>
 							Clear
 						</button>
@@ -322,7 +322,7 @@
 			<div class="mt-8 grid grid-cols-3 gap-4">
 				<div
 					class="col-span-2 grid grid-cols-2 gap-4"
-					v-if="state.images.length > 0"
+					v-if="state.images.length > 0 && selectedCategories.length > 0"
 				>
 					<div class="col-span-1">
 						<h2>Annotations</h2>
@@ -359,39 +359,68 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-span-1" style="width: 416px; height: 416px" v-if="predictedAnnotations.length > 0">
+					<div class="col-span-1" style="width: 416px; height: 416px">
 						<h2>Prediction</h2>
 						<div class="relative col-span-1">
+							<div
+								class="absolute h-full w-full"
+								v-if="predictedAnnotations.length > 0"
+							>
+								<div
+									class="predicted-bounding-box flex flex-col justify-start"
+									v-for="(annotation, index) in filteredPredictions"
+									:key="index"
+									:style="`top: ${annotation.y - annotation.height / 2}px;
+								left: ${annotation.x - annotation.width / 2}px;
+								width: ${annotation.width}px;
+								height: ${annotation.height}px; ${classStyles[annotation.class].border_styles}`"
+								>
+									<div :style="classStyles[annotation.class].background_styles">
+										{{ annotation.class }}
+										{{ annotation.confidence.toFixed(2) }}
+									</div>
+								</div>
+							</div>
+
+							<div
+								class="absolute flex h-full w-full items-center justify-center bg-white/30 text-white backdrop-blur-sm"
+								v-else
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 animate-spin"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.5"
+										d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+									></path>
+								</svg>
+							</div>
 							<img
 								style="width: 416px; height: 416px"
 								:src="state.images[0]"
 								alt="Predicted Image"
 							/>
-
-							<div
-								class="predicted-bounding-box flex flex-col justify-start"
-								v-for="(annotation, index) in filteredPredictions"
-								:key="index"
-								:style="`top: ${annotation.y - annotation.height / 2}px;
-								left: ${annotation.x - annotation.width / 2}px;
-								width: ${annotation.width}px;
-								height: ${annotation.height}px; ${classStyles[annotation.class].border_styles}`"
-							>
-								<div :style="classStyles[annotation.class].background_styles">
-									{{ annotation.class }} {{ annotation.confidence.toFixed(2) }}
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-span-1 text-xs" v-if="true">
 					<pre id="output" class="codeblock">{{
-						`Bounding box accuracy: ${(
-							calculateBoundingBoxAccuracy(
-								filteredPredictions,
-								filteredAnnotations
-							) * 100
-						).toFixed(2)}%`
+						`Bounding box accuracy: ${
+							isLoading
+								? '...'
+								: `${(
+										calculateBoundingBoxAccuracy(
+											filteredPredictions,
+											filteredAnnotations
+										) * 100
+								  ).toFixed(2)}%`
+						}`
 					}}</pre>
 				</div>
 			</div>
