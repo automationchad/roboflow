@@ -9,7 +9,7 @@
 	// Constants
 	const url = 'https://detect.roboflow.com/blood-cell-detection-1ekwu/2';
 	const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-	const params = { api_key: process.env.ROBOFLOW_API_KEY };
+	const params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
 
 	// Reactive variables
 	const result = ref(null);
@@ -27,50 +27,26 @@
 	let originalImageWidth = ref(null);
 	let originalImageHeight = ref(null);
 	let scale = ref(1);
+	let selectedCategories = ref([]);
 
-	let classesInput = ref('');
-
-	const categoriesMap = computed(() => {
-		const map = new Map();
-		annotationsFile.categories.forEach((category) => {
-			map.set(category.name, category.id);
+	const categories = computed(() => {
+		return annotationsFile.categories.map((category) => {
+			return { id: category.id, name: category.name };
 		});
-		return map;
-	});
-
-	const categoryIDNameMap = new Map();
-	annotationsFile.categories.forEach((category) => {
-		categoryIDNameMap.set(category.id, category.name);
 	});
 
 	// Functions
 	const handleFiles = () => {
-		let newFiles = Array.from(fileInput.value.files);
-		if (newFiles.length + state.selectedFiles.size > 50) {
-			alert('You can only select up to 50 files at once.');
+		let file = fileInput.value.files[0];
+		if (!file) {
+			alert('No file selected.');
 			return;
 		}
-		newFiles.forEach((file) => {
-			state.selectedFiles.add(file);
-			state.images.push(URL.createObjectURL(file));
-		});
-
-		let classes = classesInput.value ? classesInput.value.split(',') : [];
-		let categoryIds = classes.map((className) =>
-			categoriesMap.value.get(className.trim())
-		);
-
-		trueAnnotations.value = annotationsMap
-			.get(Array.from(state.selectedFiles).map((file) => file.name)[0])
-			.filter(
-				(annotation) =>
-					categoryIds.length === 0 ||
-					categoryIds.includes(annotation.category_id)
-			);
-
-		console.log(trueAnnotations.value);
-
-		fileInput.value.value = '';
+		state.images = [];
+		state.selectedFiles.add(file);
+		state.images.push(URL.createObjectURL(file));
+		predictedAnnotations.value = [];
+		trueAnnotations.value = annotationsMap.get(file.name);
 	};
 
 	const onImageLoad = (event) => {
@@ -87,72 +63,58 @@
 		fileInput.value.value = '';
 	};
 
-	const getBoundingBoxStyle = (annotation) => {
-		let [x, y, width, height] = annotation.bbox;
-		return {
-			top: `${(y - height / 2) * scale.value}px`,
-			left: `${(x - width / 2) * scale.value}px`,
-			width: `${width * scale.value}px`,
-			height: `${height * scale.value}px`,
-		};
-	};
-
-	const IoU = (boxA, boxB) => {
-		const xA = Math.max(boxA.x, boxB.x);
-		const yA = Math.max(boxA.y, boxB.y);
-		const xB = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
-		const yB = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
-		const intersectionArea = Math.max(0, xB - xA) * Math.max(0, yB - yA);
-		const boxAArea = boxA.area;
-		const boxBArea = boxB.width * boxB.height;
-		const iou = intersectionArea / (boxAArea + boxBArea - intersectionArea);
-		return iou;
-	};
-
-	const calculateBoundingBoxAccuracy = (predictedEntities, trueAnnotations) => {
-		let totalIoUForThisImage = 0;
-		let totalPredictionsForThisImage = predictedEntities.length;
-		for (let i = 0; i < predictedEntities.length; i++) {
-			let predictedEntity = predictedEntities[i];
-			let trueAnnotation = trueAnnotations[i];
-
-			if (predictedEntity === undefined || trueAnnotation === undefined) {
-				continue;
-			} else {
-				let iou = IoU(trueAnnotation.bbox, predictedEntity);
-				totalIoUForThisImage += iou;
-			}
+	const filteredAnnotations = computed(() => {
+		if (selectedCategories.value.length === 0) {
+			return trueAnnotations.value;
+		} else {
+			return trueAnnotations.value.filter((annotation) =>
+				selectedCategories.value
+					.map((o) => o.id)
+					.includes(annotation.category_id)
+			);
 		}
+	});
 
-		let averageIoUForThisImage =
-			totalIoUForThisImage / totalPredictionsForThisImage;
-
-		return averageIoUForThisImage;
-	};
+	const filteredPredictions = computed(() => {
+		if (selectedCategories.value.length === 0) {
+			return predictedAnnotations.value;
+		} else {
+			return predictedAnnotations.value.filter((prediction) =>
+				selectedCategories.value.map((o) => o.name).includes(prediction.class)
+			);
+		}
+	});
 
 	let classStyles = computed(() => {
-		let classes = classesInput.value.split(',');
-
 		let styles = {};
-
-		// You can customize the style generation logic here
-		classes.forEach((className, index) => {
-			let classTrim = className.trim();
-
-			// Ensure the object exists before setting properties
-			if (!styles[classTrim]) {
-				styles[classTrim] = {};
+		selectedCategories.value.forEach((category, index) => {
+			if (!category.id || !category.name) {
+				console.error('Category object is missing id or name:', category);
+				return; // skip this iteration
 			}
 
-			// This assigns a random color to each class
-			styles[classTrim]['background_styles'] = `background-color: hsl(${
-				(index * 360) / classes.length
+			if (!styles[category.id]) {
+				styles[category.id] = {};
+			}
+
+			styles[category.id]['background_styles'] = `background-color: hsl(${
+				(index * 360) / selectedCategories.value.length
 			}, 50%, 50%); opacity: 50%; color: white; font-size: 8px;`;
-			styles[classTrim]['border_styles'] = `border-color: hsl(${
-				(index * 360) / classes.length
+			styles[category.id]['border_styles'] = `border-color: hsl(${
+				(index * 360) / selectedCategories.value.length
+			}, 50%, 50%);`;
+
+			if (!styles[category.name]) {
+				styles[category.name] = {};
+			}
+
+			styles[category.name]['background_styles'] = `background-color: hsl(${
+				(index * 360) / selectedCategories.value.length
+			}, 50%, 50%); opacity: 50%; color: white; font-size: 8px;`;
+			styles[category.name]['border_styles'] = `border-color: hsl(${
+				(index * 360) / selectedCategories.value.length
 			}, 50%, 50%);`;
 		});
-
 		return styles;
 	});
 
@@ -171,19 +133,8 @@
 					},
 					params,
 				});
-
 				let predicted = response.data.predictions;
-
-				// If classesInput is not empty, filter predictions
-				if (classesInput.value.trim() !== '') {
-					const classes = classesInput.value.split(',');
-					predicted = predicted.filter((prediction) =>
-						classes.includes(prediction.class)
-					);
-				}
-
 				predictedAnnotations.value = predicted;
-
 				return {
 					fileName: file.name,
 				};
@@ -200,8 +151,6 @@
 				}
 			});
 			isLoading.value = false;
-
-			console.log(predictedAnnotations.value);
 		} catch (err) {
 			isLoading.value = false;
 			error.value = err.message;
@@ -212,6 +161,7 @@
 	// Initial setup
 
 	const images = annotationsFile.images;
+
 	for (let image of images) {
 		imageIdToFileName.set(image.id, image.file_name);
 	}
@@ -223,7 +173,6 @@
 			annotationsMap.set(fileName, []);
 		}
 		let { bbox, category_id } = annotation;
-		let className = categoryIDNameMap.get(category_id); // Add this line
 		let [x1, y1, width, height] = bbox;
 		let x = x1 + width / 2;
 		let y = y1 + height / 2;
@@ -243,7 +192,6 @@
 		};
 		let newAnnotation = {
 			...annotation,
-			className, // Add this line
 			bbox: { x, y, width, height, area: width * height, corners, edges },
 		};
 		annotationsMap.get(fileName).push(newAnnotation);
@@ -252,7 +200,7 @@
 
 <template>
 	<div id="inputForm">
-		<div class="header">
+		<!-- <div class="header">
 			<div class="header__grid">
 				<img
 					class="header__logo"
@@ -272,31 +220,11 @@
 					<input class="input" type="text" id="api_key" />
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<div class="content">
-			<div class="content__grid">
-				<div class="col-12-s6-m4" id="method">
-					<label class="input__label">Upload Method</label>
-					<Switch
-						v-model="uploadMethod"
-						:class="[
-							uploadMethod ? 'bg-brand-600' : 'bg-gray-200',
-							'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
-						]"
-					>
-						<span class="sr-only">Use setting</span>
-						<span
-							aria-hidden="true"
-							:class="[
-								uploadMethod ? 'translate-x-5' : 'translate-x-0',
-								'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-							]"
-						/>
-					</Switch>
-				</div>
-
-				<div class="col-12-m8" id="fileSelectionContainer">
+			<div class="">
+				<div class="col" id="fileSelectionContainer">
 					<label class="input__label" for="file">Select File</label>
 					<div class="flex">
 						<input
@@ -316,7 +244,7 @@
 					<input style="display: none" type="file" id="file" />
 				</div>
 
-				<div class="col-12-m8" id="urlContainer" style="display: none">
+				<div class="col-12" id="urlContainer" style="display: none">
 					<label class="input__label" for="file">Enter Image URL</label>
 					<div class="flex">
 						<input
@@ -328,99 +256,79 @@
 					</div>
 				</div>
 
-				<div class="col-12-m6">
+				<div class="col-12">
 					<label class="input__label" for="classes">Filter Classes</label>
-					<input
-						type="text"
-						id="classes"
-						placeholder="Enter class names"
-						class="input"
-						v-model="classesInput"
-					/><br />
-					<span class="text--small">Separate names with commas</span>
+					<fieldset>
+						<div
+							class="mt-4 divide-y divide-gray-200 border-b border-t border-gray-200"
+						>
+							<div
+								v-for="(category, categoryIdx) in categories"
+								:key="categoryIdx"
+								class="relative flex items-start py-4"
+							>
+								<div class="min-w-0 flex-1 text-sm leading-6">
+									<label
+										:for="`person-${category.id}`"
+										class="select-none font-medium text-gray-900"
+										>{{ category.name }}</label
+									>
+								</div>
+								<div class="ml-3 flex h-6 items-center">
+									<input
+										:id="`category-${category.id}`"
+										:name="`category-${category.id}`"
+										type="checkbox"
+										class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+										:value="category"
+										v-model="selectedCategories"
+									/>
+								</div>
+							</div>
+						</div>
+					</fieldset>
 				</div>
 
-				<div class="col-6-m3 relative">
-					<label class="input__label" for="confidence">Min Confidence</label>
-					<div>
-						<i class="fas fa-crown"></i>
-						<span class="icon">%</span>
-						<input
-							type="number"
-							id="confidence"
-							value="40"
-							max="100"
-							accuracy="2"
-							min="0"
-							class="input input__icon"
-						/>
-					</div>
-				</div>
-				<div class="col-6-m3 relative">
-					<label class="input__label" for="overlap">Max Overlap</label>
-					<div>
-						<i class="fas fa-object-ungroup"></i>
-						<span class="icon">%</span>
-						<input
-							type="number"
-							id="overlap"
-							value="30"
-							max="100"
-							accuracy="2"
-							min="0"
-							class="input input__icon"
-						/>
-					</div>
-				</div>
-				<div class="col-6-m3" id="format">
-					<label class="input__label">Inference Result</label>
-					<div>
-						<button
-							id="imageButton"
-							data-value="image"
-							class="bttn left fill active"
-						>
-							Image
-						</button>
-						<button id="jsonButton" data-value="json" class="bttn right fill">
-							JSON
-						</button>
-					</div>
-				</div>
-				<div class="col-12 content__grid" id="imageOptions">
-					<div class="col-12-s6-m4" id="labels">
-						<label class="input__label">Labels</label>
-						<div>
-							<button class="bttn left">Off</button>
-							<button data-value="on" class="bttn right active">On</button>
-						</div>
-					</div>
-					<div class="col-12-s6-m4" id="stroke">
-						<label class="input__label">Stroke Width</label>
-						<div>
-							<button data-value="1" class="bttn left">1px</button>
-							<button data-value="2" class="bttn">2px</button>
-							<button data-value="5" class="bttn active">5px</button>
-							<button data-value="10" class="bttn right">10px</button>
-						</div>
-					</div>
-				</div>
 				<div class="col-12">
-					<button @click="processImages" class="bttn__primary">
-						Run Inference
+					<button
+						:disabled="
+							isLoading ||
+							selectedCategories.length === 0 ||
+							state.images.length === 0
+						"
+						@click="processImages"
+						:class="[
+							'font-regular bg-brand-fixed-1100 hover:bg-brand-fixed-1000 border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000 focus-visible:outline-brand-600 relative inline-flex items-center justify-center space-x-2 rounded-md border px-3 py-2 text-center text-sm leading-4 text-white shadow-sm outline-none outline-0 transition-all duration-200 ease-out focus-visible:outline-4 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-50',
+						]"
+					>
+						<svg
+							v-if="isLoading"
+							class="mr-3 h-5 w-5 animate-spin"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							fill="none"
+						>
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="1.5"
+								d="M12 4.75v1.5m5.126.624L16 8m3.25 4h-1.5m-.624 5.126-1.768-1.768M12 16.75v2.5m-3.36-3.891-1.768 1.768M7.25 12h-2.5m3.891-3.358L6.874 6.874"
+							></path>
+						</svg>
+						<span class="truncate">{{
+							isLoading ? 'Inferring...' : 'Run Inference'
+						}}</span>
 					</button>
 				</div>
 			</div>
-			<div class="result" id="resultContainer" style="display: block">
-				<div class="divider"></div>
-				<div class="result__header">
-					<h3 class="headline">Result</h3>
-					<a href="#">Copy Code</a>
-				</div>
-				<!-- <pre id="output" class="codeblock">{{
-					isLoading ? 'Inferring...' : result
-				}}</pre> -->
-				<div class="grid grid-cols-2 gap-4">
+			<div class="mt-8 grid grid-cols-3 gap-4">
+				<div
+					class="col-span-2 grid grid-cols-2 gap-4"
+					v-if="selectedCategories.length > 0 && state.images.length > 0"
+				>
 					<div class="col-span-1">
 						<h2>Annotations</h2>
 						<div class="image-container col-span-1">
@@ -432,7 +340,7 @@
 							/>
 							<div
 								class="bounding-box"
-								v-for="(annotation, index) in trueAnnotations"
+								v-for="(annotation, index) in filteredAnnotations"
 								:key="index"
 								:style="`top: ${
 									annotation.bbox.y - annotation.bbox.height / 2
@@ -440,13 +348,15 @@
 								left: ${annotation.bbox.x - annotation.bbox.width / 2}px;
 								width: ${annotation.bbox.width}px;
 								height: ${annotation.bbox.height}px; ${
-									classStyles[annotation.className].border_styles
+									classStyles[annotation.category_id].border_styles
 								}`"
 							>
 								<div
-									:style="classStyles[annotation.className].background_styles"
+									:style="classStyles[annotation.category_id].background_styles"
 								>
-									{{ annotation.className }}
+									{{
+										categories.find((v) => v.id === annotation.category_id).name
+									}}
 								</div>
 							</div>
 						</div>
@@ -462,7 +372,7 @@
 
 							<div
 								class="predicted-bounding-box flex flex-col justify-start"
-								v-for="(annotation, index) in predictedAnnotations"
+								v-for="(annotation, index) in filteredPredictions"
 								:key="index"
 								:style="`top: ${annotation.y - annotation.height / 2}px;
 								left: ${annotation.x - annotation.width / 2}px;
@@ -475,6 +385,12 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="col-span-1 text-xs" v-if="false">
+					<pre id="output" class="codeblock">{{ filteredAnnotations }}</pre>
+					<pre id="output" class="codeblock">{{ filteredPredictions }}</pre>
+					<pre id="output" class="codeblock">{{ classStyles }}</pre>
+					<pre id="output" class="codeblock">{{ selectedCategories }}</pre>
 				</div>
 			</div>
 		</div>
