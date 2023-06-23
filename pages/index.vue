@@ -1,38 +1,31 @@
 <script setup>
 	import { ref, reactive, toRefs } from 'vue';
 	import annotationsFile from '../public/annotations.json';
-
-	import { Switch } from '@headlessui/vue';
-
 	import axios from 'axios';
 
 	// Constants
-
-	let api_key = ref('kxFwtA4VcEYhiYQBeaZe');
-	let modelId = ref('blood-cell-detection-1ekwu');
-	let version = ref(2);
-
-	let url = `https://detect.roboflow.com/${modelId.value}/${version.value}`;
-	const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-	let params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
+	const api_key = ref('kxFwtA4VcEYhiYQBeaZe'),
+		modelId = ref('blood-cell-detection-1ekwu'),
+		version = ref(2),
+		url = `https://detect.roboflow.com/${modelId.value}/${version.value}`,
+		headers = { 'Content-Type': 'application/x-www-form-urlencoded' },
+		params = { api_key: 'kxFwtA4VcEYhiYQBeaZe' };
 
 	// Reactive variables
-	const result = ref(null);
-	const isLoading = ref(false);
-	const error = ref(null);
-	const fileInput = ref(null);
-	const state = reactive({
-		selectedFiles: new Set(),
-		images: [],
-	});
-
-	let imageIdToFileName = new Map();
-	let trueAnnotations = ref([]);
-	let predictedAnnotations = ref([]);
-	let originalImageWidth = ref(null);
-	let originalImageHeight = ref(null);
-	let scale = ref(1);
-	let selectedCategories = ref([]);
+	let isLoading = ref(false),
+		error = ref(null),
+		fileInput = ref(null),
+		state = reactive({
+			selectedFiles: new Set(),
+			images: [],
+		}),
+		imageIdToFileName = new Map(),
+		trueAnnotations = ref([]),
+		predictedAnnotations = ref([]),
+		originalImageWidth = ref(null),
+		originalImageHeight = ref(null),
+		scale = ref(1),
+		selectedCategories = ref([]);
 
 	// Computed variables
 
@@ -41,40 +34,6 @@
 			return { id: category.id, name: category.name };
 		});
 	});
-
-	// Functions
-	const handleFiles = () => {
-		let file = fileInput.value.files[0];
-		if (!file) {
-			alert('No file selected.');
-			return;
-		}
-		state.images = [];
-		state.selectedFiles = new Set();
-
-		state.selectedFiles.add(file);
-		state.images.push(URL.createObjectURL(file));
-		predictedAnnotations.value = [];
-		trueAnnotations.value = annotationsMap.get(file.name);
-	};
-
-	const onImageLoad = (event) => {
-		originalImageWidth.value = event.target.naturalWidth;
-		originalImageHeight.value = event.target.naturalHeight;
-		scale.value = event.target.width / originalImageWidth.value;
-	};
-
-	const removeImage = (index) => {
-		state.images = [];
-		state.selectedFiles = new Set();
-		predictedAnnotations.value = [];
-		trueAnnotations.value = [];
-		URL.revokeObjectURL(state.images[index]);
-		let file = Array.from(state.selectedFiles)[index];
-		state.selectedFiles.delete(file);
-		state.images.splice(index, 1);
-		fileInput.value.value = '';
-	};
 
 	const filteredAnnotations = computed(() => {
 		if (selectedCategories.value.length === 0) {
@@ -97,6 +56,36 @@
 			);
 		}
 	});
+
+	// Functions
+	const handleFiles = () => {
+		let file = fileInput.value.files[0];
+		state.images = [];
+		state.selectedFiles = new Set();
+
+		state.selectedFiles.add(file);
+		state.images.push(URL.createObjectURL(file));
+		predictedAnnotations.value = [];
+		trueAnnotations.value = annotationsMap.get(file.name);
+	};
+
+	const onImageLoad = (event) => {
+		originalImageWidth.value = event.target.naturalWidth;
+		originalImageHeight.value = event.target.naturalHeight;
+		scale.value = event.target.width / originalImageWidth.value;
+	};
+
+	const removeImage = (index) => {
+		state.images = [];
+		state.selectedFiles = new Set();
+		predictedAnnotations = [];
+		trueAnnotations = [];
+		URL.revokeObjectURL(state.images[index]);
+		let file = Array.from(state.selectedFiles)[index];
+		state.selectedFiles.delete(file);
+		state.images.splice(index, 1);
+		fileInput.value.value = '';
+	};
 
 	let classStyles = computed(() => {
 		let styles = {};
@@ -333,7 +322,7 @@
 			<div class="mt-8 grid grid-cols-3 gap-4">
 				<div
 					class="col-span-2 grid grid-cols-2 gap-4"
-					v-if="selectedCategories.length > 0 && state.images.length > 0"
+					v-if="state.images.length > 0"
 				>
 					<div class="col-span-1">
 						<h2>Annotations</h2>
@@ -370,7 +359,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-span-1" style="width: 416px; height: 416px">
+					<div class="col-span-1" style="width: 416px; height: 416px" v-if="predictedAnnotations.length > 0">
 						<h2>Prediction</h2>
 						<div class="relative col-span-1">
 							<img
